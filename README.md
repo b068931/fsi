@@ -3,7 +3,7 @@ This project is a reworked version of my private repository.
 FSI (these letters literally mean nothing) is a programming language with syntax that resembles assembler, but with bare-bones amount of instructions, so that it is not dependent on a particular architecture. But 'Engine' (a program that executes binary files) works only on x86-64 under Windows systems.
 
 ## Is it intended to solve some particular problem?
-FSI has no purpose at all. I just wanted to write something that can generate machine instructions. Why? Because implementing your own solution is the best way to learn. In this case, I was trying to understand how a language compiler/translator (maybe it is not the best way to phrase it because of the way programs are executed - neither 'translator' nor 'engine' create .exe files).
+FSI has no purpose at all. I just wanted to write something that can generate machine instructions. Why? Because implementing your own solution is the best way to learn. In this case, I was trying to understand how a language compiler/translator (maybe it is not the best way to phrase it because of the way programs are executed - neither 'translator' nor 'engine' create .exe files) might work.
 
 ## How does it work?
 1. 'translator.exe' generates binary file that contains bytecode. (e.g. `translator source.text out.binary include-debug/no-debug`)
