@@ -95,6 +95,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release No .PDB .LIB .EXP|x64'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\Engine\Dynamic Libraries\Core\</OutDir>
     <TargetName>Execution Module</TargetName>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -151,7 +152,9 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <ImportLibrary>NO</ImportLibrary>
+      <ImportLibrary>
+      </ImportLibrary>
+      <AdditionalOptions>/NOIMPLIB /NOEXP %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
