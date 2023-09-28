@@ -1,0 +1,14 @@
+from prts import <io.log.info, pointer.allocate, pointer.deallocate>
+
+$string message ''''Hello World!''''
+
+function main()
+main {
+    $decl pointer message_storage
+    
+    message_storage: prts->pointer.allocate(sizeof message)
+    copy_string var pointer message_storage, str message;
+
+    void: prts->io.log.info(var pointer message_storage)
+    message_storage: prts->pointer.deallocate()
+}

@@ -1,0 +1,23 @@
+from prts import <io.log.info, pointer.allocate, pointer.deallocate>
+
+$define DEFINE_MESSAGE
+$undefine DEFINE_MESSAGE
+
+$ifdef DEFINE_MESSAGE
+$string message ''''Hello World!''''
+$endif
+
+$ifndef DEFINE_MESSAGE
+$string message ''''This is the wrong message. Remove undefine.''''
+$endif
+
+function main()
+main {
+    $decl pointer message_storage
+    
+    message_storage: prts->pointer.allocate(sizeof message)
+    copy_string var pointer message_storage, str message;
+
+    void: prts->io.log.info(var pointer message_storage)
+    message_storage: prts->pointer.deallocate()
+}

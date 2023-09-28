@@ -1,0 +1,16 @@
+#ifndef PRTS_MULTITHREADING_H
+#define PRTS_MULTITHREADING_H
+
+#include "declarations.h"
+
+PROGRAMRUNTIMESERVICES_API return_value yield(arguments_string_type bundle);
+PROGRAMRUNTIMESERVICES_API return_value self_terminate(arguments_string_type bundle);
+PROGRAMRUNTIMESERVICES_API return_value self_priority(arguments_string_type bundle);
+PROGRAMRUNTIMESERVICES_API return_value thread_id(arguments_string_type bundle);
+PROGRAMRUNTIMESERVICES_API return_value thread_group_id(arguments_string_type bundle);
+PROGRAMRUNTIMESERVICES_API return_value dynamic_call(arguments_string_type bundle);
+
+PROGRAMRUNTIMESERVICES_API return_value create_thread(arguments_string_type bundle);
+PROGRAMRUNTIMESERVICES_API return_value create_thread_group(arguments_string_type bundle);
+
+#endif

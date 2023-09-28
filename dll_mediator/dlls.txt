@@ -1,0 +1,87 @@
+-part that actually makes everything work
+[excm:Dynamic Libraries/Core/Execution Module.dll]
+on_container_creation=ullong pointer
+on_thread_creation=ullong ullong
+
+create_thread=ullong pointer pointer ullong
+self_duplicate=pointer pointer ullong
+
+run_program=pointer
+start=ullong
+
+get_current_thread_id=
+get_current_thread_group_id=
+
+self_block=
+make_runnable=ullong
+get_thread_saved_variable=
+self_priority=
+dynamic_call=pointer pointer
+
+-controls creation and destruction of thread and container objects
+[resm:Dynamic Libraries/Core/Resource Module.dll]
+add_container_on_destroy=ullong pointer pointer
+add_thread_on_destroy=ullong pointer pointer
+
+duplicate_container=ullong pointer
+
+create_new_program_container=pointer uint pointer uint pointer ullong pointer ullong
+create_new_thread=ullong
+
+allocate_program_memory=ullong ullong
+allocate_thread_memory=ullong ullong
+
+deallocate_program_container=ullong
+deallocate_thread=ullong
+
+get_running_threads_count=ullong
+get_program_container_id=ullong
+
+get_jump_table=ullong
+get_jump_table_size=ullong
+
+deallocate_program_memory=ullong pointer
+deallocate_thread_memory=ullong pointer
+
+-the most important part that creates instructions
+[progload:Dynamic Libraries/Core/Program Loader.dll]
+load_program_to_memory=pointer
+free_program=pointer uint pointer uint pointer pointer ullong
+
+check_function_arguments=pointer ullong
+get_function_name=ullong
+
+[logger:Dynamic Libraries/Core/Logger.dll]
+info=pointer
+warning=pointer
+error=pointer
+fatal=pointer
+
+program_info=pointer
+program_warning=pointer
+program_error=pointer
+program_fatal=pointer
+
+-allows program to interact with the environment
+[prts:Dynamic Libraries/Core/Program Runtime Services.dll]
+-pointers
+!allocate_pointer:pointer.allocate=pointer uchar ullong
+!deallocate_pointer:pointer.deallocate=pointer uchar
+!get_allocated_size:pointer.allocated_size=pointer uchar pointer
+
+-this thread
+!yield:this_thread.yield=
+!self_terminate:this_thread.terminate=
+!self_priority:this_thread.priority=pointer uchar
+!thread_id:this_thread.id=pointer uchar
+!thread_group_id:this_thread.group_id=pointer uchar
+!dynamic_call:this_thread.dynamic_call=dynamic
+
+-threading
+!create_thread:threading.create=dynamic
+!create_thread_group:threading.create_group=dynamic
+
+-io/logging
+!info:io.log.info=pointer
+!warning:io.log.warning=pointer
+!error:io.log.error=pointer

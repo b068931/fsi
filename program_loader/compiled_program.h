@@ -1,0 +1,20 @@
+#ifndef COMPILED_PROGRAM_STRUCTURE_H
+#define COMPILED_PROGRAM_STRUCTURE_H
+
+#include <cstdint>
+
+struct compiled_program {
+	void** compiled_functions;
+	std::uint32_t functions_count;
+
+	void** exposed_functions;
+	std::uint32_t exposed_functions_count;
+
+	void* jump_table;
+	std::uint64_t jump_table_size;
+
+	void** program_strings;
+	std::uint64_t program_strings_count;
+};
+
+#endif

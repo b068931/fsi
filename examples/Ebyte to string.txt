@@ -1,0 +1,89 @@
+from prts import <io.log.info, pointer.allocate, pointer.deallocate>
+
+$redefine symbol_base 48
+
+function copy(pointer destination, pointer source, ebyte size)
+copy {
+    @repeat;
+    compare var ebyte size, imm ebyte 0;
+    jump_equal pnt end;
+
+    decrement var ebyte size;
+    move ref byte destination[size], ref byte source[size];
+    jump pnt repeat;
+
+    @end;
+}
+
+function reversed_copy(pointer destination, pointer source, ebyte size)
+reversed_copy {
+    $decl ebyte destination_index
+    move var ebyte destination_index, imm ebyte 0;
+
+    @repeat;
+    compare var ebyte size, imm ebyte 0;
+    jump_equal pnt end;
+
+    decrement var ebyte size;
+
+    move ref byte destination[destination_index], ref byte source[size];
+    increment var ebyte destination_index;
+
+    jump pnt repeat;
+    @end;
+}
+
+function ebyte_to_string(ebyte value)
+ebyte_to_string {
+    $decl pointer result
+    $decl pointer result_copy
+
+    $decl ebyte result_size
+    move var ebyte result_size, imm ebyte 0;
+
+    $decl ebyte result_copy_size
+    move var ebyte result_copy_size, imm ebyte 0;
+
+    $decl ebyte symbol
+
+    @repeat;
+    divide var ebyte value, imm ebyte 10;
+    increment var ebyte result_copy_size;
+
+    result_copy: prts->pointer.allocate(var ebyte result_copy_size)
+    copy(var pointer result_copy, var pointer result, var ebyte result_size)
+
+    result: prts->pointer.deallocate()
+
+    load var ebyte symbol;
+    add var ebyte symbol, imm ebyte symbol_base;
+
+    move ref byte result_copy[result_size], var byte symbol;
+
+    pset var pointer result, var pointer result_copy;
+    move var ebyte result_size, var ebyte result_copy_size;
+
+    compare var ebyte value, imm ebyte 0;
+
+    jump_equal pnt end;
+    jump pnt repeat;
+
+    @end;
+    increment var ebyte result_copy_size;
+    result_copy: prts->pointer.allocate(var ebyte result_copy_size)
+    
+    reversed_copy(var pointer result_copy, var pointer result, var ebyte result_size)
+    result: prts->pointer.deallocate()
+
+    save var pointer result_copy;
+}
+
+function main()
+main {
+    $decl pointer message
+
+    ebyte_to_string(imm ebyte 22082023)
+    load var pointer message;
+
+    void: prts->io.log.info(var pointer message)
+}

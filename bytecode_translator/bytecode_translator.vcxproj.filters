@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Examples">
+      <UniqueIdentifier>{7ad379c7-cca2-479f-8187-d01ec66f7e66}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="bytecode_translator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="structure_builder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="parse_map_configuration.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="..\examples\Ebyte to string.txt">
+      <Filter>Examples</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\examples\Hello World!.txt">
+      <Filter>Examples</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\examples\Ping pong (thread groups example).txt">
+      <Filter>Examples</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\examples\Program logic error.txt">
+      <Filter>Examples</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\examples\Remove undefine to make the program work.txt">
+      <Filter>Examples</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\examples\stackoverflow.txt">
+      <Filter>Examples</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\examples\make.bat" />
+  </ItemGroup>
+</Project>

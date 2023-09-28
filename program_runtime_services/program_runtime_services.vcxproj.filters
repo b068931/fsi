@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\PCH">
+      <UniqueIdentifier>{430eda8f-b209-4adb-8912-a1e98b811136}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Base">
+      <UniqueIdentifier>{8ae81805-af01-4143-828a-3b988fe62f2f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Program Services">
+      <UniqueIdentifier>{cbe38442-3118-46cd-b135-21fcfe8b51dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Program Services\Basic">
+      <UniqueIdentifier>{59193ae9-004c-48c4-a80b-46ac461606c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Program Services\IO">
+      <UniqueIdentifier>{f01ed763-447a-4c5c-b176-a83d48617f99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Base">
+      <UniqueIdentifier>{c6f7e82c-8042-41e5-b24e-ae37c8447e1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Program Services">
+      <UniqueIdentifier>{ce899a5a-1dc3-4ee5-9d30-3d682383c07c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Program Services\Basic">
+      <UniqueIdentifier>{c2acb0ac-c1a6-4ef1-9a32-0bd4b93d40c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Program Services\IO">
+      <UniqueIdentifier>{9b78b53d-d233-4530-8452-bff69c9e638f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Maintenance">
+      <UniqueIdentifier>{8af1e863-e399-4756-8da0-6a75f1e2f321}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="framework.h">
+      <Filter>Header Files\PCH</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Header Files\PCH</Filter>
+    </ClInclude>
+    <ClInclude Include="declarations.h">
+      <Filter>Header Files\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="dll_mediator_declarations.h">
+      <Filter>Header Files\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="multithreading.h">
+      <Filter>Header Files\Program Services\Basic</Filter>
+    </ClInclude>
+    <ClInclude Include="pointers.h">
+      <Filter>Header Files\Program Services\Basic</Filter>
+    </ClInclude>
+    <ClInclude Include="logging.h">
+      <Filter>Header Files\Program Services\IO</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="definitions.cpp">
+      <Filter>Source Files\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="dll_mediator_init.cpp">
+      <Filter>Source Files\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="multithreading.cpp">
+      <Filter>Source Files\Program Services\Basic</Filter>
+    </ClCompile>
+    <ClCompile Include="pointers.cpp">
+      <Filter>Source Files\Program Services\Basic</Filter>
+    </ClCompile>
+    <ClCompile Include="logging.cpp">
+      <Filter>Source Files\Program Services\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files\Maintenance</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Source Files\Maintenance</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

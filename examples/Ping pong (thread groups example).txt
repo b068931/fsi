@@ -1,0 +1,79 @@
+from prts import <io.log.info, io.log.warning, pointer.allocate, pointer.deallocate, this_thread.yield, threading.create_group>
+
+$string ping ''''ping''''
+$string pong ''''pong''''
+
+$string warning ''''You should start this application with only one executor, or the output may look strange.''''
+
+function get_ping_string()
+get_ping_string {
+    $decl pointer ping_storage
+    ping_storage: prts->pointer.allocate(sizeof ping)
+
+    copy_string var pointer ping_storage, str ping;
+    save var pointer ping_storage;
+}
+
+function get_pong_string()
+get_pong_string {
+    $decl pointer pong_storage
+    pong_storage: prts->pointer.allocate(sizeof pong)
+
+    copy_string var pointer pong_storage, str pong;
+    save var pointer pong_storage;
+}
+
+function choose_string(byte is_ping)
+choose_string {
+    compare var byte is_ping, imm byte 1;
+    jump_equal pnt ping;
+
+    get_pong_string()
+    jump pnt end;
+
+    @ping;
+    get_ping_string()
+
+    @end;
+}
+
+function show_passed_message_and_switch(ebyte counter, byte is_ping)
+show_passed_message_and_switch {
+    $decl pointer message
+    choose_string(var byte is_ping)
+
+    load var pointer message;
+
+    @repeat;
+    void: prts->io.log.info(var pointer message)
+
+    compare var ebyte counter, imm ebyte 0;
+    jump_equal pnt end;
+
+    decrement var ebyte counter;
+
+    void: prts->this_thread.yield()
+    jump pnt repeat;
+
+    @end;
+    message: prts->pointer.deallocate()
+}
+
+function show_warning()
+show_warning {
+    $decl pointer warning_message
+
+    warning_message: prts->pointer.allocate(sizeof warning)
+    copy_string var pointer warning_message, str warning;
+
+    void: prts->io.log.warning(var pointer warning_message)
+    warning_message: prts->pointer.deallocate()
+}
+
+function main()
+main {
+    show_warning()
+
+    void: prts->threading.create_group(fnc show_passed_message_and_switch, imm ebyte 5, imm byte 0)
+    void: prts->threading.create_group(fnc show_passed_message_and_switch, imm ebyte 5, imm byte 1)
+}
