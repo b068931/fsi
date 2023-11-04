@@ -318,6 +318,17 @@ protected:
 		this->write_bytes(variable_info.first - additional_displacement);
 	}
 	void generate_pointer_size_check() {
+		this->translated_instruction_symbols.push_back('\x49'); //cmp r15, 0
+		this->translated_instruction_symbols.push_back('\x83');
+		this->translated_instruction_symbols.push_back('\xff');
+		this->translated_instruction_symbols.push_back('\x00');
+
+		this->translated_instruction_symbols.push_back('\x75'); //jne nullptr_check
+		this->write_bytes<char>(program_termination_code_size);
+
+		::generate_program_termination_code(this->translated_instruction_symbols, termination_codes::nullptr_dereference);
+		//:nullptr_check
+
 		this->translated_instruction_symbols.push_back('\x4d'); //cmp r8, [r15]
 		this->translated_instruction_symbols.push_back('\x3b');
 		this->translated_instruction_symbols.push_back('\x07');
@@ -334,10 +345,8 @@ protected:
 		for (entity_id dereference_index : pointer->get_dereference_indexes()) {
 			auto variable_info = this->get_variable_info(dereference_index);
 			uint8_t variable_type = variable_info.second;
-			if (variable_type == 4) {
-				this->assert_statement(false, "You can not use pointer as offset index.", pointer->get_id());
-				return;
-			}
+
+			this->assert_statement(variable_type != 4, "You can not use pointer as offset index.", pointer->get_id());
 
 			regular_variable reg_var{ variable_type, variable_type, dereference_index };
 			this->create_variable_instruction_with_two_opcodes('\x02', '\x03', true, &reg_var, 0, additional_displacement);
@@ -348,17 +357,6 @@ protected:
 			this->get_variable_info(pointer->get_id()), 
 			additional_displacement
 		);
-
-		this->translated_instruction_symbols.push_back('\x49'); //cmp r15, 0
-		this->translated_instruction_symbols.push_back('\x83');
-		this->translated_instruction_symbols.push_back('\xff');
-		this->translated_instruction_symbols.push_back('\x00');
-
-		this->translated_instruction_symbols.push_back('\x75'); //jne nullptr_check
-		this->write_bytes<char>(program_termination_code_size);
-
-		::generate_program_termination_code(this->translated_instruction_symbols, termination_codes::nullptr_dereference);
-		//:nullptr_check
 
 		uint32_t active_type_size = static_cast<uint32_t>(
 			memory_layouts_builder::get_variable_size(pointer->get_active_type())
