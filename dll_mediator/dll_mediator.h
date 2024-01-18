@@ -422,6 +422,7 @@ public:
 							{"[", dll_builder::data_file_token::header_open},
 							{"]", dll_builder::data_file_token::header_close},
 							{"=", dll_builder::data_file_token::value_assign},
+							{"\n", dll_builder::data_file_token::new_line},
 							{"\r\n", dll_builder::data_file_token::new_line}
 						},
 						{}

@@ -198,7 +198,7 @@ void dll_mediator::dll_builder::configure_parse_map() {
 
 	inside_value
 		.detached_name(false)
-		.set_error_message("Incorrectly set arguments types")
+		.set_error_message("Incorrectly set arguments types.")
 		.set_handle_tokens({ data_file_token::new_line, data_file_token::end_of_file })
 		.set_redirection_for_token(
 			data_file_token::new_line,
