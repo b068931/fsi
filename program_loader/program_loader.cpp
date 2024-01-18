@@ -326,19 +326,19 @@ return_value load_program_to_memory(arguments_string_type bundle) {
 	char* file_name = static_cast<char*>(std::get<0>(arguments));
 
 	runs_container container; //load file information to memory
-	run_reader<runs_container> reader(std::string{file_name}, &container, 
-		{
-			{0, &runs_container::modules_reader},
-			{1, &runs_container::jump_points_reader},
-			{2, &runs_container::function_signatures_reader},
-			{3, &runs_container::function_bodies_reader},
-			{4, &runs_container::exposed_functions_reader},
-			{5, &runs_container::program_strings_reader},
-			{6, &runs_container::debug_run_reader}
-		}
-	);
-
 	try {
+		run_reader<runs_container> reader(std::string{file_name}, &container, 
+			{
+				{0, &runs_container::modules_reader},
+				{1, &runs_container::jump_points_reader},
+				{2, &runs_container::function_signatures_reader},
+				{3, &runs_container::function_bodies_reader},
+				{4, &runs_container::exposed_functions_reader},
+				{5, &runs_container::program_strings_reader},
+				{6, &runs_container::debug_run_reader}
+			}
+		);
+
 		std::vector<
 			std::pair<memory_layouts_builder::memory_addresses, memory_layouts_builder::memory_addresses>
 		> memory_layouts{ construct_memory_layout(container) };
@@ -378,10 +378,16 @@ return_value load_program_to_memory(arguments_string_type bundle) {
 		else {
 			log_error(get_dll_part(), exc.what());
 		}
-		
-		log_fatal(get_dll_part(), "Program compilation has failed.");
+	}
+	catch (const std::filesystem::filesystem_error& exc) {
+		log_error(get_dll_part(), "Got a filesystem error. Most likely, provided file does not exist or it is not accessible.");
+	}
+	catch (const std::exception& exc) {
+		log_error(get_dll_part(), "Unexpected exception was caught during compilation.");
+		log_error(get_dll_part(), exc.what());
 	}
 
+	log_fatal(get_dll_part(), "Program compilation has failed.");
 	return 1;
 }
 return_value free_program(arguments_string_type bundle) {

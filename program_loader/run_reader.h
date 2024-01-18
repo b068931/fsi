@@ -1,9 +1,10 @@
 #ifndef RUN_READER_H
 #define RUN_READER_H
 
-#include "../dll_mediator/block_reader.h"
 #include <stdint.h>
 #include <map>
+#include <iostream>
+#include "../dll_mediator/block_reader.h"
 
 template<typename container>
 class run_reader {
@@ -56,16 +57,13 @@ public:
 	run_reader(const std::string& file_name, container* cont, std::map<char, container_run_initialize_function> run_initializers) {
 		std::shared_ptr<block_reader<1024>> reader;
 
-		try {
-			reader = std::shared_ptr<block_reader<1024>>{
-				new block_reader<1024>{
-					new std::ifstream{file_name, std::ios::binary},
-					std::filesystem::file_size(file_name)
-				}
-			};
-		}
-		catch (...) { return; }
-
+		reader = std::shared_ptr<block_reader<1024>>{
+			new block_reader<1024>{
+				new std::ifstream{file_name, std::ios::binary},
+				std::filesystem::file_size(file_name)
+			}
+		};
+		
 		for (filepos index = 0, length = reader->get_symbols_count(); (index < length);) {
 			char run_type = reader->get_symbol(index++);
 
