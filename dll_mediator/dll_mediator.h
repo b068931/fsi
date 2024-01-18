@@ -192,7 +192,12 @@ private:
 
 		void load_dll(const std::string& dll_path) {
 			this->loaded_dll = LoadLibraryA(dll_path.c_str());
-			if (this->loaded_dll == NULL) std::abort(); //execution without loaded modules does not make sense
+			if (this->loaded_dll == NULL) {
+				std::cerr << "Unable to load one of the modules. Process will be terminated with std::abort."
+					<< " (Path: " << dll_path << ')' << std::endl;
+
+				std::abort();
+			}
 		}
 		void free_dll() {
 			if (this->loaded_dll != NULL) {
@@ -202,12 +207,22 @@ private:
 				}
 
 				BOOL freed_library = FreeLibrary(this->loaded_dll);
-				if (!freed_library) std::abort();
+				if (!freed_library) {
+					std::cerr << "Unable to correctly dispose one of the modules. Process will be terminated with std::abort."
+						<< " (Name: " << this->name << ')' << std::endl;
+
+					std::abort();
+				}
 			}
 		}
 		void initialize_module(dll_part* mediator) {
 			FARPROC initialize = GetProcAddress(this->loaded_dll, "initialize_m");
-			if (initialize == NULL) std::abort();
+			if (initialize == NULL) {
+				std::cerr << "One of the modules does not define the initialize_m function. Process will be terminated with std::abort."
+					<< "(Name: " << this->name << ')' << std::endl;
+
+				std::abort();
+			}
 
 			((void(*)(dll_part*))initialize)(mediator); //convert and call initialize_m
 		}

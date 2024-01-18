@@ -12,12 +12,15 @@
 #define log_program_error(part, message) ((void)0)
 #define log_program_fatal(part, message) ((void)0)
 #else
+
 #include <string>
+#include <iostream>
 #include "../dll_mediator/dll_part.h"
 
 inline void generic_log_message(dll_part* part, size_t message_type, std::string message) {
 	static size_t logger = part->find_dll_index("logger");
 	if (logger == dll_part::dll_not_found) {
+		std::cerr << "One of the modules requires uses logging. 'logger' was not found. Terminating with std::abort." << std::endl;
 		std::abort();
 	}
 
@@ -36,6 +39,7 @@ inline void generic_log_message(dll_part* part, size_t message_type, std::string
 
 	size_t log_type = logger_indexes[message_type];
 	if (log_type == dll_part::function_not_found) {
+		std::cerr << "One of the required logging functions was not found. Terminating with std::abort." << std::endl;
 		std::abort();
 	}
 
