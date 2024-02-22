@@ -50,13 +50,13 @@ void generic_log_message_with_thread_information(message_type type, arguments_st
 	char* message = static_cast<char*>(std::get<0>(arguments));
 
 	std::stringstream stream{};
-	stream << "[thread:" << fast_call_module(
+	stream << "[thread: " << fast_call_module(
 		::part,
 		index_getter::excm(),
 		index_getter::excm_get_current_thread_id()
 	);
 
-	stream << " thread group:" << fast_call_module(
+	stream << ", thread group: " << fast_call_module(
 		::part,
 		index_getter::excm(),
 		index_getter::excm_get_current_thread_group_id()
