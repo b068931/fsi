@@ -49,18 +49,26 @@ void generic_log_message_with_thread_information(message_type type, arguments_st
 	auto arguments = arguments_string_builder::unpack<void*>(bundle);
 	char* message = static_cast<char*>(std::get<0>(arguments));
 
-	std::stringstream stream{};
-	stream << "[thread: " << fast_call_module(
+	return_value current_thread_id = fast_call_module(
 		::part,
 		index_getter::excm(),
 		index_getter::excm_get_current_thread_id()
 	);
 
-	stream << ", thread group: " << fast_call_module(
+	return_value current_thread_group_id = fast_call_module(
 		::part,
 		index_getter::excm(),
 		index_getter::excm_get_current_thread_group_id()
 	);
+
+	std::stringstream stream{};
+	if ((current_thread_id == 0) && (current_thread_group_id == 0)) {
+		stream << "[ENGINE";
+	}
+	else {
+		stream << "[thread: " << current_thread_id;
+		stream << ", thread group: " << current_thread_group_id;
+	}
 
 	stream << "] " << message;
 	log_message(type, stream.str().c_str());
