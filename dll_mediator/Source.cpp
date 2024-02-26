@@ -18,12 +18,13 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 
+	std::cout << "Type 'okimdone' to exit. Make sure that your program is actually done executing." << std::endl;
+
 	dll_mediator dll_mediator{};
 	std::string error_message = dll_mediator.load_dlls("dlls.txt");
 
 	dll_part* part = dll_mediator.get_dll_part();
 	if (error_message.empty()) {
-		std::cout << "Type 'okimdone' to exit. Make sure that your program is actually done executing." << std::endl;
 
 		size_t excm = part->find_dll_index("excm");
 		size_t startup = part->find_function_index(excm, "start");

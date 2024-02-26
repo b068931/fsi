@@ -379,7 +379,7 @@ return_value load_program_to_memory(arguments_string_type bundle) {
 			log_error(get_dll_part(), exc.what());
 		}
 	}
-	catch (const std::filesystem::filesystem_error& exc) {
+	catch (const std::filesystem::filesystem_error&) {
 		log_error(get_dll_part(), "Got a filesystem error. Most likely, provided file does not exist or it is not accessible.");
 	}
 	catch (const std::exception& exc) {

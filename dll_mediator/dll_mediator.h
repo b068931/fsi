@@ -435,9 +435,14 @@ public:
 			this
 		};
 
-		parser.start(file_name);
-		this->loaded_dlls = parser.get_builder_value();
+		try {
+			parser.start(file_name);
+		}
+		catch (const std::filesystem::filesystem_error&) {
+			return std::string{ "Can not find 'dlls.txt', it is required in order to load appropriate modules." };
+		}
 
+		this->loaded_dlls = parser.get_builder_value();
 		return parser.error();
 	}
 	dll_part* get_dll_part() {
