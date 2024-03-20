@@ -28,7 +28,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "resource_module", "resource
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Executables", "Executables", "{C857E16E-4CDC-448E-9A2E-6079AFEFC914}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Application Setup", "ApplicationSetup\ApplicationSetup.vdproj", "{BB720CD8-9861-4CAC-8B6B-FD54E1A4A7DB}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Application Setup", "application_setup\application_setup.vdproj", "{BB720CD8-9861-4CAC-8B6B-FD54E1A4A7DB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

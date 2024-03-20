@@ -362,3 +362,4 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /ApplicationSetup/appico.png
+/application_setup/appico.ico
