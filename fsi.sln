@@ -30,6 +30,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Executables", "Executables"
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Application Setup", "application_setup\application_setup.vdproj", "{BB720CD8-9861-4CAC-8B6B-FD54E1A4A7DB}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Legal", "Legal", "{EDAA1009-AF0E-4FD1-AAFE-EF360DF81916}"
+	ProjectSection(SolutionItems) = preProject
+		Acknowledgments.txt = Acknowledgments.txt
+		LICENSE.txt = LICENSE.txt
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64

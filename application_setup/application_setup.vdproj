@@ -129,6 +129,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_549F7898F4424B4DA09CF0543870950D"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_5C85676FF5EE40D8BE1289D80F3FC7EA"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -142,6 +148,12 @@
         "Entry"
         {
         "MsmKey" = "8:_7E5E0E2B54AA4110BC848B2049F4B346"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_80575984B67B47E08D9BE14AFCD1A8D1"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -191,6 +203,12 @@
         {
         "MsmKey" = "8:_899F19966554D764D490F4CAD87EA261"
         "OwnerKey" = "8:_3FB58A64CA6648798D76CC4D86FD15F8"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_8E8B7B943305467A9E8DACA5D4004DBF"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -588,6 +606,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_549F7898F4424B4DA09CF0543870950D"
+            {
+            "SourcePath" = "8:..\\Acknowledgments.txt"
+            "TargetName" = "8:Acknowledgments.txt"
+            "Tag" = "8:"
+            "Folder" = "8:_24D880757B13474F849832C8313D4570"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5C85676FF5EE40D8BE1289D80F3FC7EA"
             {
             "SourcePath" = "8:..\\examples\\Program logic error.txt"
@@ -648,6 +686,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_80575984B67B47E08D9BE14AFCD1A8D1"
+            {
+            "SourcePath" = "8:..\\LICENSE.txt"
+            "TargetName" = "8:LICENSE.txt"
+            "Tag" = "8:"
+            "Folder" = "8:_24D880757B13474F849832C8313D4570"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_83842ECE122D47ED9297A2A99250030D"
             {
             "SourcePath" = "8:..\\examples\\Ebyte to string.txt"
@@ -686,6 +744,26 @@
             "Register" = "3:1"
             "Exclude" = "11:TRUE"
             "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_8E8B7B943305467A9E8DACA5D4004DBF"
+            {
+            "SourcePath" = "8:..\\README.md"
+            "TargetName" = "8:README.md"
+            "Tag" = "8:"
+            "Folder" = "8:_24D880757B13474F849832C8313D4570"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_92F2D6B41069A9693DF9A08AFDD7B412"
