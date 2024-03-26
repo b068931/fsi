@@ -15,6 +15,12 @@
     {
         "Entry"
         {
+        "MsmKey" = "8:_0D1FAC7B90774C629B087143237A2706"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_0E128AF58B2744878D545F8680849F08"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -93,13 +99,25 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_389FBE6A92104006AFAA3CA3BDE5F555"
+        "MsmKey" = "8:_307CC2378143433CB5D805B8A4A23266"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_3CB97044B64E465ABBE0DB730A73DBCD"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_3FB58A64CA6648798D76CC4D86FD15F8"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_42A24F6FA3E043BE824DCFF40809CBB7"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -117,13 +135,13 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_4B0E52FB81404D4F82BDF24315540700"
+        "MsmKey" = "8:_4B99833BE0D44EC1BC8EFB9D65CD3719"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_4B99833BE0D44EC1BC8EFB9D65CD3719"
+        "MsmKey" = "8:_545740BBD0BC49F985DE9B1D94D6EC92"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -135,31 +153,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_5C85676FF5EE40D8BE1289D80F3FC7EA"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_6EEB7110525446118BB17606B1CE26E1"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_7E5E0E2B54AA4110BC848B2049F4B346"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_80575984B67B47E08D9BE14AFCD1A8D1"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_83842ECE122D47ED9297A2A99250030D"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -208,6 +202,12 @@
         "Entry"
         {
         "MsmKey" = "8:_8E8B7B943305467A9E8DACA5D4004DBF"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_8F03B53699964E608C4A58ACE14DE943"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -379,6 +379,12 @@
         "OwnerKey" = "8:_85DABA5E01E4411AAD06B5F22766ED32"
         "MsmSig" = "8:_UNDEFINED"
         }
+        "Entry"
+        {
+        "MsmKey" = "8:_EE219CDDAFAA44F9A57E869D7A188BCE"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
     }
     "Configurations"
     {
@@ -466,6 +472,26 @@
         }
         "File"
         {
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0D1FAC7B90774C629B087143237A2706"
+            {
+            "SourcePath" = "8:..\\examples\\Remove Undefine To Make The Program Work.txt"
+            "TargetName" = "8:Remove Undefine To Make The Program Work.txt"
+            "Tag" = "8:"
+            "Folder" = "8:_6B51D42DF1364945B951059526EBC2B8"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_26820C0C0B010719814BDE4081BA4092"
             {
             "SourcePath" = "8:api-ms-win-crt-stdio-l1-1-0.dll"
@@ -526,10 +552,50 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_389FBE6A92104006AFAA3CA3BDE5F555"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_307CC2378143433CB5D805B8A4A23266"
             {
-            "SourcePath" = "8:..\\examples\\stackoverflow.txt"
-            "TargetName" = "8:stackoverflow.txt"
+            "SourcePath" = "8:..\\examples\\Hello World!.txt"
+            "TargetName" = "8:Hello World!.txt"
+            "Tag" = "8:"
+            "Folder" = "8:_6B51D42DF1364945B951059526EBC2B8"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3CB97044B64E465ABBE0DB730A73DBCD"
+            {
+            "SourcePath" = "8:..\\examples\\Ebyte To String.txt"
+            "TargetName" = "8:Ebyte To String.txt"
+            "Tag" = "8:"
+            "Folder" = "8:_6B51D42DF1364945B951059526EBC2B8"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_42A24F6FA3E043BE824DCFF40809CBB7"
+            {
+            "SourcePath" = "8:..\\examples\\Ping Pong (Thread Groups Example).txt"
+            "TargetName" = "8:Ping Pong (Thread Groups Example).txt"
             "Tag" = "8:"
             "Folder" = "8:_6B51D42DF1364945B951059526EBC2B8"
             "Condition" = "8:"
@@ -566,12 +632,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4B0E52FB81404D4F82BDF24315540700"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4B99833BE0D44EC1BC8EFB9D65CD3719"
             {
-            "SourcePath" = "8:..\\examples\\Hello World!.txt"
-            "TargetName" = "8:Hello World!.txt"
+            "SourcePath" = "8:..\\dll_mediator\\dlls.txt"
+            "TargetName" = "8:dlls.txt"
             "Tag" = "8:"
-            "Folder" = "8:_6B51D42DF1364945B951059526EBC2B8"
+            "Folder" = "8:_193912ADD08549EA802630E58105B84D"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -586,12 +652,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4B99833BE0D44EC1BC8EFB9D65CD3719"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_545740BBD0BC49F985DE9B1D94D6EC92"
             {
-            "SourcePath" = "8:..\\dll_mediator\\dlls.txt"
-            "TargetName" = "8:dlls.txt"
+            "SourcePath" = "8:..\\examples\\Dynamic Call.txt"
+            "TargetName" = "8:Dynamic Call.txt"
             "Tag" = "8:"
-            "Folder" = "8:_193912ADD08549EA802630E58105B84D"
+            "Folder" = "8:_6B51D42DF1364945B951059526EBC2B8"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -626,92 +692,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5C85676FF5EE40D8BE1289D80F3FC7EA"
-            {
-            "SourcePath" = "8:..\\examples\\Program logic error.txt"
-            "TargetName" = "8:Program logic error.txt"
-            "Tag" = "8:"
-            "Folder" = "8:_6B51D42DF1364945B951059526EBC2B8"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6EEB7110525446118BB17606B1CE26E1"
-            {
-            "SourcePath" = "8:..\\examples\\Remove undefine to make the program work.txt"
-            "TargetName" = "8:Remove undefine to make the program work.txt"
-            "Tag" = "8:"
-            "Folder" = "8:_6B51D42DF1364945B951059526EBC2B8"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7E5E0E2B54AA4110BC848B2049F4B346"
-            {
-            "SourcePath" = "8:..\\examples\\Ping pong (thread groups example).txt"
-            "TargetName" = "8:Ping pong (thread groups example).txt"
-            "Tag" = "8:"
-            "Folder" = "8:_6B51D42DF1364945B951059526EBC2B8"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_80575984B67B47E08D9BE14AFCD1A8D1"
             {
             "SourcePath" = "8:..\\LICENSE.txt"
             "TargetName" = "8:LICENSE.txt"
             "Tag" = "8:"
             "Folder" = "8:_24D880757B13474F849832C8313D4570"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_83842ECE122D47ED9297A2A99250030D"
-            {
-            "SourcePath" = "8:..\\examples\\Ebyte to string.txt"
-            "TargetName" = "8:Ebyte to string.txt"
-            "Tag" = "8:"
-            "Folder" = "8:_6B51D42DF1364945B951059526EBC2B8"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -752,6 +738,26 @@
             "TargetName" = "8:README.md"
             "Tag" = "8:"
             "Folder" = "8:_24D880757B13474F849832C8313D4570"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_8F03B53699964E608C4A58ACE14DE943"
+            {
+            "SourcePath" = "8:..\\examples\\Stackoverflow.txt"
+            "TargetName" = "8:Stackoverflow.txt"
+            "Tag" = "8:"
+            "Folder" = "8:_6B51D42DF1364945B951059526EBC2B8"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -884,6 +890,26 @@
             "Register" = "3:1"
             "Exclude" = "11:TRUE"
             "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_EE219CDDAFAA44F9A57E869D7A188BCE"
+            {
+            "SourcePath" = "8:..\\examples\\Program Logic Error.txt"
+            "TargetName" = "8:Program Logic Error.txt"
+            "Tag" = "8:"
+            "Folder" = "8:_6B51D42DF1364945B951059526EBC2B8"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
         }

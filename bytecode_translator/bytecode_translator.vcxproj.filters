@@ -34,24 +34,29 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="..\examples\Ebyte to string.txt">
+    <CopyFileToFolders Include="..\examples\Ebyte To String.txt">
       <Filter>Examples</Filter>
     </CopyFileToFolders>
     <CopyFileToFolders Include="..\examples\Hello World!.txt">
       <Filter>Examples</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\examples\Ping pong (thread groups example).txt">
+    <CopyFileToFolders Include="..\examples\Ping Pong %28Thread Groups Example%29.txt">
       <Filter>Examples</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\examples\Program logic error.txt">
+    <CopyFileToFolders Include="..\examples\Program Logic Error.txt">
       <Filter>Examples</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\examples\Remove undefine to make the program work.txt">
+    <CopyFileToFolders Include="..\examples\Remove Undefine To Make The Program Work.txt">
       <Filter>Examples</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\examples\stackoverflow.txt">
+    <CopyFileToFolders Include="..\examples\Stackoverflow.txt">
       <Filter>Examples</Filter>
     </CopyFileToFolders>
     <CopyFileToFolders Include="..\examples\make.bat" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\examples\Dynamic Call.txt">
+      <Filter>Examples</Filter>
+    </Text>
   </ItemGroup>
 </Project>

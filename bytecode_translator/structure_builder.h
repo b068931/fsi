@@ -73,7 +73,6 @@ public:
 		IFNDEF,
 		ENDIF,
 		STACK_SIZE,
-		GENERATE_INTERRUPTS,
 		DECL,
 		function_declaration, //function
 		function_args_start, //(
@@ -133,7 +132,7 @@ public:
 		REF,
 		SHIFT_LEFT,
 		SHIFT_RIGHT,
-		CTJTD,
+		CTJTD, //convert to jump table displacement
 		STRING,
 		string_separator,
 		string_argument,

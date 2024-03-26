@@ -499,7 +499,7 @@ return_value dynamic_call(arguments_string_type bundle) {
 
 	if (inner_check_function_signature(function_address, function_arguments_string) != 0) {
 		log_program_error(
-			::part, "Function signature for function '" + get_exposed_function_name(function_address) +
+			::part, "A function signature for function '" + get_exposed_function_name(function_address) +
 			"' does not match passed arguments. (dynamic call)"
 		);
 
@@ -527,7 +527,7 @@ return_value dynamic_call(arguments_string_type bundle) {
 	);
 
 	if (new_current_stack_position == reinterpret_cast<uintptr_t>(nullptr)) {
-		log_program_error(::part, "Thread stack initialization has failed. (dynamic call)");
+		log_program_error(::part, "The thread stack initialization has failed. (dynamic call)");
 		return 1;
 	}
 
@@ -558,7 +558,7 @@ return_value make_runnable(arguments_string_type bundle) {
 	auto arguments = arguments_string_builder::unpack<return_value>(bundle);
 
 	return_value thread_id = std::get<0>(arguments);
-	log_program_info(::part, "Made thread with id '" + std::to_string(thread_id) + "' runnable again.");
+	log_program_info(::part, "Made a thread with id '" + std::to_string(thread_id) + "' runnable again.");
 
 	manager.make_runnable(thread_id);
 	return 0;

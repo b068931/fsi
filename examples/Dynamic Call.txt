@@ -1,0 +1,29 @@
+from prts import <
+    io.log.info, 
+    pointer.allocate,
+    pointer.deallocate, 
+    this_thread.dynamic_call
+>
+
+function hello_world(pointer the_message)
+hello_world {
+    void: prts->io.log.info(var pointer the_message)
+    the_message: prts->pointer.deallocate()
+}
+
+$string message ''''Hello World!''''
+
+function main()
+main {
+    $decl pointer message_storage
+    $decl ebyte function_address
+    
+    message_storage: prts->pointer.allocate(sizeof message)
+    copy_string var pointer message_storage, str message;
+
+    ctjtd var ebyte function_address, fnc hello_world;
+    void: prts->this_thread.dynamic_call(
+	var ebyte function_address, 
+	var pointer message_storage
+    )
+}

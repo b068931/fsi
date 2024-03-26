@@ -7,6 +7,8 @@ int main(int argc, char** argv) {
 	auto start_time = std::chrono::high_resolution_clock::now();
 	if (argc != 4) {
 		std::cout << "Provide the name of the file to compile and its output destination. And add 'include-debug' or 'no-debug' at the end. It is only three arguments." << std::endl;
+
+		system("pause");
 		return 1;
 	}
 
@@ -123,6 +125,8 @@ int main(int argc, char** argv) {
 	}
 	catch (const std::exception&) {
 		std::cout << "Unable to process the file." << std::endl;
+
+		system("pause");
 		return 1;
 	}
 
@@ -131,8 +135,9 @@ int main(int argc, char** argv) {
 	if (!error.second.empty()) {
 		std::cout << "SYNTAX ERROR:	";
 		std::cout << error.second << std::endl;
-
 		std::cout << " NEAR LINE " << error.first << std::endl;
+
+		system("pause");
 		return 1;
 	}
 
@@ -143,14 +148,20 @@ int main(int argc, char** argv) {
 
 	if (!check_instructions_arugments(parser_value)) {
 		std::cout << "SYNTAX ERROR: each instruction can have no more than " << max_instruction_arguments_count << " arguments" << std::endl;
+
+		system("pause");
 		return 1;
 	}
 	else if (!check_functions_count(parser_value)) {
 		std::cout << "SYNTAX ERROR: you can have no more than " << max_functions_count << " functions in one file" << std::endl;
+
+		system("pause");
 		return 1;
 	}
 	else if (!check_functions_size(parser_value)) {
 		std::cout << "SYNTAX ERROR: you can have no more than " << max_instructions_count << " instructions in each function" << std::endl;
+
+		system("pause");
 		return 1;
 	}
 	else {

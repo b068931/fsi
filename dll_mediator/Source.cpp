@@ -5,7 +5,9 @@
 
 int main(int argc, char** argv) {
 	if (argc != 3) {
-		std::cout << "You need to provide two arguments: executors count and compiled file." << std::endl;
+		std::cout << "You need to provide two arguments: executors count and a compiled file." << std::endl;
+
+		system("pause");
 		return 1;
 	}
 
@@ -15,6 +17,8 @@ int main(int argc, char** argv) {
 	converter >> executors_count;
 	if (!converter.eof()) {
 		std::cout << "The second argument must be an integer." << std::endl;
+
+		system("pause");
 		return 1;
 	}
 

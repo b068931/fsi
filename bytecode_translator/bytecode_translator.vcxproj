@@ -126,7 +126,7 @@
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="..\examples\Ebyte to string.txt">
+    <CopyFileToFolders Include="..\examples\Ebyte To String.txt">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
@@ -148,7 +148,7 @@
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\Examples</DestinationFolders>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release No .PDB .LIB .EXP|x64'">$(OutDir)\Examples</DestinationFolders>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\examples\Ping pong (thread groups example).txt">
+    <CopyFileToFolders Include="..\examples\Ping Pong %28Thread Groups Example%29.txt">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
@@ -159,7 +159,7 @@
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\Examples</DestinationFolders>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release No .PDB .LIB .EXP|x64'">$(OutDir)\Examples</DestinationFolders>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\examples\Program logic error.txt">
+    <CopyFileToFolders Include="..\examples\Program Logic Error.txt">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
@@ -170,7 +170,7 @@
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\Examples</DestinationFolders>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release No .PDB .LIB .EXP|x64'">$(OutDir)\Examples</DestinationFolders>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\examples\Remove undefine to make the program work.txt">
+    <CopyFileToFolders Include="..\examples\Remove Undefine To Make The Program Work.txt">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
@@ -181,7 +181,7 @@
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\Examples</DestinationFolders>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release No .PDB .LIB .EXP|x64'">$(OutDir)\Examples</DestinationFolders>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\examples\stackoverflow.txt">
+    <CopyFileToFolders Include="..\examples\Stackoverflow.txt">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
@@ -206,6 +206,9 @@
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\..\</DestinationFolders>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release No .PDB .LIB .EXP|x64'">$(OutDir)\..\</DestinationFolders>
     </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\examples\Dynamic Call.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
