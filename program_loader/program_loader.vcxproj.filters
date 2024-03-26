@@ -213,9 +213,4 @@
       <Filter>Source Files\Reading Bytecode File And Machine Code Generation</Filter>
     </ClCompile>
   </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="program_loader.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
-  </ItemGroup>
 </Project>

@@ -31,7 +31,6 @@ load_execution_threadf PROC
 load_execution_threadf ENDP
 
 ;saves the state of this thread and loads the state of a program, third argument is used to determine whether this thread needs additional configuration for startup or not
-;сохраняет состояние текущего потока и загружает состояние программы, третий аргумент указывает на то первый ли это запуск потока или нет, если нет, то просто jump, иначе перед jump на стек RSP кладётся адрес завершения выполнения потока
 load_programf PROC
 	;--------------------
 	;save executor state
@@ -105,7 +104,6 @@ special_call_modulef PROC
 special_call_modulef ENDP
 
 ;used to continue an execution of a program (after module has done its work)
-;нужна для продолжения выполнения текущей программы, то есть после того, как модуль выполнит свою задачу, фактически просто сначала возвращает значение RSP до запуска, потом восстанавливает состояние программы
 resume_program_executionf PROC
 	mov r11, [rcx + 16]
 	mov rcx, [rcx + 24]

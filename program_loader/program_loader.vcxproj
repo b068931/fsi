@@ -76,9 +76,6 @@
     <ClCompile Include="program_loader.cpp" />
     <ClCompile Include="runs_container_readers.cpp" />
   </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="program_loader.rc" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>

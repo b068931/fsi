@@ -300,6 +300,7 @@ public:
 									(thread_obj.state == thread_states::runnable) || 
 									(thread_obj.state == thread_states::startup)
 								) { //check if thread is runnable
+									//lock will be released in put_back
 									return true;
 								}
 								else {
