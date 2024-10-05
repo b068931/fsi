@@ -19,10 +19,9 @@ The description of the internals of the source code files requires much more tim
 # Building the project
 As you might have noticed by the .sln file this project is intended to be opened using Visual Studio. Instructions:
 1. Open the SLN file.
-2. Select build options (You should be able to choose from 'Debug', 'Release', or 'Release No .PDB .LIB .EXP')
+2. Select build options (You should be able to choose from 'Debug', 'Release', or 'Release (Installer)')
 3. Go to the output directory and call the executables from the command prompt or start your project directly from Visual Studio. You'll need to select dll\_mediator as your starting project.
 
 # Installing the release
 If you do not want to waste your time on building the project, you might want to use the installer (check the 'releases' section in github).
-Be aware that the installer will create an application in Settings -> Apps -> Installed Apps -> (use search) FSI. You should see a trollface as an icon.
-It is just a silly joke. Don't overthink this.
+Be aware that the installer will create an application in Settings -> Apps -> Installed Apps -> (use search) FSI.

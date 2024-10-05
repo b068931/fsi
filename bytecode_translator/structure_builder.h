@@ -553,7 +553,13 @@ public:
 		switch (token) {
 			case source_file_token::new_line: {
 				++this->error_line;
-				token = source_file_token::name; //all new_line tokens are replaced with name tokens
+
+				if (this->generator->get_additional_token() != source_file_token::end_of_file) { //check if the name is a keyword that has a special token
+					token = this->generator->get_additional_token();
+				}
+				else {
+					token = source_file_token::name;
+				}
 			}
 		}
 

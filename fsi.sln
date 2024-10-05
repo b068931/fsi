@@ -32,7 +32,6 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Application Setup", "applic
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Legal", "Legal", "{EDAA1009-AF0E-4FD1-AAFE-EF360DF81916}"
 	ProjectSection(SolutionItems) = preProject
-		Acknowledgments.txt = Acknowledgments.txt
 		LICENSE.txt = LICENSE.txt
 		README.md = README.md
 	EndProjectSection
@@ -40,38 +39,54 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
+		Release (Installer)|x64 = Release (Installer)|x64
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{18C883CB-68CE-4787-8017-76D8BBEA5F71}.Debug|x64.ActiveCfg = Debug|x64
 		{18C883CB-68CE-4787-8017-76D8BBEA5F71}.Debug|x64.Build.0 = Debug|x64
+		{18C883CB-68CE-4787-8017-76D8BBEA5F71}.Release (Installer)|x64.ActiveCfg = Release (Installer)|x64
+		{18C883CB-68CE-4787-8017-76D8BBEA5F71}.Release (Installer)|x64.Build.0 = Release (Installer)|x64
 		{18C883CB-68CE-4787-8017-76D8BBEA5F71}.Release|x64.ActiveCfg = Release|x64
 		{18C883CB-68CE-4787-8017-76D8BBEA5F71}.Release|x64.Build.0 = Release|x64
 		{E3EEA055-1FCF-456D-96D9-0297F9866563}.Debug|x64.ActiveCfg = Debug|x64
 		{E3EEA055-1FCF-456D-96D9-0297F9866563}.Debug|x64.Build.0 = Debug|x64
+		{E3EEA055-1FCF-456D-96D9-0297F9866563}.Release (Installer)|x64.ActiveCfg = Release (Installer)|x64
+		{E3EEA055-1FCF-456D-96D9-0297F9866563}.Release (Installer)|x64.Build.0 = Release (Installer)|x64
 		{E3EEA055-1FCF-456D-96D9-0297F9866563}.Release|x64.ActiveCfg = Release|x64
 		{E3EEA055-1FCF-456D-96D9-0297F9866563}.Release|x64.Build.0 = Release|x64
 		{EFFA46AB-91B0-4C85-9B61-998018F77CBC}.Debug|x64.ActiveCfg = Debug|x64
 		{EFFA46AB-91B0-4C85-9B61-998018F77CBC}.Debug|x64.Build.0 = Debug|x64
+		{EFFA46AB-91B0-4C85-9B61-998018F77CBC}.Release (Installer)|x64.ActiveCfg = Release (Installer)|x64
+		{EFFA46AB-91B0-4C85-9B61-998018F77CBC}.Release (Installer)|x64.Build.0 = Release (Installer)|x64
 		{EFFA46AB-91B0-4C85-9B61-998018F77CBC}.Release|x64.ActiveCfg = Release|x64
 		{EFFA46AB-91B0-4C85-9B61-998018F77CBC}.Release|x64.Build.0 = Release|x64
 		{C32F169C-7C46-4F51-B67C-B7E732B9ED14}.Debug|x64.ActiveCfg = Debug|x64
 		{C32F169C-7C46-4F51-B67C-B7E732B9ED14}.Debug|x64.Build.0 = Debug|x64
+		{C32F169C-7C46-4F51-B67C-B7E732B9ED14}.Release (Installer)|x64.ActiveCfg = Release (Installer)|x64
+		{C32F169C-7C46-4F51-B67C-B7E732B9ED14}.Release (Installer)|x64.Build.0 = Release (Installer)|x64
 		{C32F169C-7C46-4F51-B67C-B7E732B9ED14}.Release|x64.ActiveCfg = Release|x64
 		{C32F169C-7C46-4F51-B67C-B7E732B9ED14}.Release|x64.Build.0 = Release|x64
 		{A455276F-6B76-4598-878B-8C250A0CD49F}.Debug|x64.ActiveCfg = Debug|x64
 		{A455276F-6B76-4598-878B-8C250A0CD49F}.Debug|x64.Build.0 = Debug|x64
+		{A455276F-6B76-4598-878B-8C250A0CD49F}.Release (Installer)|x64.ActiveCfg = Release (Installer)|x64
+		{A455276F-6B76-4598-878B-8C250A0CD49F}.Release (Installer)|x64.Build.0 = Release (Installer)|x64
 		{A455276F-6B76-4598-878B-8C250A0CD49F}.Release|x64.ActiveCfg = Release|x64
 		{A455276F-6B76-4598-878B-8C250A0CD49F}.Release|x64.Build.0 = Release|x64
 		{FFFB66E6-5E8C-4F95-B0E8-A546ABEB983D}.Debug|x64.ActiveCfg = Debug|x64
 		{FFFB66E6-5E8C-4F95-B0E8-A546ABEB983D}.Debug|x64.Build.0 = Debug|x64
+		{FFFB66E6-5E8C-4F95-B0E8-A546ABEB983D}.Release (Installer)|x64.ActiveCfg = Release (Installer)|x64
+		{FFFB66E6-5E8C-4F95-B0E8-A546ABEB983D}.Release (Installer)|x64.Build.0 = Release (Installer)|x64
 		{FFFB66E6-5E8C-4F95-B0E8-A546ABEB983D}.Release|x64.ActiveCfg = Release|x64
 		{FFFB66E6-5E8C-4F95-B0E8-A546ABEB983D}.Release|x64.Build.0 = Release|x64
 		{61A05BF4-34D6-48EB-A39B-ADEE8898671E}.Debug|x64.ActiveCfg = Debug|x64
 		{61A05BF4-34D6-48EB-A39B-ADEE8898671E}.Debug|x64.Build.0 = Debug|x64
+		{61A05BF4-34D6-48EB-A39B-ADEE8898671E}.Release (Installer)|x64.ActiveCfg = Release (Installer)|x64
+		{61A05BF4-34D6-48EB-A39B-ADEE8898671E}.Release (Installer)|x64.Build.0 = Release (Installer)|x64
 		{61A05BF4-34D6-48EB-A39B-ADEE8898671E}.Release|x64.ActiveCfg = Release|x64
 		{61A05BF4-34D6-48EB-A39B-ADEE8898671E}.Release|x64.Build.0 = Release|x64
 		{BB720CD8-9861-4CAC-8B6B-FD54E1A4A7DB}.Debug|x64.ActiveCfg = Debug
+		{BB720CD8-9861-4CAC-8B6B-FD54E1A4A7DB}.Release (Installer)|x64.ActiveCfg = Release (Installer)
 		{BB720CD8-9861-4CAC-8B6B-FD54E1A4A7DB}.Release|x64.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution

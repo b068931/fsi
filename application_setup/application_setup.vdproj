@@ -129,12 +129,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_49BB0F7666FB456C98E83A5FD7587565"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_4B99833BE0D44EC1BC8EFB9D65CD3719"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -142,12 +136,6 @@
         "Entry"
         {
         "MsmKey" = "8:_545740BBD0BC49F985DE9B1D94D6EC92"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_549F7898F4424B4DA09CF0543870950D"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -452,6 +440,38 @@
                 }
             }
         }
+        "Release (Installer)"
+        {
+        "DisplayName" = "8:Release (Installer)"
+        "IsDebugOnly" = "11:FALSE"
+        "IsReleaseOnly" = "11:FALSE"
+        "OutputFilename" = "8:Release (Installer)\\fsi_setup.msi"
+        "PackageFilesAs" = "3:2"
+        "PackageFileSize" = "3:-2147483648"
+        "CabType" = "3:1"
+        "Compression" = "3:2"
+        "SignOutput" = "11:FALSE"
+        "CertificateFile" = "8:"
+        "PrivateKeyFile" = "8:"
+        "TimeStampServer" = "8:"
+        "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.Visual.C++.14.0.x64"
+                    {
+                    "Name" = "8:Visual C++ \"14\" Runtime Libraries (x64)"
+                    "ProductCode" = "8:Microsoft.Visual.C++.14.0.x64"
+                    }
+                }
+            }
+        }
     }
     "Deployable"
     {
@@ -612,26 +632,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_49BB0F7666FB456C98E83A5FD7587565"
-            {
-            "SourcePath" = "8:appico.ico"
-            "TargetName" = "8:appico.ico"
-            "Tag" = "8:"
-            "Folder" = "8:_24D880757B13474F849832C8313D4570"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4B99833BE0D44EC1BC8EFB9D65CD3719"
             {
             "SourcePath" = "8:..\\dll_mediator\\dlls.txt"
@@ -658,26 +658,6 @@
             "TargetName" = "8:Dynamic Call.txt"
             "Tag" = "8:"
             "Folder" = "8:_6B51D42DF1364945B951059526EBC2B8"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_549F7898F4424B4DA09CF0543870950D"
-            {
-            "SourcePath" = "8:..\\Acknowledgments.txt"
-            "TargetName" = "8:Acknowledgments.txt"
-            "Tag" = "8:"
-            "Folder" = "8:_24D880757B13474F849832C8313D4570"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1023,15 +1003,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:FSI"
-        "ProductCode" = "8:{A92D7E21-9727-4E08-926A-E16FED297C84}"
-        "PackageCode" = "8:{293D943C-36AF-4AF1-A3F9-887A119A4E74}"
+        "ProductCode" = "8:{E503F26E-E953-469C-B124-E8ECE9AE5C1F}"
+        "PackageCode" = "8:{E13876C7-21C5-44E4-B878-38C03DB49FFA}"
         "UpgradeCode" = "8:{95F50751-258F-4D59-AC9D-6B28888B41F6}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:0.1.0"
+        "ProductVersion" = "8:0.1.1"
         "Manufacturer" = "8:b068931"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -1041,7 +1021,7 @@
         "Keywords" = "8:"
         "ARPCOMMENTS" = "8:A useless piece of software."
         "ARPURLINFOABOUT" = "8:"
-        "ARPPRODUCTICON" = "8:_49BB0F7666FB456C98E83A5FD7587565"
+        "ARPPRODUCTICON" = "8:"
         "ARPIconIndex" = "3:0"
         "SearchPath" = "8:"
         "UseSystemSearchPath" = "11:TRUE"
@@ -1239,8 +1219,8 @@
                             "Type" = "3:3"
                             "ContextData" = "8:"
                             "Attributes" = "3:0"
-                            "Setting" = "3:1"
-                            "Value" = "8:#1202"
+                            "Setting" = "3:2"
+                            "Value" = "8:"
                             "DefaultValue" = "8:#1202"
                             "UsePlugInResources" = "11:TRUE"
                             }
@@ -1545,7 +1525,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_0E128AF58B2744878D545F8680849F08"
             {
-            "SourcePath" = "8:..\\x64\\Release\\Engine\\Dynamic Libraries\\Core\\Resource Module.dll"
+            "SourcePath" = "8:..\\x64\\Release (Installer)\\Engine\\Dynamic Libraries\\Core\\Resource Module.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_1FBE022B092241B49274ABC6DDA79674"
@@ -1573,7 +1553,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_3FB58A64CA6648798D76CC4D86FD15F8"
             {
-            "SourcePath" = "8:..\\x64\\Release\\Engine\\mediator.exe"
+            "SourcePath" = "8:..\\x64\\Release (Installer)\\Engine\\mediator.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_193912ADD08549EA802630E58105B84D"
@@ -1601,7 +1581,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_466B7B31E1EB4FADAFBAC584D0CB4888"
             {
-            "SourcePath" = "8:..\\x64\\Release\\Engine\\Dynamic Libraries\\Core\\Program Runtime Services.dll"
+            "SourcePath" = "8:..\\x64\\Release (Installer)\\Engine\\Dynamic Libraries\\Core\\Program Runtime Services.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_1FBE022B092241B49274ABC6DDA79674"
@@ -1629,7 +1609,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_85DABA5E01E4411AAD06B5F22766ED32"
             {
-            "SourcePath" = "8:..\\x64\\Release\\Translator\\translator.exe"
+            "SourcePath" = "8:..\\x64\\Release (Installer)\\Translator\\translator.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_266D926C8E3A4787808280F14CA29CEC"
@@ -1657,7 +1637,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_9771A5D5761840788E03017567764D6F"
             {
-            "SourcePath" = "8:..\\x64\\Release\\Engine\\Dynamic Libraries\\Core\\Logger.dll"
+            "SourcePath" = "8:..\\x64\\Release (Installer)\\Engine\\Dynamic Libraries\\Core\\Logger.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_1FBE022B092241B49274ABC6DDA79674"
@@ -1685,7 +1665,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_A878F0B9A7CE4A35998E364C55086589"
             {
-            "SourcePath" = "8:..\\x64\\Release\\Engine\\Dynamic Libraries\\Core\\Execution Module.dll"
+            "SourcePath" = "8:..\\x64\\Release (Installer)\\Engine\\Dynamic Libraries\\Core\\Execution Module.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_1FBE022B092241B49274ABC6DDA79674"
@@ -1713,7 +1693,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_D1D421D49FC141FB8A6BBD35EC01D22B"
             {
-            "SourcePath" = "8:..\\x64\\Release\\Engine\\Dynamic Libraries\\Core\\Program Loader.dll"
+            "SourcePath" = "8:..\\x64\\Release (Installer)\\Engine\\Dynamic Libraries\\Core\\Program Loader.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_1FBE022B092241B49274ABC6DDA79674"
