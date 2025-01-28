@@ -1,89 +1,93 @@
 from prts import <io.log.info, pointer.allocate, pointer.deallocate>
 
-$redefine symbol_base 48
+$redefine symbol-base 48
 
-function copy(pointer destination, pointer source, ebyte size)
+function copy(pointer destination, pointer source, eight-bytes size)
 copy {
-    @repeat;
-    compare var ebyte size, imm ebyte 0;
-    jump_equal pnt end;
+    $declare one-byte why-not
+    move variable one-byte why-not, immediate one-byte 0;
 
-    decrement var ebyte size;
-    move ref byte destination[size], ref byte source[size];
-    jump pnt repeat;
+    @repeat;
+    compare variable eight-bytes size, immediate eight-bytes 0;
+    jump-equal point end;
+
+    decrement variable eight-bytes size;
+    /*technically pointer dereference is supported for many variables, but it is not shown anywhere so it is here for demonstration purposes*/
+    move dereference one-byte destination[size, why-not], dereference one-byte source[size];
+    jump point repeat;
 
     @end;
 }
 
-function reversed_copy(pointer destination, pointer source, ebyte size)
-reversed_copy {
-    $decl ebyte destination_index
-    move var ebyte destination_index, imm ebyte 0;
+function reversed-copy(pointer destination, pointer source, eight-bytes size)
+reversed-copy {
+    $declare eight-bytes destination-index
+    move variable eight-bytes destination-index, immediate eight-bytes 0;
 
     @repeat;
-    compare var ebyte size, imm ebyte 0;
-    jump_equal pnt end;
+    compare variable eight-bytes size, immediate eight-bytes 0;
+    jump-equal point end;
 
-    decrement var ebyte size;
+    decrement variable eight-bytes size;
 
-    move ref byte destination[destination_index], ref byte source[size];
-    increment var ebyte destination_index;
+    move dereference one-byte destination[destination-index], dereference one-byte source[size];
+    increment variable eight-bytes destination-index;
 
-    jump pnt repeat;
+    jump point repeat;
     @end;
 }
 
-function ebyte_to_string(ebyte value)
-ebyte_to_string {
-    $decl pointer result
-    $decl pointer result_copy
+function ebyte-to-string(eight-bytes value)
+ebyte-to-string {
+    $declare pointer result
+    $declare pointer result-copy
 
-    $decl ebyte result_size
-    move var ebyte result_size, imm ebyte 0;
+    $declare eight-bytes result-size
+    move variable eight-bytes result-size, immediate eight-bytes 0;
 
-    $decl ebyte result_copy_size
-    move var ebyte result_copy_size, imm ebyte 0;
+    $declare eight-bytes result-copy-size
+    move variable eight-bytes result-copy-size, immediate eight-bytes 0;
 
-    $decl ebyte symbol
+    $declare eight-bytes symbol
 
     @repeat;
-    divide var ebyte value, imm ebyte 10;
-    increment var ebyte result_copy_size;
+    divide variable eight-bytes value, immediate eight-bytes 10;
+    increment variable eight-bytes result-copy-size;
 
-    result_copy: prts->pointer.allocate(var ebyte result_copy_size)
-    copy(var pointer result_copy, var pointer result, var ebyte result_size)
+    result-copy: prts->pointer.allocate(variable eight-bytes result-copy-size)
+    copy(variable pointer result-copy, variable pointer result, variable eight-bytes result-size)
 
     result: prts->pointer.deallocate()
 
-    load var ebyte symbol;
-    add var ebyte symbol, imm ebyte symbol_base;
+    load-value variable eight-bytes symbol;
+    add variable eight-bytes symbol, immediate eight-bytes symbol-base;
 
-    move ref byte result_copy[result_size], var byte symbol;
+    move dereference one-byte result-copy[result-size], variable one-byte symbol;
 
-    pset var pointer result, var pointer result_copy;
-    move var ebyte result_size, var ebyte result_copy_size;
+    move-pointer variable pointer result, variable pointer result-copy;
+    move variable eight-bytes result-size, variable eight-bytes result-copy-size;
 
-    compare var ebyte value, imm ebyte 0;
+    compare variable eight-bytes value, immediate eight-bytes 0;
 
-    jump_equal pnt end;
-    jump pnt repeat;
+    jump-equal point end;
+    jump point repeat;
 
     @end;
-    increment var ebyte result_copy_size;
-    result_copy: prts->pointer.allocate(var ebyte result_copy_size)
-    
-    reversed_copy(var pointer result_copy, var pointer result, var ebyte result_size)
+    increment variable eight-bytes result-copy-size;
+    result-copy: prts->pointer.allocate(variable eight-bytes result-copy-size)
+   
+    reversed-copy(variable pointer result-copy, variable pointer result, variable eight-bytes result-size)
     result: prts->pointer.deallocate()
 
-    save var pointer result_copy;
+    save-value variable pointer result-copy;
 }
 
 function main()
 main {
-    $decl pointer message
+    $declare pointer message
 
-    ebyte_to_string(imm ebyte 22082023)
-    load var pointer message;
+    ebyte-to-string(immediate eight-bytes 22082023)
+    load-value variable pointer message;
 
-    void: prts->io.log.info(var pointer message)
+    void: prts->io.log.info(variable pointer message)
 }

@@ -41,7 +41,7 @@ int main(int argc, char** argv) {
 		part->call_module(excm, startup, args.get());
 	}
 	else {
-		std::cout << error_message << std::endl;
+		std::cout << "Could not correctly parse dlls.txt: " << error_message << std::endl;
 	}
 
 	std::string user_input{};

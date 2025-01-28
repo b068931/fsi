@@ -153,17 +153,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="block_reader.h" />
     <ClInclude Include="fsi_types.h" />
-    <ClInclude Include="read_map.h" />
+    <ClInclude Include="function_with_exported_name_state.h" />
+    <ClInclude Include="inside_header_state.h" />
+    <ClInclude Include="inside_value_state.h" />
+    <ClInclude Include="main_state.h" />
     <ClInclude Include="dll_part.h" />
-    <ClInclude Include="generic_parser.h" />
-    <ClInclude Include="typename_array.h" />
+    <ClInclude Include="type_definitions.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dll_mediator.h" />
     <ClCompile Include="parse_map_configuration.cpp" />
-    <ClCompile Include="Source.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="dlls.txt">

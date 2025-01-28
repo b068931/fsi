@@ -1,7 +1,7 @@
 #ifndef DLL_MEDIATOR
 #define DLL_MEDIATOR
 
-#define NOMINMAX
+#define NOMINMAX 
 #include <Windows.h>
 #include <sstream>
 #include <cassert>
@@ -10,10 +10,11 @@
 #include <algorithm>
 #include <stdexcept>
 
-#include "typename_array.h"
+#include "../typename_array/typename_array.h"
 #include "dll_part.h"
-#include "generic_parser.h"
-#include "read_map.h"
+#include "../generic_parser/token_generator.h"
+#include "../generic_parser/parser_facade.h"
+#include "../generic_parser/read_map.h"
 #include "../console_and_debug/logging.h"
 
 /*
@@ -21,6 +22,287 @@
 * the same memory location, the expressions are said to conflict."
 * find_dll_index, find_function_index, call_module should not modify memory locations in any way
 */
+
+using module_callable_function_type = return_value(*)(arguments_string_type);
+class function {
+private:
+	std::string name; //this function's name. used to identify its index
+	arguments_string_type arguments_symbols; //a sequence of bytes that represent this function's arguments
+
+	bool visible;
+	module_callable_function_type function_address;
+
+	/*
+		Structure:
+		first byte - size of this string (including first byte and arguments' types, but excluding arguments' values)
+		other bytes:
+		0 = char,
+		1 = uchar,
+		2 = short,
+		3 = ushort,
+		4 = int,
+		5 = uint,
+		6 = long,
+		7 = ulong,
+		8 = llong,
+		9 = ullong,
+		10 = pointer
+
+		Values of these arguments
+	*/
+
+	void delete_arguments_symbols() {
+		delete this->arguments_symbols;
+		this->arguments_symbols = nullptr;
+	}
+	void move_value(function&& old_value) {
+		this->arguments_symbols = old_value.arguments_symbols;
+		this->name = std::move(old_value.name);
+		this->visible = old_value.visible;
+		this->function_address = old_value.function_address;
+
+		old_value.arguments_symbols = nullptr;
+	}
+
+	bool compare_arguments_strings_arguments_count(arguments_string_type arguments_symbols) const {
+		return arguments_symbols[0] == this->arguments_symbols[0];
+	}
+	bool check_arguments_strings_arguments_types(arguments_string_type arguments_symbols) const {
+		return std::memcmp(arguments_symbols, this->arguments_symbols, static_cast<size_t>(this->arguments_symbols[0]) + 1) == 0;
+	}
+public:
+	function()
+		:arguments_symbols{ nullptr },
+		visible{ false },
+		function_address{ nullptr }
+	{}
+
+	function(std::string&& name, module_callable_function_type function_address, arguments_string_type arguments_symbols, bool visible)
+		:name{ std::move(name) },
+		arguments_symbols{ arguments_symbols },
+		visible{ visible },
+		function_address{ function_address }
+	{}
+
+	function(const function&) = delete; //this type is used with std::vector which does not generally require copy constructor (only with special functions)
+	void operator= (const function&) = delete;
+
+	function(function&& old_value) noexcept {
+		this->move_value(std::move(old_value));
+	}
+	void operator= (function&& old_value) noexcept {
+		this->delete_arguments_symbols();
+		this->move_value(std::move(old_value));
+	}
+
+	bool compare_names(std::string_view name) const { return this->name == name; }
+	bool compare_arguments_types(arguments_string_type arguments_symbols) const { //true if equal
+		assert(arguments_symbols && "null pointer");
+		if (this->arguments_symbols == nullptr) { //if function has no arguments symbols it means that it automatically accepts all arguments
+			return true;
+		}
+
+		if (this->compare_arguments_strings_arguments_count(arguments_symbols)) {
+			return this->check_arguments_strings_arguments_types(arguments_symbols);
+		}
+
+		return false;
+	}
+
+	bool is_visible() const { return this->visible; }
+	return_value call(arguments_string_type arguments) const {
+		return this->function_address(arguments);
+	}
+
+	~function() {
+		this->delete_arguments_symbols();
+	}
+};
+
+class dll {
+private:
+	std::string name; //used to find dll's index
+	HMODULE loaded_dll;
+
+	std::vector<function> functions;
+
+	void move_value(dll&& old_value) {
+		this->name = std::move(old_value.name);
+		this->functions = std::move(old_value.functions);
+
+		this->loaded_dll = old_value.loaded_dll;
+		old_value.loaded_dll = NULL;
+	}
+	void free_resources() {
+		this->free_dll();
+	}
+
+	void load_dll(const std::string& dll_path) {
+		this->loaded_dll = LoadLibraryA(dll_path.c_str());
+		if (this->loaded_dll == NULL) {
+			std::cerr << "Unable to load one of the modules. Process will be terminated with std::abort."
+				<< " (Path: " << dll_path << ')' << std::endl;
+
+			std::abort();
+		}
+	}
+	void free_dll() {
+		if (this->loaded_dll != NULL) {
+			FARPROC free = GetProcAddress(this->loaded_dll, "free_m");
+			if (free != NULL) {
+				((void(*)())free)();
+			}
+
+			BOOL freed_library = FreeLibrary(this->loaded_dll);
+			if (!freed_library) {
+				std::cerr << "Unable to correctly dispose one of the modules. Process will be terminated with std::abort."
+					<< " (Name: " << this->name << ')' << std::endl;
+
+				std::abort();
+			}
+		}
+	}
+	void initialize_module(dll_part* mediator) {
+		FARPROC initialize = GetProcAddress(this->loaded_dll, "initialize_m");
+		if (initialize == NULL) {
+			std::cerr << "One of the modules does not define the initialize_m function. Process will be terminated with std::abort."
+				<< "(Name: " << this->name << ')' << std::endl;
+
+			std::abort();
+		}
+
+		((void(*)(dll_part*))initialize)(mediator); //convert and call initialize_m
+	}
+public:
+	dll(
+		std::string&& dll_name, 
+		std::string&& dll_path, 
+		dll_part* mediator //pointer to dll_part allows to access some of the dll_mediator functions
+	)
+		:name{ std::move(dll_name) },
+		loaded_dll{ NULL }
+	{
+		this->load_dll(dll_path);
+		this->initialize_module(mediator);
+	}
+
+	dll(const dll&) = delete;
+	void operator= (const dll&) = delete;
+
+	dll(dll&& old_value) noexcept {
+		this->move_value(std::move(old_value));
+	}
+	void operator= (dll&& old_value) noexcept {
+		this->free_resources();
+		this->move_value(std::move(old_value));
+	}
+
+	const std::string& get_name() const {
+		return this->name;
+	}
+
+	bool compare_names(std::string_view name) const { return this->name == name; }
+	size_t find_function_index(std::string_view name) const {
+		for (size_t find_index = 0, size = this->functions.size(); find_index < size; ++find_index) {
+			if (this->functions[find_index].compare_names(name)) {
+				return find_index;
+			}
+		}
+
+		return dll_part::function_not_found;
+	}
+	
+	const function& get_function(size_t index) const { 
+		return this->functions.at(index); 
+	}
+	bool add_function(const std::string& name, std::string&& export_name, arguments_string_type arguments_string, bool is_visible) {
+		FARPROC loaded_function = GetProcAddress(this->loaded_dll, name.c_str());
+		if (loaded_function == NULL)
+			return false;
+
+		this->functions.push_back(
+			function{
+				std::move(export_name),
+				(module_callable_function_type)loaded_function, 
+				arguments_string, 
+				is_visible
+			}
+		);
+
+		return true;
+	}
+
+	~dll() {
+		this->free_resources();
+	}
+};
+
+class dll_mediator;
+class dll_builder {
+	public:
+		struct builder_parameters {
+			dll_part* dll_part{};
+			std::vector<std::string> arguments{ "char", "uchar", "short", "ushort", "int", "uint", "long", "ulong", "llong", "ullong", "pointer" };
+
+			std::string module_name;
+
+			bool is_visible{ false };
+			std::string function_name;
+			std::string function_exported_name;
+		};
+
+		enum class file_tokens {
+			end_of_file,
+			name, //this token is ignored, because configuration of token_generator for this class does not have base_separators
+			new_line,
+			header_open,
+			header_close,
+			value_assign,
+			comment,
+			name_and_public_name_separator,
+			program_callable_function
+		};
+		enum class dynamic_parameters_keys {}; //unused
+		enum class context_keys {
+			main_context
+		};
+
+		using read_map_type = generic_parser::read_map<file_tokens, context_keys, std::vector<dll>, builder_parameters, dynamic_parameters_keys>;
+		using result_type = std::vector<dll>;
+	private:
+		std::vector<dll> dlls;
+		builder_parameters parameters;
+
+		generic_parser::token_generator<file_tokens, context_keys>* generator;
+		std::vector<std::pair<std::string, dll_builder::file_tokens>>* names_stack;
+		
+		dll_mediator* mediator;
+
+		read_map_type parse_map;
+		void configure_parse_map();
+
+	public:
+		dll_builder(
+			std::vector<std::pair<std::string, dll_builder::file_tokens>>* names_stack, 
+			generic_parser::token_generator<dll_builder::file_tokens, context_keys>* token_generator, 
+			dll_mediator* mediator
+		) //"mediator" will be used to initialize dll objects
+			:parse_map{file_tokens::end_of_file, file_tokens::name, token_generator},
+			generator{token_generator},
+			names_stack{names_stack},
+			mediator{mediator}
+		{
+			this->configure_parse_map();
+		}
+
+		const std::string& error() { return this->parse_map.error(); }
+		bool is_working() { return this->parse_map.is_working(); }
+		void handle_token(dll_builder::file_tokens token) { 
+			this->parse_map.handle_token(&this->dlls, token, &this->parameters);
+		}
+		result_type get_value() { return std::move(this->dlls); }
+	};
+
 class dll_mediator {
 private:
 	class dll_part_implementation : public dll_part {
@@ -75,287 +357,6 @@ private:
 		}
 	};
 
-	class dll_builder;
-	using module_callable_function_type = return_value(*)(arguments_string_type);
-
-	class function {
-	private:
-		std::string name; //this function's name. used to identify its index
-		arguments_string_type arguments_symbols; //a sequence of bytes that represent this function's arguments
-
-		bool visible;
-		module_callable_function_type function_address;
-
-		/*
-			Structure:
-			first byte - size of this string (including first byte and arguments' types, but excluding arguments' values)
-			other bytes:
-			0 = char,
-			1 = uchar,
-			2 = short,
-			3 = ushort,
-			4 = int,
-			5 = uint,
-			6 = long,
-			7 = ulong,
-			8 = llong,
-			9 = ullong,
-			10 = pointer
-
-			Values of these arguments
-		*/
-
-		void delete_arguments_symbols() {
-			delete this->arguments_symbols;
-			this->arguments_symbols = nullptr;
-		}
-		void move_value(function&& old_value) {
-			this->arguments_symbols = old_value.arguments_symbols;
-			this->name = std::move(old_value.name);
-			this->visible = old_value.visible;
-			this->function_address = old_value.function_address;
-
-			old_value.arguments_symbols = nullptr;
-		}
-
-		bool compare_arguments_strings_arguments_count(arguments_string_type arguments_symbols) const {
-			return arguments_symbols[0] == this->arguments_symbols[0];
-		}
-		bool check_arguments_strings_arguments_types(arguments_string_type arguments_symbols) const {
-			return std::memcmp(arguments_symbols, this->arguments_symbols, static_cast<size_t>(this->arguments_symbols[0]) + 1) == 0;
-		}
-	public:
-		function()
-			:arguments_symbols{ nullptr },
-			visible{ false },
-			function_address{ nullptr }
-		{}
-
-		function(std::string&& name, module_callable_function_type function_address, arguments_string_type arguments_symbols, bool visible)
-			:name{ std::move(name) },
-			arguments_symbols{ arguments_symbols },
-			visible{ visible },
-			function_address{ function_address }
-		{}
-
-		function(const function&) = delete; //this type is used with std::vector which does not generally require copy constructor (only with special functions)
-		void operator= (const function&) = delete;
-
-		function(function&& old_value) noexcept {
-			this->move_value(std::move(old_value));
-		}
-		void operator= (function&& old_value) noexcept {
-			this->delete_arguments_symbols();
-			this->move_value(std::move(old_value));
-		}
-
-		bool compare_names(std::string_view name) const { return this->name == name; }
-		bool compare_arguments_types(arguments_string_type arguments_symbols) const { //true if equal
-			assert(arguments_symbols && "null pointer");
-			if (this->arguments_symbols == nullptr) { //if function has no arguments symbols it means that it automatically accepts all arguments
-				return true;
-			}
-
-			if (this->compare_arguments_strings_arguments_count(arguments_symbols)) {
-				return this->check_arguments_strings_arguments_types(arguments_symbols);
-			}
-
-			return false;
-		}
-
-		bool is_visible() const { return this->visible; }
-		return_value call(arguments_string_type arguments) const {
-			return this->function_address(arguments);
-		}
-
-		~function() {
-			this->delete_arguments_symbols();
-		}
-	};
-	class dll {
-	private:
-		std::string name; //used to find dll's index
-		HMODULE loaded_dll;
-
-		std::vector<function> functions;
-
-		void move_value(dll&& old_value) {
-			this->name = std::move(old_value.name);
-			this->functions = std::move(old_value.functions);
-
-			this->loaded_dll = old_value.loaded_dll;
-			old_value.loaded_dll = NULL;
-		}
-		void free_resources() {
-			this->free_dll();
-		}
-
-		void load_dll(const std::string& dll_path) {
-			this->loaded_dll = LoadLibraryA(dll_path.c_str());
-			if (this->loaded_dll == NULL) {
-				std::cerr << "Unable to load one of the modules. Process will be terminated with std::abort."
-					<< " (Path: " << dll_path << ')' << std::endl;
-
-				std::abort();
-			}
-		}
-		void free_dll() {
-			if (this->loaded_dll != NULL) {
-				FARPROC free = GetProcAddress(this->loaded_dll, "free_m");
-				if (free != NULL) {
-					((void(*)())free)();
-				}
-
-				BOOL freed_library = FreeLibrary(this->loaded_dll);
-				if (!freed_library) {
-					std::cerr << "Unable to correctly dispose one of the modules. Process will be terminated with std::abort."
-						<< " (Name: " << this->name << ')' << std::endl;
-
-					std::abort();
-				}
-			}
-		}
-		void initialize_module(dll_part* mediator) {
-			FARPROC initialize = GetProcAddress(this->loaded_dll, "initialize_m");
-			if (initialize == NULL) {
-				std::cerr << "One of the modules does not define the initialize_m function. Process will be terminated with std::abort."
-					<< "(Name: " << this->name << ')' << std::endl;
-
-				std::abort();
-			}
-
-			((void(*)(dll_part*))initialize)(mediator); //convert and call initialize_m
-		}
-	public:
-		dll(
-			std::string&& dll_name, 
-			std::string&& dll_path, 
-			dll_part* mediator //pointer to dll_part allows to access some of the dll_mediator functions
-		)
-			:name{ std::move(dll_name) },
-			loaded_dll{ NULL }
-		{
-			this->load_dll(dll_path);
-			this->initialize_module(mediator);
-		}
-
-		dll(const dll&) = delete;
-		void operator= (const dll&) = delete;
-
-		dll(dll&& old_value) noexcept {
-			this->move_value(std::move(old_value));
-		}
-		void operator= (dll&& old_value) noexcept {
-			this->free_resources();
-			this->move_value(std::move(old_value));
-		}
-
-		const std::string& get_name() const {
-			return this->name;
-		}
-
-		bool compare_names(std::string_view name) const { return this->name == name; }
-		size_t find_function_index(std::string_view name) const {
-			for (size_t find_index = 0, size = this->functions.size(); find_index < size; ++find_index) {
-				if (this->functions[find_index].compare_names(name)) {
-					return find_index;
-				}
-			}
-
-			return dll_part::function_not_found;
-		}
-		
-		const function& get_function(size_t index) const { 
-			return this->functions.at(index); 
-		}
-		bool add_function(const std::string& name, std::string&& export_name, arguments_string_type arguments_string, bool is_visible) {
-			FARPROC loaded_function = GetProcAddress(this->loaded_dll, name.c_str());
-			if (loaded_function == NULL)
-				return false;
-
-			this->functions.push_back(
-				function{
-					std::move(export_name),
-					(module_callable_function_type)loaded_function, 
-					arguments_string, 
-					is_visible
-				}
-			);
-
-			return true;
-		}
-
-		~dll() {
-			this->free_resources();
-		}
-	};
-	
-	class dll_builder {
-	private:
-		struct inter_states_parameters_structure {
-			dll_part* dll_part{};
-			std::vector<std::string> arguments{ "char", "uchar", "short", "ushort", "int", "uint", "long", "ulong", "llong", "ullong", "pointer" };
-
-			std::string module_name;
-
-			bool is_visible{ false };
-			std::string function_name;
-			std::string function_exported_name;
-		};
-
-	public:
-		enum class data_file_token {
-			end_of_file,
-			name, //this token is ignored, because configuration of token_generator for this class does not have base_separators
-			new_line,
-			header_open,
-			header_close,
-			value_assign,
-			comment,
-			name_and_public_name_separator,
-			program_callable_function
-		};
-		enum class parameters_enumeration {}; //unused
-		enum class context_key {
-			main_context
-		};
-
-	private:
-		using read_map_type = read_map<data_file_token, context_key, std::vector<dll>, inter_states_parameters_structure, parameters_enumeration>;
-
-		std::vector<dll> dlls;
-		inter_states_parameters_structure parameters;
-
-		token_generator<data_file_token, context_key>* generator;
-		std::vector<std::pair<std::string, dll_builder::data_file_token>>* names_stack;
-		
-		dll_mediator* mediator;
-
-		read_map_type parse_map;
-		void configure_parse_map();
-
-	public:
-		dll_builder(
-			std::vector<std::pair<std::string, dll_builder::data_file_token>>* names_stack, 
-			token_generator<dll_builder::data_file_token, context_key>* token_generator, 
-			dll_mediator* mediator
-		) //"mediator" will be used to initialize dll objects
-			:parse_map{data_file_token::end_of_file, data_file_token::name, token_generator},
-			generator{token_generator},
-			names_stack{names_stack},
-			mediator{mediator}
-		{
-			this->configure_parse_map();
-		}
-
-		const std::string& error() { return this->parse_map.error(); }
-		bool is_working() { return this->parse_map.is_working(); }
-		void handle_token(dll_builder::data_file_token token) { 
-			this->parse_map.handle_token(&this->dlls, token, &this->parameters);
-		}
-		std::vector<dll> get_value() { return std::move(this->dlls); }
-	};
-	
 	class function_not_visible : public std::logic_error {
 	public:
 		function_not_visible(const std::string& string)
@@ -409,29 +410,29 @@ public:
 	{}
 
 	std::string load_dlls(std::string file_name) {
-		parser_facade<dll_builder::data_file_token, dll_builder::context_key, dll_builder> parser{
+		generic_parser::parser_facade<dll_builder::file_tokens, dll_builder::context_keys, dll_builder> parser{
 			{},
 			{
 				{
-					dll_builder::context_key::main_context,
-					token_generator<dll_builder::data_file_token, dll_builder::context_key>::symbols_pair{
+					dll_builder::context_keys::main_context,
+					generic_parser::token_generator<dll_builder::file_tokens, dll_builder::context_keys>::symbols_pair{
 						{
-							{":", dll_builder::data_file_token::name_and_public_name_separator},
-							{"!", dll_builder::data_file_token::program_callable_function},
-							{"-", dll_builder::data_file_token::comment},
-							{"[", dll_builder::data_file_token::header_open},
-							{"]", dll_builder::data_file_token::header_close},
-							{"=", dll_builder::data_file_token::value_assign},
-							{"\n", dll_builder::data_file_token::new_line},
-							{"\r\n", dll_builder::data_file_token::new_line}
+							{":", dll_builder::file_tokens::name_and_public_name_separator},
+							{"!", dll_builder::file_tokens::program_callable_function},
+							{"--", dll_builder::file_tokens::comment},
+							{"[", dll_builder::file_tokens::header_open},
+							{"]", dll_builder::file_tokens::header_close},
+							{"=", dll_builder::file_tokens::value_assign},
+							{"\n", dll_builder::file_tokens::new_line},
+							{"\r\n", dll_builder::file_tokens::new_line}
 						},
 						{}
 					}
 				}
 			},
-			dll_builder::data_file_token::name,
-			dll_builder::data_file_token::end_of_file,
-			dll_builder::context_key::main_context,
+			dll_builder::file_tokens::name,
+			dll_builder::file_tokens::end_of_file,
+			dll_builder::context_keys::main_context,
 			this
 		};
 

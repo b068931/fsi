@@ -100,8 +100,8 @@ private:
 		};
 
 		template<template<typename, typename...> class templ, typename filter, typename... other>
-		struct filter_wrapper<templ<filter, other...>> : public filter_wrapper<typename_array<other...>> {
-			using base_class = filter_wrapper<typename_array<other...>>;
+		struct filter_wrapper<templ<filter, other...>> : public filter_wrapper<typename_array::typename_array<other...>> {
+			using base_class = filter_wrapper<typename_array::typename_array<other...>>;
 			bool check(const structure_builder::instruction& instruction) {
 				if (this->base_class::check(instruction)) { //at first we use base class filters
 					if (!filter::check(instruction)) { //and only after that we apply our current filter. this way we will not modify error message if one of the filters higher in class hierarchy returns false
@@ -117,9 +117,9 @@ private:
 		};
 
 	public:
-		using type = filter_wrapper<typename_array<filters...>>;
+		using type = filter_wrapper<typename_array::typename_array<filters...>>;
 	};
-	struct general_instruction { //inst_name (var/imm/pnt) [(byte/dbyte/fbyte/ebyte)] name, ... - example
+	struct general_instruction {
 		static constexpr error_t error_message{ error_t::general_instruction };
 		static bool check(const structure_builder::instruction& instruction) {
 			//at first we make sure that this insturction won't use arguments specific to function calls
@@ -158,7 +158,7 @@ private:
 				structure_builder::regular_variable* current_argument = 
 					dynamic_cast<structure_builder::regular_variable*>(std::get<1>(instruction.operands_in_order[index]));
 				
-				if (current_argument && (current_argument->type == structure_builder::source_file_token::POINTER)) {
+				if (current_argument && (current_argument->type == structure_builder::source_file_token::pointer_type_keyword)) {
 					return false;
 				}
 			}
@@ -171,7 +171,7 @@ private:
 		static bool check(const structure_builder::instruction& instruction) {
 			if (instruction.operands_in_order.size() != 0) {
 				return (typeid(*std::get<1>(instruction.operands_in_order[0])) !=
-					typeid(structure_builder::imm_variable)) || (instruction.instruction_type == structure_builder::source_file_token::COMPARE);
+					typeid(structure_builder::imm_variable)) || (instruction.instruction_type == structure_builder::source_file_token::compare_instruction_keyword);
 			}
 
 			return false;
@@ -269,7 +269,7 @@ private:
 					structure_builder::regular_variable* current_argument =
 						dynamic_cast<structure_builder::regular_variable*>(std::get<1>(instruction.operands_in_order[index]));
 
-					if (current_argument && (current_argument->type != structure_builder::source_file_token::POINTER)) {
+					if (current_argument && (current_argument->type != structure_builder::source_file_token::pointer_type_keyword)) {
 						return false;
 					}
 				}
@@ -305,8 +305,8 @@ private:
 		static constexpr error_t error_message{ error_t::string_instruction };
 		static bool check(const structure_builder::instruction& instruction) {
 			if ((instruction.strings.size() == 1) && (instruction.operands_in_order.size() >= 2)) {
-				return (std::get<0>(instruction.operands_in_order[0]) == structure_builder::source_file_token::POINTER) &&
-					(std::get<0>(instruction.operands_in_order[1]) == structure_builder::source_file_token::string_argument);
+				return (std::get<0>(instruction.operands_in_order[0]) == structure_builder::source_file_token::pointer_type_keyword) &&
+					(std::get<0>(instruction.operands_in_order[1]) == structure_builder::source_file_token::string_argument_keyword);
 			}
 
 			return false;
@@ -367,27 +367,27 @@ private:
 		static uint8_t convert_type_to_uint8(structure_builder::source_file_token token_type) {
 			uint8_t type = 0;
 			switch (token_type) {
-				case structure_builder::source_file_token::BYTE: {
+				case structure_builder::source_file_token::one_byte_type_keyword: {
 					type = 0;
 					break;
 				}
-				case structure_builder::source_file_token::DBYTE: {
+				case structure_builder::source_file_token::two_bytes_type_keyword: {
 					type = 1;
 					break;
 				}
-				case structure_builder::source_file_token::FBYTE: {
+				case structure_builder::source_file_token::four_bytes_type_keyword: {
 					type = 2;
 					break;
 				}
-				case structure_builder::source_file_token::EBYTE: {
+				case structure_builder::source_file_token::eight_bytes_type_keyword: {
 					type = 3;
 					break;
 				}
-				case structure_builder::source_file_token::VOID: {
+				case structure_builder::source_file_token::no_return_module_call_keyword: {
 					type = 1;
 					break;
 				}
-				case structure_builder::source_file_token::POINTER: {
+				case structure_builder::source_file_token::pointer_type_keyword: {
 					type = 3;
 					break;
 				}
@@ -436,10 +436,10 @@ private:
 				this->encode_active_type(instruction_encoder::convert_type_to_uint8(active_type), 0b00);
 			}
 			else {
-				if (active_type == structure_builder::source_file_token::VOID) {
+				if (active_type == structure_builder::source_file_token::no_return_module_call_keyword) {
 					this->encode_active_type(0b01, 0b11);
 				}
-				else if (active_type == structure_builder::source_file_token::POINTER) {
+				else if (active_type == structure_builder::source_file_token::pointer_type_keyword) {
 					this->encode_active_type(0b11, 0b11);
 				}
 				else {
@@ -452,19 +452,19 @@ private:
 		virtual void visit(structure_builder::source_file_token active_type, const structure_builder::imm_variable* variable, bool is_signed) {
 			this->encode_active_type(instruction_encoder::convert_type_to_uint8(active_type), 0b01);
 			switch (variable->type) {
-				case structure_builder::source_file_token::BYTE: {
+				case structure_builder::source_file_token::one_byte_type_keyword: {
 					this->write_bytes<uint8_t>(static_cast<uint8_t>(variable->imm_val));
 					break;
 				}
-				case structure_builder::source_file_token::DBYTE: {
+				case structure_builder::source_file_token::two_bytes_type_keyword: {
 					this->write_bytes<uint16_t>(static_cast<uint16_t>(variable->imm_val));
 					break;
 				}
-				case structure_builder::source_file_token::FBYTE: {
+				case structure_builder::source_file_token::four_bytes_type_keyword: {
 					this->write_bytes<uint32_t>(static_cast<uint32_t>(variable->imm_val));
 					break;
 				}
-				case structure_builder::source_file_token::EBYTE: {
+				case structure_builder::source_file_token::eight_bytes_type_keyword: {
 					this->write_bytes<uint64_t>(static_cast<uint64_t>(variable->imm_val));
 					break;
 				}
@@ -564,19 +564,19 @@ private:
 	static uint8_t convert_type_to_uint8(structure_builder::source_file_token token_type) {
 		uint8_t type = 0;
 		switch (token_type) {
-			case structure_builder::source_file_token::DBYTE: {
+			case structure_builder::source_file_token::two_bytes_type_keyword: {
 				type = 1;
 				break;
 			}
-			case structure_builder::source_file_token::FBYTE: {
+			case structure_builder::source_file_token::four_bytes_type_keyword: {
 				type = 2;
 				break;
 			}
-			case structure_builder::source_file_token::EBYTE: {
+			case structure_builder::source_file_token::eight_bytes_type_keyword: {
 				type = 3;
 				break;
 			}
-			case structure_builder::source_file_token::POINTER: {
+			case structure_builder::source_file_token::pointer_type_keyword: {
 				type = 4;
 				break;
 			}
@@ -601,42 +601,42 @@ private:
 
 	static std::map<structure_builder::source_file_token, uint8_t> get_operation_codes() {
 		return {
-			{structure_builder::source_file_token::SUBSTRACT, 0},
-			{structure_builder::source_file_token::SSUBSTRACT, 1},
-			{structure_builder::source_file_token::DIVIDE, 2},
-			{structure_builder::source_file_token::SDIVIDE, 3},
-			{structure_builder::source_file_token::COMPARE, 4},
-			{structure_builder::source_file_token::MOVE, 5},
-			{structure_builder::source_file_token::ADD, 6},
-			{structure_builder::source_file_token::SADD, 7},
-			{structure_builder::source_file_token::MULTIPLY, 8},
-			{structure_builder::source_file_token::SMULTIPLY, 9},
-			{structure_builder::source_file_token::INCREMENT, 10},
-			{structure_builder::source_file_token::DECREMENT, 11},
-			{structure_builder::source_file_token::XOR, 12},
-			{structure_builder::source_file_token::AND, 13},
-			{structure_builder::source_file_token::OR, 14},
-			{structure_builder::source_file_token::JUMP, 15},
-			{structure_builder::source_file_token::JUMP_EQUAL, 16},
-			{structure_builder::source_file_token::JUMP_NOT_EQUAL, 17},
-			{structure_builder::source_file_token::JUMP_GREATER, 18},
-			{structure_builder::source_file_token::JUMP_GREATER_EQUAL, 19},
-			{structure_builder::source_file_token::JUMP_LESS_EQUAL, 20},
-			{structure_builder::source_file_token::JUMP_LESS, 27},
-			{structure_builder::source_file_token::JUMP_ABOVE, 21},
-			{structure_builder::source_file_token::JUMP_ABOVE_EQUAL, 22},
-			{structure_builder::source_file_token::JUMP_BELOW, 23},
-			{structure_builder::source_file_token::JUMP_BELOW_EQUAL, 24},
+			{structure_builder::source_file_token::subtract_instruction_keyword, 0},
+			{structure_builder::source_file_token::signed_subtract_instruction_keyword, 1},
+			{structure_builder::source_file_token::divide_instruction_keyword, 2},
+			{structure_builder::source_file_token::signed_divide_instruction_keyword, 3},
+			{structure_builder::source_file_token::compare_instruction_keyword, 4},
+			{structure_builder::source_file_token::move_instruction_keyword, 5},
+			{structure_builder::source_file_token::add_instruction_keyword, 6},
+			{structure_builder::source_file_token::signed_add_instruction_keyword, 7},
+			{structure_builder::source_file_token::multiply_instruction_keyword, 8},
+			{structure_builder::source_file_token::signed_multiply_instruction_keyword, 9},
+			{structure_builder::source_file_token::increment_instruction_keyword, 10},
+			{structure_builder::source_file_token::decrement_instruction_keyword, 11},
+			{structure_builder::source_file_token::bit_xor_instruction_keyword, 12},
+			{structure_builder::source_file_token::bit_and_instruction_keyword, 13},
+			{structure_builder::source_file_token::bit_or_instruction_keyword, 14},
+			{structure_builder::source_file_token::jump_instruction_keyword, 15},
+			{structure_builder::source_file_token::jump_equal_instruction_keyword, 16},
+			{structure_builder::source_file_token::jump_not_equal_instruction_keyword, 17},
+			{structure_builder::source_file_token::jump_greater_instruction_keyword, 18},
+			{structure_builder::source_file_token::jump_greater_equal_instruction_keyword, 19},
+			{structure_builder::source_file_token::jump_less_equal_instruction_keyword, 20},
+			{structure_builder::source_file_token::jump_less_instruction_keyword, 27},
+			{structure_builder::source_file_token::jump_above_instruction_keyword, 21},
+			{structure_builder::source_file_token::jump_above_equal_instruction_keyword, 22},
+			{structure_builder::source_file_token::jump_below_instruction_keyword, 23},
+			{structure_builder::source_file_token::jump_below_equal_instruction_keyword, 24},
 			{structure_builder::source_file_token::function_call, 25},
 			{structure_builder::source_file_token::module_call, 26},
-			{structure_builder::source_file_token::NOT, 28},
-			{structure_builder::source_file_token::SAVE, 29},
-			{structure_builder::source_file_token::LOAD, 30},
-			{structure_builder::source_file_token::REF, 31},
-			{structure_builder::source_file_token::SHIFT_LEFT, 32},
-			{structure_builder::source_file_token::SHIFT_RIGHT, 33},
-			{structure_builder::source_file_token::CTJTD, 34},
-			{structure_builder::source_file_token::COPY_STRING, 35}
+			{structure_builder::source_file_token::bit_not_instruction_keyword, 28},
+			{structure_builder::source_file_token::save_value_instruction_keyword, 29},
+			{structure_builder::source_file_token::load_value_instruction_keyword, 30},
+			{structure_builder::source_file_token::move_pointer_instruction_keyword, 31},
+			{structure_builder::source_file_token::bit_shift_left_instruction_keyword, 32},
+			{structure_builder::source_file_token::bit_shift_right_instruction_keyword, 33},
+			{structure_builder::source_file_token::get_function_address_instruction_keyword, 34},
+			{structure_builder::source_file_token::copy_string_instruction_keyword, 35}
 		};
 	}
 	static std::vector<instruction_check*> get_instruction_filters() {
@@ -700,39 +700,39 @@ private:
 
 		return {
 			new generic_instruction_check<binary_instruction_filter>{{
-				structure_builder::source_file_token::SUBSTRACT,
-				structure_builder::source_file_token::SSUBSTRACT,
-				structure_builder::source_file_token::DIVIDE,
-				structure_builder::source_file_token::SDIVIDE,
-				structure_builder::source_file_token::COMPARE,
-				structure_builder::source_file_token::MOVE,
-				structure_builder::source_file_token::AND,
-				structure_builder::source_file_token::OR,
-				structure_builder::source_file_token::XOR
+				structure_builder::source_file_token::subtract_instruction_keyword,
+				structure_builder::source_file_token::signed_subtract_instruction_keyword,
+				structure_builder::source_file_token::divide_instruction_keyword,
+				structure_builder::source_file_token::signed_divide_instruction_keyword,
+				structure_builder::source_file_token::compare_instruction_keyword,
+				structure_builder::source_file_token::move_instruction_keyword,
+				structure_builder::source_file_token::bit_and_instruction_keyword,
+				structure_builder::source_file_token::bit_or_instruction_keyword,
+				structure_builder::source_file_token::bit_xor_instruction_keyword
 			}},
 			new generic_instruction_check<multi_instruction_filter>{{
-				structure_builder::source_file_token::ADD,
-				structure_builder::source_file_token::SADD,
-				structure_builder::source_file_token::MULTIPLY,
-				structure_builder::source_file_token::SMULTIPLY
+				structure_builder::source_file_token::add_instruction_keyword,
+				structure_builder::source_file_token::signed_add_instruction_keyword,
+				structure_builder::source_file_token::multiply_instruction_keyword,
+				structure_builder::source_file_token::signed_multiply_instruction_keyword
 			}},
 			new generic_instruction_check<different_type_multi_instruction_filter>{{
-				structure_builder::source_file_token::INCREMENT,
-				structure_builder::source_file_token::DECREMENT,
-				structure_builder::source_file_token::NOT
+				structure_builder::source_file_token::increment_instruction_keyword,
+				structure_builder::source_file_token::decrement_instruction_keyword,
+				structure_builder::source_file_token::bit_not_instruction_keyword
 			}},
 			new generic_instruction_check<jump_instruction_filter>{{
-				structure_builder::source_file_token::JUMP,
-				structure_builder::source_file_token::JUMP_EQUAL,
-				structure_builder::source_file_token::JUMP_NOT_EQUAL,
-				structure_builder::source_file_token::JUMP_GREATER,
-				structure_builder::source_file_token::JUMP_GREATER_EQUAL,
-				structure_builder::source_file_token::JUMP_LESS,
-				structure_builder::source_file_token::JUMP_LESS_EQUAL,
-				structure_builder::source_file_token::JUMP_ABOVE,
-				structure_builder::source_file_token::JUMP_ABOVE_EQUAL,
-				structure_builder::source_file_token::JUMP_BELOW,
-				structure_builder::source_file_token::JUMP_BELOW_EQUAL
+				structure_builder::source_file_token::jump_instruction_keyword,
+				structure_builder::source_file_token::jump_equal_instruction_keyword,
+				structure_builder::source_file_token::jump_not_equal_instruction_keyword,
+				structure_builder::source_file_token::jump_greater_instruction_keyword,
+				structure_builder::source_file_token::jump_greater_equal_instruction_keyword,
+				structure_builder::source_file_token::jump_less_instruction_keyword,
+				structure_builder::source_file_token::jump_less_equal_instruction_keyword,
+				structure_builder::source_file_token::jump_above_instruction_keyword,
+				structure_builder::source_file_token::jump_above_equal_instruction_keyword,
+				structure_builder::source_file_token::jump_below_instruction_keyword,
+				structure_builder::source_file_token::jump_below_equal_instruction_keyword
 			}},
 			new generic_instruction_check<program_function_call_instruction_filter>{{
 				structure_builder::source_file_token::function_call
@@ -741,23 +741,23 @@ private:
 				structure_builder::source_file_token::module_call
 			}},
 			new generic_instruction_check<save_variable_state_instruction_filter>{{
-				structure_builder::source_file_token::SAVE
+				structure_builder::source_file_token::save_value_instruction_keyword
 			}},
 			new generic_instruction_check<load_variable_state_instruction_filter>{ {
-				structure_builder::source_file_token::LOAD
+				structure_builder::source_file_token::load_value_instruction_keyword
 			}},
 			new generic_instruction_check<pointer_ref_instruction_filter>{{
-				structure_builder::source_file_token::REF
+				structure_builder::source_file_token::move_pointer_instruction_keyword
 			}},
 			new generic_instruction_check<bit_shift_instruction_filter>{ {
-				structure_builder::source_file_token::SHIFT_LEFT,
-				structure_builder::source_file_token::SHIFT_RIGHT
+				structure_builder::source_file_token::bit_shift_left_instruction_keyword,
+				structure_builder::source_file_token::bit_shift_right_instruction_keyword
 			}},
 			new generic_instruction_check<ctjtd_instruction_filter>{{
-				structure_builder::source_file_token::CTJTD
+				structure_builder::source_file_token::get_function_address_instruction_keyword
 			}},
 			new generic_instruction_check<string_instruction_filter>{{
-				structure_builder::source_file_token::COPY_STRING
+				structure_builder::source_file_token::copy_string_instruction_keyword
 			}}
 		};
 	}

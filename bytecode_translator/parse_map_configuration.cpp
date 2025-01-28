@@ -1,19 +1,19 @@
 #include "structure_builder.h"
 #include "../dll_mediator/fsi_types.h"
 
-using states_builder_type = states_builder<structure_builder::source_file_token, structure_builder::context_key, structure_builder::file, structure_builder::helper_inter_states_object, structure_builder::parameters_enumeration>;
-using state_settings = states_builder_type::state_settings;
+using states_builder_type = generic_parser::states_builder<structure_builder::source_file_token, structure_builder::context_key, structure_builder::file, structure_builder::helper_inter_states_object, structure_builder::parameters_enumeration>;
+using state_settings = states_builder_type::state_settings_type;
 using state_type = states_builder_type::state_type;
 
 std::vector<structure_builder::source_file_token> all_types {
-	structure_builder::source_file_token::BYTE, structure_builder::source_file_token::DBYTE,
-		structure_builder::source_file_token::FBYTE, structure_builder::source_file_token::EBYTE,
-		structure_builder::source_file_token::POINTER
+	structure_builder::source_file_token::one_byte_type_keyword, structure_builder::source_file_token::two_bytes_type_keyword,
+		structure_builder::source_file_token::four_bytes_type_keyword, structure_builder::source_file_token::eight_bytes_type_keyword,
+		structure_builder::source_file_token::pointer_type_keyword
 };
 
 std::vector<structure_builder::source_file_token> integer_types {
-	structure_builder::source_file_token::BYTE, structure_builder::source_file_token::DBYTE,
-		structure_builder::source_file_token::FBYTE, structure_builder::source_file_token::EBYTE
+	structure_builder::source_file_token::one_byte_type_keyword, structure_builder::source_file_token::two_bytes_type_keyword,
+		structure_builder::source_file_token::four_bytes_type_keyword, structure_builder::source_file_token::eight_bytes_type_keyword
 };
 
 std::vector<structure_builder::source_file_token> argument_end_tokens {
@@ -53,28 +53,28 @@ state_settings& configure_modules_import(states_builder_type& builder) {
 	inside_module_import
 		.set_redirection_for_token(
 			structure_builder::source_file_token::name,
-			state_action::change_top,
+			generic_parser::state_action::change_top,
 			IMPORT_token
 		);
 
 	IMPORT_token
 		.set_redirection_for_token(
-			structure_builder::source_file_token::IMPORT,
-			state_action::change_top,
+			structure_builder::source_file_token::import_keyword,
+			generic_parser::state_action::change_top,
 			import_start
 		);
 
 	import_start
 		.set_redirection_for_token(
 			structure_builder::source_file_token::import_start,
-			state_action::change_top,
+			generic_parser::state_action::change_top,
 			inside_functions_import
 		);
 
 	inside_functions_import
 		.set_redirection_for_token(
 			structure_builder::source_file_token::import_end,
-			state_action::pop_top,
+			generic_parser::state_action::pop_top,
 			nullptr
 		);
 
@@ -92,7 +92,7 @@ state_settings& configure_comment(states_builder_type& builder) {
 		.whitelist(false)
 		.set_redirection_for_token(
 			structure_builder::source_file_token::comment_end,
-			state_action::pop_top,
+			generic_parser::state_action::pop_top,
 			nullptr
 		);
 
@@ -103,7 +103,7 @@ void configure_special_instruction_end(state_settings& last_state) {
 	last_state
 		.set_redirection_for_token(
 			structure_builder::source_file_token::name,
-			state_action::pop_top,
+			generic_parser::state_action::pop_top,
 			nullptr
 		);
 }
@@ -222,19 +222,19 @@ state_settings& configure_special_instructions(states_builder_type& builder) {
 	);
 
 	auto ifdef_ifndef_pop_check_custom_function =
-		[](parameters_container<structure_builder::parameters_enumeration>& parameters, structure_builder::helper_inter_states_object& helper) -> bool {
+		[](generic_parser::parameters_container<structure_builder::parameters_enumeration>& parameters, structure_builder::helper_inter_states_object& helper) -> bool {
 		return parameters.retrieve_parameter<bool>(structure_builder::parameters_enumeration::ifdef_ifndef_pop_check);
 	};
 
 	ifdef.add_custom_function(
 		ifdef_ifndef_pop_check_custom_function,
-		state_action::pop_top,
+		generic_parser::state_action::pop_top,
 		nullptr
 	);
 
 	ifndef.add_custom_function(
 		ifdef_ifndef_pop_check_custom_function,
-		state_action::pop_top,
+		generic_parser::state_action::pop_top,
 		nullptr
 	);
 
@@ -254,43 +254,43 @@ state_settings& configure_special_instructions(states_builder_type& builder) {
 
 	inside_special_instruction
 		.set_redirection_for_token(
-			structure_builder::source_file_token::DEFINE,
-			state_action::change_top,
+			structure_builder::source_file_token::define_keyword,
+			generic_parser::state_action::change_top,
 			define
 		)
 		.set_redirection_for_token(
-			structure_builder::source_file_token::REDEFINE,
-			state_action::change_top,
+			structure_builder::source_file_token::redefine_keyword,
+			generic_parser::state_action::change_top,
 			redefine_name
 		)
 		.set_redirection_for_token(
-			structure_builder::source_file_token::UNDEFINE,
-			state_action::change_top,
+			structure_builder::source_file_token::undefine_keyword,
+			generic_parser::state_action::change_top,
 			undefine
 		)
 		.set_redirection_for_token(
-			structure_builder::source_file_token::IFDEF,
-			state_action::change_top,
+			structure_builder::source_file_token::if_defined_keyword,
+			generic_parser::state_action::change_top,
 			ifdef
 		)
 		.set_redirection_for_token(
-			structure_builder::source_file_token::IFNDEF,
-			state_action::change_top,
+			structure_builder::source_file_token::if_not_defined_keyword,
+			generic_parser::state_action::change_top,
 			ifndef
 		)
 		.set_redirection_for_token(
-			structure_builder::source_file_token::STACK_SIZE,
-			state_action::change_top,
+			structure_builder::source_file_token::stack_size_keyword,
+			generic_parser::state_action::change_top,
 			stack_size
 		)
 		.set_redirection_for_token(
-			structure_builder::source_file_token::DECL,
-			state_action::change_top,
+			structure_builder::source_file_token::declare_keyword,
+			generic_parser::state_action::change_top,
 			decl_TYPE_name
 		)
 		.set_redirection_for_token(
-			structure_builder::source_file_token::STRING,
-			state_action::change_top,
+			structure_builder::source_file_token::define_string_keyword,
+			generic_parser::state_action::change_top,
 			string_NAME_value
 		);
 
@@ -301,21 +301,21 @@ state_settings& configure_special_instructions(states_builder_type& builder) {
 	redefine_name
 		.set_redirection_for_token(
 			structure_builder::source_file_token::name,
-			state_action::change_top,
+			generic_parser::state_action::change_top,
 			redefine_value
 		);
 
 	ifdef
 		.set_redirection_for_token(
 			structure_builder::source_file_token::name,
-			state_action::change_top,
+			generic_parser::state_action::change_top,
 			ignore_all_until_endif
 		);
 
 	ifndef
 		.set_redirection_for_token(
 			structure_builder::source_file_token::name,
-			state_action::change_top,
+			generic_parser::state_action::change_top,
 			ignore_all_until_endif
 		);
 
@@ -323,8 +323,8 @@ state_settings& configure_special_instructions(states_builder_type& builder) {
 		.detached_name(false)
 		.whitelist(false)
 		.set_redirection_for_token(
-			structure_builder::source_file_token::ENDIF,
-			state_action::pop_top,
+			structure_builder::source_file_token::endif_keyword,
+			generic_parser::state_action::pop_top,
 			nullptr
 		);
 
@@ -334,21 +334,21 @@ state_settings& configure_special_instructions(states_builder_type& builder) {
 	decl_TYPE_name
 		.set_redirection_for_tokens(
 			std::vector<structure_builder::source_file_token>{ all_types },
-			state_action::change_top,
+			generic_parser::state_action::change_top,
 			decl_type_NAME
 		);
 
 	string_NAME_value
 		.set_redirection_for_token(
 			structure_builder::source_file_token::string_separator,
-			state_action::change_top,
+			generic_parser::state_action::change_top,
 			string_name_VALUE
 		);
 
 	string_name_VALUE
 		.set_redirection_for_token(
 			structure_builder::source_file_token::string_separator,
-			state_action::pop_top,
+			generic_parser::state_action::pop_top,
 			nullptr
 		);
 
@@ -373,12 +373,12 @@ void configure_instruction_argument_end(state_settings& argument_last_state, sta
 			{
 				structure_builder::source_file_token::function_args_end, structure_builder::source_file_token::expression_end
 			},
-			state_action::pop_top,
+			generic_parser::state_action::pop_top,
 			nullptr
 		)
 		.set_redirection_for_token(
 			structure_builder::source_file_token::coma,
-			state_action::change_top,
+			generic_parser::state_action::change_top,
 			instruction_arguments_base
 		);
 }
@@ -435,19 +435,19 @@ state_settings& configure_instruction_arguments(states_builder_type& builder) {
 			}
 
 			switch (element_token) {
-			case structure_builder::source_file_token::BYTE:
+			case structure_builder::source_file_token::one_byte_type_keyword:
 				element_size = sizeof(byte);
 				break;
 
-			case structure_builder::source_file_token::DBYTE:
+			case structure_builder::source_file_token::two_bytes_type_keyword:
 				element_size = sizeof(dbyte);
 				break;
 
-			case structure_builder::source_file_token::FBYTE:
+			case structure_builder::source_file_token::four_bytes_type_keyword:
 				element_size = sizeof(fbyte);
 				break;
 
-			case structure_builder::source_file_token::EBYTE:
+			case structure_builder::source_file_token::eight_bytes_type_keyword:
 				element_size = sizeof(ebyte);
 				break;
 
@@ -463,11 +463,11 @@ state_settings& configure_instruction_arguments(states_builder_type& builder) {
 			}
 
 			helper.current_function.get_last_instruction().immediates.push_back(
-				structure_builder::imm_variable{ structure_builder::source_file_token::EBYTE, element_size }
+				structure_builder::imm_variable{ structure_builder::source_file_token::eight_bytes_type_keyword, element_size }
 			);
 
 			helper.current_function.add_new_operand_to_last_instruction(
-				structure_builder::source_file_token::EBYTE,
+				structure_builder::source_file_token::eight_bytes_type_keyword,
 				&helper.current_function.get_last_instruction().immediates.back(),
 				false
 			);
@@ -549,7 +549,7 @@ state_settings& configure_instruction_arguments(states_builder_type& builder) {
 
 			helper.current_function.get_last_instruction().jump_variables.push_back({ jump_point });
 			helper.current_function.add_new_operand_to_last_instruction(
-				structure_builder::source_file_token::jump_data,
+				structure_builder::source_file_token::jump_point_argument_keyword,
 				&helper.current_function.get_last_instruction().jump_variables.back(),
 				false
 			);
@@ -567,7 +567,7 @@ state_settings& configure_instruction_arguments(states_builder_type& builder) {
 
 			helper.current_function.get_last_instruction().strings.push_back({ &(found_string->second) });
 			helper.current_function.add_new_operand_to_last_instruction(
-				structure_builder::source_file_token::string_argument,
+				structure_builder::source_file_token::string_argument_keyword,
 				&helper.current_function.get_last_instruction().strings.back(),
 				false
 			);
@@ -617,47 +617,47 @@ state_settings& configure_instruction_arguments(states_builder_type& builder) {
 			{
 				structure_builder::source_file_token::expression_end, structure_builder::source_file_token::function_args_end
 			},
-			state_action::pop_top,
+			generic_parser::state_action::pop_top,
 			nullptr
 		)
 		.set_redirection_for_token(
-			structure_builder::source_file_token::function_address,
-			state_action::change_top,
+			structure_builder::source_file_token::function_address_argument_keyword,
+			generic_parser::state_action::change_top,
 			add_function_address_argument
 		)
 		.set_redirection_for_token(
-			structure_builder::source_file_token::immediate_data,
-			state_action::change_top,
+			structure_builder::source_file_token::immediate_argument_keyword,
+			generic_parser::state_action::change_top,
 			add_immediate_argument
 		)
 		.set_redirection_for_token(
-			structure_builder::source_file_token::variable_referenced,
-			state_action::change_top,
+			structure_builder::source_file_token::variable_argument_keyword,
+			generic_parser::state_action::change_top,
 			add_regular_variable_argument
 		)
 		.set_redirection_for_token(
-			structure_builder::source_file_token::SIGNED,
-			state_action::change_top,
+			structure_builder::source_file_token::signed_argument_keyword,
+			generic_parser::state_action::change_top,
 			add_signed_regular_variable_argument
 		)
 		.set_redirection_for_token(
-			structure_builder::source_file_token::pointer_dereference,
-			state_action::change_top,
+			structure_builder::source_file_token::pointer_dereference_argument_keyword,
+			generic_parser::state_action::change_top,
 			add_pointer_dereference_argument
 		)
 		.set_redirection_for_token(
-			structure_builder::source_file_token::jump_data,
-			state_action::change_top,
+			structure_builder::source_file_token::jump_point_argument_keyword,
+			generic_parser::state_action::change_top,
 			add_jump_data_argument
 		)
 		.set_redirection_for_token(
-			structure_builder::source_file_token::SIZEOF,
-			state_action::change_top,
+			structure_builder::source_file_token::sizeof_argument_keyword,
+			generic_parser::state_action::change_top,
 			add_sizeof_argument
 		)
 		.set_redirection_for_token(
-			structure_builder::source_file_token::string_argument,
-			state_action::change_top,
+			structure_builder::source_file_token::string_argument_keyword,
+			generic_parser::state_action::change_top,
 			add_string_argument
 		);
 
@@ -668,7 +668,7 @@ state_settings& configure_instruction_arguments(states_builder_type& builder) {
 	add_immediate_argument
 		.set_redirection_for_tokens(
 			std::vector<structure_builder::source_file_token>{ integer_types },
-			state_action::change_top,
+			generic_parser::state_action::change_top,
 			add_immediate_argument_value
 		);
 
@@ -676,35 +676,35 @@ state_settings& configure_instruction_arguments(states_builder_type& builder) {
 	add_regular_variable_argument
 		.set_redirection_for_tokens(
 			std::vector<structure_builder::source_file_token>{ all_types },
-			state_action::change_top,
+			generic_parser::state_action::change_top,
 			add_regular_variable_argument_name
 		);
 
 	add_signed_regular_variable_argument
 		.set_redirection_for_tokens(
 			std::vector<structure_builder::source_file_token>{ integer_types },
-			state_action::change_top,
+			generic_parser::state_action::change_top,
 			add_regular_variable_argument_name
 		);
 
 	add_pointer_dereference_argument
 		.set_redirection_for_tokens(
 			std::vector<structure_builder::source_file_token>{ integer_types },
-			state_action::change_top,
+			generic_parser::state_action::change_top,
 			map_dereferenced_variable_name
 		);
 
 	map_dereferenced_variable_name
 		.set_redirection_for_token(
 			structure_builder::source_file_token::dereference_start,
-			state_action::change_top,
+			generic_parser::state_action::change_top,
 			add_new_dereference_variable
 		);
 
 	add_new_dereference_variable
 		.set_redirection_for_token(
 			structure_builder::source_file_token::dereference_end,
-			state_action::change_top,
+			generic_parser::state_action::change_top,
 			dereference_variables_add_end
 		);
 
@@ -782,31 +782,31 @@ state_settings& configure_function_declaration(states_builder_type& builder) {
 	declare_function
 		.set_redirection_for_token(
 			structure_builder::source_file_token::function_args_start,
-			state_action::change_top,
+			generic_parser::state_action::change_top,
 			add_function_argument_type
 		);
 
 	add_function_argument_type
 		.set_redirection_for_tokens(
 			std::vector<structure_builder::source_file_token>{ all_types },
-			state_action::change_top,
+			generic_parser::state_action::change_top,
 			add_function_argument_name
 		)
 		.set_redirection_for_token(
 			structure_builder::source_file_token::function_args_end,
-			state_action::pop_top,
+			generic_parser::state_action::pop_top,
 			nullptr
 		);
 
 	add_function_argument_name
 		.set_redirection_for_token(
 			structure_builder::source_file_token::coma,
-			state_action::change_top,
+			generic_parser::state_action::change_top,
 			add_function_argument_type
 		)
 		.set_redirection_for_token(
 			structure_builder::source_file_token::function_args_end,
-			state_action::pop_top,
+			generic_parser::state_action::pop_top,
 			nullptr
 		);
 
@@ -830,7 +830,7 @@ state_settings& configure_inside_function(states_builder_type& builder, state_se
 				std::string name = helper.names_remapping.translate_name(read_map.get_token_generator_name());
 
 				helper.current_function.add_new_instruction(structure_builder::source_file_token::module_call);
-				helper.current_function.add_new_operand_to_last_instruction(structure_builder::source_file_token::VOID, nullptr, false);
+				helper.current_function.add_new_operand_to_last_instruction(structure_builder::source_file_token::no_return_module_call_keyword, nullptr, false);
 				if (name != "void") {
 					helper.current_function.map_operand_with_variable(name, &std::get<1>(helper.current_function.get_last_operand()), read_map);
 				}
@@ -841,7 +841,7 @@ state_settings& configure_inside_function(states_builder_type& builder, state_se
 				helper.current_function.set_current_function(nullptr);
 				helper.instruction_index = 0;
 			}
-			else if ((token != structure_builder::source_file_token::function_body_end) && (token != structure_builder::source_file_token::jump_point) && (token != structure_builder::source_file_token::ENDIF)) {
+			else if ((token != structure_builder::source_file_token::function_body_end) && (token != structure_builder::source_file_token::jump_point) && (token != structure_builder::source_file_token::endif_keyword)) {
 				helper.current_function.add_new_instruction(token);
 				++helper.instruction_index;
 			}
@@ -926,24 +926,24 @@ state_settings& configure_inside_function(states_builder_type& builder, state_se
 		{
 			structure_builder::source_file_token::function_args_start,
 			structure_builder::source_file_token::module_return_value, structure_builder::source_file_token::jump_point,
-			structure_builder::source_file_token::function_body_end, structure_builder::source_file_token::ADD,
-			structure_builder::source_file_token::SADD, structure_builder::source_file_token::MULTIPLY,
-			structure_builder::source_file_token::SMULTIPLY, structure_builder::source_file_token::SUBSTRACT,
-			structure_builder::source_file_token::SSUBSTRACT, structure_builder::source_file_token::DIVIDE,
-			structure_builder::source_file_token::SDIVIDE, structure_builder::source_file_token::COMPARE,
-			structure_builder::source_file_token::INCREMENT, structure_builder::source_file_token::DECREMENT,
-			structure_builder::source_file_token::JUMP, structure_builder::source_file_token::JUMP_GREATER,
-			structure_builder::source_file_token::JUMP_GREATER_EQUAL, structure_builder::source_file_token::JUMP_EQUAL,
-			structure_builder::source_file_token::JUMP_NOT_EQUAL, structure_builder::source_file_token::JUMP_LESS,
-			structure_builder::source_file_token::JUMP_LESS_EQUAL, structure_builder::source_file_token::JUMP_ABOVE,
-			structure_builder::source_file_token::JUMP_ABOVE_EQUAL, structure_builder::source_file_token::JUMP_BELOW,
-			structure_builder::source_file_token::JUMP_BELOW_EQUAL, structure_builder::source_file_token::MOVE,
-			structure_builder::source_file_token::AND, structure_builder::source_file_token::OR,
-			structure_builder::source_file_token::XOR, structure_builder::source_file_token::NOT,
-			structure_builder::source_file_token::LOAD, structure_builder::source_file_token::SAVE,
-			structure_builder::source_file_token::REF, structure_builder::source_file_token::SHIFT_LEFT,
-			structure_builder::source_file_token::SHIFT_RIGHT, structure_builder::source_file_token::CTJTD,
-			structure_builder::source_file_token::COPY_STRING
+			structure_builder::source_file_token::function_body_end, structure_builder::source_file_token::add_instruction_keyword,
+			structure_builder::source_file_token::signed_add_instruction_keyword, structure_builder::source_file_token::multiply_instruction_keyword,
+			structure_builder::source_file_token::signed_multiply_instruction_keyword, structure_builder::source_file_token::subtract_instruction_keyword,
+			structure_builder::source_file_token::signed_subtract_instruction_keyword, structure_builder::source_file_token::divide_instruction_keyword,
+			structure_builder::source_file_token::signed_divide_instruction_keyword, structure_builder::source_file_token::compare_instruction_keyword,
+			structure_builder::source_file_token::increment_instruction_keyword, structure_builder::source_file_token::decrement_instruction_keyword,
+			structure_builder::source_file_token::jump_instruction_keyword, structure_builder::source_file_token::jump_greater_instruction_keyword,
+			structure_builder::source_file_token::jump_greater_equal_instruction_keyword, structure_builder::source_file_token::jump_equal_instruction_keyword,
+			structure_builder::source_file_token::jump_not_equal_instruction_keyword, structure_builder::source_file_token::jump_less_instruction_keyword,
+			structure_builder::source_file_token::jump_less_equal_instruction_keyword, structure_builder::source_file_token::jump_above_instruction_keyword,
+			structure_builder::source_file_token::jump_above_equal_instruction_keyword, structure_builder::source_file_token::jump_below_instruction_keyword,
+			structure_builder::source_file_token::jump_below_equal_instruction_keyword, structure_builder::source_file_token::move_instruction_keyword,
+			structure_builder::source_file_token::bit_and_instruction_keyword, structure_builder::source_file_token::bit_or_instruction_keyword,
+			structure_builder::source_file_token::bit_xor_instruction_keyword, structure_builder::source_file_token::bit_not_instruction_keyword,
+			structure_builder::source_file_token::load_value_instruction_keyword, structure_builder::source_file_token::save_value_instruction_keyword,
+			structure_builder::source_file_token::move_pointer_instruction_keyword, structure_builder::source_file_token::bit_shift_left_instruction_keyword,
+			structure_builder::source_file_token::bit_shift_right_instruction_keyword, structure_builder::source_file_token::get_function_address_instruction_keyword,
+			structure_builder::source_file_token::copy_string_instruction_keyword
 		}
 	);
 
@@ -954,70 +954,70 @@ state_settings& configure_inside_function(states_builder_type& builder, state_se
 	inside_function_body
 		.set_redirection_for_token(
 			structure_builder::source_file_token::function_args_start,
-			state_action::push_state,
+			generic_parser::state_action::push_state,
 			instruction_arguments
 		)
 		.set_redirection_for_token(
 			structure_builder::source_file_token::comment_start,
-			state_action::push_state,
+			generic_parser::state_action::push_state,
 			comment
 		)
 		.set_redirection_for_token(
 			structure_builder::source_file_token::special_instruction,
-			state_action::push_state,
+			generic_parser::state_action::push_state,
 			special_instruction
 		)
 		.set_redirection_for_token(
 			structure_builder::source_file_token::jump_point,
-			state_action::push_state,
+			generic_parser::state_action::push_state,
 			add_new_jump_point
 		)
 		.set_redirection_for_token(
 			structure_builder::source_file_token::module_return_value,
-			state_action::push_state,
+			generic_parser::state_action::push_state,
 			add_module_name_to_instruction
 		)
 		.set_redirection_for_token(
 			structure_builder::source_file_token::function_body_end,
-			state_action::pop_top,
+			generic_parser::state_action::pop_top,
 			nullptr
 		)
 		.set_redirection_for_tokens(
 			{
-				structure_builder::source_file_token::ADD, structure_builder::source_file_token::SADD, structure_builder::source_file_token::MULTIPLY,
-				structure_builder::source_file_token::SMULTIPLY, structure_builder::source_file_token::SUBSTRACT, structure_builder::source_file_token::SSUBSTRACT,
-				structure_builder::source_file_token::DIVIDE, structure_builder::source_file_token::SDIVIDE, structure_builder::source_file_token::COMPARE,
-				structure_builder::source_file_token::INCREMENT, structure_builder::source_file_token::DECREMENT, structure_builder::source_file_token::JUMP,
-				structure_builder::source_file_token::JUMP_NOT_EQUAL, structure_builder::source_file_token::JUMP_EQUAL, structure_builder::source_file_token::JUMP_GREATER,
-				structure_builder::source_file_token::JUMP_GREATER_EQUAL, structure_builder::source_file_token::JUMP_LESS, structure_builder::source_file_token::JUMP_LESS_EQUAL,
-				structure_builder::source_file_token::JUMP_ABOVE, structure_builder::source_file_token::JUMP_ABOVE_EQUAL, structure_builder::source_file_token::JUMP_BELOW,
-				structure_builder::source_file_token::MOVE, structure_builder::source_file_token::AND, structure_builder::source_file_token::OR,
-				structure_builder::source_file_token::XOR, structure_builder::source_file_token::NOT, structure_builder::source_file_token::SAVE,
-				structure_builder::source_file_token::LOAD, structure_builder::source_file_token::REF, structure_builder::source_file_token::SHIFT_LEFT,
-				structure_builder::source_file_token::SHIFT_RIGHT, structure_builder::source_file_token::CTJTD, structure_builder::source_file_token::COPY_STRING
+				structure_builder::source_file_token::add_instruction_keyword, structure_builder::source_file_token::signed_add_instruction_keyword, structure_builder::source_file_token::multiply_instruction_keyword,
+				structure_builder::source_file_token::signed_multiply_instruction_keyword, structure_builder::source_file_token::subtract_instruction_keyword, structure_builder::source_file_token::signed_subtract_instruction_keyword,
+				structure_builder::source_file_token::divide_instruction_keyword, structure_builder::source_file_token::signed_divide_instruction_keyword, structure_builder::source_file_token::compare_instruction_keyword,
+				structure_builder::source_file_token::increment_instruction_keyword, structure_builder::source_file_token::decrement_instruction_keyword, structure_builder::source_file_token::jump_instruction_keyword,
+				structure_builder::source_file_token::jump_not_equal_instruction_keyword, structure_builder::source_file_token::jump_equal_instruction_keyword, structure_builder::source_file_token::jump_greater_instruction_keyword,
+				structure_builder::source_file_token::jump_greater_equal_instruction_keyword, structure_builder::source_file_token::jump_less_instruction_keyword, structure_builder::source_file_token::jump_less_equal_instruction_keyword,
+				structure_builder::source_file_token::jump_above_instruction_keyword, structure_builder::source_file_token::jump_above_equal_instruction_keyword, structure_builder::source_file_token::jump_below_instruction_keyword,
+				structure_builder::source_file_token::move_instruction_keyword, structure_builder::source_file_token::bit_and_instruction_keyword, structure_builder::source_file_token::bit_or_instruction_keyword,
+				structure_builder::source_file_token::bit_xor_instruction_keyword, structure_builder::source_file_token::bit_not_instruction_keyword, structure_builder::source_file_token::save_value_instruction_keyword,
+				structure_builder::source_file_token::load_value_instruction_keyword, structure_builder::source_file_token::move_pointer_instruction_keyword, structure_builder::source_file_token::bit_shift_left_instruction_keyword,
+				structure_builder::source_file_token::bit_shift_right_instruction_keyword, structure_builder::source_file_token::get_function_address_instruction_keyword, structure_builder::source_file_token::copy_string_instruction_keyword
 			},
-			state_action::push_state,
+			generic_parser::state_action::push_state,
 			instruction_arguments
 		);
 
 	add_new_jump_point
 		.set_redirection_for_token(
 			structure_builder::source_file_token::expression_end,
-			state_action::pop_top,
+			generic_parser::state_action::pop_top,
 			nullptr
 		);
 
 	add_module_name_to_instruction
 		.set_redirection_for_token(
 			structure_builder::source_file_token::module_call,
-			state_action::change_top,
+			generic_parser::state_action::change_top,
 			add_module_function_name_to_instruction
 		);
 
 	add_module_function_name_to_instruction
 		.set_redirection_for_token(
 			structure_builder::source_file_token::function_args_start,
-			state_action::change_top,
+			generic_parser::state_action::change_top,
 			instruction_arguments
 		);
 
@@ -1060,7 +1060,7 @@ void structure_builder::configure_parse_map() {
 	main_state.set_handle_tokens(
 		{
 			source_file_token::end_of_file,
-			source_file_token::ENDIF,
+			source_file_token::endif_keyword,
 			source_file_token::function_body_start
 		}
 	);
@@ -1069,28 +1069,28 @@ void structure_builder::configure_parse_map() {
 	main_state
 		.set_as_starting_state()
 		.set_redirection_for_token(
-			source_file_token::FROM,
-			state_action::push_state,
+			source_file_token::from_keyword,
+			generic_parser::state_action::push_state,
 			modules_import
 		)
 		.set_redirection_for_token(
 			source_file_token::comment_start,
-			state_action::push_state,
+			generic_parser::state_action::push_state,
 			comment
 		)
 		.set_redirection_for_token(
 			source_file_token::special_instruction,
-			state_action::push_state,
+			generic_parser::state_action::push_state,
 			special_instruction
 		)
 		.set_redirection_for_token(
-			source_file_token::function_declaration,
-			state_action::push_state,
+			source_file_token::function_declaration_keyword,
+			generic_parser::state_action::push_state,
 			function_declaration
 		)
 		.set_redirection_for_token(
 			source_file_token::function_body_start,
-			state_action::push_state,
+			generic_parser::state_action::push_state,
 			function_body
 		);
 

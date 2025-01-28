@@ -8,7 +8,7 @@
 #include <utility>
 #include <memory>
 
-#include "typename_array.h"
+#include "../typename_array/typename_array.h"
 
 using return_value = uint64_t;
 using arguments_string_type = unsigned char*;
@@ -44,7 +44,7 @@ private:
 		static constexpr size_t sizes[]{ sizeof(types)... };
 	};
 
-	using map_array = typename_array<char, unsigned char, short, unsigned short, int, unsigned int, long, unsigned long, long long, unsigned long long, void*>;
+	using map_array = typename_array::typename_array<char, unsigned char, short, unsigned short, int, unsigned int, long, unsigned long, long long, unsigned long long, void*>;
 	using type_sizes_container = map_array::template acquire<enumarate_type_sizes>;
 
 	template<typename type>
@@ -52,12 +52,12 @@ private:
 		static constexpr decltype(auto) value = sizeof(type);
 	};
 
-	template<typename type, typename_array_size_t index>
+	template<typename type, typename_array::typename_array_size_t index>
 	struct get_arguments_types {
 		using new_value =
-			typename_array<
-			value<find<map_array, type>::index>,
-			value<index + 1> //+1 because the first byte is the amount of arguments in a string
+			typename_array::typename_array<
+				typename_array::value<typename_array::find<map_array, type>::index>,
+				typename_array::value<index + 1> //+1 because the first byte is the amount of arguments in a string
 			>;
 	};
 
@@ -66,7 +66,7 @@ private:
 	private:
 		template<typename T>
 		static void do_assign(arguments_string_type string) {
-			string[get<1, T>::value::get_value] = get<0, T>::value::get_value;
+			string[typename_array::get<1, T>::value::get_value] = typename_array::get<0, T>::value::get_value;
 		}
 
 	public:
@@ -83,12 +83,12 @@ private:
 
 	template<typename... types>
 	static arguments_string_type build_types_string(size_t size) {
-		using types_array = typename_array<types...>;
+		using types_array = typename_array::typename_array<types...>;
 
 		arguments_string_type types_string = new arguments_string_element[size] {};
 		types_string[0] = sizeof... (types);
 
-		using types_assign = typename apply<types_array, get_arguments_types>::new_array::template acquire<assign_arguments_types>;
+		using types_assign = typename typename_array::apply<types_array, get_arguments_types>::new_array::template acquire<assign_arguments_types>;
 		types_assign::assign(types_string);
 
 		return types_string;
@@ -114,7 +114,7 @@ private:
 
 public:
 	template<typename type>
-	static constexpr typename_array_size_t get_type_index = find<map_array, type>::index;
+	static constexpr typename_array::typename_array_size_t get_type_index = typename_array::find<map_array, type>::index;
 
 	static size_t get_type_size_by_index(arguments_string_element index) {
 		assert(index < map_array::size && "invalid index");
@@ -222,7 +222,7 @@ public:
 		const arguments_array_type& arguments_array
 	) {
 		constexpr auto type_index = arguments_string_builder::get_type_index<destination_type>;
-		static_assert(type_index != npos);
+		static_assert(type_index != typename_array::npos);
 
 		if (index < arguments_array.size()) {
 			if (arguments_array[index].first == type_index) {
@@ -236,8 +236,8 @@ public:
 
 	template<typename... types>
 	static arguments_string_type pack(types... values) {
-		using types_array = typename_array<types...>;
-		constexpr size_t arguments_string_size = sum<types_array, functor_sum, size_t>::new_value + sizeof... (types) + 1; //+1 because of the first byte
+		using types_array = typename_array::typename_array<types...>;
+		constexpr size_t arguments_string_size = typename_array::sum<types_array, functor_sum, size_t>::new_value + sizeof... (types) + 1; //+1 because of the first byte
 		
 		arguments_string_type arguments_string = build_types_string<types...>(arguments_string_size);
 		arguments_string_type arguments_string_pointer_copy = arguments_string + sizeof... (types) + 1;

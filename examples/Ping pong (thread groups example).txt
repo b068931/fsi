@@ -1,79 +1,79 @@
-from prts import <io.log.info, io.log.warning, pointer.allocate, pointer.deallocate, this_thread.yield, threading.create_group>
+from prts import <io.log.info, io.log.warning, pointer.allocate, pointer.deallocate, this-thread.yield, threading.create-group>
 
-$string ping ''''ping''''
-$string pong ''''pong''''
+$define-string ping ''''ping''''
+$define-string pong ''''pong''''
 
-$string warning ''''You should start this application with only one executor, or the output may look strange.''''
+$define-string warning ''''You should start this application with only one executor, or the output may look strange.''''
 
-function get_ping_string()
-get_ping_string {
-    $decl pointer ping_storage
-    ping_storage: prts->pointer.allocate(sizeof ping)
+function get-ping-string()
+get-ping-string {
+    $declare pointer ping-storage
+    ping-storage: prts->pointer.allocate(size-of ping)
 
-    copy_string var pointer ping_storage, str ping;
-    save var pointer ping_storage;
+    copy-string variable pointer ping-storage, string ping;
+    save-value variable pointer ping-storage;
 }
 
-function get_pong_string()
-get_pong_string {
-    $decl pointer pong_storage
-    pong_storage: prts->pointer.allocate(sizeof pong)
+function get-pong-string()
+get-pong-string {
+    $declare pointer pong-storage
+    pong-storage: prts->pointer.allocate(size-of pong)
 
-    copy_string var pointer pong_storage, str pong;
-    save var pointer pong_storage;
+    copy-string variable pointer pong-storage, string pong;
+    save-value variable pointer pong-storage;
 }
 
-function choose_string(byte is_ping)
-choose_string {
-    compare var byte is_ping, imm byte 1;
-    jump_equal pnt ping;
+function choose-string(one-byte is-ping)
+choose-string {
+    compare variable one-byte is-ping, immediate one-byte 1;
+    jump-equal point ping;
 
-    get_pong_string()
-    jump pnt end;
+    get-pong-string()
+    jump point end;
 
     @ping;
-    get_ping_string()
+    get-ping-string()
 
     @end;
 }
 
-function show_passed_message_and_switch(ebyte counter, byte is_ping)
-show_passed_message_and_switch {
-    $decl pointer message
-    choose_string(var byte is_ping)
+function show-passed-message-and-switch(eight-bytes counter, one-byte is-ping)
+show-passed-message-and-switch {
+    $declare pointer message
+    choose-string(variable one-byte is-ping)
 
-    load var pointer message;
+    load-value variable pointer message;
 
     @repeat;
-    void: prts->io.log.info(var pointer message)
+    void: prts->io.log.info(variable pointer message)
 
-    compare var ebyte counter, imm ebyte 0;
-    jump_equal pnt end;
+    compare variable eight-bytes counter, immediate eight-bytes 0;
+    jump-equal point end;
 
-    decrement var ebyte counter;
+    decrement variable eight-bytes counter;
 
-    void: prts->this_thread.yield()
-    jump pnt repeat;
+    void: prts->this-thread.yield()
+    jump point repeat;
 
     @end;
     message: prts->pointer.deallocate()
 }
 
-function show_warning()
-show_warning {
-    $decl pointer warning_message
+function show-warning()
+show-warning {
+    $declare pointer warning-message
 
-    warning_message: prts->pointer.allocate(sizeof warning)
-    copy_string var pointer warning_message, str warning;
+    warning-message: prts->pointer.allocate(size-of warning)
+    copy-string variable pointer warning-message, string warning;
 
-    void: prts->io.log.warning(var pointer warning_message)
-    warning_message: prts->pointer.deallocate()
+    void: prts->io.log.warning(variable pointer warning-message)
+    warning-message: prts->pointer.deallocate()
 }
 
 function main()
 main {
-    show_warning()
+    show-warning()
 
-    void: prts->threading.create_group(fnc show_passed_message_and_switch, imm ebyte 5, imm byte 0)
-    void: prts->threading.create_group(fnc show_passed_message_and_switch, imm ebyte 5, imm byte 1)
+    void: prts->threading.create-group(function-name show-passed-message-and-switch, immediate eight-bytes 5, immediate one-byte 0)
+    void: prts->threading.create-group(function-name show-passed-message-and-switch, immediate eight-bytes 5, immediate one-byte 1)
 }

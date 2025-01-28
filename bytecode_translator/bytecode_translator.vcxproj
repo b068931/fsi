@@ -122,7 +122,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="parse_map_configuration.cpp" />
-    <ClCompile Include="Source.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="..\examples\Ebyte To String.txt">
@@ -207,7 +207,11 @@
     </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\examples\Dynamic Call.txt" />
+    <CopyFileToFolders Include="..\examples\Dynamic Call.txt">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\Examples</DestinationFolders>
+    </CopyFileToFolders>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

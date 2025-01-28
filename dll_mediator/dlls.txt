@@ -1,4 +1,4 @@
--part that actually makes everything work
+--part that actually makes everything work
 [excm:Dynamic Libraries/Core/Execution Module.dll]
 on_container_creation=ullong pointer
 on_thread_creation=ullong ullong
@@ -18,7 +18,7 @@ get_thread_saved_variable=
 self_priority=
 dynamic_call=pointer pointer
 
--controls creation and destruction of thread and container objects
+--controls creation and destruction of thread and container objects
 [resm:Dynamic Libraries/Core/Resource Module.dll]
 add_container_on_destroy=ullong pointer pointer
 add_thread_on_destroy=ullong pointer pointer
@@ -43,7 +43,7 @@ get_jump_table_size=ullong
 deallocate_program_memory=ullong pointer
 deallocate_thread_memory=ullong pointer
 
--the most important part that creates instructions
+--the most important part that creates instructions
 [progload:Dynamic Libraries/Core/Program Loader.dll]
 load_program_to_memory=pointer
 free_program=pointer uint pointer uint pointer pointer ullong
@@ -62,26 +62,26 @@ program_warning=pointer
 program_error=pointer
 program_fatal=pointer
 
--allows program to interact with the environment
+--allows program to interact with the environment
 [prts:Dynamic Libraries/Core/Program Runtime Services.dll]
--pointers
+--pointers
 !allocate_pointer:pointer.allocate=pointer uchar ullong
 !deallocate_pointer:pointer.deallocate=pointer uchar
-!get_allocated_size:pointer.allocated_size=pointer uchar pointer
+!get_allocated_size:pointer.allocated-size=pointer uchar pointer
 
--this thread
-!yield:this_thread.yield=
-!self_terminate:this_thread.terminate=
-!self_priority:this_thread.priority=pointer uchar
-!thread_id:this_thread.id=pointer uchar
-!thread_group_id:this_thread.group_id=pointer uchar
-!dynamic_call:this_thread.dynamic_call=dynamic
+--this thread
+!yield:this-thread.yield=
+!self_terminate:this-thread.terminate=
+!self_priority:this-thread.priority=pointer uchar
+!thread_id:this-thread.id=pointer uchar
+!thread_group_id:this-thread.group-id=pointer uchar
+!dynamic_call:this-thread.dynamic-call=dynamic
 
--threading
+--threading
 !create_thread:threading.create=dynamic
-!create_thread_group:threading.create_group=dynamic
+!create_thread_group:threading.create-group=dynamic
 
--io/logging
+--io/logging
 !info:io.log.info=pointer
 !warning:io.log.warning=pointer
 !error:io.log.error=pointer

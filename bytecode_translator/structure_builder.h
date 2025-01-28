@@ -8,8 +8,8 @@
 #include <list>
 #include <stdexcept>
 
-#include "../dll_mediator/generic_parser.h"
-#include "../dll_mediator/read_map.h"
+#include "../generic_parser/token_generator.h"
+#include "../generic_parser/read_map.h"
 
 /*
 * generally speaking, this entire file is FUCKED UP.
@@ -63,80 +63,80 @@ public:
 		comment_end,
 		import_start,  //from ... import <> (<)
 		import_end,	   //(>)
-		FROM,
-		IMPORT,
+		from_keyword,
+		import_keyword,
 		special_instruction, //.redefine and other
-		REDEFINE,
-		DEFINE,
-		UNDEFINE,
-		IFDEF,
-		IFNDEF,
-		ENDIF,
-		STACK_SIZE,
-		DECL,
-		function_declaration, //function
+		redefine_keyword,
+		define_keyword,
+		undefine_keyword,
+		if_defined_keyword,
+		if_not_defined_keyword,
+		endif_keyword,
+		stack_size_keyword,
+		declare_keyword,
+		function_declaration_keyword, //function
 		function_args_start, //(
 		function_args_end, //)
-		SIZEOF,
-		BYTE,
-		DBYTE,
-		FBYTE,
-		EBYTE,
-		POINTER,
+		sizeof_argument_keyword,
+		one_byte_type_keyword,
+		two_bytes_type_keyword,
+		four_bytes_type_keyword,
+		eight_bytes_type_keyword,
+		pointer_type_keyword,
 		function_body_start, //{
 		expression_end, //;
-		MOVE,
-		ADD,
-		SADD,
-		SUBSTRACT,
-		SSUBSTRACT,
-		MULTIPLY,
-		SMULTIPLY,
-		DIVIDE,
-		SDIVIDE,
-		COMPARE,
-		INCREMENT,
-		DECREMENT,
-		JUMP,
-		JUMP_EQUAL,
-		JUMP_NOT_EQUAL,
-		JUMP_GREATER,
-		JUMP_GREATER_EQUAL,
-		JUMP_LESS,
-		JUMP_LESS_EQUAL,
-		JUMP_ABOVE,
-		JUMP_ABOVE_EQUAL,
-		JUMP_BELOW,
-		JUMP_BELOW_EQUAL,
+		move_instruction_keyword,
+		add_instruction_keyword,
+		signed_add_instruction_keyword,
+		subtract_instruction_keyword,
+		signed_subtract_instruction_keyword,
+		multiply_instruction_keyword,
+		signed_multiply_instruction_keyword,
+		divide_instruction_keyword,
+		signed_divide_instruction_keyword,
+		compare_instruction_keyword,
+		increment_instruction_keyword,
+		decrement_instruction_keyword,
+		jump_instruction_keyword,
+		jump_equal_instruction_keyword,
+		jump_not_equal_instruction_keyword,
+		jump_greater_instruction_keyword,
+		jump_greater_equal_instruction_keyword,
+		jump_less_instruction_keyword,
+		jump_less_equal_instruction_keyword,
+		jump_above_instruction_keyword,
+		jump_above_equal_instruction_keyword,
+		jump_below_instruction_keyword,
+		jump_below_equal_instruction_keyword,
 		dereference_start, //[
 		dereference_end, //]
 		module_call, //->
 		module_return_value, //:
 		jump_point, //@
 		function_body_end, //}
-		immediate_data,
+		immediate_argument_keyword,
 		new_line,
-		function_address,
-		SIGNED,
-		variable_referenced,
-		pointer_dereference,
-		VOID,
+		function_address_argument_keyword,
+		signed_argument_keyword,
+		variable_argument_keyword,
+		pointer_dereference_argument_keyword,
+		no_return_module_call_keyword,
 		function_call,
-		jump_data,
-		AND,
-		OR,
-		XOR,
-		NOT,
-		SAVE,
-		LOAD,
-		REF,
-		SHIFT_LEFT,
-		SHIFT_RIGHT,
-		CTJTD, //convert to jump table displacement
-		STRING,
+		jump_point_argument_keyword,
+		bit_and_instruction_keyword,
+		bit_or_instruction_keyword,
+		bit_xor_instruction_keyword,
+		bit_not_instruction_keyword,
+		save_value_instruction_keyword,
+		load_value_instruction_keyword,
+		move_pointer_instruction_keyword,
+		bit_shift_left_instruction_keyword,
+		bit_shift_right_instruction_keyword,
+		get_function_address_instruction_keyword,
+		define_string_keyword,
 		string_separator,
-		string_argument,
-		COPY_STRING
+		string_argument_keyword,
+		copy_string_instruction_keyword
 	};
 	enum class parameters_enumeration {
 		ifdef_ifndef_pop_check
@@ -410,7 +410,7 @@ public:
 			}
 
 			template<typename type>
-			void map_operand_with_variable(const std::string& name, type** out, read_map<source_file_token, context_key, file, helper_inter_states_object, parameters_enumeration>& parse_map) {
+			void map_operand_with_variable(const std::string& name, type** out, generic_parser::read_map<source_file_token, context_key, file, helper_inter_states_object, parameters_enumeration>& parse_map) {
 				auto found_argument = this->find_argument_variable_by_name(name);
 				if (found_argument != this->get_current_function().arguments.end()) {
 					*out = &(*found_argument);
@@ -492,7 +492,7 @@ public:
 			static entity_id id = 1;
 			return id++;
 		}
-		void add_function_address_argument(file& output_file_structure, helper_inter_states_object& helper, read_map<source_file_token, context_key, file, helper_inter_states_object, parameters_enumeration>& read_map) {
+		void add_function_address_argument(file& output_file_structure, helper_inter_states_object& helper, generic_parser::read_map<source_file_token, context_key, file, helper_inter_states_object, parameters_enumeration>& read_map) {
 			helper.current_function.get_last_instruction().func_addresses.push_back(function_address{}); //add new function address to the list function addresses of specific instruction
 
 			function_address* func = &helper.current_function.get_last_instruction().func_addresses.back();
@@ -515,16 +515,16 @@ public:
 				output_file_structure.exposed_functions.push_back(function);
 			}
 
-			helper.current_function.add_new_operand_to_last_instruction(source_file_token::function_address, func, false);
+			helper.current_function.add_new_operand_to_last_instruction(source_file_token::function_address_argument_keyword, func, false);
 		}
 	};
-	using read_map_type = read_map<source_file_token, context_key, file, helper_inter_states_object, parameters_enumeration>;
+	using read_map_type = generic_parser::read_map<source_file_token, context_key, file, helper_inter_states_object, parameters_enumeration>;
 
 private:
 	line_type error_line;
 	bool working;
 
-	token_generator<structure_builder::source_file_token, context_key>* generator;
+	generic_parser::token_generator<structure_builder::source_file_token, context_key>* generator;
 	std::vector<std::pair<std::string, structure_builder::source_file_token>>* names_stack;
 
 	read_map_type parse_map;
@@ -533,7 +533,7 @@ private:
 	helper_inter_states_object helper{};
 	file output_file_structure;
 public:
-	structure_builder(std::vector<std::pair<std::string, structure_builder::source_file_token>>* names_stack, token_generator<structure_builder::source_file_token, context_key>* token_generator)
+	structure_builder(std::vector<std::pair<std::string, structure_builder::source_file_token>>* names_stack, generic_parser::token_generator<structure_builder::source_file_token, context_key>* token_generator)
 		:working{ true },
 		generator{ token_generator },
 		names_stack{ names_stack },

@@ -9,18 +9,11 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="Header Files\Generic Parser">
-      <UniqueIdentifier>{e20c5104-7022-45e9-bc59-b8b1da506764}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Export">
       <UniqueIdentifier>{3819a92d-e72d-415d-a124-346ecda49783}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Dependencies">
-      <UniqueIdentifier>{1d47356e-31fb-432e-b390-edeaf94511c2}</UniqueIdentifier>
+    <Filter Include="Header Files\Parse Map States">
+      <UniqueIdentifier>{4527f85b-349b-4b22-8e7f-12f4f2492168}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -30,28 +23,31 @@
     <ClCompile Include="parse_map_configuration.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="block_reader.h">
-      <Filter>Header Files\Generic Parser</Filter>
-    </ClInclude>
-    <ClInclude Include="generic_parser.h">
-      <Filter>Header Files\Generic Parser</Filter>
-    </ClInclude>
-    <ClInclude Include="read_map.h">
-      <Filter>Header Files\Generic Parser</Filter>
-    </ClInclude>
     <ClInclude Include="fsi_types.h">
       <Filter>Header Files\Export</Filter>
     </ClInclude>
     <ClInclude Include="dll_part.h">
       <Filter>Header Files\Export</Filter>
     </ClInclude>
-    <ClInclude Include="typename_array.h">
-      <Filter>Header Files\Dependencies</Filter>
+    <ClInclude Include="inside_header_state.h">
+      <Filter>Header Files\Parse Map States</Filter>
+    </ClInclude>
+    <ClInclude Include="type_definitions.h">
+      <Filter>Header Files\Parse Map States</Filter>
+    </ClInclude>
+    <ClInclude Include="main_state.h">
+      <Filter>Header Files\Parse Map States</Filter>
+    </ClInclude>
+    <ClInclude Include="function_with_exported_name_state.h">
+      <Filter>Header Files\Parse Map States</Filter>
+    </ClInclude>
+    <ClInclude Include="inside_value_state.h">
+      <Filter>Header Files\Parse Map States</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

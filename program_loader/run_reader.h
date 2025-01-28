@@ -4,20 +4,21 @@
 #include <stdint.h>
 #include <map>
 #include <iostream>
-#include "../dll_mediator/block_reader.h"
+
+#include "../generic_parser/block_reader.h"
 
 template<typename container>
 class run_reader {
 public:
 	class run { //used to access bytes ONLY from specific run
 	private:
-		filepos run_start;
-		filepos run_position;
-		filepos run_size;
+		generic_parser::filepos run_start;
+		generic_parser::filepos run_position;
+		generic_parser::filepos run_size;
 
-		std::shared_ptr<block_reader<1024>> reader; //we will use only one block_reader for all runs
+		std::shared_ptr<generic_parser::block_reader<1024>> reader; //we will use only one block_reader for all runs
 	public:
-		run(filepos start, filepos size, std::shared_ptr<block_reader<1024>> reader)
+		run(generic_parser::filepos start, generic_parser::filepos size, std::shared_ptr<generic_parser::block_reader<1024>> reader)
 			:run_start{ start },
 			run_size{ size },
 			reader{ reader },
@@ -38,13 +39,13 @@ public:
 			return '\0';
 		}
 
-		filepos get_run_size() const { return this->run_size; }
-		filepos get_run_position() const { return this->run_position; }
+		generic_parser::filepos get_run_size() const { return this->run_size; }
+		generic_parser::filepos get_run_position() const { return this->run_position; }
 
 		template<typename type>
 		type get_object(type value = type{}) {
 			char* bytes = reinterpret_cast<char*>(&value);
-			for (filepos count = 0; (count < sizeof(type)) && (this->run_position < this->run_size);
+			for (generic_parser::filepos count = 0; (count < sizeof(type)) && (this->run_position < this->run_size);
 				++count, ++this->run_position) {
 				bytes[count] = this->reader->get_symbol(this->run_start + this->run_position);
 			}
@@ -55,16 +56,16 @@ public:
 	using container_run_initialize_function = void (container::*)(run);
 
 	run_reader(const std::string& file_name, container* cont, std::map<char, container_run_initialize_function> run_initializers) {
-		std::shared_ptr<block_reader<1024>> reader;
+		std::shared_ptr<generic_parser::block_reader<1024>> reader;
 
-		reader = std::shared_ptr<block_reader<1024>>{
-			new block_reader<1024>{
+		reader = std::shared_ptr<generic_parser::block_reader<1024>>{
+			new generic_parser::block_reader<1024>{
 				new std::ifstream{file_name, std::ios::binary},
 				std::filesystem::file_size(file_name)
 			}
 		};
 		
-		for (filepos index = 0, length = reader->get_symbols_count(); (index < length);) {
+		for (generic_parser::filepos index = 0, length = reader->get_symbols_count(); (index < length);) {
 			char run_type = reader->get_symbol(index++);
 
 			uint64_t run_size = 0;
