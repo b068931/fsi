@@ -436,19 +436,19 @@ state_settings& configure_instruction_arguments(states_builder_type& builder) {
 
 			switch (element_token) {
 			case structure_builder::source_file_token::one_byte_type_keyword:
-				element_size = sizeof(byte);
+				element_size = sizeof(module_mediator::one_byte);
 				break;
 
 			case structure_builder::source_file_token::two_bytes_type_keyword:
-				element_size = sizeof(dbyte);
+				element_size = sizeof(module_mediator::two_bytes);
 				break;
 
 			case structure_builder::source_file_token::four_bytes_type_keyword:
-				element_size = sizeof(fbyte);
+				element_size = sizeof(module_mediator::four_bytes);
 				break;
 
 			case structure_builder::source_file_token::eight_bytes_type_keyword:
-				element_size = sizeof(ebyte);
+				element_size = sizeof(module_mediator::eight_bytes);
 				break;
 
 			default:

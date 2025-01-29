@@ -9,7 +9,7 @@
 
 #include "../dll_mediator/dll_part.h"
 
-dll_part* get_dll_part();
+module_mediator::dll_part* get_dll_part();
 void* get_default_function_address();
 
 class index_getter {

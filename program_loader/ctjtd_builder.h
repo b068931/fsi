@@ -29,7 +29,7 @@ public:
 			variable->is_valid_active_type() && 
 			variable->get_active_type() == 0b11 &&
 			this->get_argument_index() == 0,
-			"Regular variable or pointer dereference must be used as the first argument. Use 'ebyte' as the active type."
+			"Regular variable or pointer dereference must be used as the first argument. Use 'eight_bytes' as the active type."
 		);
 
 		this->load_variable_address(variable->get_id());
@@ -38,7 +38,7 @@ public:
 		this->assert_statement(
 			pointer->get_active_type() == 0b11 &&
 			this->get_argument_index() == 0,
-			"Regular variable or pointer dereference must be used as the first argument. Use 'ebyte' as the active type."
+			"Regular variable or pointer dereference must be used as the first argument. Use 'eight_bytes' as the active type."
 		);
 
 		this->accumulate_pointer_offset(pointer.get());

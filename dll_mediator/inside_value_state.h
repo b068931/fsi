@@ -12,10 +12,10 @@ public:
 	) override {
 		std::string function_types_string = read_map.get_token_generator_name();
 
-		arguments_string_type arguments_symbols = nullptr;
+		module_mediator::arguments_string_type arguments_symbols = nullptr;
 		if (function_types_string != "dynamic") {
 			std::stringstream arguments_string{ function_types_string };
-			arguments_symbols = new arguments_string_element[1]{ 0 };
+			arguments_symbols = new module_mediator::arguments_string_element[1]{ 0 };
 
 			std::string argument;
 			while (arguments_string.good()) { //won't execute if name string is empty
@@ -26,11 +26,11 @@ public:
 					if (found_argument != parameters.arguments.end()) {
 						unsigned char previous_size = static_cast<unsigned char>(arguments_symbols[0]);
 
-						arguments_string_type new_arguments_symbols = new arguments_string_element[static_cast<size_t>(previous_size) + 2];
+						module_mediator::arguments_string_type new_arguments_symbols = new module_mediator::arguments_string_element[static_cast<size_t>(previous_size) + 2];
 						new_arguments_symbols[0] = previous_size + 1;
 
 						std::memcpy(new_arguments_symbols + 1, arguments_symbols + 1, previous_size);
-						new_arguments_symbols[static_cast<size_t>(new_arguments_symbols[0])] = static_cast<arguments_string_element>(found_argument - parameters.arguments.begin()); //difference_type for std::vector is signed integral type
+						new_arguments_symbols[static_cast<size_t>(new_arguments_symbols[0])] = static_cast<module_mediator::arguments_string_element>(found_argument - parameters.arguments.begin()); //difference_type for std::vector is signed integral type
 
 						delete[] arguments_symbols;
 						arguments_symbols = new_arguments_symbols;

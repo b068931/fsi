@@ -9,7 +9,7 @@ extern thread_local_structure* get_thread_local_structure();
 
 extern "C" [[noreturn]] void load_execution_threadf(void*);
 extern "C" void load_programf(void*, void*, size_t is_startup);
-extern "C" return_value special_call_modulef();
+extern "C" module_mediator::return_value special_call_modulef();
 extern "C" [[noreturn]] void resume_program_executionf(void*);
 
 #endif

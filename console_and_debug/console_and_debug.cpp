@@ -38,24 +38,24 @@ void log_message(message_type type, const char* message) {
 	std::cerr << ' ' << "\x1b[97m" << message << "\033[0m" << std::endl;
 }
 
-void generic_log_message(message_type type, arguments_string_type bundle) {
-	auto arguments = arguments_string_builder::unpack<void*>(bundle);
+void generic_log_message(message_type type, module_mediator::arguments_string_type bundle) {
+	auto arguments = module_mediator::arguments_string_builder::unpack<void*>(bundle);
 	log_message(
 		type,
 		static_cast<char*>(std::get<0>(arguments))
 	);
 }
-void generic_log_message_with_thread_information(message_type type, arguments_string_type bundle) {
-	auto arguments = arguments_string_builder::unpack<void*>(bundle);
+void generic_log_message_with_thread_information(message_type type, module_mediator::arguments_string_type bundle) {
+	auto arguments = module_mediator::arguments_string_builder::unpack<void*>(bundle);
 	char* message = static_cast<char*>(std::get<0>(arguments));
 
-	return_value current_thread_id = fast_call_module(
+	module_mediator::return_value current_thread_id = module_mediator::fast_call(
 		::part,
 		index_getter::excm(),
 		index_getter::excm_get_current_thread_id()
 	);
 
-	return_value current_thread_group_id = fast_call_module(
+	module_mediator::return_value current_thread_group_id = module_mediator::fast_call(
 		::part,
 		index_getter::excm(),
 		index_getter::excm_get_current_thread_group_id()
@@ -74,41 +74,41 @@ void generic_log_message_with_thread_information(message_type type, arguments_st
 	log_message(type, stream.str().c_str());
 }
 
-return_value info(arguments_string_type bundle) {
+module_mediator::return_value info(module_mediator::arguments_string_type bundle) {
 	generic_log_message(message_type::info, bundle);
 	return 0;
 }
-return_value warning(arguments_string_type bundle) {
+module_mediator::return_value warning(module_mediator::arguments_string_type bundle) {
 	generic_log_message(message_type::warning, bundle);
 	return 0;
 }
-return_value error(arguments_string_type bundle) {
+module_mediator::return_value error(module_mediator::arguments_string_type bundle) {
 	generic_log_message(message_type::error, bundle);
 	return 0;
 }
-return_value fatal(arguments_string_type bundle) {
+module_mediator::return_value fatal(module_mediator::arguments_string_type bundle) {
 	generic_log_message(message_type::fatal, bundle);
 	return 0;
 }
 
-return_value program_info(arguments_string_type bundle) {
+module_mediator::return_value program_info(module_mediator::arguments_string_type bundle) {
 	generic_log_message_with_thread_information(message_type::info, bundle);
 	return 0;
 }
-return_value program_warning(arguments_string_type bundle) {
+module_mediator::return_value program_warning(module_mediator::arguments_string_type bundle) {
 	generic_log_message_with_thread_information(message_type::warning, bundle);
 	return 0;
 }
-return_value program_error(arguments_string_type bundle) {
+module_mediator::return_value program_error(module_mediator::arguments_string_type bundle) {
 	generic_log_message_with_thread_information(message_type::error, bundle);
 	return 0;
 }
-return_value program_fatal(arguments_string_type bundle) {
+module_mediator::return_value program_fatal(module_mediator::arguments_string_type bundle) {
 	generic_log_message_with_thread_information(message_type::fatal, bundle);
 	return 0;
 }
 
-void initialize_m(dll_part* part) {
+void initialize_m(module_mediator::dll_part* part) {
 	::part = part;
 
 	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);

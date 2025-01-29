@@ -38,28 +38,28 @@ private:
 	}
 
 public:
-	void add_thread_group(return_value id) {
+	void add_thread_group(module_mediator::return_value id) {
 		this->scheduler.add_thread_group(id);
 	}
 	void add_thread(
-		return_value thread_group_id,
-		return_value thread_id,
-		return_value priority,
+		module_mediator::return_value thread_group_id,
+		module_mediator::return_value thread_id,
+		module_mediator::return_value priority,
 		void* thread_state,
 		const void* jump_table
 	) {
 		this->scheduler.add_thread(thread_group_id, thread_id, priority, thread_state, jump_table);
 	}
-	void forget_thread_group(return_value thread_group_id) {
+	void forget_thread_group(module_mediator::return_value thread_group_id) {
 		this->scheduler.forget_thread_group(thread_group_id);
 	}
-	bool delete_thread(return_value thread_group_id, return_value thread_id) {
+	bool delete_thread(module_mediator::return_value thread_group_id, module_mediator::return_value thread_id) {
 		return this->scheduler.delete_thread(thread_group_id, thread_id);
 	}
-	void block(return_value thread_id) {
+	void block(module_mediator::return_value thread_id) {
 		this->scheduler.block(thread_id);
 	}
-	void make_runnable(return_value thread_id) {
+	void make_runnable(module_mediator::return_value thread_id) {
 		this->scheduler.make_runnable(thread_id);
 	}
 	void startup(uint16_t thread_count) {

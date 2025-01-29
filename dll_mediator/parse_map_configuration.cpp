@@ -6,10 +6,10 @@
 
 void dll_builder::configure_parse_map() {
 	using state_type =
-		generic_parser::states_builder<file_tokens, context_keys, std::vector<dll>, builder_parameters, dynamic_parameters_keys>::state_type;
+		generic_parser::states_builder<file_tokens, context_keys, result_type, builder_parameters, dynamic_parameters_keys>::state_type;
 
 	this->parameters.dll_part = this->mediator->get_dll_part();
-	generic_parser::states_builder<file_tokens, context_keys, std::vector<dll>, builder_parameters, dynamic_parameters_keys> builder{};
+	generic_parser::states_builder<file_tokens, context_keys, result_type, builder_parameters, dynamic_parameters_keys> builder{};
 
 	state_settings& starting_state = builder.create_state<state_type>();
 	state_settings& base_state = builder.create_state<main_state>();

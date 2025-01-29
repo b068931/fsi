@@ -11,7 +11,7 @@
 
 class id_generator {
 public:
-	using id_type = return_value;
+	using id_type = module_mediator::return_value;
 
 private:
 	static std::stack<id_type> free_ids;
@@ -37,29 +37,29 @@ public:
 	}
 };
 
-RESOURCEMODULE_API return_value add_container_on_destroy(arguments_string_type bundle);
-RESOURCEMODULE_API return_value add_thread_on_destroy(arguments_string_type bundle);
+RESOURCEMODULE_API module_mediator::return_value add_container_on_destroy(module_mediator::arguments_string_type bundle);
+RESOURCEMODULE_API module_mediator::return_value add_thread_on_destroy(module_mediator::arguments_string_type bundle);
 
-RESOURCEMODULE_API return_value duplicate_container(arguments_string_type bundle);
+RESOURCEMODULE_API module_mediator::return_value duplicate_container(module_mediator::arguments_string_type bundle);
 
-RESOURCEMODULE_API return_value create_new_program_container(arguments_string_type bundle);
-RESOURCEMODULE_API return_value create_new_thread(arguments_string_type bundle);
+RESOURCEMODULE_API module_mediator::return_value create_new_program_container(module_mediator::arguments_string_type bundle);
+RESOURCEMODULE_API module_mediator::return_value create_new_thread(module_mediator::arguments_string_type bundle);
 
-RESOURCEMODULE_API return_value allocate_program_memory(arguments_string_type bundle);
-RESOURCEMODULE_API return_value allocate_thread_memory(arguments_string_type bundle);
+RESOURCEMODULE_API module_mediator::return_value allocate_program_memory(module_mediator::arguments_string_type bundle);
+RESOURCEMODULE_API module_mediator::return_value allocate_thread_memory(module_mediator::arguments_string_type bundle);
 
-RESOURCEMODULE_API return_value deallocate_program_memory(arguments_string_type bundle);
-RESOURCEMODULE_API return_value deallocate_thread_memory(arguments_string_type bundle);
+RESOURCEMODULE_API module_mediator::return_value deallocate_program_memory(module_mediator::arguments_string_type bundle);
+RESOURCEMODULE_API module_mediator::return_value deallocate_thread_memory(module_mediator::arguments_string_type bundle);
 
-RESOURCEMODULE_API return_value deallocate_program_container(arguments_string_type bundle);
-RESOURCEMODULE_API return_value deallocate_thread(arguments_string_type bundle);
+RESOURCEMODULE_API module_mediator::return_value deallocate_program_container(module_mediator::arguments_string_type bundle);
+RESOURCEMODULE_API module_mediator::return_value deallocate_thread(module_mediator::arguments_string_type bundle);
 
-RESOURCEMODULE_API return_value get_running_threads_count(arguments_string_type bundle);
-RESOURCEMODULE_API return_value get_program_container_id(arguments_string_type bundle);
+RESOURCEMODULE_API module_mediator::return_value get_running_threads_count(module_mediator::arguments_string_type bundle);
+RESOURCEMODULE_API module_mediator::return_value get_program_container_id(module_mediator::arguments_string_type bundle);
 
-RESOURCEMODULE_API return_value get_jump_table(arguments_string_type bundle);
-RESOURCEMODULE_API return_value get_jump_table_size(arguments_string_type bundle);
+RESOURCEMODULE_API module_mediator::return_value get_jump_table(module_mediator::arguments_string_type bundle);
+RESOURCEMODULE_API module_mediator::return_value get_jump_table_size(module_mediator::arguments_string_type bundle);
 
-RESOURCEMODULE_API void initialize_m(dll_part*);
+RESOURCEMODULE_API void initialize_m(module_mediator::dll_part*);
 
 #endif // !RESOURCE_MODULE

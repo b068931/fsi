@@ -3,14 +3,14 @@
 
 #include "declarations.h"
 
-PROGRAMRUNTIMESERVICES_API return_value yield(arguments_string_type bundle);
-PROGRAMRUNTIMESERVICES_API return_value self_terminate(arguments_string_type bundle);
-PROGRAMRUNTIMESERVICES_API return_value self_priority(arguments_string_type bundle);
-PROGRAMRUNTIMESERVICES_API return_value thread_id(arguments_string_type bundle);
-PROGRAMRUNTIMESERVICES_API return_value thread_group_id(arguments_string_type bundle);
-PROGRAMRUNTIMESERVICES_API return_value dynamic_call(arguments_string_type bundle);
+PROGRAMRUNTIMESERVICES_API module_mediator::return_value yield(module_mediator::arguments_string_type bundle);
+PROGRAMRUNTIMESERVICES_API module_mediator::return_value self_terminate(module_mediator::arguments_string_type bundle);
+PROGRAMRUNTIMESERVICES_API module_mediator::return_value self_priority(module_mediator::arguments_string_type bundle);
+PROGRAMRUNTIMESERVICES_API module_mediator::return_value thread_id(module_mediator::arguments_string_type bundle);
+PROGRAMRUNTIMESERVICES_API module_mediator::return_value thread_group_id(module_mediator::arguments_string_type bundle);
+PROGRAMRUNTIMESERVICES_API module_mediator::return_value dynamic_call(module_mediator::arguments_string_type bundle);
 
-PROGRAMRUNTIMESERVICES_API return_value create_thread(arguments_string_type bundle);
-PROGRAMRUNTIMESERVICES_API return_value create_thread_group(arguments_string_type bundle);
+PROGRAMRUNTIMESERVICES_API module_mediator::return_value create_thread(module_mediator::arguments_string_type bundle);
+PROGRAMRUNTIMESERVICES_API module_mediator::return_value create_thread_group(module_mediator::arguments_string_type bundle);
 
 #endif

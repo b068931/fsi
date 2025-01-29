@@ -1,14 +1,14 @@
 #include "pch.h"
 #include "declarations.h"
 
-return_value get_current_thread_group_id() {
-	return fast_call_module(
+module_mediator::return_value get_current_thread_group_id() {
+	return module_mediator::fast_call(
 		get_dll_part(),
 		index_getter::excm(),
 		index_getter::excm_get_current_thread_group_id()
 	);
 }
-std::pair<void*, uint64_t> decay_pointer(pointer value) {
+std::pair<void*, uint64_t> decay_pointer(module_mediator::pointer value) {
 	char* pointer = static_cast<char*>(value);
 	void* data = nullptr;
 	uint64_t size{};

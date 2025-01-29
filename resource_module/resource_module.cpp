@@ -11,9 +11,9 @@
 	#define _Releases_lock_(a)
 #endif
 
-dll_part* part = nullptr;
+module_mediator::dll_part* part = nullptr;
 
-enum class return_code : return_value {
+enum class return_code : module_mediator::return_value {
 	ok,
 	concurrency_error
 };
@@ -91,7 +91,7 @@ _Acquires_lock_(return.second) auto get_iterator(T& object, std::recursive_mutex
 }
 
 template<typename T>
-void add_destory_callback_generic(std::recursive_mutex& mutex, T& object, id_generator::id_type id, void(*callback)(return_value, return_value, void*), void* paired_information) {
+void add_destory_callback_generic(std::recursive_mutex& mutex, T& object, id_generator::id_type id, void(*callback)(module_mediator::return_value, module_mediator::return_value, void*), void* paired_information) {
 	auto iterator_lock = get_iterator(object, mutex, id);
 	if (iterator_lock.second) {
 		iterator_lock.first->second.destroy_callbacks.push_back(std::pair{callback, paired_information});
@@ -151,7 +151,7 @@ std::conditional_t<
 > 
 	deallocate_generic(std::recursive_mutex& mutex, T& object, id_generator::id_type id) {
 	constexpr bool thread_structure_switch = std::is_same_v<T, std::map<id_generator::id_type, thread_structure>>;
-	std::vector<std::pair<void(*)(return_value, return_value, void*), void*>> destroy_callbacks{};
+	std::vector<std::pair<void(*)(module_mediator::return_value, module_mediator::return_value, void*), void*>> destroy_callbacks{};
 
 	[[maybe_unused]] id_generator::id_type program_container_id = 0;
 	id_generator::id_type free_id = 0;
@@ -218,8 +218,8 @@ void insert_new_container(id_generator::id_type id, program_context* context) {
 	std::lock_guard lock{ containers_mutex };
 	containers[id] = std::move(new_container);
 }
-return_value notify_excm_new_container(id_generator::id_type id, void* main_function) {
-	return fast_call_module<return_value, void*>(
+module_mediator::return_value notify_excm_new_container(id_generator::id_type id, void* main_function) {
+	return module_mediator::fast_call<module_mediator::return_value, void*>(
 		::part,
 		index_getter::excm(),
 		index_getter::excm_on_container_creation(),
@@ -228,33 +228,33 @@ return_value notify_excm_new_container(id_generator::id_type id, void* main_func
 	);
 }
 
-return_value add_container_on_destroy(arguments_string_type bundle) {
-	auto arguments = arguments_string_builder::unpack<return_value, void*, void*>(bundle);
+module_mediator::return_value add_container_on_destroy(module_mediator::arguments_string_type bundle) {
+	auto arguments = module_mediator::arguments_string_builder::unpack<module_mediator::return_value, void*, void*>(bundle);
 	add_destory_callback_generic(
 		containers_mutex,
 		containers,
 		std::get<0>(arguments),
-		static_cast<void(*)(return_value, return_value, void*)>(std::get<1>(arguments)),
+		static_cast<void(*)(module_mediator::return_value, module_mediator::return_value, void*)>(std::get<1>(arguments)),
 		std::get<2>(arguments)
 	);
 
 	return 0;
 }
-return_value add_thread_on_destroy(arguments_string_type bundle) {
-	auto arguments = arguments_string_builder::unpack<return_value, void*, void*>(bundle);
+module_mediator::return_value add_thread_on_destroy(module_mediator::arguments_string_type bundle) {
+	auto arguments = module_mediator::arguments_string_builder::unpack<module_mediator::return_value, void*, void*>(bundle);
 	add_destory_callback_generic(
 		thread_structures_mutex,
 		thread_structures,
 		std::get<0>(arguments),
-		static_cast<void(*)(return_value, return_value, void*)>(std::get<1>(arguments)),
+		static_cast<void(*)(module_mediator::return_value, module_mediator::return_value, void*)>(std::get<1>(arguments)),
 		std::get<2>(arguments)
 	);
 
 	return 0;
 }
 
-return_value duplicate_container(arguments_string_type bundle) {
-	auto arguments = arguments_string_builder::unpack<id_generator::id_type, void*>(bundle);
+module_mediator::return_value duplicate_container(module_mediator::arguments_string_type bundle) {
+	auto arguments = module_mediator::arguments_string_builder::unpack<id_generator::id_type, void*>(bundle);
 	id_generator::id_type container_id = std::get<0>(arguments);
 	void* main_function = std::get<1>(arguments);
 
@@ -278,9 +278,9 @@ return_value duplicate_container(arguments_string_type bundle) {
 	return 1;
 }
 
-return_value create_new_program_container(arguments_string_type bundle) {
+module_mediator::return_value create_new_program_container(module_mediator::arguments_string_type bundle) {
 	id_generator::id_type id = id_generator::get_id();
-	auto arguments = arguments_string_builder::unpack<void*, uint32_t, void*, uint32_t, void*, uint64_t, void*, uint64_t>(bundle);
+	auto arguments = module_mediator::arguments_string_builder::unpack<void*, uint32_t, void*, uint32_t, void*, uint64_t, void*, uint64_t>(bundle);
 	
 	void** code = static_cast<void**>(std::get<0>(arguments));
 	uint32_t functions_count = std::get<1>(arguments);
@@ -311,8 +311,8 @@ return_value create_new_program_container(arguments_string_type bundle) {
 
 	return notify_excm_new_container(id, code[functions_count - 1]);
 }
-return_value create_new_thread(arguments_string_type bundle) {
-	auto arguments = arguments_string_builder::unpack<id_generator::id_type>(bundle);
+module_mediator::return_value create_new_thread(module_mediator::arguments_string_type bundle) {
+	auto arguments = module_mediator::arguments_string_builder::unpack<id_generator::id_type>(bundle);
 	id_generator::id_type container_id = std::get<0>(arguments);
 
 	id_generator::id_type id = id_generator::get_id();
@@ -333,7 +333,7 @@ return_value create_new_thread(arguments_string_type bundle) {
 		++iterator_lock.first->second.threads_count;
 	}
 
-	return fast_call_module<return_value, return_value>(
+	return module_mediator::fast_call<module_mediator::return_value, module_mediator::return_value>(
 		::part,
 		index_getter::excm(),
 		index_getter::excm_on_thread_creation(),
@@ -342,34 +342,34 @@ return_value create_new_thread(arguments_string_type bundle) {
 	);
 }
 
-return_value allocate_program_memory(arguments_string_type bundle) {
-	auto arguments = arguments_string_builder::unpack<id_generator::id_type, uint64_t>(bundle);
+module_mediator::return_value allocate_program_memory(module_mediator::arguments_string_type bundle) {
+	auto arguments = module_mediator::arguments_string_builder::unpack<id_generator::id_type, uint64_t>(bundle);
 	return allocate_memory_generic(containers_mutex, containers, std::get<0>(arguments), std::get<1>(arguments));
 }
-return_value allocate_thread_memory(arguments_string_type bundle) {
-	auto arguments = arguments_string_builder::unpack<id_generator::id_type, uint64_t>(bundle);
+module_mediator::return_value allocate_thread_memory(module_mediator::arguments_string_type bundle) {
+	auto arguments = module_mediator::arguments_string_builder::unpack<id_generator::id_type, uint64_t>(bundle);
 	return allocate_memory_generic(thread_structures_mutex, thread_structures, std::get<0>(arguments), std::get<1>(arguments));
 }
 
-return_value deallocate_program_memory(arguments_string_type bundle) {
-	auto arguments = arguments_string_builder::unpack<id_generator::id_type, void*>(bundle);
+module_mediator::return_value deallocate_program_memory(module_mediator::arguments_string_type bundle) {
+	auto arguments = module_mediator::arguments_string_builder::unpack<id_generator::id_type, void*>(bundle);
 	deallocate_memory_generic(containers_mutex, containers, std::get<0>(arguments), std::get<1>(arguments));
 
 	return 0;
 }
-return_value deallocate_thread_memory(arguments_string_type bundle) {
-	auto arguments = arguments_string_builder::unpack<id_generator::id_type, void*>(bundle);
+module_mediator::return_value deallocate_thread_memory(module_mediator::arguments_string_type bundle) {
+	auto arguments = module_mediator::arguments_string_builder::unpack<id_generator::id_type, void*>(bundle);
 	deallocate_memory_generic(thread_structures_mutex, thread_structures, std::get<0>(arguments), std::get<1>(arguments));
 
 	return 0;
 }
 
-return_value deallocate_program_container(arguments_string_type bundle) {
-	auto arguments = arguments_string_builder::unpack<id_generator::id_type>(bundle);
-	return static_cast<return_value>(deallocate_generic(containers_mutex, containers, std::get<0>(arguments)));
+module_mediator::return_value deallocate_program_container(module_mediator::arguments_string_type bundle) {
+	auto arguments = module_mediator::arguments_string_builder::unpack<id_generator::id_type>(bundle);
+	return static_cast<module_mediator::return_value>(deallocate_generic(containers_mutex, containers, std::get<0>(arguments)));
 }
-return_value deallocate_thread(arguments_string_type bundle) {
-	auto arguments = arguments_string_builder::unpack<id_generator::id_type>(bundle);
+module_mediator::return_value deallocate_thread(module_mediator::arguments_string_type bundle) {
+	auto arguments = module_mediator::arguments_string_builder::unpack<id_generator::id_type>(bundle);
 	auto code_id = deallocate_generic(thread_structures_mutex, thread_structures, std::get<0>(arguments));
 	if (code_id.first != return_code::concurrency_error) {
 		auto iterator_lock = get_iterator(containers, containers_mutex, code_id.second);
@@ -381,8 +381,8 @@ return_value deallocate_thread(arguments_string_type bundle) {
 	return 0;
 }
 
-return_value get_running_threads_count(arguments_string_type bundle) {
-	auto arguments = arguments_string_builder::unpack<id_generator::id_type>(bundle);
+module_mediator::return_value get_running_threads_count(module_mediator::arguments_string_type bundle) {
+	auto arguments = module_mediator::arguments_string_builder::unpack<id_generator::id_type>(bundle);
 	auto iterator_lock = get_iterator(containers, containers_mutex, std::get<0>(arguments));
 	if (iterator_lock.second) {
 		return iterator_lock.first->second.threads_count;
@@ -393,10 +393,10 @@ return_value get_running_threads_count(arguments_string_type bundle) {
 	* we don't return 0 because an index to this program container might have already been reused
 	*/
 
-	return std::numeric_limits<return_value>::max(); 
+	return std::numeric_limits<module_mediator::return_value>::max(); 
 }
-return_value get_program_container_id(arguments_string_type bundle) {
-	auto arguments = arguments_string_builder::unpack<id_generator::id_type>(bundle);
+module_mediator::return_value get_program_container_id(module_mediator::arguments_string_type bundle) {
+	auto arguments = module_mediator::arguments_string_builder::unpack<id_generator::id_type>(bundle);
 	auto iterator_lock = get_iterator(thread_structures, thread_structures_mutex, std::get<0>(arguments));
 	if (iterator_lock.second) {
 		iterator_lock.first->second.program_container;
@@ -406,8 +406,8 @@ return_value get_program_container_id(arguments_string_type bundle) {
 	return 0;
 }
 
-return_value get_jump_table(arguments_string_type bundle) {
-	auto arguments = arguments_string_builder::unpack<id_generator::id_type>(bundle);
+module_mediator::return_value get_jump_table(module_mediator::arguments_string_type bundle) {
+	auto arguments = module_mediator::arguments_string_builder::unpack<id_generator::id_type>(bundle);
 	auto iterator_lock = get_iterator(containers, containers_mutex, std::get<0>(arguments));
 	if (iterator_lock.second) {
 		return reinterpret_cast<uintptr_t>(iterator_lock.first->second.context->jump_table);
@@ -415,8 +415,8 @@ return_value get_jump_table(arguments_string_type bundle) {
 	
 	return reinterpret_cast<uintptr_t>(nullptr);
 }
-return_value get_jump_table_size(arguments_string_type bundle) {
-	auto arguments = arguments_string_builder::unpack<id_generator::id_type>(bundle);
+module_mediator::return_value get_jump_table_size(module_mediator::arguments_string_type bundle) {
+	auto arguments = module_mediator::arguments_string_builder::unpack<id_generator::id_type>(bundle);
 	auto iterator_lock = get_iterator(containers, containers_mutex, std::get<0>(arguments));
 	if (iterator_lock.second) {
 		return iterator_lock.first->second.context->jump_table_size;
@@ -425,7 +425,7 @@ return_value get_jump_table_size(arguments_string_type bundle) {
 	return 0;
 }
 
-void initialize_m(dll_part* part) {
+void initialize_m(module_mediator::dll_part* part) {
 	::part = part;
 }
 program_container::~program_container() noexcept {
@@ -438,7 +438,7 @@ program_container::~program_container() noexcept {
 }
 program_context::~program_context() noexcept {
 	assert(this->references_count == 0);
-	fast_call_module<void*, uint32_t, void*, uint32_t, void*, void*, uint64_t>(
+	module_mediator::fast_call<void*, uint32_t, void*, uint32_t, void*, void*, uint64_t>(
 		::part,
 		index_getter::progload(),
 		index_getter::progload_free_program(),

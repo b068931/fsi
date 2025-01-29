@@ -17,7 +17,7 @@ public:
 	}
 
 	virtual void visit(std::unique_ptr<dereferenced_pointer> pointer) override {
-		this->assert_statement(pointer->get_active_type() == 0b11, "You must use 'ebyte' as the active type.", pointer->get_id());
+		this->assert_statement(pointer->get_active_type() == 0b11, "You must use 'eight_bytes' as the active type.", pointer->get_id());
 		this->accumulate_pointer_offset(pointer.get());
 		this->add_base_address_to_pointer_dereference(pointer.get());
 		if (this->get_argument_index() == 0) {

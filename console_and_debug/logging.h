@@ -17,9 +17,9 @@
 #include <iostream>
 #include "../dll_mediator/dll_part.h"
 
-inline void generic_log_message(dll_part* part, size_t message_type, std::string message) {
+inline void generic_log_message(module_mediator::dll_part* part, size_t message_type, std::string message) {
 	static size_t logger = part->find_dll_index("logger");
-	if (logger == dll_part::dll_not_found) {
+	if (logger == module_mediator::dll_part::dll_not_found) {
 		std::cerr << "One of the modules requires uses logging. 'logger' was not found. Terminating with std::abort." << std::endl;
 		std::abort();
 	}
@@ -38,12 +38,12 @@ inline void generic_log_message(dll_part* part, size_t message_type, std::string
 	assert(message_type < 8);
 
 	size_t log_type = logger_indexes[message_type];
-	if (log_type == dll_part::function_not_found) {
+	if (log_type == module_mediator::dll_part::function_not_found) {
 		std::cerr << "One of the required logging functions was not found. Terminating with std::abort." << std::endl;
 		std::abort();
 	}
 
-	fast_call_module<void*>(part, logger, log_type, message.data());
+	module_mediator::fast_call<void*>(part, logger, log_type, message.data());
 }
 
 #define log_info(part, message) generic_log_message(part, 0, message)

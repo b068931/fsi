@@ -3,6 +3,6 @@
 
 #include "declarations.h"
 
-PROGRAMRUNTIMESERVICES_API void initialize_m(dll_part*);
+PROGRAMRUNTIMESERVICES_API void initialize_m(module_mediator::dll_part*);
 
 #endif

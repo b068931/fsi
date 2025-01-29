@@ -3,8 +3,8 @@
 
 #include "declarations.h"
 
-PROGRAMRUNTIMESERVICES_API return_value info(arguments_string_type bundle);
-PROGRAMRUNTIMESERVICES_API return_value warning(arguments_string_type bundle);
-PROGRAMRUNTIMESERVICES_API return_value error(arguments_string_type bundle);
+PROGRAMRUNTIMESERVICES_API module_mediator::return_value info(module_mediator::arguments_string_type bundle);
+PROGRAMRUNTIMESERVICES_API module_mediator::return_value warning(module_mediator::arguments_string_type bundle);
+PROGRAMRUNTIMESERVICES_API module_mediator::return_value error(module_mediator::arguments_string_type bundle);
 
 #endif

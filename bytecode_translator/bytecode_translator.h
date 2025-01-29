@@ -815,7 +815,7 @@ private:
 
 		this->write_run_footer(saved_position, run_size);
 	}
-	void create_function_signatures_run() { //4 bytes: signatures count, 8 bytes: entity_id, 1 byte: number of arguments, 1 byte: argument's type, 8 bytes: entity_id. 0 - byte, 1 - dbyte, 2 - fbyte, 3 - ebyte, 4 - pointer
+	void create_function_signatures_run() { //4 bytes: signatures count, 8 bytes: entity_id, 1 byte: number of arguments, 1 byte: argument's type, 8 bytes: entity_id. 0 - byte, 1 - two_bytes, 2 - four_bytes, 3 - eight_bytes, 4 - pointer
 		uint64_t run_size = sizeof(uint32_t);
 		auto saved_position = this->write_run_header(function_signatures_run);
 
@@ -1097,7 +1097,7 @@ void translate_error(bytecode_translator::error_t error, std::ostream& stream) {
 			break;
 		}
 		case bytecode_translator::error_t::ctjtd_instruction: {
-			stream << "ctjtd (convert to jump table displacement) instruction must be used with fnc as the second argument while the first argument is the place to store the ebyte displacement";
+			stream << "ctjtd (convert to jump table displacement) instruction must be used with fnc as the second argument while the first argument is the place to store the eight_bytes displacement";
 			break;
 		}
 		case bytecode_translator::error_t::non_string_instruction: {

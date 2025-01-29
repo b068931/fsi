@@ -19,7 +19,7 @@ protected:
 	}
 
 	uint8_t translate_current_type_to_memory_layouts_builder_type() {
-		uint8_t translated_type = 0; //0 - byte, 1 - dbyte, 2 - fbyte, 3 - ebyte, 4 - pointer
+		uint8_t translated_type = 0; //0 - byte, 1 - two_bytes, 2 - four_bytes, 3 - eight_bytes, 4 - pointer
 		if (this->get_current_variable_type() == 0b1111) {
 			translated_type = 4;
 		}

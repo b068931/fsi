@@ -11,10 +11,10 @@
 #define PROGRAMRUNTIMESERVICES_API extern "C" __declspec(dllimport) 
 #endif
 
-dll_part* get_dll_part();
-return_value get_current_thread_group_id();
+module_mediator::dll_part* get_dll_part();
+module_mediator::return_value get_current_thread_group_id();
 
-std::pair<pointer, ebyte> decay_pointer(pointer);
+std::pair<module_mediator::pointer, module_mediator::eight_bytes> decay_pointer(module_mediator::pointer);
 
 class index_getter {
 public:

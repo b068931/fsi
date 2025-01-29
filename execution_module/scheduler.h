@@ -157,10 +157,10 @@ public:
 	};
 
 	struct schedule_information {
-		return_value thread_id;
-		return_value thread_group_id;
+		module_mediator::return_value thread_id;
+		module_mediator::return_value thread_group_id;
 
-		return_value priority;
+		module_mediator::return_value priority;
 		thread_states state;
 		
 		void* thread_state;
@@ -170,7 +170,7 @@ public:
 
 private:
 	struct executable_thread {
-		return_value id;
+		module_mediator::return_value id;
 
 		//if locked, this means that the thread is already taken
 		std::mutex lock;
@@ -179,7 +179,7 @@ private:
 		void* thread_state;
 		const void* jump_table;
 
-		executable_thread(return_value id, thread_states state, void* thread_state, const void* jump_table)
+		executable_thread(module_mediator::return_value id, thread_states state, void* thread_state, const void* jump_table)
 			:state{ state },
 			thread_state{ thread_state },
 			jump_table{ jump_table },
@@ -203,12 +203,12 @@ private:
 	};
 
 	struct thread_group {
-		return_value id;
+		module_mediator::return_value id;
 
 		std::mutex lock;
-		priority_list<executable_thread, return_value> threads;
+		priority_list<executable_thread, module_mediator::return_value> threads;
 
-		thread_group(return_value id)
+		thread_group(module_mediator::return_value id)
 			:id{id}
 		{}
 
@@ -228,26 +228,26 @@ private:
 	* https://en.cppreference.com/w/cpp/container/unordered_map
 	*/
 
-	std::unordered_map<return_value, clock_list<thread_group>::proxy> thread_groups_hash_table;
+	std::unordered_map<module_mediator::return_value, clock_list<thread_group>::proxy> thread_groups_hash_table;
 	std::mutex thread_groups_hash_table_mutex;
 
-	std::unordered_map<return_value, priority_list<executable_thread, return_value>::proxy> threads_hash_table;
+	std::unordered_map<module_mediator::return_value, priority_list<executable_thread, module_mediator::return_value>::proxy> threads_hash_table;
 	std::mutex threads_hash_table_mutex;
 
-	return_value runnable_threads_count{};
+	module_mediator::return_value runnable_threads_count{};
 	clock_list<thread_group> thread_groups;
 	std::mutex clock_list_mutex;
 
 	std::condition_variable runnable_thread_notify;
 
 	using thread_group_proxy = clock_list<thread_group>::proxy;
-	using thread_proxy = priority_list<executable_thread, return_value>::proxy;
+	using thread_proxy = priority_list<executable_thread, module_mediator::return_value>::proxy;
 
-	thread_group_proxy& get_thread_group_using_hash_table(return_value id) {
+	thread_group_proxy& get_thread_group_using_hash_table(module_mediator::return_value id) {
 		std::lock_guard<std::mutex> thread_group_hash_table_lock{ this->thread_groups_hash_table_mutex };
 		return this->thread_groups_hash_table[id];
 	}
-	void remove_thread_group_from_hash_table(return_value thread_group_id) {
+	void remove_thread_group_from_hash_table(module_mediator::return_value thread_group_id) {
 		std::lock_guard<std::mutex> thread_groups_hash_table_lock{ this->thread_groups_hash_table_mutex };
 
 		auto found_thread_group = this->thread_groups_hash_table.find(thread_group_id);
@@ -259,7 +259,7 @@ private:
 		this->thread_groups_hash_table.erase(found_thread_group);
 	}
 	
-	thread_proxy& get_thread_using_hash_table(return_value id) {
+	thread_proxy& get_thread_using_hash_table(module_mediator::return_value id) {
 		std::lock_guard<std::mutex> threads_hash_table_lock{ this->threads_hash_table_mutex };
 		return this->threads_hash_table[id];
 	}
@@ -293,7 +293,7 @@ public:
 					std::unique_lock<std::mutex> thread_group_lock{ current_thread_group->lock };
 					clock_list_lock.unlock();
 
-					std::pair<executable_thread*, return_value> thread = current_thread_group->threads.find(
+					std::pair<executable_thread*, module_mediator::return_value> thread = current_thread_group->threads.find(
 						[](executable_thread& thread_obj) {
 							if (thread_obj.lock.try_lock()) { //check if thread is already taken
 								if (
@@ -345,7 +345,7 @@ public:
 			}
 		}
 	}
-	void add_thread_group(return_value id) {
+	void add_thread_group(module_mediator::return_value id) {
 		thread_group_proxy proxy{};
 		
 		{
@@ -357,9 +357,9 @@ public:
 		this->thread_groups_hash_table[id] = std::move(proxy);
 	}
 	void add_thread(
-					return_value thread_group_id, 
-					return_value thread_id, 
-					return_value priority,
+					module_mediator::return_value thread_group_id, 
+					module_mediator::return_value thread_id, 
+					module_mediator::return_value priority,
 					void* thread_state,
 					const void* jump_table
 	) {
@@ -381,7 +381,7 @@ public:
 
 		this->notify_runnable();
 	}
-	void forget_thread_group(return_value thread_group_id) {
+	void forget_thread_group(module_mediator::return_value thread_group_id) {
 		//see FORGET above
 		thread_group_proxy& thread_group_proxy = this->get_thread_group_using_hash_table(thread_group_id);
 		std::lock_guard<std::mutex> clock_list_lock{ this->clock_list_mutex };
@@ -394,7 +394,7 @@ public:
 
 		this->remove_thread_group_from_hash_table(thread_group_id);
 	}
-	bool delete_thread(return_value thread_group_id, return_value thread_id) { //true if thread_group was deleted
+	bool delete_thread(module_mediator::return_value thread_group_id, module_mediator::return_value thread_id) { //true if thread_group was deleted
 		//see DELETING above
 		thread_group_proxy& thread_group_proxy = this->get_thread_group_using_hash_table(thread_group_id);
 		
@@ -434,13 +434,13 @@ public:
 
 		return false;
 	}
-	void block(return_value thread_id) {
+	void block(module_mediator::return_value thread_id) {
 		//see BLOCK above
 
 		thread_proxy& thread_proxy = this->get_thread_using_hash_table(thread_id);
 		thread_proxy->state = thread_states::blocked;
 	}
-	void make_runnable(return_value thread_id) {
+	void make_runnable(module_mediator::return_value thread_id) {
 		thread_proxy& thread_proxy = this->get_thread_using_hash_table(thread_id);
 
 		{

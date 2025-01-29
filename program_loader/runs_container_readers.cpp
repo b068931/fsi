@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "run_container.h"
 
-extern dll_part* part;
+extern module_mediator::dll_part* part;
 
 void runs_container::modules_reader(run_reader<runs_container>::run run) { //every run has its own specific structure, so we need to use different functions for each type of run (see bytecode_translator.h)
 	for (uint64_t counter = 0, modules_count = run.get_object<uint64_t>(); counter < modules_count; ++counter) {

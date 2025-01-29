@@ -6,7 +6,7 @@
 #include <utility>
 
 struct resource_container {
-	std::vector<std::pair<void(*)(return_value, return_value, void*), void*>> destroy_callbacks{};
+	std::vector<std::pair<void(*)(module_mediator::return_value, module_mediator::return_value, void*), void*>> destroy_callbacks{};
 	std::vector<void*> allocated_memory{};
 
 	std::recursive_mutex* lock{ new std::recursive_mutex{} };

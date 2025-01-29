@@ -23,11 +23,11 @@
 * find_dll_index, find_function_index, call_module should not modify memory locations in any way
 */
 
-using module_callable_function_type = return_value(*)(arguments_string_type);
+using module_callable_function_type = module_mediator::return_value(*)(module_mediator::arguments_string_type);
 class function {
 private:
 	std::string name; //this function's name. used to identify its index
-	arguments_string_type arguments_symbols; //a sequence of bytes that represent this function's arguments
+	module_mediator::arguments_string_type arguments_symbols; //a sequence of bytes that represent this function's arguments
 
 	bool visible;
 	module_callable_function_type function_address;
@@ -64,10 +64,10 @@ private:
 		old_value.arguments_symbols = nullptr;
 	}
 
-	bool compare_arguments_strings_arguments_count(arguments_string_type arguments_symbols) const {
+	bool compare_arguments_strings_arguments_count(module_mediator::arguments_string_type arguments_symbols) const {
 		return arguments_symbols[0] == this->arguments_symbols[0];
 	}
-	bool check_arguments_strings_arguments_types(arguments_string_type arguments_symbols) const {
+	bool check_arguments_strings_arguments_types(module_mediator::arguments_string_type arguments_symbols) const {
 		return std::memcmp(arguments_symbols, this->arguments_symbols, static_cast<size_t>(this->arguments_symbols[0]) + 1) == 0;
 	}
 public:
@@ -77,7 +77,7 @@ public:
 		function_address{ nullptr }
 	{}
 
-	function(std::string&& name, module_callable_function_type function_address, arguments_string_type arguments_symbols, bool visible)
+	function(std::string&& name, module_callable_function_type function_address, module_mediator::arguments_string_type arguments_symbols, bool visible)
 		:name{ std::move(name) },
 		arguments_symbols{ arguments_symbols },
 		visible{ visible },
@@ -96,7 +96,7 @@ public:
 	}
 
 	bool compare_names(std::string_view name) const { return this->name == name; }
-	bool compare_arguments_types(arguments_string_type arguments_symbols) const { //true if equal
+	bool compare_arguments_types(module_mediator::arguments_string_type arguments_symbols) const { //true if equal
 		assert(arguments_symbols && "null pointer");
 		if (this->arguments_symbols == nullptr) { //if function has no arguments symbols it means that it automatically accepts all arguments
 			return true;
@@ -110,7 +110,7 @@ public:
 	}
 
 	bool is_visible() const { return this->visible; }
-	return_value call(arguments_string_type arguments) const {
+	module_mediator::return_value call(module_mediator::arguments_string_type arguments) const {
 		return this->function_address(arguments);
 	}
 
@@ -162,7 +162,7 @@ private:
 			}
 		}
 	}
-	void initialize_module(dll_part* mediator) {
+	void initialize_module(module_mediator::dll_part* mediator) {
 		FARPROC initialize = GetProcAddress(this->loaded_dll, "initialize_m");
 		if (initialize == NULL) {
 			std::cerr << "One of the modules does not define the initialize_m function. Process will be terminated with std::abort."
@@ -171,13 +171,13 @@ private:
 			std::abort();
 		}
 
-		((void(*)(dll_part*))initialize)(mediator); //convert and call initialize_m
+		((void(*)(module_mediator::dll_part*))initialize)(mediator); //convert and call initialize_m
 	}
 public:
 	dll(
 		std::string&& dll_name, 
 		std::string&& dll_path, 
-		dll_part* mediator //pointer to dll_part allows to access some of the dll_mediator functions
+		module_mediator::dll_part* mediator //pointer to dll_part allows to access some of the dll_mediator functions
 	)
 		:name{ std::move(dll_name) },
 		loaded_dll{ NULL }
@@ -209,13 +209,13 @@ public:
 			}
 		}
 
-		return dll_part::function_not_found;
+		return module_mediator::dll_part::function_not_found;
 	}
 	
 	const function& get_function(size_t index) const { 
 		return this->functions.at(index); 
 	}
-	bool add_function(const std::string& name, std::string&& export_name, arguments_string_type arguments_string, bool is_visible) {
+	bool add_function(const std::string& name, std::string&& export_name, module_mediator::arguments_string_type arguments_string, bool is_visible) {
 		FARPROC loaded_function = GetProcAddress(this->loaded_dll, name.c_str());
 		if (loaded_function == NULL)
 			return false;
@@ -241,7 +241,7 @@ class dll_mediator;
 class dll_builder {
 	public:
 		struct builder_parameters {
-			dll_part* dll_part{};
+			module_mediator::dll_part* dll_part{};
 			std::vector<std::string> arguments{ "char", "uchar", "short", "ushort", "int", "uint", "long", "ulong", "llong", "ullong", "pointer" };
 
 			std::string module_name;
@@ -267,10 +267,10 @@ class dll_builder {
 			main_context
 		};
 
-		using read_map_type = generic_parser::read_map<file_tokens, context_keys, std::vector<dll>, builder_parameters, dynamic_parameters_keys>;
 		using result_type = std::vector<dll>;
+		using read_map_type = generic_parser::read_map<file_tokens, context_keys, result_type, builder_parameters, dynamic_parameters_keys>;
 	private:
-		std::vector<dll> dlls;
+		result_type dlls;
 		builder_parameters parameters;
 
 		generic_parser::token_generator<file_tokens, context_keys>* generator;
@@ -305,7 +305,7 @@ class dll_builder {
 
 class dll_mediator {
 private:
-	class dll_part_implementation : public dll_part {
+	class dll_part_implementation : public module_mediator::dll_part {
 	private:
 		dll_mediator* mediator;
 
@@ -319,13 +319,13 @@ private:
 				return this->mediator->find_function_index(dll_index, name);
 			}
 			catch (const std::out_of_range&) {
-				return dll_part::function_not_found;
+				return module_mediator::dll_part::function_not_found;
 			}
 		}
 		virtual size_t find_dll_index(const char* name) const override {
 			return this->mediator->find_dll_index(name);
 		}
-		virtual return_value call_module(size_t module_index, size_t function_index, arguments_string_type arguments_string) override {
+		virtual module_mediator::return_value call_module(size_t module_index, size_t function_index, module_mediator::arguments_string_type arguments_string) override {
 			try {
 				return this->mediator->call_module(module_index, function_index, arguments_string);
 			}
@@ -336,7 +336,7 @@ private:
 				std::abort();
 			}
 		}
-		virtual return_value call_module_visible_only(size_t module_index, size_t function_index, arguments_string_type arguments_string, void(*error_callback)(call_error)) override {
+		virtual module_mediator::return_value call_module_visible_only(size_t module_index, size_t function_index, module_mediator::arguments_string_type arguments_string, void(*error_callback)(call_error)) override {
 			call_error error{ call_error::no_error };
 			
 			try {
@@ -384,20 +384,20 @@ private:
 			}
 		}
 
-		return dll_part::dll_not_found;
+		return module_mediator::dll_part::dll_not_found;
 	}
 	size_t find_function_index(size_t dll_index, std::string_view name) const { 
 		return this->get_dll(dll_index).find_function_index(name);
 	}
 
-	return_value call_module(size_t module_index, size_t function_index, arguments_string_type arguments_string) {
+	module_mediator::return_value call_module(size_t module_index, size_t function_index, module_mediator::arguments_string_type arguments_string) {
 		if (this->get_dll(module_index).get_function(function_index).compare_arguments_types(arguments_string)) { //true if arguments match
 			return this->get_dll(module_index).get_function(function_index).call(arguments_string);
 		}
 
 		throw invalid_arguments_string{ "Invalid arguments string used." };
 	}
-	return_value call_module_visible_only(size_t module_index, size_t function_index, arguments_string_type arguments_string) {
+	module_mediator::return_value call_module_visible_only(size_t module_index, size_t function_index, module_mediator::arguments_string_type arguments_string) {
 		if (this->get_dll(module_index).get_function(function_index).is_visible()) {
 			return this->call_module(module_index, function_index, arguments_string);
 		}
@@ -446,7 +446,7 @@ public:
 		this->loaded_dlls = parser.get_builder_value();
 		return parser.error();
 	}
-	dll_part* get_dll_part() {
+	module_mediator::dll_part* get_dll_part() {
 		return this->part_implementation;
 	}
 

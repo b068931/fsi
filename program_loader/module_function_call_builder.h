@@ -117,7 +117,7 @@ public:
 	)
 		:general_function_call_builder{ std::forward<args>(instruction_builder_args)... },
 		associated_module{ nullptr },
-		function_to_call_index{ dll_part::function_not_found },
+		function_to_call_index{ module_mediator::dll_part::function_not_found },
 		current_rbx_displacement{ 0 },
 		variable_index{ 0 },
 		is_second_time{ false },
@@ -134,7 +134,7 @@ public:
 		this->associated_module = &(found_module->second);
 	}
 	virtual void visit(std::unique_ptr<function> fnc) override {
-		if (this->function_to_call_index == dll_part::function_not_found) {
+		if (this->function_to_call_index == module_mediator::dll_part::function_not_found) {
 			auto found_fnc = this->associated_module->module_functions.find(fnc->get_id());
 			if (found_fnc == this->associated_module->module_functions.cend()) {
 				this->assert_statement(false, "Module function does not exist.", fnc->get_id());

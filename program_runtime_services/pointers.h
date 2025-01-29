@@ -3,8 +3,8 @@
 
 #include "declarations.h"
 
-PROGRAMRUNTIMESERVICES_API return_value allocate_pointer(arguments_string_type bundle);
-PROGRAMRUNTIMESERVICES_API return_value deallocate_pointer(arguments_string_type bundle);
-PROGRAMRUNTIMESERVICES_API return_value get_allocated_size(arguments_string_type bundle);
+PROGRAMRUNTIMESERVICES_API module_mediator::return_value allocate_pointer(module_mediator::arguments_string_type bundle);
+PROGRAMRUNTIMESERVICES_API module_mediator::return_value deallocate_pointer(module_mediator::arguments_string_type bundle);
+PROGRAMRUNTIMESERVICES_API module_mediator::return_value get_allocated_size(module_mediator::arguments_string_type bundle);
 
 #endif

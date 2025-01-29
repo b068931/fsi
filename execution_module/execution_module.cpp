@@ -6,7 +6,7 @@
 #include "../program_loader/functions.h"
 #include "../console_and_debug/logging.h"
 
-dll_part* part = nullptr;
+module_mediator::dll_part* part = nullptr;
 
 const size_t thread_state_size = 144;
 size_t thread_stack_size = 1000000;
@@ -98,16 +98,16 @@ public:
 };
 thread_manager manager;
 
-return_value inner_deallocate_thread(return_value thread_id) {
-	return fast_call_module<return_value>(
+module_mediator::return_value inner_deallocate_thread(module_mediator::return_value thread_id) {
+	return module_mediator::fast_call<module_mediator::return_value>(
 		::part,
 		index_getter::resm(),
 		index_getter::resm_deallocate_thread(),
 		thread_id
 	);
 }
-void inner_deallocate_program_container(return_value container_id) {
-	fast_call_module<return_value>(
+void inner_deallocate_program_container(module_mediator::return_value container_id) {
+	module_mediator::fast_call<module_mediator::return_value>(
 		::part,
 		index_getter::resm(),
 		index_getter::resm_deallocate_program_container(),
@@ -116,8 +116,8 @@ void inner_deallocate_program_container(return_value container_id) {
 }
 void inner_delete_running_thread() {
 	thread_local_structure* thread_structure = get_thread_local_structure();
-	return_value thread_group_id = thread_structure->currently_running_thread_information.thread_group_id;
-	return_value thread_id = thread_structure->currently_running_thread_information.thread_id;
+	module_mediator::return_value thread_group_id = thread_structure->currently_running_thread_information.thread_group_id;
+	module_mediator::return_value thread_id = thread_structure->currently_running_thread_information.thread_id;
 
 	bool is_delete_container = manager.delete_thread(thread_group_id, thread_id);
 
@@ -181,17 +181,17 @@ void show_error(uint64_t error_code) {
 	load_execution_threadf(get_thread_local_structure()->execution_thread_state);
 }
 
-[[noreturn]] void inner_call_module_error(dll_part::call_error error) {
+[[noreturn]] void inner_call_module_error(module_mediator::dll_part::call_error error) {
 	switch (error) {
-	case dll_part::call_error::function_is_not_visible:
+	case module_mediator::dll_part::call_error::function_is_not_visible:
 		log_program_error(::part, "Called module function is not visible. Thread terminated.");
 		break;
 
-	case dll_part::call_error::invalid_arguments_string:
+	case module_mediator::dll_part::call_error::invalid_arguments_string:
 		log_program_error(::part, "Incorrect arguments were used for the module function call. Thread terminated.");
 		break;
 
-	case dll_part::call_error::unknown_index:
+	case module_mediator::dll_part::call_error::unknown_index:
 		log_program_error(::part, "Module function does not exist. Thread terminated.");
 		break;
 	}
@@ -199,8 +199,8 @@ void show_error(uint64_t error_code) {
 	thread_terminate();
 	load_execution_threadf(get_thread_local_structure()->execution_thread_state);
 }
-[[noreturn]] void inner_call_module(uint64_t module_id, uint64_t function_id, arguments_string_type args_string) {
-	return_value action_code = ::part->call_module_visible_only(module_id, function_id, args_string, &inner_call_module_error);
+[[noreturn]] void inner_call_module(uint64_t module_id, uint64_t function_id, module_mediator::arguments_string_type args_string) {
+	module_mediator::return_value action_code = ::part->call_module_visible_only(module_id, function_id, args_string, &inner_call_module_error);
 	
 	//all these functions are declared as [[noreturn]]
 	switch (action_code)
@@ -224,16 +224,16 @@ void show_error(uint64_t error_code) {
 	}
 }
 
-return_value inner_self_duplicate(void* main_function, arguments_string_type initializer) {
+module_mediator::return_value inner_self_duplicate(void* main_function, module_mediator::arguments_string_type initializer) {
 	assert(get_thread_local_structure()->initializer == nullptr && "possible memory leak");
 	get_thread_local_structure()->initializer = initializer;
 	if (initializer != nullptr) { //you can not initialize a thread_group with pointer because this can lead to data race
-		constexpr auto pointer_type_index = arguments_string_builder::get_type_index<pointer>;
+		constexpr auto pointer_type_index = module_mediator::arguments_string_builder::get_type_index<module_mediator::pointer>;
 		
-		arguments_string_element arguments_count = initializer[0];
-		arguments_string_type arguments_types = initializer + 1;
-		for (arguments_string_element index = 0; index < arguments_count; ++index) {
-			if (arguments_types[index] == static_cast<arguments_string_element>(pointer_type_index)) {
+		module_mediator::arguments_string_element arguments_count = initializer[0];
+		module_mediator::arguments_string_type arguments_types = initializer + 1;
+		for (module_mediator::arguments_string_element index = 0; index < arguments_count; ++index) {
+			if (arguments_types[index] == static_cast<module_mediator::arguments_string_element>(pointer_type_index)) {
 				delete[] initializer;
 				get_thread_local_structure()->initializer = nullptr;
 
@@ -243,7 +243,7 @@ return_value inner_self_duplicate(void* main_function, arguments_string_type ini
 		}
 	}
 
-	return fast_call_module<return_value, void*>(
+	return module_mediator::fast_call<module_mediator::return_value, void*>(
 		::part,
 		index_getter::resm(),
 		index_getter::resm_duplicate_container(),
@@ -251,8 +251,8 @@ return_value inner_self_duplicate(void* main_function, arguments_string_type ini
 		main_function
 	);
 }
-return_value inner_get_container_running_threads_count(return_value container_id) {
-	return fast_call_module<return_value>(
+module_mediator::return_value inner_get_container_running_threads_count(module_mediator::return_value container_id) {
+	return module_mediator::fast_call<module_mediator::return_value>(
 		::part,
 		index_getter::resm(),
 		index_getter::resm_get_running_threads_count(),
@@ -263,21 +263,21 @@ return_value inner_get_container_running_threads_count(return_value container_id
 void inner_fill_in_reg_array_entry(uint64_t entry_index, char* memory, uint64_t value) {
 	std::memcpy(memory + (sizeof(uint64_t) * entry_index), &value, sizeof(uint64_t));
 }
-return_value inner_create_thread(return_value thread_group_id, return_value priority, void* function_address) {
+module_mediator::return_value inner_create_thread(module_mediator::return_value thread_group_id, module_mediator::return_value priority, void* function_address) {
 	thread_local_structure* thread_structure = get_thread_local_structure();
 	log_program_info(::part, "Creating new thread.");
 
 	thread_structure->program_function_address = function_address;
 	thread_structure->priority = priority;
 
-	return fast_call_module<return_value>(
+	return module_mediator::fast_call<module_mediator::return_value>(
 		::part,
 		index_getter::resm(),
 		index_getter::resm_create_new_thread(),
 		thread_group_id
 	);
 }
-return_value inner_create_thread_with_initializer(return_value priority, void* function_address, arguments_string_type initializer) {
+module_mediator::return_value inner_create_thread_with_initializer(module_mediator::return_value priority, void* function_address, module_mediator::arguments_string_type initializer) {
 	assert(get_thread_local_structure()->initializer == nullptr && "possible memory leak");
 	get_thread_local_structure()->initializer = initializer;
 	return inner_create_thread(
@@ -286,9 +286,9 @@ return_value inner_create_thread_with_initializer(return_value priority, void* f
 		function_address
 	);
 }
-char* inner_allocate_thread_memory(return_value thread_id, uint64_t size) {
+char* inner_allocate_thread_memory(module_mediator::return_value thread_id, uint64_t size) {
 	return reinterpret_cast<char*>(
-		fast_call_module<return_value, uint64_t>(
+		module_mediator::fast_call<module_mediator::return_value, uint64_t>(
 			::part,
 			index_getter::resm(),
 			index_getter::resm_allocate_thread_memory(),
@@ -297,14 +297,14 @@ char* inner_allocate_thread_memory(return_value thread_id, uint64_t size) {
 		)
 	);
 }
-return_value inner_check_function_signature(void* function_address, arguments_string_type initializer) {
-	std::unique_ptr<arguments_string_element[]> default_signature{ arguments_string_builder::get_types_string() };
-	arguments_string_type alleged_signature = default_signature.get();
+module_mediator::return_value inner_check_function_signature(void* function_address, module_mediator::arguments_string_type initializer) {
+	std::unique_ptr<module_mediator::arguments_string_element[]> default_signature{ module_mediator::arguments_string_builder::get_types_string() };
+	module_mediator::arguments_string_type alleged_signature = default_signature.get();
 	if (initializer != nullptr) {
 		alleged_signature = initializer;
 	}
 
-	return fast_call_module<void*, uintptr_t>(
+	return module_mediator::fast_call<void*, uintptr_t>(
 		::part,
 		index_getter::progload(),
 		index_getter::progload_check_function_arguments(),
@@ -313,7 +313,7 @@ return_value inner_check_function_signature(void* function_address, arguments_st
 	);
 }
 [[maybe_unused]] std::string get_exposed_function_name(void* function_address) {
-	return_value functions_symbols_address = fast_call_module(
+	module_mediator::return_value functions_symbols_address = module_mediator::fast_call(
 		::part,
 		index_getter::progload(),
 		index_getter::progload_get_function_name(),
@@ -328,9 +328,9 @@ return_value inner_check_function_signature(void* function_address, arguments_st
 
 	return function_name;
 }
-uintptr_t inner_apply_initializer_on_thread_stack(char* thread_stack_memory, char* thread_stack_end, const arguments_array_type& arguments) {
-	for (arguments_array_type::const_reverse_iterator begin = arguments.rbegin(), end = arguments.rend(); begin != end; ++begin) {
-		size_t type_size = arguments_string_builder::get_type_size_by_index(begin->first);
+uintptr_t inner_apply_initializer_on_thread_stack(char* thread_stack_memory, char* thread_stack_end, const module_mediator::arguments_array_type& arguments) {
+	for (module_mediator::arguments_array_type::const_reverse_iterator begin = arguments.rbegin(), end = arguments.rend(); begin != end; ++begin) {
+		size_t type_size = module_mediator::arguments_string_builder::get_type_size_by_index(begin->first);
 		if ((thread_stack_memory + type_size) >= thread_stack_end) {
 			log_program_error(::part, "Not enough stack space to initialize thread stack.");
 			reinterpret_cast<uintptr_t>(nullptr);
@@ -347,9 +347,9 @@ uintptr_t inner_apply_initializer_on_thread_stack(char* thread_stack_memory, cha
 
 	return reinterpret_cast<uintptr_t>(thread_stack_memory);
 }
-uintptr_t inner_initialize_thread_stack(void* function_address, char* thread_stack_memory, char* thread_stack_end, return_value thread_id) {
+uintptr_t inner_initialize_thread_stack(void* function_address, char* thread_stack_memory, char* thread_stack_end, module_mediator::return_value thread_id) {
 	if (inner_check_function_signature(function_address, get_thread_local_structure()->initializer) != 0) {
-		return_value container_id = inner_deallocate_thread(thread_id);
+		module_mediator::return_value container_id = inner_deallocate_thread(thread_id);
 		if (inner_get_container_running_threads_count(container_id) == 0) {
 			manager.forget_thread_group(container_id);
 			inner_deallocate_program_container(container_id);
@@ -367,10 +367,10 @@ uintptr_t inner_initialize_thread_stack(void* function_address, char* thread_sta
 		return reinterpret_cast<uintptr_t>(nullptr);
 	}
 	
-	arguments_string_type initializer = get_thread_local_structure()->initializer;
+	module_mediator::arguments_string_type initializer = get_thread_local_structure()->initializer;
 	if (initializer != nullptr) {
-		arguments_array_type arguments =
-			arguments_string_builder::convert_to_arguments_array(get_thread_local_structure()->initializer);
+		module_mediator::arguments_array_type arguments =
+			module_mediator::arguments_string_builder::convert_to_arguments_array(get_thread_local_structure()->initializer);
 
 		uintptr_t result = inner_apply_initializer_on_thread_stack(thread_stack_memory, thread_stack_end, arguments);
 
@@ -383,21 +383,21 @@ uintptr_t inner_initialize_thread_stack(void* function_address, char* thread_sta
 	return reinterpret_cast<uintptr_t>(thread_stack_memory);
 }
 
-return_value on_thread_creation(arguments_string_type bundle) {
-	auto arguments = arguments_string_builder::unpack<return_value, return_value>(bundle);
-	return_value container_id = std::get<0>(arguments);
-	return_value thread_id = std::get<1>(arguments);
+module_mediator::return_value on_thread_creation(module_mediator::arguments_string_type bundle) {
+	auto arguments = module_mediator::arguments_string_builder::unpack<module_mediator::return_value, module_mediator::return_value>(bundle);
+	module_mediator::return_value container_id = std::get<0>(arguments);
+	module_mediator::return_value thread_id = std::get<1>(arguments);
 
 	thread_local_structure* thread_structure = get_thread_local_structure();
 
 	char* thread_state_memory = inner_allocate_thread_memory(thread_id, thread_state_size);
 	char* thread_stack_memory = inner_allocate_thread_memory(thread_id, thread_stack_size);
 	
-	char* thread_stack_end = thread_stack_memory + thread_stack_size - (sizeof(byte) + sizeof(uint64_t));
+	char* thread_stack_end = thread_stack_memory + thread_stack_size - (sizeof(module_mediator::one_byte) + sizeof(uint64_t));
 
 	//get program jump table from resm
 	void* program_jump_table = reinterpret_cast<void*>(
-		fast_call_module<return_value>(
+		module_mediator::fast_call<module_mediator::return_value>(
 			::part,
 			index_getter::resm(),
 			index_getter::resm_get_jump_table(),
@@ -460,9 +460,9 @@ return_value on_thread_creation(arguments_string_type bundle) {
 	log_program_info(::part, "New thread has been successfully created.");
 	return 0;
 }
-return_value on_container_creation(arguments_string_type bundle) {
-	auto arguments = arguments_string_builder::unpack<return_value, void*>(bundle);
-	return_value container_id = std::get<0>(arguments);
+module_mediator::return_value on_container_creation(module_mediator::arguments_string_type bundle) {
+	auto arguments = module_mediator::arguments_string_builder::unpack<module_mediator::return_value, void*>(bundle);
+	module_mediator::return_value container_id = std::get<0>(arguments);
 	void* program_main = std::get<1>(arguments);
 
 	manager.add_thread_group(container_id);
@@ -471,10 +471,10 @@ return_value on_container_creation(arguments_string_type bundle) {
 	return inner_create_thread(container_id, 0, program_main);
 }
 
-return_value self_duplicate(arguments_string_type bundle) {
-	auto arguments = arguments_string_builder::unpack<void*, void*, uint64_t>(bundle);
+module_mediator::return_value self_duplicate(module_mediator::arguments_string_type bundle) {
+	auto arguments = module_mediator::arguments_string_builder::unpack<void*, void*, uint64_t>(bundle);
 
-	arguments_string_type copy = new arguments_string_element[std::get<2>(arguments)]{};
+	module_mediator::arguments_string_type copy = new module_mediator::arguments_string_element[std::get<2>(arguments)]{};
 	std::memcpy(copy, std::get<1>(arguments), std::get<2>(arguments));
 
 	return inner_self_duplicate(
@@ -482,20 +482,20 @@ return_value self_duplicate(arguments_string_type bundle) {
 		copy
 	);
 }
-return_value self_priority(arguments_string_type) {
+module_mediator::return_value self_priority(module_mediator::arguments_string_type) {
 	return get_thread_local_structure()->currently_running_thread_information.priority;
 }
-return_value get_thread_saved_variable(arguments_string_type) {
+module_mediator::return_value get_thread_saved_variable(module_mediator::arguments_string_type) {
 	char* thread_state = static_cast<char*>(get_thread_local_structure()->currently_running_thread_information.thread_state) + 40;
-	pointer thread_stack_end{};
+	module_mediator::pointer thread_stack_end{};
 
-	std::memcpy(&thread_stack_end, thread_state, sizeof(pointer));
+	std::memcpy(&thread_stack_end, thread_state, sizeof(module_mediator::pointer));
 	return reinterpret_cast<uintptr_t>(thread_stack_end);
 }
-return_value dynamic_call(arguments_string_type bundle) {
-	auto arguments = arguments_string_builder::unpack<void*, void*>(bundle);
+module_mediator::return_value dynamic_call(module_mediator::arguments_string_type bundle) {
+	auto arguments = module_mediator::arguments_string_builder::unpack<void*, void*>(bundle);
 	void* function_address = std::get<0>(arguments);
-	arguments_string_type function_arguments_string = static_cast<arguments_string_type>(std::get<1>(arguments));
+	module_mediator::arguments_string_type function_arguments_string = static_cast<module_mediator::arguments_string_type>(std::get<1>(arguments));
 
 	if (inner_check_function_signature(function_address, function_arguments_string) != 0) {
 		log_program_error(
@@ -511,13 +511,13 @@ return_value dynamic_call(arguments_string_type bundle) {
 	};
 
 	uintptr_t program_return_address = state_manager.get_return_address();
-	arguments_array_type function_arguments = arguments_string_builder::convert_to_arguments_array(
+	module_mediator::arguments_array_type function_arguments = module_mediator::arguments_string_builder::convert_to_arguments_array(
 		function_arguments_string
 	);
 
 	function_arguments.insert(
 		function_arguments.cbegin(),
-		{ static_cast<arguments_string_element>(arguments_string_builder::get_type_index<uintptr_t>), &program_return_address }
+		{ static_cast<module_mediator::arguments_string_element>(module_mediator::arguments_string_builder::get_type_index<uintptr_t>), &program_return_address }
 	);
 
 	uintptr_t new_current_stack_position = inner_apply_initializer_on_thread_stack(
@@ -532,7 +532,7 @@ return_value dynamic_call(arguments_string_type bundle) {
 	}
 
 	state_manager.set_current_stack_position(
-		new_current_stack_position - arguments_string_builder::get_type_size_by_index(arguments_string_builder::get_type_index<uintptr_t>)
+		new_current_stack_position - module_mediator::arguments_string_builder::get_type_size_by_index(module_mediator::arguments_string_builder::get_type_index<uintptr_t>)
 	);
 	
 	state_manager.set_return_address(
@@ -542,29 +542,29 @@ return_value dynamic_call(arguments_string_type bundle) {
 	return 0;
 }
 
-return_value self_block(arguments_string_type) {
+module_mediator::return_value self_block(module_mediator::arguments_string_type) {
 	log_program_info(::part, "Was blocked.");
 	manager.block(get_thread_local_structure()->currently_running_thread_information.thread_id);
 
 	return 0;
 }
-return_value get_current_thread_id(arguments_string_type) {
+module_mediator::return_value get_current_thread_id(module_mediator::arguments_string_type) {
 	return get_thread_local_structure()->currently_running_thread_information.thread_id;
 }
-return_value get_current_thread_group_id(arguments_string_type) {
+module_mediator::return_value get_current_thread_group_id(module_mediator::arguments_string_type) {
 	return get_thread_local_structure()->currently_running_thread_information.thread_group_id;
 }
-return_value make_runnable(arguments_string_type bundle) {
-	auto arguments = arguments_string_builder::unpack<return_value>(bundle);
+module_mediator::return_value make_runnable(module_mediator::arguments_string_type bundle) {
+	auto arguments = module_mediator::arguments_string_builder::unpack<module_mediator::return_value>(bundle);
 
-	return_value thread_id = std::get<0>(arguments);
+	module_mediator::return_value thread_id = std::get<0>(arguments);
 	log_program_info(::part, "Made a thread with id '" + std::to_string(thread_id) + "' runnable again.");
 
 	manager.make_runnable(thread_id);
 	return 0;
 }
-return_value start(arguments_string_type bundle) {
-	auto arguments = arguments_string_builder::unpack<return_value>(bundle);
+module_mediator::return_value start(module_mediator::arguments_string_type bundle) {
+	auto arguments = module_mediator::arguments_string_builder::unpack<module_mediator::return_value>(bundle);
 	uint16_t thread_count = static_cast<uint16_t>(std::get<0>(arguments));
 
 	log_info(::part, "Creating execution daemons. Count: " + std::to_string(thread_count));
@@ -572,10 +572,10 @@ return_value start(arguments_string_type bundle) {
 
 	return 0;
 }
-return_value create_thread(arguments_string_type bundle) {
-	auto arguments = arguments_string_builder::unpack<return_value, void*, void*, uint64_t>(bundle);
+module_mediator::return_value create_thread(module_mediator::arguments_string_type bundle) {
+	auto arguments = module_mediator::arguments_string_builder::unpack<module_mediator::return_value, void*, void*, uint64_t>(bundle);
 
-	arguments_string_type copy = new arguments_string_element[std::get<3>(arguments)]{};
+	module_mediator::arguments_string_type copy = new module_mediator::arguments_string_element[std::get<3>(arguments)]{};
 	std::memcpy(copy, std::get<2>(arguments), std::get<3>(arguments));
 
 	return inner_create_thread_with_initializer(
@@ -586,12 +586,12 @@ return_value create_thread(arguments_string_type bundle) {
 
 	return 0;
 }
-return_value run_program(arguments_string_type bundle) {
+module_mediator::return_value run_program(module_mediator::arguments_string_type bundle) {
 	//excm(run_program)->prog_load(load_program_to_memory)->resm(create_new_prog_container)->excm(on_container_creation)
-	auto arguments = arguments_string_builder::unpack<void*>(bundle);
+	auto arguments = module_mediator::arguments_string_builder::unpack<void*>(bundle);
 	log_program_info(::part, "Starting new program.");
 
-	fast_call_module<void*>(
+	module_mediator::fast_call<void*>(
 		::part,
 		index_getter::progload(),
 		index_getter::progload_load_program_to_memory(),
@@ -605,7 +605,7 @@ return_value run_program(arguments_string_type bundle) {
 	thread_terminate();
 	load_execution_threadf(get_thread_local_structure()->execution_thread_state);
 }
-void initialize_m(dll_part* part) {
+void initialize_m(module_mediator::dll_part* part) {
 	::part = part;
 	::program_control_functions_addresses = new char[4 * sizeof(uint64_t)] {};
 	
