@@ -19,13 +19,13 @@ CONSOLEANDDEBUG_API module_mediator::return_value program_warning(module_mediato
 CONSOLEANDDEBUG_API module_mediator::return_value program_error(module_mediator::arguments_string_type bundle);
 CONSOLEANDDEBUG_API module_mediator::return_value program_fatal(module_mediator::arguments_string_type bundle);
 
-CONSOLEANDDEBUG_API void initialize_m(module_mediator::dll_part*);
+CONSOLEANDDEBUG_API void initialize_m(module_mediator::module_part*);
 
-module_mediator::dll_part* part;
+module_mediator::module_part* part;
 class index_getter {
 public:
 	static size_t excm() {
-		static size_t index = ::part->find_dll_index("excm");
+		static size_t index = ::part->find_module_index("excm");
 		return index;
 	}
 

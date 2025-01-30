@@ -24,7 +24,7 @@ module_mediator::return_value add_program(
 	void** program_strings, uint64_t program_strings_count
 ) {
 	return module_mediator::fast_call<void*, uint32_t, void*, uint32_t, void*, uint64_t, void*, uint64_t>(
-		get_dll_part(),
+		get_module_part(),
 		index_getter::resm(), 
 		index_getter::resm_create_new_program_container(),
 		code, functions_count, 
@@ -369,25 +369,25 @@ module_mediator::return_value load_program_to_memory(module_mediator::arguments_
 		if (found_entity_name != container.entities_names.end()) {
 			std::string message{ exc.what() };
 			log_error(
-				get_dll_part(),
+				get_module_part(),
 				message +
 					" (It appears that this error is related to the following object: '" +
 					found_entity_name->second + "')"
 			);
 		}
 		else {
-			log_error(get_dll_part(), exc.what());
+			log_error(get_module_part(), exc.what());
 		}
 	}
 	catch (const std::filesystem::filesystem_error&) {
-		log_error(get_dll_part(), "Got a filesystem error. Most likely, provided file does not exist or it is not accessible.");
+		log_error(get_module_part(), "Got a filesystem error. Most likely, provided file does not exist or it is not accessible.");
 	}
 	catch (const std::exception& exc) {
-		log_error(get_dll_part(), "Unexpected exception was caught during compilation.");
-		log_error(get_dll_part(), exc.what());
+		log_error(get_module_part(), "Unexpected exception was caught during compilation.");
+		log_error(get_module_part(), exc.what());
 	}
 
-	log_fatal(get_dll_part(), "Program compilation has failed.");
+	log_fatal(get_module_part(), "Program compilation has failed.");
 	return 1;
 }
 module_mediator::return_value free_program(module_mediator::arguments_string_type bundle) {

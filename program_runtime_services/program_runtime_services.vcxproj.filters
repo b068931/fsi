@@ -50,7 +50,7 @@
     <ClInclude Include="declarations.h">
       <Filter>Header Files\Base</Filter>
     </ClInclude>
-    <ClInclude Include="dll_mediator_declarations.h">
+    <ClInclude Include="module_mediator_declarations.h">
       <Filter>Header Files\Base</Filter>
     </ClInclude>
     <ClInclude Include="multithreading.h">

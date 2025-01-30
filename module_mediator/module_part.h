@@ -1,5 +1,5 @@
-#ifndef DLL_PART
-#define DLL_PART
+#ifndef MODULE_PART_H
+#define MODULE_PART_H
 
 #include <string>
 #include <tuple>
@@ -16,8 +16,8 @@ namespace module_mediator {
 	using arguments_string_element = unsigned char;
 	using arguments_array_type = std::vector<std::pair<arguments_string_element, void*>>;
 
-	//this class will be passed to dlls so that they can call functions in other dlls
-	class dll_part {
+	//this class will be passed to modules so that they can call functions in other modules
+	class module_part {
 	public:
 		enum class call_error {
 			function_is_not_visible,
@@ -27,15 +27,15 @@ namespace module_mediator {
 		};
 
 		static constexpr size_t function_not_found = std::numeric_limits<size_t>::max();
-		static constexpr size_t dll_not_found = std::numeric_limits<size_t>::max();
+		static constexpr size_t module_not_found = std::numeric_limits<size_t>::max();
 
-		virtual size_t find_function_index(size_t dll_index, const char* name) const = 0;
-		virtual size_t find_dll_index(const char* name) const = 0;
+		virtual size_t find_function_index(size_t module_index, const char* name) const = 0;
+		virtual size_t find_module_index(const char* name) const = 0;
 
 		virtual return_value call_module(size_t module_index, size_t function_index, arguments_string_type arguments_string) = 0;
 		virtual return_value call_module_visible_only(size_t module_index, size_t function_index, arguments_string_type arguments_string, void(*error_callback)(call_error)) = 0;
 
-		virtual ~dll_part() = default;
+		virtual ~module_part() = default;
 	};
 
 	class arguments_string_builder {
@@ -260,7 +260,7 @@ namespace module_mediator {
 
 	template<typename... args>
 	return_value fast_call(
-		dll_part* part,
+		module_part* part,
 		size_t module_index,
 		size_t function_index,
 		args... arguments

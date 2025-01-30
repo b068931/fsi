@@ -3,19 +3,19 @@
 #include "functions.h"
 #include "program_loader.h"
 
-module_mediator::dll_part* part = nullptr;
+module_mediator::module_part* part = nullptr;
 
 //technically, this function is used during program's lifetime, so it is not necessary to deallocate its memory VirtualFree(::default_function_address, 0, MEM_RELEASE);
 void* default_function_address = nullptr; //default address for functions that were declared but weren't initialized (terminates the program)
 
-module_mediator::dll_part* get_dll_part() {
+module_mediator::module_part* get_module_part() {
 	return ::part;
 }
 void* get_default_function_address() {
 	return ::default_function_address;
 }
 
-void initialize_m(module_mediator::dll_part* part) {
+void initialize_m(module_mediator::module_part* part) {
 	::part = part;
 
 	std::vector<char> default_function_symbols{};

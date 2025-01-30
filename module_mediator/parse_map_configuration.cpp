@@ -1,14 +1,14 @@
-#include "dll_mediator.h"
+#include "module_mediator.h"
 #include "inside_header_state.h"
 #include "main_state.h"
 #include "function_with_exported_name_state.h"
 #include "inside_value_state.h"
 
-void dll_builder::configure_parse_map() {
+void engine_module_builder::configure_parse_map() {
 	using state_type =
 		generic_parser::states_builder<file_tokens, context_keys, result_type, builder_parameters, dynamic_parameters_keys>::state_type;
 
-	this->parameters.dll_part = this->mediator->get_dll_part();
+	this->parameters.module_part = this->mediator->get_module_part();
 	generic_parser::states_builder<file_tokens, context_keys, result_type, builder_parameters, dynamic_parameters_keys> builder{};
 
 	state_settings& starting_state = builder.create_state<state_type>();

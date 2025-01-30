@@ -2,7 +2,7 @@
 #define FSI_TYPES_H
 
 #include <stdint.h>
-#include "dll_part.h"
+#include "module_part.h"
 
 namespace module_mediator {
 	using one_byte = uint8_t;

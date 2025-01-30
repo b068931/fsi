@@ -6,7 +6,7 @@
 #include "../program_loader/functions.h"
 #include "../console_and_debug/logging.h"
 
-module_mediator::dll_part* part = nullptr;
+module_mediator::module_part* part = nullptr;
 
 const size_t thread_state_size = 144;
 size_t thread_stack_size = 1000000;
@@ -17,7 +17,7 @@ class index_getter {
 //i guess this class is thread safe https://stackoverflow.com/questions/8102125/is-local-static-variable-initialization-thread-safe-in-c11
 public:
 	static size_t progload() {
-		static size_t index = ::part->find_dll_index("progload");
+		static size_t index = ::part->find_module_index("progload");
 		return index;
 	}
 
@@ -37,7 +37,7 @@ public:
 	}
 
 	static size_t resm() {
-		static size_t index = ::part->find_dll_index("resm");
+		static size_t index = ::part->find_module_index("resm");
 		return index;
 	}
 
@@ -181,17 +181,17 @@ void show_error(uint64_t error_code) {
 	load_execution_threadf(get_thread_local_structure()->execution_thread_state);
 }
 
-[[noreturn]] void inner_call_module_error(module_mediator::dll_part::call_error error) {
+[[noreturn]] void inner_call_module_error(module_mediator::module_part::call_error error) {
 	switch (error) {
-	case module_mediator::dll_part::call_error::function_is_not_visible:
+	case module_mediator::module_part::call_error::function_is_not_visible:
 		log_program_error(::part, "Called module function is not visible. Thread terminated.");
 		break;
 
-	case module_mediator::dll_part::call_error::invalid_arguments_string:
+	case module_mediator::module_part::call_error::invalid_arguments_string:
 		log_program_error(::part, "Incorrect arguments were used for the module function call. Thread terminated.");
 		break;
 
-	case module_mediator::dll_part::call_error::unknown_index:
+	case module_mediator::module_part::call_error::unknown_index:
 		log_program_error(::part, "Module function does not exist. Thread terminated.");
 		break;
 	}
@@ -605,7 +605,7 @@ module_mediator::return_value run_program(module_mediator::arguments_string_type
 	thread_terminate();
 	load_execution_threadf(get_thread_local_structure()->execution_thread_state);
 }
-void initialize_m(module_mediator::dll_part* part) {
+void initialize_m(module_mediator::module_part* part) {
 	::part = part;
 	::program_control_functions_addresses = new char[4 * sizeof(uint64_t)] {};
 	

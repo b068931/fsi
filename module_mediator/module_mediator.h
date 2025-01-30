@@ -1,5 +1,5 @@
-#ifndef DLL_MEDIATOR
-#define DLL_MEDIATOR
+#ifndef ENGINE_MODULE_MEDIATOR_H
+#define ENGINE_MODULE_MEDIATOR_H
 
 #define NOMINMAX 
 #include <Windows.h>
@@ -10,8 +10,8 @@
 #include <algorithm>
 #include <stdexcept>
 
+#include "module_part.h"
 #include "../typename_array/typename_array.h"
-#include "dll_part.h"
 #include "../generic_parser/token_generator.h"
 #include "../generic_parser/parser_facade.h"
 #include "../generic_parser/read_map.h"
@@ -20,7 +20,7 @@
 /*
 * "When an evaluation of an expression writes to a memory location and another evaluation reads or modifies
 * the same memory location, the expressions are said to conflict."
-* find_dll_index, find_function_index, call_module should not modify memory locations in any way
+* find_module_index, find_function_index, call_module should not modify memory locations in any way
 */
 
 using module_callable_function_type = module_mediator::return_value(*)(module_mediator::arguments_string_type);
@@ -119,41 +119,41 @@ public:
 	}
 };
 
-class dll {
+class engine_module {
 private:
-	std::string name; //used to find dll's index
-	HMODULE loaded_dll;
+	std::string name; //used to find engine_module's index
+	HMODULE loaded_module;
 
 	std::vector<function> functions;
 
-	void move_value(dll&& old_value) {
+	void move_value(engine_module&& old_value) {
 		this->name = std::move(old_value.name);
 		this->functions = std::move(old_value.functions);
 
-		this->loaded_dll = old_value.loaded_dll;
-		old_value.loaded_dll = NULL;
+		this->loaded_module = old_value.loaded_module;
+		old_value.loaded_module = NULL;
 	}
 	void free_resources() {
-		this->free_dll();
+		this->free_module();
 	}
 
-	void load_dll(const std::string& dll_path) {
-		this->loaded_dll = LoadLibraryA(dll_path.c_str());
-		if (this->loaded_dll == NULL) {
+	void load_module(const std::string& module_path) {
+		this->loaded_module = LoadLibraryA(module_path.c_str());
+		if (this->loaded_module == NULL) {
 			std::cerr << "Unable to load one of the modules. Process will be terminated with std::abort."
-				<< " (Path: " << dll_path << ')' << std::endl;
+				<< " (Path: " << module_path << ')' << std::endl;
 
 			std::abort();
 		}
 	}
-	void free_dll() {
-		if (this->loaded_dll != NULL) {
-			FARPROC free = GetProcAddress(this->loaded_dll, "free_m");
+	void free_module() {
+		if (this->loaded_module != NULL) {
+			FARPROC free = GetProcAddress(this->loaded_module, "free_m");
 			if (free != NULL) {
 				((void(*)())free)();
 			}
 
-			BOOL freed_library = FreeLibrary(this->loaded_dll);
+			BOOL freed_library = FreeLibrary(this->loaded_module);
 			if (!freed_library) {
 				std::cerr << "Unable to correctly dispose one of the modules. Process will be terminated with std::abort."
 					<< " (Name: " << this->name << ')' << std::endl;
@@ -162,8 +162,8 @@ private:
 			}
 		}
 	}
-	void initialize_module(module_mediator::dll_part* mediator) {
-		FARPROC initialize = GetProcAddress(this->loaded_dll, "initialize_m");
+	void initialize_module(module_mediator::module_part* mediator) {
+		FARPROC initialize = GetProcAddress(this->loaded_module, "initialize_m");
 		if (initialize == NULL) {
 			std::cerr << "One of the modules does not define the initialize_m function. Process will be terminated with std::abort."
 				<< "(Name: " << this->name << ')' << std::endl;
@@ -171,28 +171,28 @@ private:
 			std::abort();
 		}
 
-		((void(*)(module_mediator::dll_part*))initialize)(mediator); //convert and call initialize_m
+		((void(*)(module_mediator::module_part*))initialize)(mediator); //convert and call initialize_m
 	}
 public:
-	dll(
-		std::string&& dll_name, 
-		std::string&& dll_path, 
-		module_mediator::dll_part* mediator //pointer to dll_part allows to access some of the dll_mediator functions
+	engine_module(
+		std::string&& module_name, 
+		std::string&& module_path, 
+		module_mediator::module_part* mediator //pointer to module_part allows to access some of the engine_module_mediator functions
 	)
-		:name{ std::move(dll_name) },
-		loaded_dll{ NULL }
+		:name{ std::move(module_name) },
+		loaded_module{ NULL }
 	{
-		this->load_dll(dll_path);
+		this->load_module(module_path);
 		this->initialize_module(mediator);
 	}
 
-	dll(const dll&) = delete;
-	void operator= (const dll&) = delete;
+	engine_module(const engine_module&) = delete;
+	void operator= (const engine_module&) = delete;
 
-	dll(dll&& old_value) noexcept {
+	engine_module(engine_module&& old_value) noexcept {
 		this->move_value(std::move(old_value));
 	}
-	void operator= (dll&& old_value) noexcept {
+	void operator= (engine_module&& old_value) noexcept {
 		this->free_resources();
 		this->move_value(std::move(old_value));
 	}
@@ -209,14 +209,14 @@ public:
 			}
 		}
 
-		return module_mediator::dll_part::function_not_found;
+		return module_mediator::module_part::function_not_found;
 	}
 	
 	const function& get_function(size_t index) const { 
 		return this->functions.at(index); 
 	}
 	bool add_function(const std::string& name, std::string&& export_name, module_mediator::arguments_string_type arguments_string, bool is_visible) {
-		FARPROC loaded_function = GetProcAddress(this->loaded_dll, name.c_str());
+		FARPROC loaded_function = GetProcAddress(this->loaded_module, name.c_str());
 		if (loaded_function == NULL)
 			return false;
 
@@ -232,16 +232,16 @@ public:
 		return true;
 	}
 
-	~dll() {
+	~engine_module() {
 		this->free_resources();
 	}
 };
 
-class dll_mediator;
-class dll_builder {
+class engine_module_mediator;
+class engine_module_builder {
 	public:
 		struct builder_parameters {
-			module_mediator::dll_part* dll_part{};
+			module_mediator::module_part* module_part{};
 			std::vector<std::string> arguments{ "char", "uchar", "short", "ushort", "int", "uint", "long", "ulong", "llong", "ullong", "pointer" };
 
 			std::string module_name;
@@ -267,26 +267,26 @@ class dll_builder {
 			main_context
 		};
 
-		using result_type = std::vector<dll>;
+		using result_type = std::vector<engine_module>;
 		using read_map_type = generic_parser::read_map<file_tokens, context_keys, result_type, builder_parameters, dynamic_parameters_keys>;
 	private:
-		result_type dlls;
+		result_type modules;
 		builder_parameters parameters;
 
 		generic_parser::token_generator<file_tokens, context_keys>* generator;
-		std::vector<std::pair<std::string, dll_builder::file_tokens>>* names_stack;
+		std::vector<std::pair<std::string, engine_module_builder::file_tokens>>* names_stack;
 		
-		dll_mediator* mediator;
+		engine_module_mediator* mediator;
 
 		read_map_type parse_map;
 		void configure_parse_map();
 
 	public:
-		dll_builder(
-			std::vector<std::pair<std::string, dll_builder::file_tokens>>* names_stack, 
-			generic_parser::token_generator<dll_builder::file_tokens, context_keys>* token_generator, 
-			dll_mediator* mediator
-		) //"mediator" will be used to initialize dll objects
+		engine_module_builder(
+			std::vector<std::pair<std::string, engine_module_builder::file_tokens>>* names_stack, 
+			generic_parser::token_generator<engine_module_builder::file_tokens, context_keys>* token_generator, 
+			engine_module_mediator* mediator
+		) //"mediator" will be used to initialize engine_module objects
 			:parse_map{file_tokens::end_of_file, file_tokens::name, token_generator},
 			generator{token_generator},
 			names_stack{names_stack},
@@ -297,33 +297,33 @@ class dll_builder {
 
 		const std::string& error() { return this->parse_map.error(); }
 		bool is_working() { return this->parse_map.is_working(); }
-		void handle_token(dll_builder::file_tokens token) { 
-			this->parse_map.handle_token(&this->dlls, token, &this->parameters);
+		void handle_token(engine_module_builder::file_tokens token) { 
+			this->parse_map.handle_token(&this->modules, token, &this->parameters);
 		}
-		result_type get_value() { return std::move(this->dlls); }
+		result_type get_value() { return std::move(this->modules); }
 	};
 
-class dll_mediator {
+class engine_module_mediator {
 private:
-	class dll_part_implementation : public module_mediator::dll_part {
+	class module_part_implementation : public module_mediator::module_part {
 	private:
-		dll_mediator* mediator;
+		engine_module_mediator* mediator;
 
 	public:
-		dll_part_implementation(dll_mediator* mediator)
+		module_part_implementation(engine_module_mediator* mediator)
 			:mediator{ mediator }
 		{}
 
-		virtual size_t find_function_index(size_t dll_index, const char* name) const override {
+		virtual size_t find_function_index(size_t module_index, const char* name) const override {
 			try {
-				return this->mediator->find_function_index(dll_index, name);
+				return this->mediator->find_function_index(module_index, name);
 			}
 			catch (const std::out_of_range&) {
-				return module_mediator::dll_part::function_not_found;
+				return module_mediator::module_part::function_not_found;
 			}
 		}
-		virtual size_t find_dll_index(const char* name) const override {
-			return this->mediator->find_dll_index(name);
+		virtual size_t find_module_index(const char* name) const override {
+			return this->mediator->find_module_index(name);
 		}
 		virtual module_mediator::return_value call_module(size_t module_index, size_t function_index, module_mediator::arguments_string_type arguments_string) override {
 			try {
@@ -370,69 +370,69 @@ private:
 		{}
 	};
 
-	std::vector<dll> loaded_dlls;
-	dll_part_implementation* part_implementation;
+	std::vector<engine_module> loaded_modules;
+	module_part_implementation* part_implementation;
 
-	const dll& get_dll(size_t module_index) const {
-		return this->loaded_dlls.at(module_index);
+	const engine_module& get_module(size_t module_index) const {
+		return this->loaded_modules.at(module_index);
 	}
 
-	size_t find_dll_index(std::string_view name) const {
-		for (size_t index = 0, size = this->loaded_dlls.size(); index < size; ++index) {
-			if (this->loaded_dlls[index].compare_names(name)) {
+	size_t find_module_index(std::string_view name) const {
+		for (size_t index = 0, size = this->loaded_modules.size(); index < size; ++index) {
+			if (this->loaded_modules[index].compare_names(name)) {
 				return index;
 			}
 		}
 
-		return module_mediator::dll_part::dll_not_found;
+		return module_mediator::module_part::module_not_found;
 	}
-	size_t find_function_index(size_t dll_index, std::string_view name) const { 
-		return this->get_dll(dll_index).find_function_index(name);
+	size_t find_function_index(size_t module_index, std::string_view name) const { 
+		return this->get_module(module_index).find_function_index(name);
 	}
 
 	module_mediator::return_value call_module(size_t module_index, size_t function_index, module_mediator::arguments_string_type arguments_string) {
-		if (this->get_dll(module_index).get_function(function_index).compare_arguments_types(arguments_string)) { //true if arguments match
-			return this->get_dll(module_index).get_function(function_index).call(arguments_string);
+		if (this->get_module(module_index).get_function(function_index).compare_arguments_types(arguments_string)) { //true if arguments match
+			return this->get_module(module_index).get_function(function_index).call(arguments_string);
 		}
 
 		throw invalid_arguments_string{ "Invalid arguments string used." };
 	}
 	module_mediator::return_value call_module_visible_only(size_t module_index, size_t function_index, module_mediator::arguments_string_type arguments_string) {
-		if (this->get_dll(module_index).get_function(function_index).is_visible()) {
+		if (this->get_module(module_index).get_function(function_index).is_visible()) {
 			return this->call_module(module_index, function_index, arguments_string);
 		}
 
 		throw function_not_visible{ "This function is not visible." };
 	}
 public:
-	dll_mediator()
-		:part_implementation{ new dll_part_implementation{ this } }
+	engine_module_mediator()
+		:part_implementation{ new module_part_implementation{ this } }
 	{}
 
-	std::string load_dlls(std::string file_name) {
-		generic_parser::parser_facade<dll_builder::file_tokens, dll_builder::context_keys, dll_builder> parser{
+	std::string load_modules(std::string file_name) {
+		generic_parser::parser_facade<engine_module_builder::file_tokens, engine_module_builder::context_keys, engine_module_builder> parser{
 			{},
 			{
 				{
-					dll_builder::context_keys::main_context,
-					generic_parser::token_generator<dll_builder::file_tokens, dll_builder::context_keys>::symbols_pair{
+					engine_module_builder::context_keys::main_context,
+					generic_parser::token_generator<engine_module_builder::file_tokens, engine_module_builder::context_keys>::symbols_pair{
 						{
-							{":", dll_builder::file_tokens::name_and_public_name_separator},
-							{"!", dll_builder::file_tokens::program_callable_function},
-							{"--", dll_builder::file_tokens::comment},
-							{"[", dll_builder::file_tokens::header_open},
-							{"]", dll_builder::file_tokens::header_close},
-							{"=", dll_builder::file_tokens::value_assign},
-							{"\n", dll_builder::file_tokens::new_line},
-							{"\r\n", dll_builder::file_tokens::new_line}
+							{":", engine_module_builder::file_tokens::name_and_public_name_separator},
+							{"!", engine_module_builder::file_tokens::program_callable_function},
+							{"--", engine_module_builder::file_tokens::comment},
+							{"[", engine_module_builder::file_tokens::header_open},
+							{"]", engine_module_builder::file_tokens::header_close},
+							{"=", engine_module_builder::file_tokens::value_assign},
+							{"\n", engine_module_builder::file_tokens::new_line},
+							{"\r\n", engine_module_builder::file_tokens::new_line}
 						},
 						{}
 					}
 				}
 			},
-			dll_builder::file_tokens::name,
-			dll_builder::file_tokens::end_of_file,
-			dll_builder::context_keys::main_context,
+			engine_module_builder::file_tokens::name,
+			engine_module_builder::file_tokens::end_of_file,
+			engine_module_builder::context_keys::main_context,
 			this
 		};
 
@@ -443,14 +443,14 @@ public:
 			return std::string{ "Can not find 'dlls.txt', it is required in order to load appropriate modules." };
 		}
 
-		this->loaded_dlls = parser.get_builder_value();
+		this->loaded_modules = parser.get_builder_value();
 		return parser.error();
 	}
-	module_mediator::dll_part* get_dll_part() {
+	module_mediator::module_part* get_module_part() {
 		return this->part_implementation;
 	}
 
-	~dll_mediator() {
+	~engine_module_mediator() {
 		delete this->part_implementation;
 	}
 };

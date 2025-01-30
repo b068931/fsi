@@ -3,7 +3,7 @@
 
 module_mediator::return_value inner_allocate(uint64_t size) {
 	return module_mediator::fast_call<module_mediator::return_value, uint64_t>(
-		get_dll_part(),
+		get_module_part(),
 		index_getter::resm(),
 		index_getter::resm_allocate_program_memory(),
 		get_current_thread_group_id(),
@@ -12,7 +12,7 @@ module_mediator::return_value inner_allocate(uint64_t size) {
 }
 void inner_deallocate(void* pointer) {
 	module_mediator::fast_call<module_mediator::return_value, void*>(
-		get_dll_part(),
+		get_module_part(),
 		index_getter::resm(),
 		index_getter::resm_deallocate_program_memory(),
 		get_current_thread_group_id(),
@@ -23,7 +23,7 @@ void inner_check_if_pointer_is_saved(module_mediator::pointer address) {
 	unsigned char* saved_variable =
 		reinterpret_cast<unsigned char*>(
 			module_mediator::fast_call(
-				get_dll_part(),
+				get_module_part(),
 				index_getter::excm(),
 				index_getter::excm_get_thread_saved_variable()
 			)
@@ -45,7 +45,7 @@ module_mediator::return_value allocate_pointer(module_mediator::arguments_string
 	module_mediator::eight_bytes size = std::get<2>(arguments);
 
 	if (return_type != module_mediator::pointer_return_value) {
-		log_program_error(get_dll_part(), "Incorrect return type. (allocate_pointer)");
+		log_program_error(get_module_part(), "Incorrect return type. (allocate_pointer)");
 		return module_mediator::execution_result_terminate;
 	}
 
@@ -54,7 +54,7 @@ module_mediator::return_value allocate_pointer(module_mediator::arguments_string
 
 	module_mediator::return_value allocated_memory = inner_allocate(size);
 	if ((value_pointer_data == reinterpret_cast<module_mediator::return_value>(nullptr)) || (allocated_memory == reinterpret_cast<module_mediator::return_value>(nullptr))) {
-		log_program_error(get_dll_part(), "Not enough memory. (allocate_pointer)");
+		log_program_error(get_module_part(), "Not enough memory. (allocate_pointer)");
 		return module_mediator::execution_result_terminate;
 	}
 
@@ -70,7 +70,7 @@ module_mediator::return_value deallocate_pointer(module_mediator::arguments_stri
 	module_mediator::one_byte return_type = std::get<1>(arguments);
 
 	if (return_type != module_mediator::pointer_return_value) {
-		log_program_error(get_dll_part(), "Incorrect return type. (deallocate_pointer)");
+		log_program_error(get_module_part(), "Incorrect return type. (deallocate_pointer)");
 		return module_mediator::execution_result_terminate;
 	}
 
@@ -98,7 +98,7 @@ module_mediator::return_value get_allocated_size(module_mediator::arguments_stri
 	module_mediator::pointer address = std::get<2>(arguments);
 
 	if (type != module_mediator::eight_bytes_return_value) {
-		log_program_error(get_dll_part(), "Incorrect return type. (get_allocated_size)");
+		log_program_error(get_module_part(), "Incorrect return type. (get_allocated_size)");
 		return module_mediator::execution_result_terminate;
 	}
 

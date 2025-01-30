@@ -60,6 +60,6 @@ RESOURCEMODULE_API module_mediator::return_value get_program_container_id(module
 RESOURCEMODULE_API module_mediator::return_value get_jump_table(module_mediator::arguments_string_type bundle);
 RESOURCEMODULE_API module_mediator::return_value get_jump_table_size(module_mediator::arguments_string_type bundle);
 
-RESOURCEMODULE_API void initialize_m(module_mediator::dll_part*);
+RESOURCEMODULE_API void initialize_m(module_mediator::module_part*);
 
 #endif // !RESOURCE_MODULE

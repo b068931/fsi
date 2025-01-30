@@ -7,20 +7,20 @@
 #define COMPILERMODULE_API extern "C" __declspec(dllimport) 
 #endif
 
-#include "../dll_mediator/dll_part.h"
+#include "../module_mediator/module_part.h"
 
-module_mediator::dll_part* get_dll_part();
+module_mediator::module_part* get_module_part();
 void* get_default_function_address();
 
 class index_getter {
 public:
 	static size_t resm() {
-		static size_t index = get_dll_part()->find_dll_index("resm");
+		static size_t index = get_module_part()->find_module_index("resm");
 		return index;
 	}
 
 	static size_t resm_create_new_program_container() {
-		static size_t index = get_dll_part()->find_function_index(index_getter::resm(), "create_new_program_container");
+		static size_t index = get_module_part()->find_function_index(index_getter::resm(), "create_new_program_container");
 		return index;
 	}
 };

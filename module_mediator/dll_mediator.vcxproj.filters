@@ -17,7 +17,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dll_mediator.h">
+    <ClCompile Include="module_mediator.h">
       <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="parse_map_configuration.cpp">
@@ -31,7 +31,7 @@
     <ClInclude Include="fsi_types.h">
       <Filter>Header Files\Export</Filter>
     </ClInclude>
-    <ClInclude Include="dll_part.h">
+    <ClInclude Include="module_part.h">
       <Filter>Header Files\Export</Filter>
     </ClInclude>
     <ClInclude Include="inside_header_state.h">

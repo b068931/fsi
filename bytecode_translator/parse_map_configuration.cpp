@@ -1,5 +1,5 @@
 #include "structure_builder.h"
-#include "../dll_mediator/fsi_types.h"
+#include "../module_mediator/fsi_types.h"
 
 using states_builder_type = generic_parser::states_builder<structure_builder::source_file_token, structure_builder::context_key, structure_builder::file, structure_builder::helper_inter_states_object, structure_builder::parameters_enumeration>;
 using state_settings = states_builder_type::state_settings_type;

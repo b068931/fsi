@@ -15,11 +15,11 @@
 
 #include <string>
 #include <iostream>
-#include "../dll_mediator/dll_part.h"
+#include "../module_mediator/module_part.h"
 
-inline void generic_log_message(module_mediator::dll_part* part, size_t message_type, std::string message) {
-	static size_t logger = part->find_dll_index("logger");
-	if (logger == module_mediator::dll_part::dll_not_found) {
+inline void generic_log_message(module_mediator::module_part* part, size_t message_type, std::string message) {
+	static size_t logger = part->find_module_index("logger");
+	if (logger == module_mediator::module_part::module_not_found) {
 		std::cerr << "One of the modules requires uses logging. 'logger' was not found. Terminating with std::abort." << std::endl;
 		std::abort();
 	}
@@ -38,7 +38,7 @@ inline void generic_log_message(module_mediator::dll_part* part, size_t message_
 	assert(message_type < 8);
 
 	size_t log_type = logger_indexes[message_type];
-	if (log_type == module_mediator::dll_part::function_not_found) {
+	if (log_type == module_mediator::module_part::function_not_found) {
 		std::cerr << "One of the required logging functions was not found. Terminating with std::abort." << std::endl;
 		std::abort();
 	}

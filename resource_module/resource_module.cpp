@@ -11,7 +11,7 @@
 	#define _Releases_lock_(a)
 #endif
 
-module_mediator::dll_part* part = nullptr;
+module_mediator::module_part* part = nullptr;
 
 enum class return_code : module_mediator::return_value {
 	ok,
@@ -20,7 +20,7 @@ enum class return_code : module_mediator::return_value {
 class index_getter {
 public:
 	static size_t excm() {
-		static size_t index = ::part->find_dll_index("excm");
+		static size_t index = ::part->find_module_index("excm");
 		return index;
 	}
 
@@ -35,7 +35,7 @@ public:
 	}
 
 	static size_t progload() {
-		static size_t index = ::part->find_dll_index("progload");
+		static size_t index = ::part->find_module_index("progload");
 		return index;
 	}
 
@@ -425,7 +425,7 @@ module_mediator::return_value get_jump_table_size(module_mediator::arguments_str
 	return 0;
 }
 
-void initialize_m(module_mediator::dll_part* part) {
+void initialize_m(module_mediator::module_part* part) {
 	::part = part;
 }
 program_container::~program_container() noexcept {

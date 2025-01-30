@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "run_container.h"
 
-extern module_mediator::dll_part* part;
+extern module_mediator::module_part* part;
 
 void runs_container::modules_reader(run_reader<runs_container>::run run) { //every run has its own specific structure, so we need to use different functions for each type of run (see bytecode_translator.h)
 	for (uint64_t counter = 0, modules_count = run.get_object<uint64_t>(); counter < modules_count; ++counter) {
@@ -10,9 +10,9 @@ void runs_container::modules_reader(run_reader<runs_container>::run run) { //eve
 		entity_id module_entityid = run.get_object<entity_id>();
 		uint64_t number_of_functions = run.get_object<uint64_t>();
 
-		const std::string& dll_name = this->read_name(run);
-		size_t found_module = ::part->find_dll_index(dll_name.c_str()); //now we try to find module's index inside dll mediator
-		if (found_module != ::part->dll_not_found) {
+		const std::string& module_name = this->read_name(run);
+		size_t found_module = ::part->find_module_index(module_name.c_str()); //now we try to find module's index inside engine_module mediator
+		if (found_module != ::part->module_not_found) {
 			new_module.module_id = found_module; //add new_module to the list of modules
 
 			for (uint64_t functions_counter = 0; functions_counter < number_of_functions; ++functions_counter) {

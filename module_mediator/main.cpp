@@ -1,7 +1,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "dll_mediator.h"
+#include "module_mediator.h"
 
 int main(int argc, char** argv) {
 	if (argc != 3) {
@@ -24,13 +24,13 @@ int main(int argc, char** argv) {
 
 	std::cout << "Type 'okimdone' to exit. Make sure that your program is actually done executing." << std::endl;
 
-	dll_mediator dll_mediator{};
-	std::string error_message = dll_mediator.load_dlls("dlls.txt");
+	engine_module_mediator module_mediator{};
+	std::string error_message = module_mediator.load_modules("dlls.txt");
 
-	module_mediator::dll_part* part = dll_mediator.get_dll_part();
+	module_mediator::module_part* part = module_mediator.get_module_part();
 	if (error_message.empty()) {
 
-		size_t excm = part->find_dll_index("excm");
+		size_t excm = part->find_module_index("excm");
 		size_t startup = part->find_function_index(excm, "start");
 		size_t run = part->find_function_index(excm, "run_program");
 

@@ -3,7 +3,7 @@
 
 module_mediator::return_value get_current_thread_group_id() {
 	return module_mediator::fast_call(
-		get_dll_part(),
+		get_module_part(),
 		index_getter::excm(),
 		index_getter::excm_get_current_thread_group_id()
 	);

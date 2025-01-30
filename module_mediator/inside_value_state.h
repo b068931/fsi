@@ -6,9 +6,9 @@
 class inside_value_state : public state_type {
 public:
 	virtual void handle_token(
-		dll_builder::result_type& dlls,
-		dll_builder::builder_parameters& parameters,
-		dll_builder::read_map_type& read_map
+		engine_module_builder::result_type& modules,
+		engine_module_builder::builder_parameters& parameters,
+		engine_module_builder::read_map_type& read_map
 	) override {
 		std::string function_types_string = read_map.get_token_generator_name();
 
@@ -39,7 +39,7 @@ public:
 			}
 		}
 
-		bool result = dlls.back().add_function(
+		bool result = modules.back().add_function(
 				parameters.function_name,
 				std::move(parameters.function_exported_name),
 				arguments_symbols,
@@ -50,7 +50,7 @@ public:
 			read_map.exit_with_error(
 				"Unable to load function '" + 
 				parameters.function_name + "' from module '" + 
-				dlls.back().get_name() + "'"
+				modules.back().get_name() + "'"
 			);
 		}
 

@@ -13,7 +13,7 @@ module_mediator::return_value generic_log_message(module_mediator::arguments_str
 	
 	size_t log_endpoints[]{ index_getter::logger_program_info(), index_getter::logger_program_warning(), index_getter::logger_program_error() };
 	if (pointer == nullptr) {
-		log_program_error(get_dll_part(), "Nullpointer passed to logging function.");
+		log_program_error(get_module_part(), "Nullpointer passed to logging function.");
 		return module_mediator::execution_result_terminate;
 	}
 
@@ -21,7 +21,7 @@ module_mediator::return_value generic_log_message(module_mediator::arguments_str
 	data[size - 1] = '\0';
 
 	module_mediator::fast_call<void*>(
-		get_dll_part(),
+		get_module_part(),
 		index_getter::logger(),
 		log_endpoints[static_cast<uint8_t>(log)],
 		data

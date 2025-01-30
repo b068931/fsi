@@ -108,7 +108,7 @@ module_mediator::return_value program_fatal(module_mediator::arguments_string_ty
 	return 0;
 }
 
-void initialize_m(module_mediator::dll_part* part) {
+void initialize_m(module_mediator::module_part* part) {
 	::part = part;
 
 	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
