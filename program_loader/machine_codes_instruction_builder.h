@@ -21,8 +21,8 @@ protected:
 		this->assert_statement(machine_codes, "This instruction must have machine codes."); //check whether machine codes for this instruction were passed
 	}
 
-	size_t get_codes_count() const { return this->machine_codes->size(); }
-	char get_code(size_t index) const { return (*this->machine_codes)[index]; }
+	std::size_t get_codes_count() const { return this->machine_codes->size(); }
+	char get_code(std::size_t index) const { return (*this->machine_codes)[index]; }
 	char get_code_back() const { return this->machine_codes->back(); }
 	char get_code_front() const { return this->machine_codes->front(); }
 };

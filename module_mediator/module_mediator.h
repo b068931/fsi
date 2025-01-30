@@ -68,7 +68,7 @@ private:
 		return arguments_symbols[0] == this->arguments_symbols[0];
 	}
 	bool check_arguments_strings_arguments_types(module_mediator::arguments_string_type arguments_symbols) const {
-		return std::memcmp(arguments_symbols, this->arguments_symbols, static_cast<size_t>(this->arguments_symbols[0]) + 1) == 0;
+		return std::memcmp(arguments_symbols, this->arguments_symbols, static_cast<std::size_t>(this->arguments_symbols[0]) + 1) == 0;
 	}
 public:
 	function()
@@ -202,8 +202,8 @@ public:
 	}
 
 	bool compare_names(std::string_view name) const { return this->name == name; }
-	size_t find_function_index(std::string_view name) const {
-		for (size_t find_index = 0, size = this->functions.size(); find_index < size; ++find_index) {
+	std::size_t find_function_index(std::string_view name) const {
+		for (std::size_t find_index = 0, size = this->functions.size(); find_index < size; ++find_index) {
 			if (this->functions[find_index].compare_names(name)) {
 				return find_index;
 			}
@@ -212,7 +212,7 @@ public:
 		return module_mediator::module_part::function_not_found;
 	}
 	
-	const function& get_function(size_t index) const { 
+	const function& get_function(std::size_t index) const { 
 		return this->functions.at(index); 
 	}
 	bool add_function(const std::string& name, std::string&& export_name, module_mediator::arguments_string_type arguments_string, bool is_visible) {
@@ -314,7 +314,7 @@ private:
 			:mediator{ mediator }
 		{}
 
-		virtual size_t find_function_index(size_t module_index, const char* name) const override {
+		virtual std::size_t find_function_index(std::size_t module_index, const char* name) const override {
 			try {
 				return this->mediator->find_function_index(module_index, name);
 			}
@@ -322,10 +322,10 @@ private:
 				return module_mediator::module_part::function_not_found;
 			}
 		}
-		virtual size_t find_module_index(const char* name) const override {
+		virtual std::size_t find_module_index(const char* name) const override {
 			return this->mediator->find_module_index(name);
 		}
-		virtual module_mediator::return_value call_module(size_t module_index, size_t function_index, module_mediator::arguments_string_type arguments_string) override {
+		virtual module_mediator::return_value call_module(std::size_t module_index, std::size_t function_index, module_mediator::arguments_string_type arguments_string) override {
 			try {
 				return this->mediator->call_module(module_index, function_index, arguments_string);
 			}
@@ -336,7 +336,7 @@ private:
 				std::abort();
 			}
 		}
-		virtual module_mediator::return_value call_module_visible_only(size_t module_index, size_t function_index, module_mediator::arguments_string_type arguments_string, void(*error_callback)(call_error)) override {
+		virtual module_mediator::return_value call_module_visible_only(std::size_t module_index, std::size_t function_index, module_mediator::arguments_string_type arguments_string, void(*error_callback)(call_error)) override {
 			call_error error{ call_error::no_error };
 			
 			try {
@@ -373,12 +373,12 @@ private:
 	std::vector<engine_module> loaded_modules;
 	module_part_implementation* part_implementation;
 
-	const engine_module& get_module(size_t module_index) const {
+	const engine_module& get_module(std::size_t module_index) const {
 		return this->loaded_modules.at(module_index);
 	}
 
-	size_t find_module_index(std::string_view name) const {
-		for (size_t index = 0, size = this->loaded_modules.size(); index < size; ++index) {
+	std::size_t find_module_index(std::string_view name) const {
+		for (std::size_t index = 0, size = this->loaded_modules.size(); index < size; ++index) {
 			if (this->loaded_modules[index].compare_names(name)) {
 				return index;
 			}
@@ -386,18 +386,18 @@ private:
 
 		return module_mediator::module_part::module_not_found;
 	}
-	size_t find_function_index(size_t module_index, std::string_view name) const { 
+	std::size_t find_function_index(std::size_t module_index, std::string_view name) const { 
 		return this->get_module(module_index).find_function_index(name);
 	}
 
-	module_mediator::return_value call_module(size_t module_index, size_t function_index, module_mediator::arguments_string_type arguments_string) {
+	module_mediator::return_value call_module(std::size_t module_index, std::size_t function_index, module_mediator::arguments_string_type arguments_string) {
 		if (this->get_module(module_index).get_function(function_index).compare_arguments_types(arguments_string)) { //true if arguments match
 			return this->get_module(module_index).get_function(function_index).call(arguments_string);
 		}
 
 		throw invalid_arguments_string{ "Invalid arguments string used." };
 	}
-	module_mediator::return_value call_module_visible_only(size_t module_index, size_t function_index, module_mediator::arguments_string_type arguments_string) {
+	module_mediator::return_value call_module_visible_only(std::size_t module_index, std::size_t function_index, module_mediator::arguments_string_type arguments_string) {
 		if (this->get_module(module_index).get_function(function_index).is_visible()) {
 			return this->call_module(module_index, function_index, arguments_string);
 		}

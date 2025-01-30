@@ -8,7 +8,7 @@
 class add_sadd_builder : public arithmetic_instruction_builder {
 private:
 	void add_r8_to_rax() {
-		uint8_t rex = '\x44';
+		std::uint8_t rex = '\x44';
 
 		switch (this->get_active_type()) {
 		case 0b01: {
@@ -62,7 +62,7 @@ public:
 
 	virtual void build() override {
 		while (this->get_arguments_count() != 0) {
-			uint8_t current_argument_index = this->get_argument_index();
+			std::uint8_t current_argument_index = this->get_argument_index();
 			this->self_call_next();
 
 			if (current_argument_index != 0) {

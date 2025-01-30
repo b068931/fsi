@@ -20,7 +20,7 @@ protected:
 		this->write_bytes('\x00');
 
 		this->write_bytes('\x75');
-		this->write_bytes(static_cast<uint8_t>(::program_termination_code_size));
+		this->write_bytes(static_cast<std::uint8_t>(::program_termination_code_size));
 
 		this->generate_program_termination_code(termination_codes::division_by_zero);
 	}
@@ -31,7 +31,7 @@ protected:
 		this->write_bytes('\xd8');
 	}
 	void store_value_from_rax_to_rbx() {
-		uint8_t rex = 0;
+		std::uint8_t rex = 0;
 		switch (this->get_active_type()) {
 		case 0b01: {
 			this->write_bytes('\x66');

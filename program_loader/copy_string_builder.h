@@ -22,7 +22,7 @@ public:
 	virtual void visit(std::unique_ptr<specialized_variable> string) override {
 		this->assert_statement(this->get_argument_index() == 1, "String must be used as the second argument.", string->get_id());
 		auto& found_string_info = this->get_string_info(string->get_id());
-		this->create_immediate_instruction<uint64_t>(found_string_info.second - 1);
+		this->create_immediate_instruction<std::uint64_t>(found_string_info.second - 1);
 		this->generate_pointer_size_check();
 
 		this->write_bytes('\x4c'); //mov rcx, r8
@@ -36,7 +36,7 @@ public:
 
 		this->write_bytes('\x48'); //mov rsi, address of the string
 		this->write_bytes('\xbe');
-		this->write_bytes<uint64_t>(reinterpret_cast<uintptr_t>(found_string_info.first.get()));
+		this->write_bytes<std::uint64_t>(reinterpret_cast<uintptr_t>(found_string_info.first.get()));
 
 		this->write_bytes('\xf3'); //rep movsb + REX.W
 		this->write_bytes('\x48');

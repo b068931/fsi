@@ -22,9 +22,9 @@
 template<typename T>
 instruction_builder* construct_builder_generic(
 	const std::vector<char>* machine_codes,
-	uint8_t prefix,
+	std::uint8_t prefix,
 	run_reader<runs_container>::run& run,
-	std::map<entity_id, std::pair<int32_t, uint8_t>>& function_memory_layout,
+	std::map<entity_id, std::pair<std::int32_t, std::uint8_t>>& function_memory_layout,
 	jump_table_builder& jump_table,
 	runs_container& general_file_information
 ) {
@@ -38,12 +38,12 @@ instruction_builder* construct_builder_generic(
 	};
 }
 
-std::map<uint8_t,
+std::map<std::uint8_t,
 	instruction_builder* (*) (
 		const std::vector<char>*,
-		uint8_t,
+		std::uint8_t,
 		run_reader<runs_container>::run&,
-		std::map<entity_id, std::pair<int32_t, uint8_t>>&,
+		std::map<entity_id, std::pair<std::int32_t, std::uint8_t>>&,
 		jump_table_builder&,
 		runs_container&
 		)
@@ -87,7 +87,7 @@ std::map<uint8_t,
 		{ 35, &construct_builder_generic<copy_string_builder> }
 	};
 }
-std::map<uint8_t, std::string> get_builders_names() {
+std::map<std::uint8_t, std::string> get_builders_names() {
 	return {
 		{ 0, "subtract" },
 		{ 1, "ssubtract" },
@@ -129,13 +129,13 @@ std::map<uint8_t, std::string> get_builders_names() {
 }
 
 instruction_builder* generate_builder(
-	uint8_t instruction_prefix,
-	uint8_t instruction_operation_code,
+	std::uint8_t instruction_prefix,
+	std::uint8_t instruction_operation_code,
 	run_reader<runs_container>::run& run,
-	std::map<entity_id, std::pair<int32_t, uint8_t>>& function_memory_layout,
+	std::map<entity_id, std::pair<std::int32_t, std::uint8_t>>& function_memory_layout,
 	jump_table_builder& jump_table,
 	runs_container& container,
-	std::map<uint8_t, std::vector<char>>& machine_codes
+	std::map<std::uint8_t, std::vector<char>>& machine_codes
 ) {
 	auto mapped_factories{ get_builders_mapping() };
 	auto found_factory = mapped_factories.find(instruction_operation_code);
@@ -165,8 +165,8 @@ instruction_builder* generate_builder(
 	return nullptr;
 }
 
-std::string decode_builder_name(uint8_t instruction_operation_code) {
-	std::map<uint8_t, std::string> builders_names{ get_builders_names() };
+std::string decode_builder_name(std::uint8_t instruction_operation_code) {
+	std::map<std::uint8_t, std::string> builders_names{ get_builders_names() };
 	auto found_name = builders_names.find(instruction_operation_code);
 	if (found_name != builders_names.end()) {
 		return found_name->second;
@@ -177,13 +177,13 @@ std::string decode_builder_name(uint8_t instruction_operation_code) {
 
 std::pair<std::unique_ptr<instruction_builder>, std::string> create_builder(
 	run_reader<runs_container>::run& run,
-	std::map<entity_id, std::pair<int32_t, uint8_t>>& function_memory_layout,
+	std::map<entity_id, std::pair<std::int32_t, std::uint8_t>>& function_memory_layout,
 	jump_table_builder& jump_table,
 	runs_container& container,
-	std::map<uint8_t, std::vector<char>>& machine_codes
+	std::map<std::uint8_t, std::vector<char>>& machine_codes
 ) {
-	uint8_t instruction_prefix = run.get_object<uint8_t>(); //arguments count and additional type bits
-	uint8_t instruction_operation_code = run.get_object<uint8_t>();
+	std::uint8_t instruction_prefix = run.get_object<std::uint8_t>(); //arguments count and additional type bits
+	std::uint8_t instruction_operation_code = run.get_object<std::uint8_t>();
 
 	//0xff means that instruction consists from multiple bytes. right now this information is useless.
 	if (instruction_operation_code != 0xff) {

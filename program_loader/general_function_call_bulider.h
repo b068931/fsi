@@ -1,7 +1,7 @@
 #ifndef GENERAL_FUNCTION_CALL_BUILDER_H
 #define GENERAL_FUNCTION_CALL_BUILDER_H
 
-#include <stdint.h>
+#include <cstdint>
 #include <utility>
 #include <vector>
 #include "instruction_builder.h"
@@ -18,8 +18,8 @@ protected:
 		this->assert_statement(!machine_codes, "Builder does not use machine codes."); //this builder does not use machine codes
 	}
 
-	uint8_t translate_current_type_to_memory_layouts_builder_type() {
-		uint8_t translated_type = 0; //0 - byte, 1 - two_bytes, 2 - four_bytes, 3 - eight_bytes, 4 - pointer
+	std::uint8_t translate_current_type_to_memory_layouts_builder_type() {
+		std::uint8_t translated_type = 0; //0 - byte, 1 - two_bytes, 2 - four_bytes, 3 - eight_bytes, 4 - pointer
 		if (this->get_current_variable_type() == 0b1111) {
 			translated_type = 4;
 		}
@@ -34,25 +34,25 @@ protected:
 	}
 
 	template<typename T>
-	void place_immediate(T value, int32_t displacement, uint8_t rm) {
+	void place_immediate(T value, std::int32_t displacement, std::uint8_t rm) {
 		using get_value_type = decltype(value->get_value());
 		this->create_immediate_instruction(value->get_value());
 
-		if constexpr (std::is_same_v<get_value_type, uint8_t>) {
+		if constexpr (std::is_same_v<get_value_type, std::uint8_t>) {
 			this->move_value_from_reg000_to_memory(0b00, true, displacement, rm);
 		}
-		else if (std::is_same_v<get_value_type, uint16_t>) {
+		else if (std::is_same_v<get_value_type, std::uint16_t>) {
 			this->move_value_from_reg000_to_memory(0b01, true, displacement, rm);
 		}
-		else if (std::is_same_v<get_value_type, uint32_t>) {
+		else if (std::is_same_v<get_value_type, std::uint32_t>) {
 			this->move_value_from_reg000_to_memory(0b10, true, displacement, rm);
 		}
-		else if (std::is_same_v<get_value_type, uint64_t>) {
+		else if (std::is_same_v<get_value_type, std::uint64_t>) {
 			this->move_value_from_reg000_to_memory(0b11, true, displacement, rm);
 		}
 	}
-	void move_value_from_reg000_to_memory(uint8_t active_type, bool is_R, int32_t displacement, uint8_t rm) {
-		uint8_t rex = 0;
+	void move_value_from_reg000_to_memory(std::uint8_t active_type, bool is_R, std::int32_t displacement, std::uint8_t rm) {
+		std::uint8_t rex = 0;
 		if (is_R) {
 			rex |= 0b01000100;
 		}

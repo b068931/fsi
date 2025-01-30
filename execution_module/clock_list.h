@@ -19,7 +19,7 @@ private:
 	};
 
 	list_element* hand{ nullptr };
-	size_t elements_count{ 0 };
+	std::size_t elements_count{ 0 };
 
 public:
 	class proxy {
@@ -107,7 +107,7 @@ public:
 		assert(this->elements_count != 0);
 		this->hand = this->hand->next;
 	}
-	size_t get_elements_count() { return this->elements_count; }
+	std::size_t get_elements_count() { return this->elements_count; }
 };
 
 #endif // !CLOCK_LIST_H

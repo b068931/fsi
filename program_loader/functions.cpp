@@ -1,15 +1,15 @@
 #include "pch.h"
 #include "functions.h"
 
-uint32_t nullify_function_pointer_variables(std::vector<char>& destination, const memory_layouts_builder::memory_addresses& locals) {
-	uint32_t instructions_size = 0;
+std::uint32_t nullify_function_pointer_variables(std::vector<char>& destination, const memory_layouts_builder::memory_addresses& locals) {
+	std::uint32_t instructions_size = 0;
 	for (const auto& variable : locals) {
 		if (variable.second.second == 4) { //if local is a pointer
 			destination.push_back('\x48');
 			destination.push_back('\xc7');
 			destination.push_back('\x85');
 			write_bytes(variable.second.first, destination);
-			write_bytes<uint32_t>(0, destination);
+			write_bytes<std::uint32_t>(0, destination);
 
 			instructions_size += 11;
 		}
@@ -22,14 +22,14 @@ void generate_program_termination_code(std::vector<char>& destination, terminati
 	destination.push_back('\x48'); //mov rcx, error_code
 	destination.push_back('\xc7');
 	destination.push_back('\xc1');
-	::write_bytes<int32_t>(static_cast<int32_t>(error_code), destination);
+	::write_bytes<std::int32_t>(static_cast<std::int32_t>(error_code), destination);
 	
 	destination.push_back('\x41'); //jmp [r10 + 16]
 	destination.push_back('\xff');
 	destination.push_back('\x62');
 	destination.push_back('\x10');
 }
-void generate_stack_allocation_code(std::vector<char>& destination, uint32_t size) {
+void generate_stack_allocation_code(std::vector<char>& destination, std::uint32_t size) {
 	if (size == 0) return;
 
 	destination.push_back('\x48'); //add rbp, size
@@ -49,7 +49,7 @@ void generate_stack_allocation_code(std::vector<char>& destination, uint32_t siz
 
 	//:end
 }
-void generate_stack_deallocation_code(std::vector<char>& destination, uint32_t size) {
+void generate_stack_deallocation_code(std::vector<char>& destination, std::uint32_t size) {
 	if (size == 0) return;
 
 	destination.push_back('\x48'); //sub rbp, size
@@ -58,7 +58,7 @@ void generate_stack_deallocation_code(std::vector<char>& destination, uint32_t s
 
 	write_bytes(size, destination);
 }
-uint32_t generate_function_prologue(std::vector<char>& destination, uint32_t allocation_size, const memory_layouts_builder::memory_addresses& locals) {
+std::uint32_t generate_function_prologue(std::vector<char>& destination, std::uint32_t allocation_size, const memory_layouts_builder::memory_addresses& locals) {
 	destination.push_back('\x48'); //mov rax, [rsp]
 	destination.push_back('\x8b');
 	destination.push_back('\x04');
@@ -77,7 +77,7 @@ uint32_t generate_function_prologue(std::vector<char>& destination, uint32_t all
 	generate_stack_allocation_code(destination, allocation_size + 8); //8 = return address
 	return nullify_function_pointer_variables(destination, locals) + stack_allocation_code_size + 12;
 }
-void generate_function_epilogue(std::vector<char>& destination, uint32_t deallocation_size, uint32_t arguments_deallocation_size) {
+void generate_function_epilogue(std::vector<char>& destination, std::uint32_t deallocation_size, std::uint32_t arguments_deallocation_size) {
 	generate_stack_deallocation_code(destination, deallocation_size + 8); //8 = return address
 
 	destination.push_back('\x48'); //mov rax, rbp

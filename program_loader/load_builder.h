@@ -5,7 +5,7 @@
 
 class load_builder : public instruction_builder {
 private:
-	void check_saved_variable_type(uint8_t type) {
+	void check_saved_variable_type(std::uint8_t type) {
 		this->write_bytes('\x41'); //cmp byte ptr [r9 + 8], type
 		this->write_bytes('\x80');
 		this->write_bytes('\x79');
@@ -13,7 +13,7 @@ private:
 		this->write_bytes(type);
 
 		this->write_bytes('\x74'); //je end
-		this->write_bytes(static_cast<uint8_t>(program_termination_code_size));
+		this->write_bytes(static_cast<std::uint8_t>(program_termination_code_size));
 
 		this->generate_program_termination_code(termination_codes::incorrect_saved_variable_type);
 		//:end

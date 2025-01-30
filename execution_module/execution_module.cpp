@@ -8,91 +8,91 @@
 
 module_mediator::module_part* part = nullptr;
 
-const size_t thread_state_size = 144;
-size_t thread_stack_size = 1000000;
+const std::size_t thread_state_size = 144;
+std::size_t thread_stack_size = 1000000;
 
 char* program_control_functions_addresses = nullptr;
 
 class index_getter { 
 //i guess this class is thread safe https://stackoverflow.com/questions/8102125/is-local-static-variable-initialization-thread-safe-in-c11
 public:
-	static size_t progload() {
-		static size_t index = ::part->find_module_index("progload");
+	static std::size_t progload() {
+		static std::size_t index = ::part->find_module_index("progload");
 		return index;
 	}
 
-	static size_t progload_load_program_to_memory() {
-		static size_t index = ::part->find_function_index(index_getter::progload(), "load_program_to_memory");
+	static std::size_t progload_load_program_to_memory() {
+		static std::size_t index = ::part->find_function_index(index_getter::progload(), "load_program_to_memory");
 		return index;
 	}
 
-	static size_t progload_check_function_arguments() {
-		static size_t index = ::part->find_function_index(index_getter::progload(), "check_function_arguments");
+	static std::size_t progload_check_function_arguments() {
+		static std::size_t index = ::part->find_function_index(index_getter::progload(), "check_function_arguments");
 		return index;
 	}
 
-	static size_t progload_get_function_name() {
-		static size_t index = ::part->find_function_index(index_getter::progload(), "get_function_name");
+	static std::size_t progload_get_function_name() {
+		static std::size_t index = ::part->find_function_index(index_getter::progload(), "get_function_name");
 		return index;
 	}
 
-	static size_t resm() {
-		static size_t index = ::part->find_module_index("resm");
+	static std::size_t resm() {
+		static std::size_t index = ::part->find_module_index("resm");
 		return index;
 	}
 
-	static size_t resm_create_new_program_container() {
-		static size_t index = ::part->find_function_index(index_getter::resm(), "create_new_program_container");
+	static std::size_t resm_create_new_program_container() {
+		static std::size_t index = ::part->find_function_index(index_getter::resm(), "create_new_program_container");
 		return index;
 	}
 
-	static size_t resm_create_new_thread() {
-		static size_t index = ::part->find_function_index(index_getter::resm(), "create_new_thread");
+	static std::size_t resm_create_new_thread() {
+		static std::size_t index = ::part->find_function_index(index_getter::resm(), "create_new_thread");
 		return index;
 	}
 
-	static size_t resm_allocate_program_memory() {
-		static size_t index = ::part->find_function_index(index_getter::resm(), "allocate_program_memory");
+	static std::size_t resm_allocate_program_memory() {
+		static std::size_t index = ::part->find_function_index(index_getter::resm(), "allocate_program_memory");
 		return index;
 	}
 
-	static size_t resm_allocate_thread_memory() {
-		static size_t index = ::part->find_function_index(index_getter::resm(), "allocate_thread_memory");
+	static std::size_t resm_allocate_thread_memory() {
+		static std::size_t index = ::part->find_function_index(index_getter::resm(), "allocate_thread_memory");
 		return index;
 	}
 
-	static size_t resm_deallocate_program_container() {
-		static size_t index = ::part->find_function_index(index_getter::resm(), "deallocate_program_container");
+	static std::size_t resm_deallocate_program_container() {
+		static std::size_t index = ::part->find_function_index(index_getter::resm(), "deallocate_program_container");
 		return index;
 	}
 
-	static size_t resm_deallocate_thread() {
-		static size_t index = ::part->find_function_index(index_getter::resm(), "deallocate_thread");
+	static std::size_t resm_deallocate_thread() {
+		static std::size_t index = ::part->find_function_index(index_getter::resm(), "deallocate_thread");
 		return index;
 	}
 
-	static size_t resm_get_running_threads_count() {
-		static size_t index = ::part->find_function_index(index_getter::resm(), "get_running_threads_count");
+	static std::size_t resm_get_running_threads_count() {
+		static std::size_t index = ::part->find_function_index(index_getter::resm(), "get_running_threads_count");
 		return index;
 	}
 
-	static size_t resm_get_program_container_id() {
-		static size_t index = ::part->find_function_index(index_getter::resm(), "get_program_container_id");
+	static std::size_t resm_get_program_container_id() {
+		static std::size_t index = ::part->find_function_index(index_getter::resm(), "get_program_container_id");
 		return index;
 	}
 
-	static size_t resm_get_jump_table() {
-		static size_t index = ::part->find_function_index(index_getter::resm(), "get_jump_table");
+	static std::size_t resm_get_jump_table() {
+		static std::size_t index = ::part->find_function_index(index_getter::resm(), "get_jump_table");
 		return index;
 	}
 
-	static size_t resm_get_jump_table_size() {
-		static size_t index = ::part->find_function_index(index_getter::resm(), "get_jump_table_size");
+	static std::size_t resm_get_jump_table_size() {
+		static std::size_t index = ::part->find_function_index(index_getter::resm(), "get_jump_table_size");
 		return index;
 	}
 
-	static size_t resm_duplicate_container() {
-		static size_t index = ::part->find_function_index(index_getter::resm(), "duplicate_container");
+	static std::size_t resm_duplicate_container() {
+		static std::size_t index = ::part->find_function_index(index_getter::resm(), "duplicate_container");
 		return index;
 	}
 };
@@ -139,7 +139,7 @@ void thread_terminate() {
 	inner_delete_running_thread();
 }
 
-void show_error(uint64_t error_code) {
+void show_error(std::uint64_t error_code) {
 	termination_codes termination_code = static_cast<termination_codes>(error_code);
 
 	switch (termination_code) {
@@ -174,7 +174,7 @@ void show_error(uint64_t error_code) {
 
 	log_program_error(::part, "Program execution error. Thread terminated.");
 }
-[[noreturn]] void inner_terminate(uint64_t error_code) {
+[[noreturn]] void inner_terminate(std::uint64_t error_code) {
 	show_error(error_code);
 
 	thread_terminate();
@@ -199,7 +199,7 @@ void show_error(uint64_t error_code) {
 	thread_terminate();
 	load_execution_threadf(get_thread_local_structure()->execution_thread_state);
 }
-[[noreturn]] void inner_call_module(uint64_t module_id, uint64_t function_id, module_mediator::arguments_string_type args_string) {
+[[noreturn]] void inner_call_module(std::uint64_t module_id, std::uint64_t function_id, module_mediator::arguments_string_type args_string) {
 	module_mediator::return_value action_code = ::part->call_module_visible_only(module_id, function_id, args_string, &inner_call_module_error);
 	
 	//all these functions are declared as [[noreturn]]
@@ -260,8 +260,8 @@ module_mediator::return_value inner_get_container_running_threads_count(module_m
 	);
 }
 
-void inner_fill_in_reg_array_entry(uint64_t entry_index, char* memory, uint64_t value) {
-	std::memcpy(memory + (sizeof(uint64_t) * entry_index), &value, sizeof(uint64_t));
+void inner_fill_in_reg_array_entry(std::uint64_t entry_index, char* memory, std::uint64_t value) {
+	std::memcpy(memory + (sizeof(std::uint64_t) * entry_index), &value, sizeof(std::uint64_t));
 }
 module_mediator::return_value inner_create_thread(module_mediator::return_value thread_group_id, module_mediator::return_value priority, void* function_address) {
 	thread_local_structure* thread_structure = get_thread_local_structure();
@@ -286,9 +286,9 @@ module_mediator::return_value inner_create_thread_with_initializer(module_mediat
 		function_address
 	);
 }
-char* inner_allocate_thread_memory(module_mediator::return_value thread_id, uint64_t size) {
+char* inner_allocate_thread_memory(module_mediator::return_value thread_id, std::uint64_t size) {
 	return reinterpret_cast<char*>(
-		module_mediator::fast_call<module_mediator::return_value, uint64_t>(
+		module_mediator::fast_call<module_mediator::return_value, std::uint64_t>(
 			::part,
 			index_getter::resm(),
 			index_getter::resm_allocate_thread_memory(),
@@ -330,7 +330,7 @@ module_mediator::return_value inner_check_function_signature(void* function_addr
 }
 uintptr_t inner_apply_initializer_on_thread_stack(char* thread_stack_memory, char* thread_stack_end, const module_mediator::arguments_array_type& arguments) {
 	for (module_mediator::arguments_array_type::const_reverse_iterator begin = arguments.rbegin(), end = arguments.rend(); begin != end; ++begin) {
-		size_t type_size = module_mediator::arguments_string_builder::get_type_size_by_index(begin->first);
+		std::size_t type_size = module_mediator::arguments_string_builder::get_type_size_by_index(begin->first);
 		if ((thread_stack_memory + type_size) >= thread_stack_end) {
 			log_program_error(::part, "Not enough stack space to initialize thread stack.");
 			reinterpret_cast<uintptr_t>(nullptr);
@@ -393,7 +393,7 @@ module_mediator::return_value on_thread_creation(module_mediator::arguments_stri
 	char* thread_state_memory = inner_allocate_thread_memory(thread_id, thread_state_size);
 	char* thread_stack_memory = inner_allocate_thread_memory(thread_id, thread_stack_size);
 	
-	char* thread_stack_end = thread_stack_memory + thread_stack_size - (sizeof(module_mediator::one_byte) + sizeof(uint64_t));
+	char* thread_stack_end = thread_stack_memory + thread_stack_size - (sizeof(module_mediator::one_byte) + sizeof(std::uint64_t));
 
 	//get program jump table from resm
 	void* program_jump_table = reinterpret_cast<void*>(
@@ -472,7 +472,7 @@ module_mediator::return_value on_container_creation(module_mediator::arguments_s
 }
 
 module_mediator::return_value self_duplicate(module_mediator::arguments_string_type bundle) {
-	auto arguments = module_mediator::arguments_string_builder::unpack<void*, void*, uint64_t>(bundle);
+	auto arguments = module_mediator::arguments_string_builder::unpack<void*, void*, std::uint64_t>(bundle);
 
 	module_mediator::arguments_string_type copy = new module_mediator::arguments_string_element[std::get<2>(arguments)]{};
 	std::memcpy(copy, std::get<1>(arguments), std::get<2>(arguments));
@@ -565,7 +565,7 @@ module_mediator::return_value make_runnable(module_mediator::arguments_string_ty
 }
 module_mediator::return_value start(module_mediator::arguments_string_type bundle) {
 	auto arguments = module_mediator::arguments_string_builder::unpack<module_mediator::return_value>(bundle);
-	uint16_t thread_count = static_cast<uint16_t>(std::get<0>(arguments));
+	std::uint16_t thread_count = static_cast<std::uint16_t>(std::get<0>(arguments));
 
 	log_info(::part, "Creating execution daemons. Count: " + std::to_string(thread_count));
 	manager.startup(thread_count);
@@ -573,7 +573,7 @@ module_mediator::return_value start(module_mediator::arguments_string_type bundl
 	return 0;
 }
 module_mediator::return_value create_thread(module_mediator::arguments_string_type bundle) {
-	auto arguments = module_mediator::arguments_string_builder::unpack<module_mediator::return_value, void*, void*, uint64_t>(bundle);
+	auto arguments = module_mediator::arguments_string_builder::unpack<module_mediator::return_value, void*, void*, std::uint64_t>(bundle);
 
 	module_mediator::arguments_string_type copy = new module_mediator::arguments_string_element[std::get<3>(arguments)]{};
 	std::memcpy(copy, std::get<2>(arguments), std::get<3>(arguments));
@@ -607,7 +607,7 @@ module_mediator::return_value run_program(module_mediator::arguments_string_type
 }
 void initialize_m(module_mediator::module_part* part) {
 	::part = part;
-	::program_control_functions_addresses = new char[4 * sizeof(uint64_t)] {};
+	::program_control_functions_addresses = new char[4 * sizeof(std::uint64_t)] {};
 	
 	inner_fill_in_reg_array_entry(
 		0,

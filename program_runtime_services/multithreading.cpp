@@ -15,7 +15,7 @@ void* get_current_thread_group_jump_table() {
 
 	return reinterpret_cast<void*>(get_module_part()->call_module(index_getter::resm(), index_getter::resm_get_jump_table(), args_string.get()));
 }
-void* get_function_address(uint64_t function_displacement) {
+void* get_function_address(std::uint64_t function_displacement) {
 	char* jump_table_bytes = 
 		static_cast<char*>(get_current_thread_group_jump_table());
 
@@ -31,7 +31,7 @@ module_mediator::return_value check_function_signature(void* function_address, m
 
 	return get_module_part()->call_module(index_getter::progload(), index_getter::progload_check_function_arguments(), args_string.get());
 }
-bool check_function_displacement(uint64_t function_displacement) {
+bool check_function_displacement(std::uint64_t function_displacement) {
 	return (function_displacement + sizeof(void*)) <= get_current_thread_group_jump_table_size();
 }
 
@@ -89,7 +89,7 @@ module_mediator::return_value thread_group_id(module_mediator::arguments_string_
 		return module_mediator::execution_result_terminate;
 	}
 
-	uint64_t thread_group_id = get_current_thread_group_id();
+	std::uint64_t thread_group_id = get_current_thread_group_id();
 	std::memcpy(return_address, &thread_group_id, sizeof(module_mediator::eight_bytes));
 
 	return module_mediator::execution_result_continue;
@@ -105,7 +105,7 @@ module_mediator::return_value dynamic_call(module_mediator::arguments_string_typ
 	}
 
 	if (check_function_displacement(function_displacement)) {
-		std::pair<module_mediator::arguments_string_type, size_t> args_string_size =
+		std::pair<module_mediator::arguments_string_type, std::size_t> args_string_size =
 			module_mediator::arguments_string_builder::convert_from_arguments_array(arguments.begin() + 1, arguments.end());
 
 		std::unique_ptr<module_mediator::arguments_string_element[]> thread_main_parameters{
@@ -144,14 +144,14 @@ module_mediator::return_value create_thread(module_mediator::arguments_string_ty
 	}
 
 	if (check_function_displacement(function_displacement)) {
-		std::pair<module_mediator::arguments_string_type, size_t> args_string_size = 
+		std::pair<module_mediator::arguments_string_type, std::size_t> args_string_size = 
 			module_mediator::arguments_string_builder::convert_from_arguments_array(arguments.begin() + 2, arguments.end());
 
 		std::unique_ptr<module_mediator::arguments_string_element[]> thread_main_parameters{
 			args_string_size.first
 		};
 
-		module_mediator::return_value result = module_mediator::fast_call<module_mediator::return_value, void*, void*, uint64_t>(
+		module_mediator::return_value result = module_mediator::fast_call<module_mediator::return_value, void*, void*, std::uint64_t>(
 			get_module_part(),
 			index_getter::excm(),
 			index_getter::excm_create_thread(),
@@ -180,14 +180,14 @@ module_mediator::return_value create_thread_group(module_mediator::arguments_str
 	}
 
 	if (check_function_displacement(function_displacement)) {
-		std::pair<module_mediator::arguments_string_type, size_t> args_string_size =
+		std::pair<module_mediator::arguments_string_type, std::size_t> args_string_size =
 			module_mediator::arguments_string_builder::convert_from_arguments_array(arguments.begin() + 1, arguments.end());
 
 		std::unique_ptr<module_mediator::arguments_string_element[]> thread_main_parameters{
 			args_string_size.first
 		};
 
-		module_mediator::return_value result = module_mediator::fast_call<void*, void*, uint64_t>(
+		module_mediator::return_value result = module_mediator::fast_call<void*, void*, std::uint64_t>(
 			get_module_part(),
 			index_getter::excm(),
 			index_getter::excm_self_duplicate(),

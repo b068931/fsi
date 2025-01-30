@@ -6,7 +6,7 @@
 #include "program_context.h"
 
 struct program_container : public resource_container {
-	size_t threads_count{ 0 };
+	std::size_t threads_count{ 0 };
 	program_context* context{};
 
 	program_container() = default;

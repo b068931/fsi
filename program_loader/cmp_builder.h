@@ -7,7 +7,7 @@
 
 class cmp_builder : public machine_codes_instruction_builder {
 private:
-	uint8_t argument_index; //first argument will be placed in rax, while second one will be placed in r8
+	std::uint8_t argument_index; //first argument will be placed in rax, while second one will be placed in r8
 
 	template<typename T>
 	void place_immediate_value(T value) {
@@ -31,16 +31,16 @@ public:
 			"Active types for this instruction must match. Arguments count must be equal to 2."); //this instruction works only with 2 arguments
 	}
 
-	virtual void visit(std::unique_ptr<variable_imm<uint8_t>> value) override {
+	virtual void visit(std::unique_ptr<variable_imm<std::uint8_t>> value) override {
 		this->place_immediate_value(value.get());
 	}
-	virtual void visit(std::unique_ptr<variable_imm<uint16_t>> value) override {
+	virtual void visit(std::unique_ptr<variable_imm<std::uint16_t>> value) override {
 		this->place_immediate_value(value.get());
 	}
-	virtual void visit(std::unique_ptr<variable_imm<uint32_t>> value) override {
+	virtual void visit(std::unique_ptr<variable_imm<std::uint32_t>> value) override {
 		this->place_immediate_value(value.get());
 	}
-	virtual void visit(std::unique_ptr<variable_imm<uint64_t>> value) override {
+	virtual void visit(std::unique_ptr<variable_imm<std::uint64_t>> value) override {
 		this->place_immediate_value(value.get());
 	}
 	virtual void visit(std::unique_ptr<regular_variable> variable) override {

@@ -45,7 +45,7 @@ public:
 		this->self_call_next();
 		this->self_call_next();
 
-		uint8_t rex = '\x44';
+		std::uint8_t rex = '\x44';
 
 		switch (this->get_active_type()) {
 		case 0b01: {

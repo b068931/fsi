@@ -58,7 +58,7 @@ public:
 
 private:
 	std::list<std::pair<T, priority_type>> type_priorities;
-	auto get_iterator(size_t displacement) {
+	auto get_iterator(std::size_t displacement) {
 		auto top = this->type_priorities.rbegin();
 		std::advance(top, displacement);
 
@@ -78,7 +78,7 @@ public:
 		return std::pair{nullptr, priority_type{}};
 	}
 
-	size_t count() const { return this->type_priorities.size(); }
+	std::size_t count() const { return this->type_priorities.size(); }
 	void remove(proxy proxy) { this->type_priorities.erase(*(proxy.associated_element)); }
 
 	template<typename... args>

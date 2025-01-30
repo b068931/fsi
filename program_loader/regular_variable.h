@@ -2,11 +2,11 @@
 #define REGULAR_VARIABLE_H
 
 #include "generic_variable.h"
-#include <stdint.h>
+#include <cstdint>
 
 class regular_variable : public generic_variable {
 public:
-	regular_variable(uint8_t real_type, uint8_t active_type, entity_id id)
+	regular_variable(std::uint8_t real_type, std::uint8_t active_type, entity_id id)
 		:generic_variable{ real_type, active_type, id }
 	{}
 

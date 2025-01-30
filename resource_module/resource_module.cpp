@@ -19,28 +19,28 @@ enum class return_code : module_mediator::return_value {
 };
 class index_getter {
 public:
-	static size_t excm() {
-		static size_t index = ::part->find_module_index("excm");
+	static std::size_t excm() {
+		static std::size_t index = ::part->find_module_index("excm");
 		return index;
 	}
 
-	static size_t excm_on_container_creation() {
-		static size_t index = ::part->find_function_index(index_getter::excm(), "on_container_creation");
+	static std::size_t excm_on_container_creation() {
+		static std::size_t index = ::part->find_function_index(index_getter::excm(), "on_container_creation");
 		return index;
 	}
 
-	static size_t excm_on_thread_creation() {
-		static size_t index = ::part->find_function_index(index_getter::excm(), "on_thread_creation");
+	static std::size_t excm_on_thread_creation() {
+		static std::size_t index = ::part->find_function_index(index_getter::excm(), "on_thread_creation");
 		return index;
 	}
 
-	static size_t progload() {
-		static size_t index = ::part->find_module_index("progload");
+	static std::size_t progload() {
+		static std::size_t index = ::part->find_module_index("progload");
 		return index;
 	}
 
-	static size_t progload_free_program() {
-		static size_t index = ::part->find_function_index(index_getter::progload(), "free_program");
+	static std::size_t progload_free_program() {
+		static std::size_t index = ::part->find_function_index(index_getter::progload(), "free_program");
 		return index;
 	}
 };
@@ -99,7 +99,7 @@ void add_destory_callback_generic(std::recursive_mutex& mutex, T& object, id_gen
 }
 
 template<typename T>
-intptr_t allocate_memory_generic(std::recursive_mutex& mutex, T& object, id_generator::id_type id, uint64_t size) {
+intptr_t allocate_memory_generic(std::recursive_mutex& mutex, T& object, id_generator::id_type id, std::uint64_t size) {
 	auto iterator_lock = get_iterator(object, mutex, id);
 
 	/*
@@ -280,19 +280,19 @@ module_mediator::return_value duplicate_container(module_mediator::arguments_str
 
 module_mediator::return_value create_new_program_container(module_mediator::arguments_string_type bundle) {
 	id_generator::id_type id = id_generator::get_id();
-	auto arguments = module_mediator::arguments_string_builder::unpack<void*, uint32_t, void*, uint32_t, void*, uint64_t, void*, uint64_t>(bundle);
+	auto arguments = module_mediator::arguments_string_builder::unpack<void*, std::uint32_t, void*, std::uint32_t, void*, std::uint64_t, void*, std::uint64_t>(bundle);
 	
 	void** code = static_cast<void**>(std::get<0>(arguments));
-	uint32_t functions_count = std::get<1>(arguments);
+	std::uint32_t functions_count = std::get<1>(arguments);
 
 	void** exposed_functions = static_cast<void**>(std::get<2>(arguments));
-	uint32_t exposed_functions_count = std::get<3>(arguments);
+	std::uint32_t exposed_functions_count = std::get<3>(arguments);
 
 	void* jump_table = std::get<4>(arguments);
-	uint64_t jump_table_size = std::get<5>(arguments);
+	std::uint64_t jump_table_size = std::get<5>(arguments);
 
 	void** program_strings = static_cast<void**>(std::get<6>(arguments));
-	uint64_t program_strings_size = std::get<7>(arguments);
+	std::uint64_t program_strings_size = std::get<7>(arguments);
 	
 	/*
 	* a newly created object can not be deleted or modified if excm does not know about it,
@@ -343,11 +343,11 @@ module_mediator::return_value create_new_thread(module_mediator::arguments_strin
 }
 
 module_mediator::return_value allocate_program_memory(module_mediator::arguments_string_type bundle) {
-	auto arguments = module_mediator::arguments_string_builder::unpack<id_generator::id_type, uint64_t>(bundle);
+	auto arguments = module_mediator::arguments_string_builder::unpack<id_generator::id_type, std::uint64_t>(bundle);
 	return allocate_memory_generic(containers_mutex, containers, std::get<0>(arguments), std::get<1>(arguments));
 }
 module_mediator::return_value allocate_thread_memory(module_mediator::arguments_string_type bundle) {
-	auto arguments = module_mediator::arguments_string_builder::unpack<id_generator::id_type, uint64_t>(bundle);
+	auto arguments = module_mediator::arguments_string_builder::unpack<id_generator::id_type, std::uint64_t>(bundle);
 	return allocate_memory_generic(thread_structures_mutex, thread_structures, std::get<0>(arguments), std::get<1>(arguments));
 }
 
@@ -438,7 +438,7 @@ program_container::~program_container() noexcept {
 }
 program_context::~program_context() noexcept {
 	assert(this->references_count == 0);
-	module_mediator::fast_call<void*, uint32_t, void*, uint32_t, void*, void*, uint64_t>(
+	module_mediator::fast_call<void*, std::uint32_t, void*, std::uint32_t, void*, void*, std::uint64_t>(
 		::part,
 		index_getter::progload(),
 		index_getter::progload_free_program(),

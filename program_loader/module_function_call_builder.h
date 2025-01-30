@@ -3,7 +3,7 @@
 
 #include <memory> //std::unique_ptr
 #include <utility> //std::forward
-#include <stdint.h>
+#include <cstdint>
 
 #include "run_container.h"
 #include "memory_layouts_builder.h"
@@ -16,22 +16,22 @@ class module_function_call_builder : public general_function_call_builder {
 	allocate it and fill in first part of the args string
 	2. fill in second part of the args string*/
 private:
-	uint32_t stack_allocation_size;
+	std::uint32_t stack_allocation_size;
 
 	const runs_container::module* associated_module;
-	size_t function_to_call_index;
+	std::size_t function_to_call_index;
 
-	int8_t variable_index;
+	std::int8_t variable_index;
 	bool is_second_time;
 
-	int32_t current_rbx_displacement;
+	std::int32_t current_rbx_displacement;
 
-	std::vector<uint8_t> args_types;
-	std::vector<int32_t> arguments_relative_addresses;
+	std::vector<std::uint8_t> args_types;
+	std::vector<std::int32_t> arguments_relative_addresses;
 	std::vector<variable*> variables;
 
-	uint8_t translate_to_args_string_type(uint8_t type_bits) {
-		uint8_t return_value = 0;
+	std::uint8_t translate_to_args_string_type(std::uint8_t type_bits) {
+		std::uint8_t return_value = 0;
 		if (type_bits == 0b1111) {
 			return_value = 10;
 		}
@@ -39,7 +39,7 @@ private:
 			return_value = 9;
 		}
 		else {
-			uint8_t active_type = type_bits & 0b11;
+			std::uint8_t active_type = type_bits & 0b11;
 			if (active_type == 0b11) {
 				return_value = 8;
 			}
@@ -54,12 +54,12 @@ private:
 
 		return return_value;
 	}
-	uint8_t get_type_size() {
-		uint8_t translated_type = this->translate_current_type_to_memory_layouts_builder_type();
+	std::uint8_t get_type_size() {
+		std::uint8_t translated_type = this->translate_current_type_to_memory_layouts_builder_type();
 
 		memory_layouts_builder::variable_size size = memory_layouts_builder::get_variable_size(translated_type);
 		if (size != memory_layouts_builder::variable_size::UNKNOWN) {
-			return static_cast<uint8_t>(size);
+			return static_cast<std::uint8_t>(size);
 		}
 
 		return 0;
@@ -75,7 +75,7 @@ private:
 
 		this->variables.push_back(var);
 	}
-	void move_value_from_reg000_to_args_string(uint8_t active_type, int32_t displacement, bool is_R) {
+	void move_value_from_reg000_to_args_string(std::uint8_t active_type, std::int32_t displacement, bool is_R) {
 		this->move_value_from_reg000_to_memory(active_type, is_R, displacement, 0b011);
 	}
 
@@ -101,7 +101,7 @@ private:
 		}
 	}
 
-	void put_byte(int32_t& displacement, uint8_t value) {
+	void put_byte(std::int32_t& displacement, std::uint8_t value) {
 		this->write_bytes('\xc6');
 		this->write_bytes('\x85');
 		this->write_bytes(displacement);
@@ -148,7 +148,7 @@ public:
 				this->zero_rax();
 
 				this->write_bytes('\xb8'); //mov eax, imm32
-				this->write_bytes(static_cast<int32_t>(this->get_function_table_index(fnc->get_id())));
+				this->write_bytes(static_cast<std::int32_t>(this->get_function_table_index(fnc->get_id())));
 
 				this->move_value_from_reg000_to_args_string(0b11, this->arguments_relative_addresses[this->variable_index], false);
 				++this->variable_index;
@@ -185,8 +185,8 @@ public:
 				this->args_types.push_back(1); //retrun value type
 
 				this->current_rbx_displacement =
-					static_cast<uint8_t>(memory_layouts_builder::get_variable_size(4)) +
-					static_cast<uint8_t>(memory_layouts_builder::get_variable_size(0)); //pointer + pointer + byte
+					static_cast<std::uint8_t>(memory_layouts_builder::get_variable_size(4)) +
+					static_cast<std::uint8_t>(memory_layouts_builder::get_variable_size(0)); //pointer + pointer + byte
 
 				this->arguments_relative_addresses.push_back(0);
 				this->arguments_relative_addresses.push_back(8);
@@ -198,16 +198,16 @@ public:
 			this->variables.push_back(variable.release());
 		}
 	}
-	virtual void visit(std::unique_ptr<variable_imm<uint8_t>> value) override {
+	virtual void visit(std::unique_ptr<variable_imm<std::uint8_t>> value) override {
 		this->place_immediate(value.release());
 	}
-	virtual void visit(std::unique_ptr<variable_imm<uint16_t>> value) override {
+	virtual void visit(std::unique_ptr<variable_imm<std::uint16_t>> value) override {
 		this->place_immediate(value.release());
 	}
-	virtual void visit(std::unique_ptr<variable_imm<uint32_t>> value) override {
+	virtual void visit(std::unique_ptr<variable_imm<std::uint32_t>> value) override {
 		this->place_immediate(value.release());
 	}
-	virtual void visit(std::unique_ptr<variable_imm<uint64_t>> value) override {
+	virtual void visit(std::unique_ptr<variable_imm<std::uint64_t>> value) override {
 		this->place_immediate(value.release());
 	}
 	virtual void visit(std::unique_ptr<pointer> pointer) override {
@@ -257,14 +257,14 @@ public:
 			this->self_call_next();
 		}
 
-		int32_t args_string_size = static_cast<int32_t>(1 + this->args_types.size() + this->current_rbx_displacement);
-		int32_t displacement = -args_string_size;
+		std::int32_t args_string_size = static_cast<std::int32_t>(1 + this->args_types.size() + this->current_rbx_displacement);
+		std::int32_t displacement = -args_string_size;
 
 		this->stack_allocation_size = args_string_size;
 		this->generate_stack_allocation_code(args_string_size);
 
-		this->put_byte(displacement, static_cast<uint8_t>(this->args_types.size())); //initialize args string types
-		for (uint8_t type : this->args_types) {
+		this->put_byte(displacement, static_cast<std::uint8_t>(this->args_types.size())); //initialize args string types
+		for (std::uint8_t type : this->args_types) {
 			this->put_byte(displacement, type);
 		}
 

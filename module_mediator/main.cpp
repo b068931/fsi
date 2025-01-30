@@ -30,9 +30,9 @@ int main(int argc, char** argv) {
 	module_mediator::module_part* part = module_mediator.get_module_part();
 	if (error_message.empty()) {
 
-		size_t excm = part->find_module_index("excm");
-		size_t startup = part->find_function_index(excm, "start");
-		size_t run = part->find_function_index(excm, "run_program");
+		std::size_t excm = part->find_module_index("excm");
+		std::size_t startup = part->find_function_index(excm, "start");
+		std::size_t run = part->find_function_index(excm, "run_program");
 
 		std::unique_ptr<module_mediator::arguments_string_element[]> args{ module_mediator::arguments_string_builder::pack<void*>(argv[2]) };
 		part->call_module(excm, run, args.get());

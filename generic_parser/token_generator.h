@@ -61,7 +61,7 @@ namespace generic_parser {
 
 			iterator best_find = container.end();
 			while (!valid_hard_symbols.empty()) {
-				for (size_t current_string_index = 0; current_string_index < valid_hard_symbols.size(); ++current_string_index) {
+				for (std::size_t current_string_index = 0; current_string_index < valid_hard_symbols.size(); ++current_string_index) {
 					if (multiindex == get_string(valid_hard_symbols[current_string_index]).size()) { //if we reached the end of the string this means that this string is currently our best find. the longest string will be returned
 						best_find = valid_hard_symbols[current_string_index];
 
@@ -98,10 +98,10 @@ namespace generic_parser {
 		}
 
 		void create_name() {
-			size_t name_size = this->name_end - this->name_start;
+			std::size_t name_size = this->name_end - this->name_start;
 			if (name_size > 0) {
 				this->name.resize(name_size);
-				for (size_t name_index = 0; this->name_start < this->name_end; ++this->name_start, ++name_index) {
+				for (std::size_t name_index = 0; this->name_start < this->name_end; ++this->name_start, ++name_index) {
 					this->name[name_index] = this->reader.get_symbol(this->name_start);
 				}
 

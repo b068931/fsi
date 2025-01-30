@@ -7,7 +7,7 @@
 
 class jcc_builder : public machine_codes_instruction_builder {
 private:
-	const uint32_t jump_rel32 = 7;
+	const std::uint32_t jump_rel32 = 7;
 
 public:
 	template<typename... args>
@@ -37,7 +37,7 @@ public:
 		this->write_bytes('\x66'); //popfw
 		this->write_bytes('\x9d');
 
-		for (size_t index = 0; index < this->get_codes_count(); ++index) { //jcc rel32
+		for (std::size_t index = 0; index < this->get_codes_count(); ++index) { //jcc rel32
 			this->write_bytes(this->get_code(index));
 		}
 		this->write_bytes(this->jump_rel32);
@@ -45,7 +45,7 @@ public:
 		this->write_bytes('\x41'); //jmp [r11+disp32]
 		this->write_bytes('\xff');
 		this->write_bytes('\xa3');
-		this->write_bytes(static_cast<uint32_t>(this->get_jump_point_table_index(variable->get_id())));
+		this->write_bytes(static_cast<std::uint32_t>(this->get_jump_point_table_index(variable->get_id())));
 	}
 	virtual void build() override {
 		this->zero_rax();

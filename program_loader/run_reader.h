@@ -1,7 +1,7 @@
 #ifndef RUN_READER_H
 #define RUN_READER_H
 
-#include <stdint.h>
+#include <cstdint>
 #include <map>
 #include <iostream>
 
@@ -68,9 +68,9 @@ public:
 		for (generic_parser::filepos index = 0, length = reader->get_symbols_count(); (index < length);) {
 			char run_type = reader->get_symbol(index++);
 
-			uint64_t run_size = 0;
+			std::uint64_t run_size = 0;
 			char* run_size_bytes = reinterpret_cast<char*>(&run_size);
-			for (size_t count = 0; count < sizeof(uint64_t); ++count) {
+			for (std::size_t count = 0; count < sizeof(std::uint64_t); ++count) {
 				run_size_bytes[count] = reader->get_symbol(index++);
 			}
 

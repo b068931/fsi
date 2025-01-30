@@ -18,12 +18,12 @@ std::mutex exposed_functions_mutex{};
 std::unordered_map<uintptr_t, std::pair<std::unique_ptr<module_mediator::arguments_string_element[]>, std::string>> exposed_functions{};
 
 module_mediator::return_value add_program(
-	void** code, uint32_t functions_count, 
-	void** exposed_functions, uint32_t exposed_functions_count, 
-	void* jump_table, uint64_t jump_table_size,
-	void** program_strings, uint64_t program_strings_count
+	void** code, std::uint32_t functions_count, 
+	void** exposed_functions, std::uint32_t exposed_functions_count, 
+	void* jump_table, std::uint64_t jump_table_size,
+	void** program_strings, std::uint64_t program_strings_count
 ) {
-	return module_mediator::fast_call<void*, uint32_t, void*, uint32_t, void*, uint64_t, void*, uint64_t>(
+	return module_mediator::fast_call<void*, std::uint32_t, void*, std::uint32_t, void*, std::uint64_t, void*, std::uint64_t>(
 		get_module_part(),
 		index_getter::resm(), 
 		index_getter::resm_create_new_program_container(),
@@ -38,9 +38,9 @@ void merge_exposed_functions(std::unordered_map<uintptr_t, std::pair<std::unique
 	::exposed_functions.merge(new_exposed_functions);
 }
 
-void free_resources_on_fail(size_t loaded_functions_size, void** loaded_functions, void** exposed_functions) {
+void free_resources_on_fail(std::size_t loaded_functions_size, void** loaded_functions, void** exposed_functions) {
 	delete[] exposed_functions;
-	for (size_t index = 0; index < loaded_functions_size; ++index) {
+	for (std::size_t index = 0; index < loaded_functions_size; ++index) {
 		VirtualFree(loaded_functions[index], 0, MEM_RELEASE);
 	}
 
@@ -88,7 +88,7 @@ jump_table_builder construct_jump_table(const runs_container& container) {
 	return jump_table;
 }
 
-std::map<uint8_t, std::vector<char>> get_machine_codes() {
+std::map<std::uint8_t, std::vector<char>> get_machine_codes() {
 	return {
 			{0, {'\x28', '\x29', '\x29', '\x29'}},
 			{1, {'\x28', '\x29', '\x29', '\x29'}},
@@ -122,29 +122,29 @@ std::map<uint8_t, std::vector<char>> get_machine_codes() {
 	};
 }
 
-uint32_t calculate_function_locals_stack_space(const runs_container::function& function) {
-	uint32_t stack_space = 0; //calculate how much stack space this function needs
+std::uint32_t calculate_function_locals_stack_space(const runs_container::function& function) {
+	std::uint32_t stack_space = 0; //calculate how much stack space this function needs
 	for (const auto& local : function.locals) {
-		stack_space += static_cast<uint8_t>(memory_layouts_builder::get_variable_size(local.second));
+		stack_space += static_cast<std::uint8_t>(memory_layouts_builder::get_variable_size(local.second));
 	}
 
 	return stack_space;
 }
-uint32_t calculate_function_arguments_stack_space(const memory_layouts_builder::memory_addresses& function_arguments_information) {
-	uint32_t function_arguments_size = 0;
+std::uint32_t calculate_function_arguments_stack_space(const memory_layouts_builder::memory_addresses& function_arguments_information) {
+	std::uint32_t function_arguments_size = 0;
 	for (const auto& val : function_arguments_information) {
-		function_arguments_size += static_cast<uint8_t>(memory_layouts_builder::get_variable_size(val.second.second));
+		function_arguments_size += static_cast<std::uint8_t>(memory_layouts_builder::get_variable_size(val.second.second));
 	}
 
 	return function_arguments_size;
 }
 
-std::pair<void**, uint64_t> create_program_strings(runs_container& container) {
-	uint64_t program_strings_size = container.program_strings.size();
+std::pair<void**, std::uint64_t> create_program_strings(runs_container& container) {
+	std::uint64_t program_strings_size = container.program_strings.size();
 
 	void** program_strings = new void* [program_strings_size] {};
 	auto current_element = container.program_strings.begin();
-	for (uint64_t index = 0; index < program_strings_size; ++index) {
+	for (std::uint64_t index = 0; index < program_strings_size; ++index) {
 		program_strings[index] = current_element->second.first.release();
 		++current_element;
 	}
@@ -153,17 +153,17 @@ std::pair<void**, uint64_t> create_program_strings(runs_container& container) {
 }
 
 std::vector<char> compile_function_body(
-	uint32_t function_index,
+	std::uint32_t function_index,
 	runs_container& container, 
 	run_reader<runs_container>::run& function_run,
 	memory_layouts_builder::memory_addresses& merged_layouts,
 	jump_table_builder& jump_table,
-	std::map<uint8_t, std::vector<char>>& machine_codes
+	std::map<std::uint8_t, std::vector<char>>& machine_codes
 ) {
 	std::vector<char> function_body_symbols{};
 
-	uint32_t instruction_index = 0;
-	uint64_t translated_address = 0;
+	std::uint32_t instruction_index = 0;
+	std::uint64_t translated_address = 0;
 	while (function_run.get_run_position() != function_run.get_run_size()) {
 		std::pair<std::unique_ptr<instruction_builder>, std::string> builder_info{
 			create_builder(
@@ -207,22 +207,22 @@ std::vector<char> compile_function_body(
 	return function_body_symbols;
 }
 
-std::pair<void*, uint32_t> compile_function(
-	uint32_t function_index,
+std::pair<void*, std::uint32_t> compile_function(
+	std::uint32_t function_index,
 	runs_container::function& current_function,
 	runs_container& container,
 	jump_table_builder& jump_table,
-	std::map<uint8_t, std::vector<char>>& machine_codes,
+	std::map<std::uint8_t, std::vector<char>>& machine_codes,
 	std::vector<std::pair<memory_layouts_builder::memory_addresses, memory_layouts_builder::memory_addresses>>& memory_layouts
 ) {
 	std::vector<char> compiled_function{};
 	std::pair<memory_layouts_builder::memory_addresses, memory_layouts_builder::memory_addresses>& function_memory_layout =
 		memory_layouts[function_index];
 
-	uint32_t stack_space = calculate_function_locals_stack_space(current_function);
-	uint32_t function_arguments_size = calculate_function_arguments_stack_space(function_memory_layout.second);
+	std::uint32_t stack_space = calculate_function_locals_stack_space(current_function);
+	std::uint32_t function_arguments_size = calculate_function_arguments_stack_space(function_memory_layout.second);
 
-	uint32_t prologue_size = generate_function_prologue(
+	std::uint32_t prologue_size = generate_function_prologue(
 		compiled_function, 
 		stack_space,
 		function_memory_layout.first
@@ -247,7 +247,7 @@ module_mediator::arguments_string_type create_function_signature(const runs_cont
 	module_mediator::arguments_string_type signature_string = new module_mediator::arguments_string_element[function_signature.argument_types.size() + 2];
 	signature_string[0] = static_cast<module_mediator::arguments_string_element>(function_signature.argument_types.size());
 
-	size_t signature_string_index = 1;
+	std::size_t signature_string_index = 1;
 	for (const auto& entity_type_pair : function_signature.argument_types) {
 		signature_string[signature_string_index] =
 			module_mediator::arguments_string_builder::convert_program_type_to_arguments_string_type(entity_type_pair.second);
@@ -261,10 +261,10 @@ module_mediator::arguments_string_type create_function_signature(const runs_cont
 compiled_program compile(
 	runs_container& container, 
 	jump_table_builder& jump_table,
-	std::map<uint8_t, std::vector<char>>& machine_codes,
+	std::map<std::uint8_t, std::vector<char>>& machine_codes,
 	std::vector<std::pair<memory_layouts_builder::memory_addresses, memory_layouts_builder::memory_addresses>>& memory_layouts
 ) {
-	uint32_t functions_count = static_cast<uint32_t>(container.function_bodies.size());
+	std::uint32_t functions_count = static_cast<std::uint32_t>(container.function_bodies.size());
 	if (functions_count == 0) {
 		throw program_compilation_error{ "Loaded program has no executable code." };
 	}
@@ -274,7 +274,7 @@ compiled_program compile(
 
 	try {
 		std::unordered_map<uintptr_t, std::pair<std::unique_ptr<module_mediator::arguments_string_element[]>, std::string>> loaded_exposed_functions{};
-		for (uint32_t function_index = 0; function_index < functions_count; ++function_index) {
+		for (std::uint32_t function_index = 0; function_index < functions_count; ++function_index) {
 			runs_container::function& current_function = container.function_bodies[function_index];
 			auto[loaded_function, prologue_size] = compile_function(
 				function_index,
@@ -296,11 +296,11 @@ compiled_program compile(
 			}
 
 			loaded_functions_addresses[function_index] = loaded_function;
-			jump_table.add_jump_base_address(static_cast<uint32_t>(function_index), reinterpret_cast<uintptr_t>(loaded_function) + prologue_size);
+			jump_table.add_jump_base_address(static_cast<std::uint32_t>(function_index), reinterpret_cast<uintptr_t>(loaded_function) + prologue_size);
 			jump_table.remap_function_address(current_function.function_signature, reinterpret_cast<uintptr_t>(loaded_function));
 		}
 
-		std::pair<void*, uint64_t> program_jump_table = jump_table.create_raw_table(reinterpret_cast<uintptr_t>(get_default_function_address));
+		std::pair<void*, std::uint64_t> program_jump_table = jump_table.create_raw_table(reinterpret_cast<uintptr_t>(get_default_function_address));
 		auto [program_strings, program_strings_size] = create_program_strings(container);
 
 		merge_exposed_functions(loaded_exposed_functions);
@@ -308,7 +308,7 @@ compiled_program compile(
 			loaded_functions_addresses,
 			functions_count,
 			exposed_functions_addresses,
-			static_cast<uint32_t>(loaded_exposed_functions.size()),
+			static_cast<std::uint32_t>(loaded_exposed_functions.size()),
 			program_jump_table.first,
 			program_jump_table.second,
 			program_strings,
@@ -344,7 +344,7 @@ module_mediator::return_value load_program_to_memory(module_mediator::arguments_
 		> memory_layouts{ construct_memory_layout(container) };
 
 		jump_table_builder jump_table{ construct_jump_table(container) };
-		std::map<uint8_t, std::vector<char>> machine_codes{ get_machine_codes() };
+		std::map<std::uint8_t, std::vector<char>> machine_codes{ get_machine_codes() };
 
 		compiled_program result = compile(
 			container,
@@ -391,32 +391,32 @@ module_mediator::return_value load_program_to_memory(module_mediator::arguments_
 	return 1;
 }
 module_mediator::return_value free_program(module_mediator::arguments_string_type bundle) {
-	auto arguments = module_mediator::arguments_string_builder::unpack<void*, uint32_t, void*, uint32_t, void*, void*, uint64_t>(bundle);
+	auto arguments = module_mediator::arguments_string_builder::unpack<void*, std::uint32_t, void*, std::uint32_t, void*, void*, std::uint64_t>(bundle);
 	void* jump_table = std::get<4>(arguments);
 
 	void** code = static_cast<void**>(std::get<0>(arguments));
-	uint32_t functions_count = std::get<1>(arguments);
+	std::uint32_t functions_count = std::get<1>(arguments);
 
 	void** exposed_functions = static_cast<void**>(std::get<2>(arguments));
-	uint32_t exposed_functions_count = std::get<3>(arguments);
+	std::uint32_t exposed_functions_count = std::get<3>(arguments);
 
 	void** program_strings = static_cast<void**>(std::get<5>(arguments));
-	uint64_t program_strings_count = std::get<6>(arguments);
+	std::uint64_t program_strings_count = std::get<6>(arguments);
 	
 	{
 		std::lock_guard<std::mutex> lock{ ::exposed_functions_mutex };
-		for (uint32_t counter = 0; counter < exposed_functions_count; ++counter) {
+		for (std::uint32_t counter = 0; counter < exposed_functions_count; ++counter) {
 			if (exposed_functions[counter] != nullptr) {
 				::exposed_functions.erase(reinterpret_cast<uintptr_t>(exposed_functions[counter]));
 			}
 		}
 	}
 
-	for (uint64_t counter = 0; counter < program_strings_count; ++counter) {
+	for (std::uint64_t counter = 0; counter < program_strings_count; ++counter) {
 		delete[] program_strings[counter];
 	}
 
-	for (uint32_t counter = 0; counter < functions_count; ++counter) {
+	for (std::uint32_t counter = 0; counter < functions_count; ++counter) {
 		VirtualFree(code[counter], 0, MEM_RELEASE);
 	}
 

@@ -7,7 +7,7 @@
 
 class arithmetic_instruction_builder : public machine_codes_instruction_builder { //implements visits for immediate values and saves them in r8
 private:
-	uint8_t active_type;
+	std::uint8_t active_type;
 
 	template<typename T>
 	void place_immediate(T value) {
@@ -26,20 +26,20 @@ protected:
 		this->assert_statement(this->check_if_active_types_match(), "Active types of the variables must match.");
 	}
 
-	uint8_t get_active_type() const { return this->active_type; }
-	void set_active_type(uint8_t active_type) { this->active_type = active_type; }
+	std::uint8_t get_active_type() const { return this->active_type; }
+	void set_active_type(std::uint8_t active_type) { this->active_type = active_type; }
 
 public:
-	virtual void visit(std::unique_ptr<variable_imm<uint8_t>> value) override {
+	virtual void visit(std::unique_ptr<variable_imm<std::uint8_t>> value) override {
 		this->place_immediate(value.get());
 	}
-	virtual void visit(std::unique_ptr<variable_imm<uint16_t>> value) override {
+	virtual void visit(std::unique_ptr<variable_imm<std::uint16_t>> value) override {
 		this->place_immediate(value.get());
 	}
-	virtual void visit(std::unique_ptr<variable_imm<uint32_t>> value) override {
+	virtual void visit(std::unique_ptr<variable_imm<std::uint32_t>> value) override {
 		this->place_immediate(value.get());
 	}
-	virtual void visit(std::unique_ptr<variable_imm<uint64_t>> value) override {
+	virtual void visit(std::unique_ptr<variable_imm<std::uint64_t>> value) override {
 		this->place_immediate(value.get());
 	}
 };

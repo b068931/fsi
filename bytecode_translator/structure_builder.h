@@ -23,9 +23,9 @@
 //this class is used to convert FSI file contents to objects. (FSI file is a source file, FSI are random letters and mean nothing)
 class structure_builder {
 public:
-	using entity_id = uint64_t;
-	using line_type = uint64_t;
-	using immediate_type = uint64_t;
+	using entity_id = std::uint64_t;
+	using line_type = std::uint64_t;
+	using immediate_type = std::uint64_t;
 
 	enum class error_t {
 		no_error,
@@ -305,16 +305,16 @@ public:
 		{}
 	};
 	struct jump_point : public entity {
-		uint32_t index;
+		std::uint32_t index;
 		std::string name;
 
-		jump_point(entity_id id, uint32_t index, std::string&& name)
+		jump_point(entity_id id, std::uint32_t index, std::string&& name)
 			:entity{ id },
 			name {std::move(name)},
 			index{index}
 		{}
 
-		jump_point(entity_id id, uint32_t index, const std::string& name)
+		jump_point(entity_id id, std::uint32_t index, const std::string& name)
 			:entity{ id },
 			name{ name },
 			index{ index }
@@ -358,7 +358,7 @@ public:
 		{}
 	};
 	struct file {
-		uint64_t stack_size{1000000};
+		std::uint64_t stack_size{1000000};
 		
 		std::vector<function*> exposed_functions;
 		std::map<std::string, string> program_strings;

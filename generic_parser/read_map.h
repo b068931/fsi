@@ -467,7 +467,7 @@ namespace generic_parser {
 		using anonymous_function_signature = typename get_function_signature<parameters_object>::value;
 
 	private:
-		size_t starting_state_index{};
+		std::size_t starting_state_index{};
 
 		std::vector<std::unique_ptr<state_type>> states;
 		std::forward_list<state_settings_type> states_settings;
@@ -558,7 +558,7 @@ namespace generic_parser {
 		using redirection_information_type =
 			std::pair<state_type*, state_action>;
 
-		size_t settings_index{};
+		std::size_t settings_index{};
 		states_builder_type* states_builder_back_reference{};
 
 		state_type* associated_state{};

@@ -62,8 +62,8 @@ public:
 	void make_runnable(module_mediator::return_value thread_id) {
 		this->scheduler.make_runnable(thread_id);
 	}
-	void startup(uint16_t thread_count) {
-		for (uint16_t counter = 0; counter < thread_count; ++counter) {
+	void startup(std::uint16_t thread_count) {
+		for (std::uint16_t counter = 0; counter < thread_count; ++counter) {
 			std::thread executor_daemon{ &thread_manager::executor_thread, this };
 			executor_daemon.detach();
 		}

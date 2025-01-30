@@ -29,7 +29,7 @@ public:
 		this->accumulate_pointer_offset(pointer.get());
 		this->add_base_address_to_pointer_dereference(pointer.get());
 
-		uint8_t rex = 0b01000001;
+		std::uint8_t rex = 0b01000001;
 		switch (pointer->get_active_type()) {
 		case 0b01: {
 			this->write_bytes<char>('\x66');
@@ -41,7 +41,7 @@ public:
 		}
 		}
 
-		this->write_bytes<uint8_t>(rex); //inc/dec {one_byte/two_bytes/four_bytes/eight_bytes} [r8]
+		this->write_bytes<std::uint8_t>(rex); //inc/dec {one_byte/two_bytes/four_bytes/eight_bytes} [r8]
 		this->write_bytes<char>(this->get_code(pointer->get_active_type()));
 
 		this->write_bytes<char>((this->get_code_back() << 3) & 0b00111000); //r/m

@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "pointers.h"
 
-module_mediator::return_value inner_allocate(uint64_t size) {
-	return module_mediator::fast_call<module_mediator::return_value, uint64_t>(
+module_mediator::return_value inner_allocate(std::uint64_t size) {
+	return module_mediator::fast_call<module_mediator::return_value, std::uint64_t>(
 		get_module_part(),
 		index_getter::resm(),
 		index_getter::resm_allocate_program_memory(),
@@ -49,7 +49,7 @@ module_mediator::return_value allocate_pointer(module_mediator::arguments_string
 		return module_mediator::execution_result_terminate;
 	}
 
-	module_mediator::return_value value_pointer_data = inner_allocate(sizeof(uint64_t) * 2); //first 8 bytes - allocated size, second 8 bytes - base address
+	module_mediator::return_value value_pointer_data = inner_allocate(sizeof(std::uint64_t) * 2); //first 8 bytes - allocated size, second 8 bytes - base address
 	char* pointer_data = reinterpret_cast<char*>(value_pointer_data);
 
 	module_mediator::return_value allocated_memory = inner_allocate(size);
@@ -58,8 +58,8 @@ module_mediator::return_value allocate_pointer(module_mediator::arguments_string
 		return module_mediator::execution_result_terminate;
 	}
 
-	std::memcpy(pointer_data, &size, sizeof(uint64_t)); //fill in pointer size
-	std::memcpy(pointer_data + sizeof(uint64_t), &allocated_memory, sizeof(uint64_t)); //fill in actual pointer value
+	std::memcpy(pointer_data, &size, sizeof(std::uint64_t)); //fill in pointer size
+	std::memcpy(pointer_data + sizeof(std::uint64_t), &allocated_memory, sizeof(std::uint64_t)); //fill in actual pointer value
 
 	std::memcpy(return_address, &value_pointer_data, sizeof(module_mediator::pointer));
 	return module_mediator::execution_result_continue;
@@ -80,8 +80,8 @@ module_mediator::return_value deallocate_pointer(module_mediator::arguments_stri
 
 	inner_check_if_pointer_is_saved(address);
 
-	uint64_t base{}; //save pointer's base address
-	std::memcpy(&base, reinterpret_cast<char*>(address) + sizeof(uint64_t), sizeof(uint64_t));
+	std::uint64_t base{}; //save pointer's base address
+	std::memcpy(&base, reinterpret_cast<char*>(address) + sizeof(std::uint64_t), sizeof(std::uint64_t));
 
 	inner_deallocate(address);
 	inner_deallocate(reinterpret_cast<void*>(base));
@@ -102,8 +102,8 @@ module_mediator::return_value get_allocated_size(module_mediator::arguments_stri
 		return module_mediator::execution_result_terminate;
 	}
 
-	uint64_t size{};
-	std::memcpy(&size, address, sizeof(uint64_t));
+	std::uint64_t size{};
+	std::memcpy(&size, address, sizeof(std::uint64_t));
 
 	std::memcpy(return_address, &size, sizeof(module_mediator::eight_bytes));
 	return module_mediator::execution_result_continue;

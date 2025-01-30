@@ -24,18 +24,18 @@ CONSOLEANDDEBUG_API void initialize_m(module_mediator::module_part*);
 module_mediator::module_part* part;
 class index_getter {
 public:
-	static size_t excm() {
-		static size_t index = ::part->find_module_index("excm");
+	static std::size_t excm() {
+		static std::size_t index = ::part->find_module_index("excm");
 		return index;
 	}
 
-	static size_t excm_get_current_thread_id() {
-		static size_t index = ::part->find_function_index(index_getter::excm(), "get_current_thread_id");
+	static std::size_t excm_get_current_thread_id() {
+		static std::size_t index = ::part->find_function_index(index_getter::excm(), "get_current_thread_id");
 		return index;
 	}
 
-	static size_t excm_get_current_thread_group_id() {
-		static size_t index = ::part->find_function_index(index_getter::excm(), "get_current_thread_group_id");
+	static std::size_t excm_get_current_thread_group_id() {
+		static std::size_t index = ::part->find_function_index(index_getter::excm(), "get_current_thread_group_id");
 		return index;
 	}
 };

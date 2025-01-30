@@ -165,7 +165,7 @@ state_settings& configure_special_instructions(states_builder_type& builder) {
 	state_settings& stack_size = builder.create_anonymous_state(
 		[](structure_builder::file& output_file_structure, structure_builder::helper_inter_states_object& helper, structure_builder::read_map_type& read_map) -> void {
 			try {
-				output_file_structure.stack_size = helper.names_remapping.translate_name_to_integer<size_t>(
+				output_file_structure.stack_size = helper.names_remapping.translate_name_to_integer<std::size_t>(
 					read_map.get_token_generator_name()
 				);
 			}
@@ -540,7 +540,7 @@ state_settings& configure_instruction_arguments(states_builder_type& builder) {
 
 			structure_builder::jump_point* jump_point = nullptr; //simply create new jump point if it wasn't already created
 			if (found_jump_point == current_function.jump_points.end()) {
-				current_function.jump_points.push_back({ helper.get_id(), static_cast<uint32_t>(helper.instruction_index - 1), name });
+				current_function.jump_points.push_back({ helper.get_id(), static_cast<std::uint32_t>(helper.instruction_index - 1), name });
 				jump_point = &current_function.jump_points.back();
 			}
 			else {
@@ -862,10 +862,10 @@ state_settings& configure_inside_function(states_builder_type& builder, state_se
 			);
 
 			if (found_jump_point != current_function.jump_points.end()) { //set index if jump point was already created
-				found_jump_point->index = static_cast<uint32_t>(helper.instruction_index);
+				found_jump_point->index = static_cast<std::uint32_t>(helper.instruction_index);
 			}
 			else { //create new jump point otherwise
-				current_function.jump_points.push_back({ helper.get_id(), static_cast<uint32_t>(helper.instruction_index), name });
+				current_function.jump_points.push_back({ helper.get_id(), static_cast<std::uint32_t>(helper.instruction_index), name });
 			}
 		}
 	);

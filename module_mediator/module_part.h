@@ -11,7 +11,7 @@
 #include "../typename_array/typename_array.h"
 
 namespace module_mediator {
-	using return_value = uint64_t;
+	using return_value = std::uint64_t;
 	using arguments_string_type = unsigned char*;
 	using arguments_string_element = unsigned char;
 	using arguments_array_type = std::vector<std::pair<arguments_string_element, void*>>;
@@ -26,14 +26,14 @@ namespace module_mediator {
 			no_error
 		};
 
-		static constexpr size_t function_not_found = std::numeric_limits<size_t>::max();
-		static constexpr size_t module_not_found = std::numeric_limits<size_t>::max();
+		static constexpr std::size_t function_not_found = std::numeric_limits<std::size_t>::max();
+		static constexpr std::size_t module_not_found = std::numeric_limits<std::size_t>::max();
 
-		virtual size_t find_function_index(size_t module_index, const char* name) const = 0;
-		virtual size_t find_module_index(const char* name) const = 0;
+		virtual std::size_t find_function_index(std::size_t module_index, const char* name) const = 0;
+		virtual std::size_t find_module_index(const char* name) const = 0;
 
-		virtual return_value call_module(size_t module_index, size_t function_index, arguments_string_type arguments_string) = 0;
-		virtual return_value call_module_visible_only(size_t module_index, size_t function_index, arguments_string_type arguments_string, void(*error_callback)(call_error)) = 0;
+		virtual return_value call_module(std::size_t module_index, std::size_t function_index, arguments_string_type arguments_string) = 0;
+		virtual return_value call_module_visible_only(std::size_t module_index, std::size_t function_index, arguments_string_type arguments_string, void(*error_callback)(call_error)) = 0;
 
 		virtual ~module_part() = default;
 	};
@@ -42,7 +42,7 @@ namespace module_mediator {
 	private:
 		template<typename... types>
 		struct enumarate_type_sizes {
-			static constexpr size_t sizes[]{ sizeof(types)... };
+			static constexpr std::size_t sizes[]{ sizeof(types)... };
 		};
 
 		using map_array = typename_array::typename_array<char, unsigned char, short, unsigned short, int, unsigned int, long, unsigned long, long long, unsigned long long, void*>;
@@ -83,7 +83,7 @@ namespace module_mediator {
 		}
 
 		template<typename... types>
-		static arguments_string_type build_types_string(size_t size) {
+		static arguments_string_type build_types_string(std::size_t size) {
 			using types_array = typename_array::typename_array<types...>;
 
 			arguments_string_type types_string = new arguments_string_element[size]{};
@@ -117,7 +117,7 @@ namespace module_mediator {
 		template<typename type>
 		static constexpr typename_array::typename_array_size_t get_type_index = typename_array::find<map_array, type>::index;
 
-		static size_t get_type_size_by_index(arguments_string_element index) {
+		static std::size_t get_type_size_by_index(arguments_string_element index) {
 			assert(index < map_array::size && "invalid index");
 			return type_sizes_container::sizes[index];
 		}
@@ -125,12 +125,12 @@ namespace module_mediator {
 		static bool check_if_arguments_strings_match(const arguments_string_element* first, const arguments_string_element* second) {
 			assert(first && second && "nullptr passed as arguments string");
 			if (first[0] == second[0]) {
-				return std::memcmp(first, second, static_cast<size_t>(first[0]) + 1) == 0;
+				return std::memcmp(first, second, static_cast<std::size_t>(first[0]) + 1) == 0;
 			}
 
 			return false;
 		}
-		static arguments_string_element convert_program_type_to_arguments_string_type(uint8_t type) {
+		static arguments_string_element convert_program_type_to_arguments_string_type(std::uint8_t type) {
 			arguments_string_element result = arguments_string_element{};
 			switch (type) {
 			case 0:
@@ -159,7 +159,7 @@ namespace module_mediator {
 
 		template<typename... types>
 		static arguments_string_type get_types_string() {
-			constexpr size_t types_string_size = sizeof... (types) + 1;
+			constexpr std::size_t types_string_size = sizeof... (types) + 1;
 			arguments_string_type types_string = build_types_string<types...>(types_string_size);
 
 			return types_string;
@@ -183,12 +183,12 @@ namespace module_mediator {
 
 			return arguments_array;
 		}
-		static std::pair<arguments_string_type, size_t> convert_from_arguments_array(
+		static std::pair<arguments_string_type, std::size_t> convert_from_arguments_array(
 			arguments_array_type::iterator begin,
 			arguments_array_type::iterator end
 		) {
 			auto saved_begin = begin;
-			size_t size_to_allocate = 1;
+			std::size_t size_to_allocate = 1;
 			while (begin != end) {
 				size_to_allocate += 1 + arguments_string_builder::get_type_size_by_index(begin->first);
 				++begin;
@@ -219,7 +219,7 @@ namespace module_mediator {
 		template<typename destination_type>
 		static bool extract_value_from_arguments_array(
 			destination_type* out,
-			size_t index,
+			std::size_t index,
 			const arguments_array_type& arguments_array
 		) {
 			constexpr auto type_index = arguments_string_builder::get_type_index<destination_type>;
@@ -238,7 +238,7 @@ namespace module_mediator {
 		template<typename... types>
 		static arguments_string_type pack(types... values) {
 			using types_array = typename_array::typename_array<types...>;
-			constexpr size_t arguments_string_size = typename_array::sum<types_array, functor_sum, size_t>::new_value + sizeof... (types) + 1; //+1 because of the first byte
+			constexpr std::size_t arguments_string_size = typename_array::sum<types_array, functor_sum, std::size_t>::new_value + sizeof... (types) + 1; //+1 because of the first byte
 
 			arguments_string_type arguments_string = build_types_string<types...>(arguments_string_size);
 			arguments_string_type arguments_string_pointer_copy = arguments_string + sizeof... (types) + 1;
@@ -261,8 +261,8 @@ namespace module_mediator {
 	template<typename... args>
 	return_value fast_call(
 		module_part* part,
-		size_t module_index,
-		size_t function_index,
+		std::size_t module_index,
+		std::size_t function_index,
 		args... arguments
 	) {
 		std::unique_ptr<arguments_string_element[]> args_string{

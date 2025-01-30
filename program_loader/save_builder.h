@@ -5,15 +5,15 @@
 
 class save_builder : public instruction_builder {
 private:
-	uint8_t used_variable_type{};
+	std::uint8_t used_variable_type{};
 
 	template<typename T>
 	void place_immediate(T value) {
 		this->used_variable_type = this->get_current_variable_type() & 0b11;
 		this->create_immediate_instruction(value);
 	}
-	void save_value_from_r8_to_program_stack(uint8_t active_type) {
-		uint8_t rex = 0x45;
+	void save_value_from_r8_to_program_stack(std::uint8_t active_type) {
+		std::uint8_t rex = 0x45;
 
 		switch (active_type) {
 		case 0b01: { //add prefix that indicates that this is 16 bit instruction
@@ -48,16 +48,16 @@ public:
 		this->assert_statement((this->get_arguments_count() == 1) && !machine_codes, "This instruction must have only one argument.");
 	}
 
-	virtual void visit(std::unique_ptr<variable_imm<uint8_t>> value) override {
+	virtual void visit(std::unique_ptr<variable_imm<std::uint8_t>> value) override {
 		this->place_immediate(value->get_value());
 	}
-	virtual void visit(std::unique_ptr<variable_imm<uint16_t>> value) override {
+	virtual void visit(std::unique_ptr<variable_imm<std::uint16_t>> value) override {
 		this->place_immediate(value->get_value());
 	}
-	virtual void visit(std::unique_ptr<variable_imm<uint32_t>> value) override {
+	virtual void visit(std::unique_ptr<variable_imm<std::uint32_t>> value) override {
 		this->place_immediate(value->get_value());
 	}
-	virtual void visit(std::unique_ptr<variable_imm<uint64_t>> value) override {
+	virtual void visit(std::unique_ptr<variable_imm<std::uint64_t>> value) override {
 		this->place_immediate(value->get_value());
 	}
 
@@ -87,7 +87,7 @@ public:
 	virtual void build() override {
 		this->zero_r8();
 		this->self_call_next();
-		uint8_t active_type = this->used_variable_type;
+		std::uint8_t active_type = this->used_variable_type;
 		if (active_type == 4) active_type = 0b11;
 
 		this->save_type_to_program_stack(this->used_variable_type);

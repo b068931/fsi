@@ -6,11 +6,11 @@
 #include <limits>
 #include <cstdint>
 
-constexpr auto max_functions_count = std::numeric_limits<uint32_t>::max();
-constexpr auto max_instructions_count = std::numeric_limits<uint32_t>::max();
+constexpr auto max_functions_count = std::numeric_limits<std::uint32_t>::max();
+constexpr auto max_instructions_count = std::numeric_limits<std::uint32_t>::max();
 constexpr auto max_instruction_arguments_count = 15;
-constexpr auto max_name_length = std::numeric_limits<uint8_t>::max();
-constexpr auto max_function_arguments_count = std::numeric_limits<uint8_t>::max();
+constexpr auto max_name_length = std::numeric_limits<std::uint8_t>::max();
+constexpr auto max_function_arguments_count = std::numeric_limits<std::uint8_t>::max();
 
 bool check_instructions_arugments(structure_builder::file& file) {
 	for (const structure_builder::function& func : file.functions) {
@@ -125,7 +125,7 @@ private:
 			//at first we make sure that this insturction won't use arguments specific to function calls
 			bool function_arguments = (instruction.func_addresses.size() == 0) && (instruction.modules.size() == 0) && (instruction.module_functions.size() == 0);
 			if (function_arguments) {
-				for (size_t index = 0, size = instruction.operands_in_order.size(); index < size; ++index) {
+				for (std::size_t index = 0, size = instruction.operands_in_order.size(); index < size; ++index) {
 					if (std::get<2>(instruction.operands_in_order[index])) { //now we make sure that this instruction won't use signed variables
 						return false;
 					}
@@ -154,7 +154,7 @@ private:
 	struct var_instruction { //var instructions can only dereference pointers and can not use them as pure arguments
 		static constexpr error_t error_message{ error_t::var_instruction };
 		static bool check(const structure_builder::instruction& instruction) {
-			for (size_t index = 0, size = instruction.operands_in_order.size(); index < size; ++index) {
+			for (std::size_t index = 0, size = instruction.operands_in_order.size(); index < size; ++index) {
 				structure_builder::regular_variable* current_argument = 
 					dynamic_cast<structure_builder::regular_variable*>(std::get<1>(instruction.operands_in_order[index]));
 				
@@ -182,7 +182,7 @@ private:
 		static bool check(const structure_builder::instruction& instruction) {
 			if (instruction.operands_in_order.size() >= 2) {
 				structure_builder::source_file_token main_active_type = std::get<0>(instruction.operands_in_order[0]);
-				for (size_t index = 1, count = instruction.operands_in_order.size(); index < count; ++index) {
+				for (std::size_t index = 1, count = instruction.operands_in_order.size(); index < count; ++index) {
 					if (main_active_type != std::get<0>(instruction.operands_in_order[index])) {
 						return false;
 					}
@@ -241,7 +241,7 @@ private:
 		static bool check(const structure_builder::instruction& instruction) {
 			bool program_function_call = (instruction.modules.size() == 0) && (instruction.module_functions.size() == 0);
 			if (program_function_call) {
-				for (size_t index = 0, size = instruction.operands_in_order.size(); index < size; ++index) {
+				for (std::size_t index = 0, size = instruction.operands_in_order.size(); index < size; ++index) {
 					if (std::get<2>(instruction.operands_in_order[index])) {
 						return false;
 					}
@@ -265,7 +265,7 @@ private:
 			bool initial_check = instruction.immediates.size() == 0;
 
 			if (initial_check) {
-				for (size_t index = 0, size = instruction.operands_in_order.size(); index < size; ++index) {
+				for (std::size_t index = 0, size = instruction.operands_in_order.size(); index < size; ++index) {
 					structure_builder::regular_variable* current_argument =
 						dynamic_cast<structure_builder::regular_variable*>(std::get<1>(instruction.operands_in_order[index]));
 
@@ -287,7 +287,7 @@ private:
 				(instruction.modules.size() == 0) && (instruction.module_functions.size() == 0);
 
 			if (initial_check && (instruction.operands_in_order.size() >= 2)) {
-				for (size_t index = 0, size = instruction.operands_in_order.size(); index < size; ++index) {
+				for (std::size_t index = 0, size = instruction.operands_in_order.size(); index < size; ++index) {
 					if (std::get<2>(instruction.operands_in_order[index])) {
 						return false;
 					}
@@ -361,11 +361,11 @@ private:
 	class instruction_encoder : public structure_builder::variable_visitor {
 	private:
 		std::vector<char> instruction_symbols;
-		size_t position_in_type_bytes{2};
+		std::size_t position_in_type_bytes{2};
 
 		instruction_encoder() = default;
-		static uint8_t convert_type_to_uint8(structure_builder::source_file_token token_type) {
-			uint8_t type = 0;
+		static std::uint8_t convert_type_to_uint8(structure_builder::source_file_token token_type) {
+			std::uint8_t type = 0;
 			switch (token_type) {
 				case structure_builder::source_file_token::one_byte_type_keyword: {
 					type = 0;
@@ -403,17 +403,17 @@ private:
 		template<typename type>
 		void write_bytes(type value) {
 			char* bytes = reinterpret_cast<char*>(&value);
-			for (size_t counter = 0; counter < sizeof(value); ++counter) {
+			for (std::size_t counter = 0; counter < sizeof(value); ++counter) {
 				this->instruction_symbols.push_back(bytes[counter]);
 			}
 		}
 		void write_id(entity_id id) {
-			this->write_bytes<uint64_t>(static_cast<uint64_t>(id));
+			this->write_bytes<std::uint64_t>(static_cast<std::uint64_t>(id));
 		}
-		void encode_active_type(uint8_t active_type, uint8_t type_mod) {
-			uint8_t type_bits =
+		void encode_active_type(std::uint8_t active_type, std::uint8_t type_mod) {
+			std::uint8_t type_bits =
 				((type_mod & 0b11) << 2) | (0b11 & active_type);
-			size_t byte_index = (this->position_in_type_bytes / 2 - 1) + 2;
+			std::size_t byte_index = (this->position_in_type_bytes / 2 - 1) + 2;
 			if ((this->position_in_type_bytes % 2) == 0) {
 				type_bits <<= 4;
 			}
@@ -453,19 +453,19 @@ private:
 			this->encode_active_type(instruction_encoder::convert_type_to_uint8(active_type), 0b01);
 			switch (variable->type) {
 				case structure_builder::source_file_token::one_byte_type_keyword: {
-					this->write_bytes<uint8_t>(static_cast<uint8_t>(variable->imm_val));
+					this->write_bytes<std::uint8_t>(static_cast<std::uint8_t>(variable->imm_val));
 					break;
 				}
 				case structure_builder::source_file_token::two_bytes_type_keyword: {
-					this->write_bytes<uint16_t>(static_cast<uint16_t>(variable->imm_val));
+					this->write_bytes<std::uint16_t>(static_cast<std::uint16_t>(variable->imm_val));
 					break;
 				}
 				case structure_builder::source_file_token::four_bytes_type_keyword: {
-					this->write_bytes<uint32_t>(static_cast<uint32_t>(variable->imm_val));
+					this->write_bytes<std::uint32_t>(static_cast<std::uint32_t>(variable->imm_val));
 					break;
 				}
 				case structure_builder::source_file_token::eight_bytes_type_keyword: {
-					this->write_bytes<uint64_t>(static_cast<uint64_t>(variable->imm_val));
+					this->write_bytes<std::uint64_t>(static_cast<std::uint64_t>(variable->imm_val));
 					break;
 				}
 			}
@@ -491,13 +491,13 @@ private:
 			this->write_id(variable->value->id);
 		}
 
-		static std::vector<char> encode_instruction(const structure_builder::instruction& current_instruction, const std::map<structure_builder::source_file_token, uint8_t>& operation_codes) {
+		static std::vector<char> encode_instruction(const structure_builder::instruction& current_instruction, const std::map<structure_builder::source_file_token, std::uint8_t>& operation_codes) {
 			instruction_encoder self{};
 			bool is_odd = current_instruction.operands_in_order.size() % 2;
 
 			auto found_opcode = operation_codes.find(current_instruction.instruction_type);
 			if (found_opcode != operation_codes.end()) {
-				self.instruction_symbols.push_back(static_cast<uint8_t>(current_instruction.operands_in_order.size()) << 4); //higher four bits: arguments count, lower four bits: additional type bits if argument count is odd
+				self.instruction_symbols.push_back(static_cast<std::uint8_t>(current_instruction.operands_in_order.size()) << 4); //higher four bits: arguments count, lower four bits: additional type bits if argument count is odd
 				self.instruction_symbols.push_back(found_opcode->second);
 				self.instruction_symbols.resize(self.instruction_symbols.size() + is_odd + (current_instruction.operands_in_order.size() / 2));
 
@@ -514,7 +514,7 @@ private:
 				}
 
 				if ((current_instruction.operands_in_order.size() % 2) == 1) { //if number of arguments is odd
-					size_t additional_type_bits_index = 2 + (current_instruction.operands_in_order.size() / 2); //move half filled type bits to prefix byte
+					std::size_t additional_type_bits_index = 2 + (current_instruction.operands_in_order.size() / 2); //move half filled type bits to prefix byte
 					self.instruction_symbols[0] |= (self.instruction_symbols[additional_type_bits_index] >> 4) & 0b1111;
 
 					self.instruction_symbols.erase(self.instruction_symbols.begin() + additional_type_bits_index);
@@ -526,13 +526,13 @@ private:
 	};
 
 private:
-	static constexpr uint8_t modules_run = 0;
-	static constexpr uint8_t jump_points_run = 1;
-	static constexpr uint8_t function_signatures_run = 2;
-	static constexpr uint8_t function_body_run = 3;
-	static constexpr uint8_t program_exposed_functions_run = 4;
-	static constexpr uint8_t program_strings_run = 5;
-	static constexpr uint8_t program_debug_run = 6;
+	static constexpr std::uint8_t modules_run = 0;
+	static constexpr std::uint8_t jump_points_run = 1;
+	static constexpr std::uint8_t function_signatures_run = 2;
+	static constexpr std::uint8_t function_body_run = 3;
+	static constexpr std::uint8_t program_exposed_functions_run = 4;
+	static constexpr std::uint8_t program_strings_run = 5;
+	static constexpr std::uint8_t program_debug_run = 6;
 
 	structure_builder::file* file_structure;
 	std::ofstream* file_stream;
@@ -545,24 +545,24 @@ private:
 		this->file_stream->write(reinterpret_cast<char*>(&value), sizeof(value));
 	}
 
-	void write_n_bytes(const char* bytes, size_t size) {
+	void write_n_bytes(const char* bytes, std::size_t size) {
 		this->file_stream->write(bytes, size);
 	}
-	void write_8_bytes(uint64_t value) {
-		this->write_bytes<uint64_t>(value);
+	void write_8_bytes(std::uint64_t value) {
+		this->write_bytes<std::uint64_t>(value);
 	}
-	void write_4_bytes(uint32_t value) {
-		this->write_bytes<uint32_t>(value);
+	void write_4_bytes(std::uint32_t value) {
+		this->write_bytes<std::uint32_t>(value);
 	}
-	void write_2_bytes(uint16_t value) {
-		this->write_bytes<uint16_t>(value);
+	void write_2_bytes(std::uint16_t value) {
+		this->write_bytes<std::uint16_t>(value);
 	}
-	void write_1_byte(uint8_t value) {
-		this->write_bytes<uint8_t>(value);
+	void write_1_byte(std::uint8_t value) {
+		this->write_bytes<std::uint8_t>(value);
 	}
 
-	static uint8_t convert_type_to_uint8(structure_builder::source_file_token token_type) {
-		uint8_t type = 0;
+	static std::uint8_t convert_type_to_uint8(structure_builder::source_file_token token_type) {
+		std::uint8_t type = 0;
 		switch (token_type) {
 			case structure_builder::source_file_token::two_bytes_type_keyword: {
 				type = 1;
@@ -585,21 +585,21 @@ private:
 		return type;
 	}
 
-	auto write_run_header(uint8_t run_type) {
+	auto write_run_header(std::uint8_t run_type) {
 		this->write_1_byte(run_type);
 		auto saved_position = this->file_stream->tellp(); //we will return here later after we calculate this run's size
 		
 		this->write_8_bytes(0);
 		return saved_position;
 	}
-	void write_run_footer(std::streampos saved_position, uint64_t run_size) {
+	void write_run_footer(std::streampos saved_position, std::uint64_t run_size) {
 		this->file_stream->seekp(saved_position); //go back and write this run's size
 		this->write_8_bytes(run_size);
 
 		this->file_stream->seekp(0, std::ios::end); //go back to the end of this file
 	}
 
-	static std::map<structure_builder::source_file_token, uint8_t> get_operation_codes() {
+	static std::map<structure_builder::source_file_token, std::uint8_t> get_operation_codes() {
 		return {
 			{structure_builder::source_file_token::subtract_instruction_keyword, 0},
 			{structure_builder::source_file_token::signed_subtract_instruction_keyword, 1},
@@ -763,28 +763,28 @@ private:
 	}
 
 	void create_modules_run() { //8 bytes: modules count, 8 bytes: module's entity_id, 8 bytes: number of functions in this module, 1 byte: module name length, module name, 8 bytes: entity_id, 1 byte module function name length, module function name;
-		uint64_t run_size = 8;
+		std::uint64_t run_size = 8;
 		auto saved_position = this->write_run_header(modules_run);
 
-		this->write_8_bytes(static_cast<uint64_t>(this->file_structure->modules.size()));
+		this->write_8_bytes(static_cast<std::uint64_t>(this->file_structure->modules.size()));
 		for (const structure_builder::module& mod : this->file_structure->modules) {
-			this->write_8_bytes(static_cast<uint64_t>(mod.id));
-			this->write_8_bytes(static_cast<uint64_t>(mod.functions_names.size()));
+			this->write_8_bytes(static_cast<std::uint64_t>(mod.id));
+			this->write_8_bytes(static_cast<std::uint64_t>(mod.functions_names.size()));
 
-			size_t module_name_size = mod.name.size();
+			std::size_t module_name_size = mod.name.size();
 			if (module_name_size > max_name_length) {
 				this->add_new_logic_error(error_t::name_too_long);
 			}
 
-			this->write_1_byte(static_cast<uint8_t>(mod.name.size()));
+			this->write_1_byte(static_cast<std::uint8_t>(mod.name.size()));
 			this->write_n_bytes(mod.name.c_str(), mod.name.size());
 			
 			run_size += 17 + module_name_size;
 			for (const structure_builder::module_function& mod_fnc : mod.functions_names) {
-				this->write_8_bytes(static_cast<uint64_t>(mod_fnc.id));
-				this->write_1_byte(static_cast<uint8_t>(mod_fnc.name.size()));
+				this->write_8_bytes(static_cast<std::uint64_t>(mod_fnc.id));
+				this->write_1_byte(static_cast<std::uint8_t>(mod_fnc.name.size()));
 
-				size_t module_function_name_size = mod_fnc.name.size();
+				std::size_t module_function_name_size = mod_fnc.name.size();
 				if (module_function_name_size > max_name_length) {
 					this->add_new_logic_error(error_t::name_too_long);
 				}
@@ -797,15 +797,15 @@ private:
 		this->write_run_footer(saved_position, run_size);
 	}
 	void create_jump_points_run() { //4 bytes: function index, 4 bytes instruction index, 8 bytes: entity_id
-		uint64_t run_size = 0;
+		std::uint64_t run_size = 0;
 		auto saved_position = this->write_run_header(jump_points_run);
 		
-		uint32_t function_index = 0;
+		std::uint32_t function_index = 0;
 		for (structure_builder::function& fnc : this->file_structure->functions) {
 			for (const structure_builder::jump_point jmp_point : fnc.jump_points) {
 				this->write_4_bytes(function_index);
 				this->write_4_bytes(jmp_point.index);
-				this->write_8_bytes(static_cast<uint64_t>(jmp_point.id));
+				this->write_8_bytes(static_cast<std::uint64_t>(jmp_point.id));
 
 				run_size += 16; //8 + 4 + 4
 			}
@@ -816,18 +816,18 @@ private:
 		this->write_run_footer(saved_position, run_size);
 	}
 	void create_function_signatures_run() { //4 bytes: signatures count, 8 bytes: entity_id, 1 byte: number of arguments, 1 byte: argument's type, 8 bytes: entity_id. 0 - byte, 1 - two_bytes, 2 - four_bytes, 3 - eight_bytes, 4 - pointer
-		uint64_t run_size = sizeof(uint32_t);
+		std::uint64_t run_size = sizeof(std::uint32_t);
 		auto saved_position = this->write_run_header(function_signatures_run);
 
-		this->write_4_bytes(static_cast<uint32_t>(this->file_structure->functions.size()));
+		this->write_4_bytes(static_cast<std::uint32_t>(this->file_structure->functions.size()));
 		for (const structure_builder::function& fnc : this->file_structure->functions) {
-			this->write_8_bytes(static_cast<uint64_t>(fnc.id));
-			size_t function_arguments_count = fnc.arguments.size();
+			this->write_8_bytes(static_cast<std::uint64_t>(fnc.id));
+			std::size_t function_arguments_count = fnc.arguments.size();
 			if (function_arguments_count > max_function_arguments_count) {
 				this->add_new_logic_error(error_t::too_many_function_arguments);
 			}
 
-			this->write_1_byte(static_cast<uint8_t>(function_arguments_count));
+			this->write_1_byte(static_cast<std::uint8_t>(function_arguments_count));
 			for (const structure_builder::regular_variable& var: fnc.arguments) {
 				this->write_1_byte(bytecode_translator::convert_type_to_uint8(var.type));
 				this->write_8_bytes(var.id);
@@ -841,11 +841,11 @@ private:
 		this->write_run_footer(saved_position, run_size);
 	}
 	void create_function_body_run(structure_builder::function& func) { //8 bytes: signature's entity_id, 4 bytes: number of local variables, 1 byte: local variable_type, 8 bytes: local variable entity_id
-		uint64_t run_size = 12; //8 bytes: signature's entity_id, 4 bytes: number of local variables
+		std::uint64_t run_size = 12; //8 bytes: signature's entity_id, 4 bytes: number of local variables
 		auto saved_position = this->write_run_header(function_body_run);
 
-		this->write_8_bytes(static_cast<uint64_t>(func.id));
-		this->write_4_bytes(static_cast<uint32_t>(func.locals.size()));
+		this->write_8_bytes(static_cast<std::uint64_t>(func.id));
+		this->write_4_bytes(static_cast<std::uint32_t>(func.locals.size()));
 
 		for (const structure_builder::regular_variable& var : func.locals) {
 			this->write_1_byte(bytecode_translator::convert_type_to_uint8(var.type));
@@ -854,7 +854,7 @@ private:
 			run_size += 9;
 		}
 
-		std::map<structure_builder::source_file_token, uint8_t> operation_codes{ this->get_operation_codes() };
+		std::map<structure_builder::source_file_token, std::uint8_t> operation_codes{ this->get_operation_codes() };
 		std::vector<instruction_check*> filters_list{ this->get_instruction_filters() };
 		for (const structure_builder::instruction& current_instruction : func.body) {
 			this->check_logic_errors(filters_list, current_instruction);
@@ -873,7 +873,7 @@ private:
 		this->write_run_footer(saved_position, run_size);
 	}
 	void create_exposed_functions_run() { //8 bytes: preferred stack size, 8 bytes: exposed functions count, 8 bytes: exposed function's entity_id, 1 byte: exposed function name size, exposed function name
-		uint64_t run_size = 16;
+		std::uint64_t run_size = 16;
 		auto saved_position = this->write_run_header(program_exposed_functions_run);
 
 		structure_builder::function& main_function = this->file_structure->functions.back();
@@ -883,11 +883,11 @@ private:
 			this->file_structure->exposed_functions.push_back(&main_function);
 		}
 
-		this->write_8_bytes(static_cast<uint64_t>(this->file_structure->stack_size));
-		this->write_8_bytes(static_cast<uint64_t>(this->file_structure->exposed_functions.size()));
+		this->write_8_bytes(static_cast<std::uint64_t>(this->file_structure->stack_size));
+		this->write_8_bytes(static_cast<std::uint64_t>(this->file_structure->exposed_functions.size()));
 		for (structure_builder::function* exposed_function : this->file_structure->exposed_functions) {
-			this->write_8_bytes(static_cast<uint64_t>(exposed_function->id));
-			this->write_1_byte(static_cast<uint8_t>(exposed_function->name.size()));
+			this->write_8_bytes(static_cast<std::uint64_t>(exposed_function->id));
+			this->write_1_byte(static_cast<std::uint8_t>(exposed_function->name.size()));
 			this->write_n_bytes(exposed_function->name.c_str(), exposed_function->name.size());
 
 			run_size += 9 + exposed_function->name.size();
@@ -896,14 +896,14 @@ private:
 		this->write_run_footer(saved_position, run_size);
 	}
 	void create_program_strings_run() { //8 bytes - amount of strings, 8 bytes - string id, 8 bytes - string size, string itself
-		uint64_t run_size = 8;
+		std::uint64_t run_size = 8;
 		auto saved_position = this->write_run_header(program_strings_run);
 
 		this->write_8_bytes(this->file_structure->program_strings.size());
 		for (const auto& key_string : this->file_structure->program_strings) {
-			size_t string_size = key_string.second.value.size();
+			std::size_t string_size = key_string.second.value.size();
 
-			this->write_8_bytes(static_cast<uint64_t>(key_string.second.id));
+			this->write_8_bytes(static_cast<std::uint64_t>(key_string.second.id));
 			this->write_8_bytes(string_size);
 
 			this->write_n_bytes(key_string.second.value.c_str(), string_size);
@@ -914,11 +914,11 @@ private:
 	}
 
 	template<typename T>
-	uint64_t generic_write_element(const std::list<T>& list, const std::string& separator, const std::string& prefix_name) {
-		uint64_t accumulator = 0;
+	std::uint64_t generic_write_element(const std::list<T>& list, const std::string& separator, const std::string& prefix_name) {
+		std::uint64_t accumulator = 0;
 		for (const T& element : list) {
-			uint16_t element_name_size =
-				static_cast<uint16_t>(element.name.size() + prefix_name.size() + separator.size());
+			std::uint16_t element_name_size =
+				static_cast<std::uint16_t>(element.name.size() + prefix_name.size() + separator.size());
 
 			std::string combined_name{ prefix_name + separator + element.name };
 
@@ -933,12 +933,12 @@ private:
 	}
 
 	void create_debug_run() {
-		uint64_t run_size = 0;
+		std::uint64_t run_size = 0;
 		auto saved_position = this->write_run_header(program_debug_run);
 
 		for (const auto& current_string : this->file_structure->program_strings) {
-			uint16_t program_string_name_size =
-				static_cast<uint16_t>(current_string.first.size());
+			std::uint16_t program_string_name_size =
+				static_cast<std::uint16_t>(current_string.first.size());
 
 			run_size += 10 + program_string_name_size;
 

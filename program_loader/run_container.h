@@ -11,29 +11,29 @@
 struct runs_container {
 public:
 	struct module {
-		size_t module_id{};
-		std::map<entity_id, size_t> module_functions;
+		std::size_t module_id{};
+		std::map<entity_id, std::size_t> module_functions;
 	};
 
 	struct function_signature {
-		std::vector<std::pair<entity_id, uint8_t>> argument_types;
+		std::vector<std::pair<entity_id, std::uint8_t>> argument_types;
 	};
 
 	struct function {
 		entity_id function_signature{};
-		std::vector<std::pair<entity_id, uint8_t>> locals;
+		std::vector<std::pair<entity_id, std::uint8_t>> locals;
 
 		run_reader<runs_container>::run function_body;
 	};
 
-	uint64_t preferred_stack_size{};
+	std::uint64_t preferred_stack_size{};
 	std::map<entity_id, std::string> entities_names{};
 
 	std::map<entity_id, module> modules;
-	std::vector<std::tuple<entity_id, uint32_t, uint32_t>> jump_points;
+	std::vector<std::tuple<entity_id, std::uint32_t, std::uint32_t>> jump_points;
 	std::map<entity_id, function_signature> function_signatures;
 	std::map<entity_id, std::string> exposed_functions;
-	std::map<entity_id, std::pair<std::unique_ptr<char[]>, size_t>> program_strings;
+	std::map<entity_id, std::pair<std::unique_ptr<char[]>, std::size_t>> program_strings;
 	std::vector<function> function_bodies;
 
 	void modules_reader(run_reader<runs_container>::run);
@@ -47,7 +47,7 @@ public:
 private:
 	std::string read_name(run_reader<runs_container>::run& run) {
 		std::string name{};
-		for (uint8_t name_counter = 0, name_length = run.get_object<uint8_t>(); name_counter < name_length; ++name_counter) {
+		for (std::uint8_t name_counter = 0, name_length = run.get_object<std::uint8_t>(); name_counter < name_length; ++name_counter) {
 			name += run.get_symbol();
 		}
 

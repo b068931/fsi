@@ -2,9 +2,9 @@
 #define AUXILIARY_VARIABLE_WITH_ID_H
 
 #include "variable.h"
-#include <stdint.h>
+#include <cstdint>
 
-using entity_id = uint64_t;
+using entity_id = std::uint64_t;
 
 class variable_with_id : public variable {
 private:

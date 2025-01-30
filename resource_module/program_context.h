@@ -6,14 +6,14 @@
 
 struct program_context {
 private:
-	size_t references_count{ 1 };
+	std::size_t references_count{ 1 };
 	std::mutex references_mutex{};
 
 	program_context(
-		void** code, uint32_t functions_count, 
-		void** exposed_functions, uint32_t exposed_functions_count, 
-		void* jump_table, uint64_t jump_table_size,
-		void** program_strings, uint64_t program_strings_size
+		void** code, std::uint32_t functions_count, 
+		void** exposed_functions, std::uint32_t exposed_functions_count, 
+		void* jump_table, std::uint64_t jump_table_size,
+		void** program_strings, std::uint64_t program_strings_size
 	)
 		:code{ code },
 		functions_count{ functions_count },
@@ -27,22 +27,22 @@ private:
 
 public:
 	void** code{};
-	uint32_t functions_count{};
+	std::uint32_t functions_count{};
 
 	void** exposed_functions{};
-	uint32_t exposed_functions_count{};
+	std::uint32_t exposed_functions_count{};
 
 	void* jump_table{};
-	uint64_t jump_table_size{};
+	std::uint64_t jump_table_size{};
 
 	void** program_strings{};
-	uint64_t program_strings_size{};
+	std::uint64_t program_strings_size{};
 
 	static program_context* create(
-		void** code, uint32_t functions_count, 
-		void** exposed_functions, uint32_t exposed_functions_count, 
-		void* jump_table, uint64_t jump_table_size,
-		void** program_strings, uint64_t program_strings_size
+		void** code, std::uint32_t functions_count, 
+		void** exposed_functions, std::uint32_t exposed_functions_count, 
+		void* jump_table, std::uint64_t jump_table_size,
+		void** program_strings, std::uint64_t program_strings_size
 	) {
 		return new program_context{ 
 			code, functions_count, 
@@ -58,7 +58,7 @@ public:
 		++object->references_count;
 		return object;
 	}
-	size_t decrease_references_count() {
+	std::size_t decrease_references_count() {
 		std::lock_guard lock{ this->references_mutex };
 		return --this->references_count;
 	}

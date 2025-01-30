@@ -26,7 +26,7 @@ public:
 		this->move_rcx_to_rbx();
 		this->move_r8_to_rcx();
 
-		uint8_t rex = 0;
+		std::uint8_t rex = 0;
 		switch (this->get_active_type())
 		{
 		case 0b01: {
@@ -43,8 +43,8 @@ public:
 			this->write_bytes(rex);
 		}
 
-		this->write_bytes<uint8_t>(this->get_code(this->get_active_type()));
-		this->write_bytes<uint8_t>(0 | ((this->get_code_back() << 3) & 0b00111000));
+		this->write_bytes<std::uint8_t>(this->get_code(this->get_active_type()));
+		this->write_bytes<std::uint8_t>(0 | ((this->get_code_back() << 3) & 0b00111000));
 
 		this->move_rbx_to_rcx();
 	}

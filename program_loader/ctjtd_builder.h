@@ -5,7 +5,7 @@
 
 class ctjtd_builder : public instruction_builder {
 private:
-	uint32_t function_displacement;
+	std::uint32_t function_displacement;
 
 public:
 	template<typename... args>
@@ -21,7 +21,7 @@ public:
 
 	virtual void visit(std::unique_ptr<function> fnc) override {
 		this->function_displacement =
-			static_cast<uint32_t>(this->get_function_table_index(fnc->get_id()));
+			static_cast<std::uint32_t>(this->get_function_table_index(fnc->get_id()));
 	}
 
 	virtual void visit(std::unique_ptr<regular_variable> variable) override {
