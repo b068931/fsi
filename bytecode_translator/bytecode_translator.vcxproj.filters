@@ -15,6 +15,18 @@
     <Filter Include="Header Files\Parse Map States">
       <UniqueIdentifier>{965a3e98-2ff5-4a9d-85ce-7ff2d511545e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Parse Map States\Modules Import">
+      <UniqueIdentifier>{c0feaa8f-63a0-4024-a261-8c61d45275f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Parse Map States\Special Instructions">
+      <UniqueIdentifier>{72403354-6394-4eed-a866-08b07ccbf7d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Parse Map States\Instruction Arguments">
+      <UniqueIdentifier>{d2e2545b-c7d2-4622-a9de-572314796cb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Parse Map States\Functions">
+      <UniqueIdentifier>{8651ef23-7ae4-4809-a54a-8d0e8ced81f5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bytecode_translator.h">
@@ -22,6 +34,72 @@
     </ClInclude>
     <ClInclude Include="structure_builder.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="type_definitions.h">
+      <Filter>Header Files\Parse Map States</Filter>
+    </ClInclude>
+    <ClInclude Include="module_import_state.h">
+      <Filter>Header Files\Parse Map States\Modules Import</Filter>
+    </ClInclude>
+    <ClInclude Include="functions_import_state.h">
+      <Filter>Header Files\Parse Map States\Modules Import</Filter>
+    </ClInclude>
+    <ClInclude Include="define_state.h">
+      <Filter>Header Files\Parse Map States\Special Instructions</Filter>
+    </ClInclude>
+    <ClInclude Include="redefine_states.h">
+      <Filter>Header Files\Parse Map States\Special Instructions</Filter>
+    </ClInclude>
+    <ClInclude Include="undefine_state.h">
+      <Filter>Header Files\Parse Map States\Special Instructions</Filter>
+    </ClInclude>
+    <ClInclude Include="if_defined_states.h">
+      <Filter>Header Files\Parse Map States\Special Instructions</Filter>
+    </ClInclude>
+    <ClInclude Include="stack_size_state.h">
+      <Filter>Header Files\Parse Map States\Special Instructions</Filter>
+    </ClInclude>
+    <ClInclude Include="declaration_states.h">
+      <Filter>Header Files\Parse Map States\Special Instructions</Filter>
+    </ClInclude>
+    <ClInclude Include="program_strings_states.h">
+      <Filter>Header Files\Parse Map States\Special Instructions</Filter>
+    </ClInclude>
+    <ClInclude Include="function_address_argument_state.h">
+      <Filter>Header Files\Parse Map States\Instruction Arguments</Filter>
+    </ClInclude>
+    <ClInclude Include="immediate_argument_states.h">
+      <Filter>Header Files\Parse Map States\Instruction Arguments</Filter>
+    </ClInclude>
+    <ClInclude Include="sizeof_argument_state.h">
+      <Filter>Header Files\Parse Map States\Instruction Arguments</Filter>
+    </ClInclude>
+    <ClInclude Include="regular_variable_argument_states.h">
+      <Filter>Header Files\Parse Map States\Instruction Arguments</Filter>
+    </ClInclude>
+    <ClInclude Include="pointer_dereference_argument_states.h">
+      <Filter>Header Files\Parse Map States\Instruction Arguments</Filter>
+    </ClInclude>
+    <ClInclude Include="jump_point_argument_state.h">
+      <Filter>Header Files\Parse Map States\Instruction Arguments</Filter>
+    </ClInclude>
+    <ClInclude Include="string_argument_state.h">
+      <Filter>Header Files\Parse Map States\Instruction Arguments</Filter>
+    </ClInclude>
+    <ClInclude Include="function_declaration_states.h">
+      <Filter>Header Files\Parse Map States\Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="inside_function_body_state.h">
+      <Filter>Header Files\Parse Map States\Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="new_jump_point_state.h">
+      <Filter>Header Files\Parse Map States\Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="module_call_states.h">
+      <Filter>Header Files\Parse Map States\Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="main_state.h">
+      <Filter>Header Files\Parse Map States</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

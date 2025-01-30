@@ -367,7 +367,7 @@ public:
 		std::list<function> functions;
 	};
 
-	class helper_inter_states_object {
+	class builder_parameters {
 	private:
 		struct current_function {
 		private:
@@ -410,7 +410,7 @@ public:
 			}
 
 			template<typename type>
-			void map_operand_with_variable(const std::string& name, type** out, generic_parser::read_map<source_file_token, context_key, file, helper_inter_states_object, parameters_enumeration>& parse_map) {
+			void map_operand_with_variable(const std::string& name, type** out, generic_parser::read_map<source_file_token, context_key, file, builder_parameters, parameters_enumeration>& parse_map) {
 				auto found_argument = this->find_argument_variable_by_name(name);
 				if (found_argument != this->get_current_function().arguments.end()) {
 					*out = &(*found_argument);
@@ -492,7 +492,7 @@ public:
 			static entity_id id = 1;
 			return id++;
 		}
-		void add_function_address_argument(file& output_file_structure, helper_inter_states_object& helper, generic_parser::read_map<source_file_token, context_key, file, helper_inter_states_object, parameters_enumeration>& read_map) {
+		void add_function_address_argument(file& output_file_structure, builder_parameters& helper, generic_parser::read_map<source_file_token, context_key, file, builder_parameters, parameters_enumeration>& read_map) {
 			helper.current_function.get_last_instruction().func_addresses.push_back(function_address{}); //add new function address to the list function addresses of specific instruction
 
 			function_address* func = &helper.current_function.get_last_instruction().func_addresses.back();
@@ -518,7 +518,7 @@ public:
 			helper.current_function.add_new_operand_to_last_instruction(source_file_token::function_address_argument_keyword, func, false);
 		}
 	};
-	using read_map_type = generic_parser::read_map<source_file_token, context_key, file, helper_inter_states_object, parameters_enumeration>;
+	using read_map_type = generic_parser::read_map<source_file_token, context_key, file, builder_parameters, parameters_enumeration>;
 
 private:
 	line_type error_line;
@@ -530,7 +530,7 @@ private:
 	read_map_type parse_map;
 	void configure_parse_map();
 
-	helper_inter_states_object helper{};
+	builder_parameters helper{};
 	file output_file_structure;
 public:
 	structure_builder(std::vector<std::pair<std::string, structure_builder::source_file_token>>* names_stack, generic_parser::token_generator<structure_builder::source_file_token, context_key>* token_generator)

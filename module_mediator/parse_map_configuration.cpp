@@ -5,9 +5,6 @@
 #include "inside_value_state.h"
 
 void module_mediator::parser::components::engine_module_builder::configure_parse_map() {
-	using state_type =
-		generic_parser::states_builder<file_tokens, context_keys, result_type, builder_parameters, dynamic_parameters_keys>::state_type;
-
 	this->parameters.module_part = this->mediator->get_module_part();
 	generic_parser::states_builder<file_tokens, context_keys, result_type, builder_parameters, dynamic_parameters_keys> builder{};
 

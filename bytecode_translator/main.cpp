@@ -180,7 +180,7 @@ int main(int argc, char** argv) {
 			translator.start(false);
 		}
 		else {
-			std::cout << "Unknown debug flag '" << argv[3] << "' debug run won't be added.";
+			std::cout << "Unknown debug flag '" << argv[3] << "' debug run won't be added.\n";
 			translator.start(false);
 		}
 
