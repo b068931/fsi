@@ -149,7 +149,7 @@ public:
 	struct function;
 	struct jump_point;
 	struct string;
-	struct module;
+	struct engine_module;
 	struct module_function;
 
 	struct entity { //every jump point, variable, function has its own id (later this id will be used in byte code)
@@ -253,9 +253,9 @@ public:
 		}
 	};
 	struct module_variable : public variable {
-		module* mod;
+		engine_module* mod;
 
-		module_variable(module* mod)
+		module_variable(engine_module* mod)
 			:variable{},
 			mod{mod}
 		{}
@@ -340,11 +340,11 @@ public:
 			name{std::move(name) }
 		{}
 	};
-	struct module : entity {
+	struct engine_module : entity {
 		std::string name;
 		std::list<module_function> functions_names;
 
-		module(entity_id id, std::string&& module_name)
+		engine_module(entity_id id, std::string&& module_name)
 			:entity{id},
 			name{std::move(module_name)},
 			functions_names{}
@@ -363,7 +363,7 @@ public:
 		std::vector<function*> exposed_functions;
 		std::map<std::string, string> program_strings;
 
-		std::list<module> modules;
+		std::list<engine_module> modules;
 		std::list<function> functions;
 	};
 

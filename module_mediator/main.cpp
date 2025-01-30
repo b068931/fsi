@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
 
 	std::cout << "Type 'okimdone' to exit. Make sure that your program is actually done executing." << std::endl;
 
-	engine_module_mediator module_mediator{};
+	module_mediator::engine_module_mediator module_mediator{};
 	std::string error_message = module_mediator.load_modules("dlls.txt");
 
 	module_mediator::module_part* part = module_mediator.get_module_part();

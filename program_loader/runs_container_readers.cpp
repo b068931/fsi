@@ -5,7 +5,7 @@ extern module_mediator::module_part* part;
 
 void runs_container::modules_reader(run_reader<runs_container>::run run) { //every run has its own specific structure, so we need to use different functions for each type of run (see bytecode_translator.h)
 	for (std::uint64_t counter = 0, modules_count = run.get_object<std::uint64_t>(); counter < modules_count; ++counter) {
-		module new_module{}; //create new module, read its entity_id and read its information about functions
+		engine_module new_module{}; //create new module, read its entity_id and read its information about functions
 
 		entity_id module_entityid = run.get_object<entity_id>();
 		std::uint64_t number_of_functions = run.get_object<std::uint64_t>();

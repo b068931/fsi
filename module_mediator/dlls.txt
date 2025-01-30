@@ -52,15 +52,15 @@ check_function_arguments=pointer ullong
 get_function_name=ullong
 
 [logger:Dynamic Libraries/Core/Logger.dll]
-info=pointer
-warning=pointer
-error=pointer
-fatal=pointer
+info=pointer ullong pointer pointer
+warning=pointer ullong pointer pointer
+error=pointer ullong pointer pointer
+fatal=pointer ullong pointer pointer
 
-program_info=pointer
-program_warning=pointer
-program_error=pointer
-program_fatal=pointer
+program_info=pointer ullong pointer pointer
+program_warning=pointer ullong pointer pointer
+program_error=pointer ullong pointer pointer
+program_fatal=pointer ullong pointer pointer
 
 --allows program to interact with the environment
 [prts:Dynamic Libraries/Core/Program Runtime Services.dll]
@@ -82,6 +82,6 @@ program_fatal=pointer
 !create_thread_group:threading.create-group=dynamic
 
 --io/logging
-!info:io.log.info=pointer
-!warning:io.log.warning=pointer
-!error:io.log.error=pointer
+!info:io.log.info=pointer ullong pointer pointer
+!warning:io.log.warning=pointer ullong pointer pointer
+!error:io.log.error=pointer ullong pointer pointer

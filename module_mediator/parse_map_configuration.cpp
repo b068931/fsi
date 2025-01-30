@@ -4,7 +4,7 @@
 #include "function_with_exported_name_state.h"
 #include "inside_value_state.h"
 
-void engine_module_builder::configure_parse_map() {
+void module_mediator::parser::components::engine_module_builder::configure_parse_map() {
 	using state_type =
 		generic_parser::states_builder<file_tokens, context_keys, result_type, builder_parameters, dynamic_parameters_keys>::state_type;
 
@@ -12,10 +12,10 @@ void engine_module_builder::configure_parse_map() {
 	generic_parser::states_builder<file_tokens, context_keys, result_type, builder_parameters, dynamic_parameters_keys> builder{};
 
 	state_settings& starting_state = builder.create_state<state_type>();
-	state_settings& base_state = builder.create_state<main_state>();
-	state_settings& inside_header = builder.create_state<inside_header_state>();
-	state_settings& function_with_exported_name = builder.create_state<function_with_exported_name_state>();
-	state_settings& inside_value = builder.create_state<inside_value_state>();
+	state_settings& base_state = builder.create_state<states::main_state>();
+	state_settings& inside_header = builder.create_state<states::inside_header_state>();
+	state_settings& function_with_exported_name = builder.create_state<states::function_with_exported_name_state>();
+	state_settings& inside_value = builder.create_state<states::inside_value_state>();
 	state_settings& inside_comment = builder.create_state<state_type>();
 
 	starting_state

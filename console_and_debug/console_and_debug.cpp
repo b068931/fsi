@@ -31,23 +31,34 @@ void decode_message_type(message_type type) {
 	}
 	std::cerr << ']';
 }
-void log_message(message_type type, const char* message) {
+void log_message(message_type type, const char* file_name, std::size_t file_line, const char* function_name, const char* message) {
 	std::lock_guard<std::mutex> lock{::global_output_lock};
 	
 	decode_message_type(type);
-	std::cerr << ' ' << "\x1b[97m" << message << "\033[0m" << std::endl;
+	std::cerr << std::format(
+		"[FILE NAME: {}, FILE LINE: {}, FUNCTION NAME: {}] \x1b[97m{}\033[0m", 
+		(file_name == nullptr) ? "UNSPECIFIED" : file_name,
+		(file_line == 0) ? "UNSPECIFIED" : std::to_string(file_line),
+		(function_name == nullptr) ? "UNSPECIFIED" : function_name,
+		message
+	) << std::endl;
 }
 
 void generic_log_message(message_type type, module_mediator::arguments_string_type bundle) {
-	auto arguments = module_mediator::arguments_string_builder::unpack<void*>(bundle);
+	auto [file_name, file_line, function_name, message] = 
+		module_mediator::arguments_string_builder::unpack<void*, module_mediator::return_value, void*, void*>(bundle);
+
 	log_message(
 		type,
-		static_cast<char*>(std::get<0>(arguments))
+		static_cast<char*>(file_name),
+		static_cast<std::size_t>(file_line),
+		static_cast<char*>(function_name),
+		static_cast<char*>(message)
 	);
 }
 void generic_log_message_with_thread_information(message_type type, module_mediator::arguments_string_type bundle) {
-	auto arguments = module_mediator::arguments_string_builder::unpack<void*>(bundle);
-	char* message = static_cast<char*>(std::get<0>(arguments));
+	auto [file_name, file_line, function_name, message] = 
+		module_mediator::arguments_string_builder::unpack<void*, module_mediator::return_value, void*, void*>(bundle);
 
 	module_mediator::return_value current_thread_id = module_mediator::fast_call(
 		::part,
@@ -66,12 +77,18 @@ void generic_log_message_with_thread_information(message_type type, module_media
 		stream << "[ENGINE";
 	}
 	else {
-		stream << "[thread: " << current_thread_id;
-		stream << ", thread group: " << current_thread_group_id;
+		stream << "[THREAD: " << current_thread_id;
+		stream << ", THREAD GROUP: " << current_thread_group_id;
 	}
 
-	stream << "] " << message;
-	log_message(type, stream.str().c_str());
+	stream << "] " << static_cast<char*>(message);
+	log_message(
+		type, 
+		static_cast<char*>(file_name),
+		static_cast<std::size_t>(file_line),
+		static_cast<char*>(function_name),
+		stream.str().c_str()
+	);
 }
 
 module_mediator::return_value info(module_mediator::arguments_string_type bundle) {

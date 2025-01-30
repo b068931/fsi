@@ -10,7 +10,7 @@
 
 struct runs_container {
 public:
-	struct module {
+	struct engine_module {
 		std::size_t module_id{};
 		std::map<entity_id, std::size_t> module_functions;
 	};
@@ -29,7 +29,7 @@ public:
 	std::uint64_t preferred_stack_size{};
 	std::map<entity_id, std::string> entities_names{};
 
-	std::map<entity_id, module> modules;
+	std::map<entity_id, engine_module> modules;
 	std::vector<std::tuple<entity_id, std::uint32_t, std::uint32_t>> jump_points;
 	std::map<entity_id, function_signature> function_signatures;
 	std::map<entity_id, std::string> exposed_functions;

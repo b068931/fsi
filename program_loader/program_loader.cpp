@@ -15,7 +15,7 @@
 #include "../console_and_debug/logging.h"
 
 std::mutex exposed_functions_mutex{};
-std::unordered_map<uintptr_t, std::pair<std::unique_ptr<module_mediator::arguments_string_element[]>, std::string>> exposed_functions{};
+std::unordered_map<std::uintptr_t, std::pair<std::unique_ptr<module_mediator::arguments_string_element[]>, std::string>> exposed_functions{};
 
 module_mediator::return_value add_program(
 	void** code, std::uint32_t functions_count, 
@@ -33,7 +33,7 @@ module_mediator::return_value add_program(
 		program_strings, program_strings_count
 	);
 }
-void merge_exposed_functions(std::unordered_map<uintptr_t, std::pair<std::unique_ptr<module_mediator::arguments_string_element[]>, std::string>>& new_exposed_functions) {
+void merge_exposed_functions(std::unordered_map<std::uintptr_t, std::pair<std::unique_ptr<module_mediator::arguments_string_element[]>, std::string>>& new_exposed_functions) {
 	std::lock_guard<std::mutex> lock{ ::exposed_functions_mutex };
 	::exposed_functions.merge(new_exposed_functions);
 }
@@ -74,7 +74,7 @@ std::vector<
 jump_table_builder construct_jump_table(const runs_container& container) {
 	jump_table_builder jump_table{}; //create jump_table builder and initialize it
 	for (const auto& fnc : container.function_bodies) {
-		jump_table.add_new_function_address(fnc.function_signature, reinterpret_cast<uintptr_t>(get_default_function_address()));
+		jump_table.add_new_function_address(fnc.function_signature, reinterpret_cast<std::uintptr_t>(get_default_function_address()));
 	}
 
 	for (const auto& jump_point : container.jump_points) {
@@ -273,7 +273,7 @@ compiled_program compile(
 	void** loaded_functions_addresses = new void* [functions_count] { nullptr };
 
 	try {
-		std::unordered_map<uintptr_t, std::pair<std::unique_ptr<module_mediator::arguments_string_element[]>, std::string>> loaded_exposed_functions{};
+		std::unordered_map<std::uintptr_t, std::pair<std::unique_ptr<module_mediator::arguments_string_element[]>, std::string>> loaded_exposed_functions{};
 		for (std::uint32_t function_index = 0; function_index < functions_count; ++function_index) {
 			runs_container::function& current_function = container.function_bodies[function_index];
 			auto[loaded_function, prologue_size] = compile_function(
@@ -288,7 +288,7 @@ compiled_program compile(
 			auto found_exposed_function_information = container.exposed_functions.find(current_function.function_signature);
 			if (found_exposed_function_information != container.exposed_functions.end()) {
 				exposed_functions_addresses[loaded_exposed_functions.size()] = loaded_function;
-				loaded_exposed_functions[reinterpret_cast<uintptr_t>(loaded_function)] =
+				loaded_exposed_functions[reinterpret_cast<std::uintptr_t>(loaded_function)] =
 					std::pair<std::unique_ptr<module_mediator::arguments_string_element[]>, std::string>{
 						create_function_signature(container.function_signatures[current_function.function_signature]),
 						std::move(found_exposed_function_information->second)
@@ -296,11 +296,11 @@ compiled_program compile(
 			}
 
 			loaded_functions_addresses[function_index] = loaded_function;
-			jump_table.add_jump_base_address(static_cast<std::uint32_t>(function_index), reinterpret_cast<uintptr_t>(loaded_function) + prologue_size);
-			jump_table.remap_function_address(current_function.function_signature, reinterpret_cast<uintptr_t>(loaded_function));
+			jump_table.add_jump_base_address(static_cast<std::uint32_t>(function_index), reinterpret_cast<std::uintptr_t>(loaded_function) + prologue_size);
+			jump_table.remap_function_address(current_function.function_signature, reinterpret_cast<std::uintptr_t>(loaded_function));
 		}
 
-		std::pair<void*, std::uint64_t> program_jump_table = jump_table.create_raw_table(reinterpret_cast<uintptr_t>(get_default_function_address));
+		std::pair<void*, std::uint64_t> program_jump_table = jump_table.create_raw_table(reinterpret_cast<std::uintptr_t>(get_default_function_address));
 		auto [program_strings, program_strings_size] = create_program_strings(container);
 
 		merge_exposed_functions(loaded_exposed_functions);
@@ -368,7 +368,7 @@ module_mediator::return_value load_program_to_memory(module_mediator::arguments_
 		auto found_entity_name = container.entities_names.find(exc.get_associated_id());
 		if (found_entity_name != container.entities_names.end()) {
 			std::string message{ exc.what() };
-			log_error(
+			LOG_ERROR(
 				get_module_part(),
 				message +
 					" (It appears that this error is related to the following object: '" +
@@ -376,18 +376,18 @@ module_mediator::return_value load_program_to_memory(module_mediator::arguments_
 			);
 		}
 		else {
-			log_error(get_module_part(), exc.what());
+			LOG_ERROR(get_module_part(), exc.what());
 		}
 	}
 	catch (const std::filesystem::filesystem_error&) {
-		log_error(get_module_part(), "Got a filesystem error. Most likely, provided file does not exist or it is not accessible.");
+		LOG_ERROR(get_module_part(), "Got a filesystem error. Most likely, provided file does not exist or it is not accessible.");
 	}
 	catch (const std::exception& exc) {
-		log_error(get_module_part(), "Unexpected exception was caught during compilation.");
-		log_error(get_module_part(), exc.what());
+		LOG_ERROR(get_module_part(), "Unexpected exception was caught during compilation.");
+		LOG_ERROR(get_module_part(), exc.what());
 	}
 
-	log_fatal(get_module_part(), "Program compilation has failed.");
+	LOG_FATAL(get_module_part(), "Program compilation has failed.");
 	return 1;
 }
 module_mediator::return_value free_program(module_mediator::arguments_string_type bundle) {
@@ -407,7 +407,7 @@ module_mediator::return_value free_program(module_mediator::arguments_string_typ
 		std::lock_guard<std::mutex> lock{ ::exposed_functions_mutex };
 		for (std::uint32_t counter = 0; counter < exposed_functions_count; ++counter) {
 			if (exposed_functions[counter] != nullptr) {
-				::exposed_functions.erase(reinterpret_cast<uintptr_t>(exposed_functions[counter]));
+				::exposed_functions.erase(reinterpret_cast<std::uintptr_t>(exposed_functions[counter]));
 			}
 		}
 	}
@@ -431,7 +431,7 @@ module_mediator::return_value free_program(module_mediator::arguments_string_typ
 module_mediator::return_value check_function_arguments(module_mediator::arguments_string_type bundle) {
 	auto arguments = module_mediator::arguments_string_builder::unpack<void*, unsigned long long>(bundle);
 	module_mediator::arguments_string_type signature_string = static_cast<module_mediator::arguments_string_type>(std::get<0>(arguments));
-	uintptr_t function_address = std::get<1>(arguments);
+	std::uintptr_t function_address = std::get<1>(arguments);
 
 	//std::unordered_map does not invalidate references and pointers to its objects unless they were erased
 	module_mediator::arguments_string_type found_signature_string{};
@@ -455,7 +455,7 @@ module_mediator::return_value check_function_arguments(module_mediator::argument
 }
 module_mediator::return_value get_function_name(module_mediator::arguments_string_type bundle) {
 	auto arguments = module_mediator::arguments_string_builder::unpack<unsigned long long>(bundle);
-	uintptr_t function_address = std::get<0>(arguments);
+	std::uintptr_t function_address = std::get<0>(arguments);
 
 	char* found_name = nullptr;
 	{
@@ -466,5 +466,5 @@ module_mediator::return_value get_function_name(module_mediator::arguments_strin
 		}
 	}
 
-	return reinterpret_cast<uintptr_t>(found_name);
+	return reinterpret_cast<std::uintptr_t>(found_name);
 }

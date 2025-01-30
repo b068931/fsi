@@ -12,6 +12,7 @@ main {
     copy-string string message, variable pointer message-storage;
     copy-string string message, variable pointer message-storage;
 
+    /*this will also kill the program*/
     void: prts->io.log.info(variable pointer message-storage)
     message-storage: prts->pointer.deallocate()
 }

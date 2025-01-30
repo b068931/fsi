@@ -93,7 +93,7 @@ private:
 				{ 0b0101, &instruction_builder::generic_create_imm<std::uint16_t> },
 				{ 0b0110, &instruction_builder::generic_create_imm<std::uint32_t> },
 				{ 0b0111, &instruction_builder::generic_create_imm<std::uint64_t> },
-				{ 0b1100, &instruction_builder::generic_create_object<module> },
+				{ 0b1100, &instruction_builder::generic_create_object<engine_module> },
 				{ 0b1101, &instruction_builder::generic_create_object<specialized_variable> },
 				{ 0b1110, &instruction_builder::generic_create_object<function> },
 				{ 0b1111, &instruction_builder::generic_create_object<pointer> }
@@ -488,7 +488,7 @@ public:
 	virtual void visit(std::unique_ptr<dereferenced_pointer> val) { 
 		this->assert_statement(false, "Instruction does not recognize pointer dereference.", val->get_id());
 	}
-	virtual void visit(std::unique_ptr<module> val) { 
+	virtual void visit(std::unique_ptr<engine_module> val) { 
 		this->assert_statement(false, "Instruction does not recognize modules.", val->get_id());
 	}
 	virtual void visit(std::unique_ptr<specialized_variable> val) { 

@@ -6,7 +6,7 @@
 
 namespace typename_array {
 	using typename_array_size_t = long long;
-	constexpr typename_array_size_t npos = -1;
+	inline constexpr typename_array_size_t npos = -1;
 
 	template<typename... args>
 	struct typename_array {

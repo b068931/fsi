@@ -18,7 +18,7 @@ class module_function_call_builder : public general_function_call_builder {
 private:
 	std::uint32_t stack_allocation_size;
 
-	const runs_container::module* associated_module;
+	const runs_container::engine_module* associated_module;
 	std::size_t function_to_call_index;
 
 	std::int8_t variable_index;
@@ -124,10 +124,10 @@ public:
 		stack_allocation_size{ 0 }
 	{}
 
-	virtual void visit(std::unique_ptr<module> module) override {
-		auto found_module = this->get_file_info().modules.find(module->get_id());
+	virtual void visit(std::unique_ptr<engine_module> engine_module) override {
+		auto found_module = this->get_file_info().modules.find(engine_module->get_id());
 		if (found_module == this->get_file_info().modules.cend()) {
-			this->assert_statement(false, "Module does not exist.", module->get_id());
+			this->assert_statement(false, "Module does not exist.", engine_module->get_id());
 			return;
 		}
 

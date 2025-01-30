@@ -9,6 +9,9 @@ module_mediator::return_value get_current_thread_group_id() {
 	);
 }
 std::pair<void*, std::uint64_t> decay_pointer(module_mediator::pointer value) {
+	if (value == nullptr) 
+		return { nullptr, 0 };
+
 	char* pointer = static_cast<char*>(value);
 	void* data = nullptr;
 	std::uint64_t size{};

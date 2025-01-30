@@ -2,25 +2,35 @@
 #define MODULES_LOGGING_H
 
 #ifdef DISABLE_LOGGING
-#define log_info(part, message) ((void)0)
-#define log_warning(part, message) ((void)0)
-#define log_error(part, message) ((void)0)
-#define log_fatal(part, message) ((void)0)
+#define LOG_INFO(part, message) ((void)0)
+#define LOG_WARNING(part, message) ((void)0)
+#define LOG_ERROR(part, message) ((void)0)
+#define LOG_FATAL(part, message) ((void)0)
 
-#define log_program_info(part, message) ((void)0)
-#define log_program_warning(part, message) ((void)0)
-#define log_program_error(part, message) ((void)0)
-#define log_program_fatal(part, message) ((void)0)
+#define LOG_PROGRAM_INFO(part, message) ((void)0)
+#define LOG_PROGRAM_WARNING(part, message) ((void)0)
+#define LOG_PROGRAM_ERROR(part, message) ((void)0)
+#define LOG_PROGRAM_FATAL(part, message) ((void)0)
 #else
 
 #include <string>
 #include <iostream>
 #include "../module_mediator/module_part.h"
 
-inline void generic_log_message(module_mediator::module_part* part, std::size_t message_type, std::string message) {
+#define ONLY_FILE_NAME strrchr("\\" __FILE__, '\\') + 1 
+
+inline void generic_log_message(
+	module_mediator::module_part* part, 
+	std::size_t message_type, 
+	std::string file_name, 
+	std::size_t file_line,
+	std::string function_name,
+	std::string message
+) {
+	assert(message.size() != 0 && "Empty log message");
 	static std::size_t logger = part->find_module_index("logger");
 	if (logger == module_mediator::module_part::module_not_found) {
-		std::cerr << "One of the modules requires uses logging. 'logger' was not found. Terminating with std::abort." << std::endl;
+		std::cerr << "One of the modules uses logging. 'logger' was not found. Terminating with std::abort." << std::endl;
 		std::abort();
 	}
 
@@ -43,18 +53,26 @@ inline void generic_log_message(module_mediator::module_part* part, std::size_t 
 		std::abort();
 	}
 
-	module_mediator::fast_call<void*>(part, logger, log_type, message.data());
+	module_mediator::fast_call<void*, module_mediator::return_value, void*, void*>(
+		part, 
+		logger, 
+		log_type, 
+		file_name.data(), 
+		file_line, 
+		function_name.data(),
+		message.data()
+	);
 }
 
-#define log_info(part, message) generic_log_message(part, 0, message)
-#define log_warning(part, message) generic_log_message(part, 1, message)
-#define log_error(part, message) generic_log_message(part, 2, message)
-#define log_fatal(part, message) generic_log_message(part, 3, message)
+#define LOG_INFO(part, message) generic_log_message(part, 0, ONLY_FILE_NAME, __LINE__, __func__, message)
+#define LOG_WARNING(part, message) generic_log_message(part, 1, ONLY_FILE_NAME, __LINE__, __func__, message)
+#define LOG_ERROR(part, message) generic_log_message(part, 2, ONLY_FILE_NAME, __LINE__, __func__, message)
+#define LOG_FATAL(part, message) generic_log_message(part, 3, ONLY_FILE_NAME, __LINE__, __func__, message)
 
-#define log_program_info(part, message) generic_log_message(part, 4, message)
-#define log_program_warning(part, message) generic_log_message(part, 5, message)
-#define log_program_error(part, message) generic_log_message(part, 6, message)
-#define log_program_fatal(part, message) generic_log_message(part, 7, message)
+#define LOG_PROGRAM_INFO(part, message) generic_log_message(part, 4, ONLY_FILE_NAME, __LINE__, __func__, message)
+#define LOG_PROGRAM_WARNING(part, message) generic_log_message(part, 5, ONLY_FILE_NAME, __LINE__, __func__, message)
+#define LOG_PROGRAM_ERROR(part, message) generic_log_message(part, 6, ONLY_FILE_NAME, __LINE__, __func__, message)
+#define LOG_PROGRAM_FATAL(part, message) generic_log_message(part, 7, ONLY_FILE_NAME, __LINE__, __func__, message)
 #endif
 
 #endif

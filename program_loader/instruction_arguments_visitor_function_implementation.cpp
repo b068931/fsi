@@ -16,7 +16,7 @@ void variable_imm<std::uint64_t>::visit(instruction_builder* builder) {
 }
 
 void function::visit(instruction_builder* builder) { builder->visit(std::unique_ptr<function>{ this }); }
-void module::visit(instruction_builder* builder) { builder->visit(std::unique_ptr<module>{ this }); }
+void engine_module::visit(instruction_builder* builder) { builder->visit(std::unique_ptr<engine_module>{ this }); }
 void pointer::visit(instruction_builder* builder) { builder->visit(std::unique_ptr<pointer>{ this }); }
 void specialized_variable::visit(instruction_builder* builder) { builder->visit(std::unique_ptr<specialized_variable>{ this }); }
 void dereferenced_pointer::visit(instruction_builder* builder) { builder->visit(std::unique_ptr<dereferenced_pointer>{ this }); }

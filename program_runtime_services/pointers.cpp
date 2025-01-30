@@ -45,7 +45,7 @@ module_mediator::return_value allocate_pointer(module_mediator::arguments_string
 	module_mediator::eight_bytes size = std::get<2>(arguments);
 
 	if (return_type != module_mediator::pointer_return_value) {
-		log_program_error(get_module_part(), "Incorrect return type. (allocate_pointer)");
+		LOG_PROGRAM_ERROR(get_module_part(), "Incorrect return type. (allocate_pointer)");
 		return module_mediator::execution_result_terminate;
 	}
 
@@ -54,7 +54,7 @@ module_mediator::return_value allocate_pointer(module_mediator::arguments_string
 
 	module_mediator::return_value allocated_memory = inner_allocate(size);
 	if ((value_pointer_data == reinterpret_cast<module_mediator::return_value>(nullptr)) || (allocated_memory == reinterpret_cast<module_mediator::return_value>(nullptr))) {
-		log_program_error(get_module_part(), "Not enough memory. (allocate_pointer)");
+		LOG_PROGRAM_ERROR(get_module_part(), "Not enough memory. (allocate_pointer)");
 		return module_mediator::execution_result_terminate;
 	}
 
@@ -70,13 +70,13 @@ module_mediator::return_value deallocate_pointer(module_mediator::arguments_stri
 	module_mediator::one_byte return_type = std::get<1>(arguments);
 
 	if (return_type != module_mediator::pointer_return_value) {
-		log_program_error(get_module_part(), "Incorrect return type. (deallocate_pointer)");
+		LOG_PROGRAM_ERROR(get_module_part(), "Incorrect return type. (deallocate_pointer)");
 		return module_mediator::execution_result_terminate;
 	}
 
 	module_mediator::pointer address{};
 	std::memcpy(&address, return_address, sizeof(module_mediator::pointer));
-	if (address == 0) return module_mediator::execution_result_continue;
+	if (address == nullptr) return module_mediator::execution_result_continue;
 
 	inner_check_if_pointer_is_saved(address);
 
@@ -98,7 +98,7 @@ module_mediator::return_value get_allocated_size(module_mediator::arguments_stri
 	module_mediator::pointer address = std::get<2>(arguments);
 
 	if (type != module_mediator::eight_bytes_return_value) {
-		log_program_error(get_module_part(), "Incorrect return type. (get_allocated_size)");
+		LOG_PROGRAM_ERROR(get_module_part(), "Incorrect return type. (get_allocated_size)");
 		return module_mediator::execution_result_terminate;
 	}
 

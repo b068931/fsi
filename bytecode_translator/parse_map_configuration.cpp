@@ -25,7 +25,7 @@ state_settings& configure_modules_import(states_builder_type& builder) {
 	state_settings& inside_module_import = builder.create_anonymous_state(
 		[](structure_builder::file& output_file_structure, structure_builder::helper_inter_states_object& helper, structure_builder::read_map_type& read_map) -> void {
 			output_file_structure.modules.push_back(
-				structure_builder::module{
+				structure_builder::engine_module{
 					helper.get_id(),
 					helper.names_remapping.translate_name(read_map.get_token_generator_name())
 				}
@@ -875,7 +875,7 @@ state_settings& configure_inside_function(states_builder_type& builder, state_se
 			std::string name = helper.names_remapping.translate_name(read_map.get_token_generator_name());
 
 			auto found_module = std::find_if(output_file_structure.modules.begin(), output_file_structure.modules.end(),
-				[&name](const structure_builder::module& mod) {
+				[&name](const structure_builder::engine_module& mod) {
 					return mod.name == name;
 				}
 			);
@@ -897,7 +897,7 @@ state_settings& configure_inside_function(states_builder_type& builder, state_se
 			std::string name = helper.names_remapping.translate_name(read_map.get_token_generator_name());
 			structure_builder::variable* module_var = std::get<1>(helper.current_function.get_last_operand());
 
-			structure_builder::module* referenced_module = static_cast<structure_builder::module_variable*>(module_var)->mod; //it is guaranteed that previous variable has module_variable type
+			structure_builder::engine_module* referenced_module = static_cast<structure_builder::module_variable*>(module_var)->mod; //it is guaranteed that previous variable has module_variable type
 			auto found_module_function = std::find_if(referenced_module->functions_names.begin(), referenced_module->functions_names.end(),
 				[&name](const structure_builder::module_function& mod) {
 					return mod.name == name;

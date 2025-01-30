@@ -111,12 +111,12 @@ intptr_t allocate_memory_generic(std::recursive_mutex& mutex, T& object, id_gene
 
 	if (iterator_lock.second) { //check if we acquired mutex for an object
 		iterator_lock.first->second.allocated_memory.push_back(new(std::nothrow) char[size] {});
-		return reinterpret_cast<uintptr_t>(iterator_lock.first->second.allocated_memory.back());
+		return reinterpret_cast<std::uintptr_t>(iterator_lock.first->second.allocated_memory.back());
 	}
 	
-	log_program_warning(::part, "Concurrency error. (allocate_memory_generic)");
+	LOG_PROGRAM_WARNING(::part, "Concurrency error. (allocate_memory_generic)");
 
-	return reinterpret_cast<uintptr_t>(nullptr);
+	return reinterpret_cast<std::uintptr_t>(nullptr);
 	_Releases_lock_(iterator_lock->second);
 }
 
@@ -138,7 +138,7 @@ void deallocate_memory_generic(std::recursive_mutex& mutex, T& object, id_genera
 			allocated_memory.erase(found_address);
 		}
 		else {
-			log_program_warning(::part, "Deallocated memory does not belong to the object. (deallocate_memory_generic)");
+			LOG_PROGRAM_WARNING(::part, "Deallocated memory does not belong to the object. (deallocate_memory_generic)");
 		}
 	}
 }
@@ -202,11 +202,11 @@ std::conditional_t<
 	}
 
 	if constexpr (thread_structure_switch) {
-		log_program_warning(::part, "Concurrency error. (deallocate_generic/thread)");
+		LOG_PROGRAM_WARNING(::part, "Concurrency error. (deallocate_generic/thread)");
 		return std::pair{ return_code::concurrency_error, 0 };
 	}
 	else {
-		log_program_warning(::part, "Concurrency error. (deallocate_generic/thread_group)");
+		LOG_PROGRAM_WARNING(::part, "Concurrency error. (deallocate_generic/thread_group)");
 		return return_code::concurrency_error;
 	}
 }
@@ -268,7 +268,7 @@ module_mediator::return_value duplicate_container(module_mediator::arguments_str
 
 		iterator_lock.second.unlock();
 
-		log_program_info(::part, "Duplicating the program context.");
+		LOG_PROGRAM_INFO(::part, "Duplicating the program context.");
 		return notify_excm_new_container(
 			new_container_id,
 			main_function
@@ -410,10 +410,10 @@ module_mediator::return_value get_jump_table(module_mediator::arguments_string_t
 	auto arguments = module_mediator::arguments_string_builder::unpack<id_generator::id_type>(bundle);
 	auto iterator_lock = get_iterator(containers, containers_mutex, std::get<0>(arguments));
 	if (iterator_lock.second) {
-		return reinterpret_cast<uintptr_t>(iterator_lock.first->second.context->jump_table);
+		return reinterpret_cast<std::uintptr_t>(iterator_lock.first->second.context->jump_table);
 	}
 	
-	return reinterpret_cast<uintptr_t>(nullptr);
+	return reinterpret_cast<std::uintptr_t>(nullptr);
 }
 module_mediator::return_value get_jump_table_size(module_mediator::arguments_string_type bundle) {
 	auto arguments = module_mediator::arguments_string_builder::unpack<id_generator::id_type>(bundle);

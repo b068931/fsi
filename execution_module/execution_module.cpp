@@ -121,10 +121,10 @@ void inner_delete_running_thread() {
 
 	bool is_delete_container = manager.delete_thread(thread_group_id, thread_id);
 
-	log_info(::part, "Deallocating a thread. ID: " + std::to_string(thread_id));
+	LOG_INFO(::part, "Deallocating a thread. ID: " + std::to_string(thread_id));
 	inner_deallocate_thread(thread_id);
 	if (is_delete_container) {
-		log_info(::part, "Deallocating a thread group. ID: " + std::to_string(thread_group_id));
+		LOG_INFO(::part, "Deallocating a thread group. ID: " + std::to_string(thread_group_id));
 		inner_deallocate_program_container(thread_group_id);
 	}
 }
@@ -133,7 +133,7 @@ void program_resume() {
 	get_thread_local_structure()->currently_running_thread_information.state = scheduler::thread_states::running;
 }
 void thread_terminate() {
-	log_program_info(::part, "Thread was terminated.");
+	LOG_PROGRAM_INFO(::part, "Thread was terminated.");
 
 	get_thread_local_structure()->currently_running_thread_information.put_back_structure = nullptr;
 	inner_delete_running_thread();
@@ -144,35 +144,35 @@ void show_error(std::uint64_t error_code) {
 
 	switch (termination_code) {
 	case termination_codes::stack_overflow:
-		log_program_error(::part, "Stack overflow. This can happen during function call, module function call, function prologue.");
+		LOG_PROGRAM_ERROR(::part, "Stack overflow. This can happen during function call, module function call, function prologue.");
 		break;
 
 	case termination_codes::nullptr_dereference:
-		log_program_error(::part, "Uninitialized pointer dereference.");
+		LOG_PROGRAM_ERROR(::part, "Uninitialized pointer dereference.");
 		break;
 
 	case termination_codes::pointer_out_of_bounds:
-		log_program_error(::part, "Pointer index is out of bounds.");
+		LOG_PROGRAM_ERROR(::part, "Pointer index is out of bounds.");
 		break;
 
 	case termination_codes::undefined_function_call:
-		log_program_error(::part, "Undefined function call. Called function has its own signature but it does not have a body.");
+		LOG_PROGRAM_ERROR(::part, "Undefined function call. Called function has its own signature but it does not have a body.");
 		break;
 
 	case termination_codes::incorrect_saved_variable_type:
-		log_program_error(::part, "Saved variable has different type.");
+		LOG_PROGRAM_ERROR(::part, "Saved variable has different type.");
 		break;
 
 	case termination_codes::division_by_zero:
-		log_program_error(::part, "Division by zero.");
+		LOG_PROGRAM_ERROR(::part, "Division by zero.");
 		break;
 
 	default:
-		log_program_fatal(::part, "Unknown termination code. The process will be terminated with 'abort'.");
+		LOG_PROGRAM_FATAL(::part, "Unknown termination code. The process will be terminated with 'abort'.");
 		std::abort();
 	}
 
-	log_program_error(::part, "Program execution error. Thread terminated.");
+	LOG_PROGRAM_ERROR(::part, "Program execution error. Thread terminated.");
 }
 [[noreturn]] void inner_terminate(std::uint64_t error_code) {
 	show_error(error_code);
@@ -184,15 +184,15 @@ void show_error(std::uint64_t error_code) {
 [[noreturn]] void inner_call_module_error(module_mediator::module_part::call_error error) {
 	switch (error) {
 	case module_mediator::module_part::call_error::function_is_not_visible:
-		log_program_error(::part, "Called module function is not visible. Thread terminated.");
+		LOG_PROGRAM_ERROR(::part, "Called module function is not visible. Thread terminated.");
 		break;
 
 	case module_mediator::module_part::call_error::invalid_arguments_string:
-		log_program_error(::part, "Incorrect arguments were used for the module function call. Thread terminated.");
+		LOG_PROGRAM_ERROR(::part, "Incorrect arguments were used for the module function call. Thread terminated.");
 		break;
 
 	case module_mediator::module_part::call_error::unknown_index:
-		log_program_error(::part, "Module function does not exist. Thread terminated.");
+		LOG_PROGRAM_ERROR(::part, "Module function does not exist. Thread terminated.");
 		break;
 	}
 
@@ -213,13 +213,13 @@ void show_error(std::uint64_t error_code) {
 		load_execution_threadf(get_thread_local_structure()->execution_thread_state);
 
 	case 2:
-		log_program_info(::part, "Requested thread termination.");
+		LOG_PROGRAM_INFO(::part, "Requested thread termination.");
 
 		thread_terminate();
 		load_execution_threadf(get_thread_local_structure()->execution_thread_state);
 
 	default:
-		log_program_fatal(::part, "Incorrect return code. Process will be killed with abort.");
+		LOG_PROGRAM_FATAL(::part, "Incorrect return code. Process will be killed with abort.");
 		std::abort();
 	}
 }
@@ -237,7 +237,7 @@ module_mediator::return_value inner_self_duplicate(void* main_function, module_m
 				delete[] initializer;
 				get_thread_local_structure()->initializer = nullptr;
 
-				log_program_error(::part, "You can not pass pointers as arguments for thread groups because this can easily lead to a data race.");
+				LOG_PROGRAM_ERROR(::part, "You can not pass pointers as arguments for thread groups because this can easily lead to a data race.");
 				return 1;
 			}
 		}
@@ -265,7 +265,7 @@ void inner_fill_in_reg_array_entry(std::uint64_t entry_index, char* memory, std:
 }
 module_mediator::return_value inner_create_thread(module_mediator::return_value thread_group_id, module_mediator::return_value priority, void* function_address) {
 	thread_local_structure* thread_structure = get_thread_local_structure();
-	log_program_info(::part, "Creating new thread.");
+	LOG_PROGRAM_INFO(::part, "Creating new thread.");
 
 	thread_structure->program_function_address = function_address;
 	thread_structure->priority = priority;
@@ -304,12 +304,12 @@ module_mediator::return_value inner_check_function_signature(void* function_addr
 		alleged_signature = initializer;
 	}
 
-	return module_mediator::fast_call<void*, uintptr_t>(
+	return module_mediator::fast_call<void*, std::uintptr_t>(
 		::part,
 		index_getter::progload(),
 		index_getter::progload_check_function_arguments(),
 		alleged_signature,
-		reinterpret_cast<uintptr_t>(function_address)
+		reinterpret_cast<std::uintptr_t>(function_address)
 	);
 }
 [[maybe_unused]] std::string get_exposed_function_name(void* function_address) {
@@ -317,7 +317,7 @@ module_mediator::return_value inner_check_function_signature(void* function_addr
 		::part,
 		index_getter::progload(),
 		index_getter::progload_get_function_name(),
-		reinterpret_cast<uintptr_t>(function_address)
+		reinterpret_cast<std::uintptr_t>(function_address)
 	);
 
 	std::string function_name{ "[UNKNOWN_FUNCTION_NAME]" };
@@ -328,12 +328,12 @@ module_mediator::return_value inner_check_function_signature(void* function_addr
 
 	return function_name;
 }
-uintptr_t inner_apply_initializer_on_thread_stack(char* thread_stack_memory, char* thread_stack_end, const module_mediator::arguments_array_type& arguments) {
+std::uintptr_t inner_apply_initializer_on_thread_stack(char* thread_stack_memory, char* thread_stack_end, const module_mediator::arguments_array_type& arguments) {
 	for (module_mediator::arguments_array_type::const_reverse_iterator begin = arguments.rbegin(), end = arguments.rend(); begin != end; ++begin) {
 		std::size_t type_size = module_mediator::arguments_string_builder::get_type_size_by_index(begin->first);
 		if ((thread_stack_memory + type_size) >= thread_stack_end) {
-			log_program_error(::part, "Not enough stack space to initialize thread stack.");
-			reinterpret_cast<uintptr_t>(nullptr);
+			LOG_PROGRAM_ERROR(::part, "Not enough stack space to initialize thread stack.");
+			reinterpret_cast<std::uintptr_t>(nullptr);
 		}
 
 		std::memcpy(
@@ -345,9 +345,9 @@ uintptr_t inner_apply_initializer_on_thread_stack(char* thread_stack_memory, cha
 		thread_stack_memory += type_size;
 	}
 
-	return reinterpret_cast<uintptr_t>(thread_stack_memory);
+	return reinterpret_cast<std::uintptr_t>(thread_stack_memory);
 }
-uintptr_t inner_initialize_thread_stack(void* function_address, char* thread_stack_memory, char* thread_stack_end, module_mediator::return_value thread_id) {
+std::uintptr_t inner_initialize_thread_stack(void* function_address, char* thread_stack_memory, char* thread_stack_end, module_mediator::return_value thread_id) {
 	if (inner_check_function_signature(function_address, get_thread_local_structure()->initializer) != 0) {
 		module_mediator::return_value container_id = inner_deallocate_thread(thread_id);
 		if (inner_get_container_running_threads_count(container_id) == 0) {
@@ -358,13 +358,13 @@ uintptr_t inner_initialize_thread_stack(void* function_address, char* thread_sta
 		delete[] get_thread_local_structure()->initializer;
 		get_thread_local_structure()->initializer = nullptr;
 
-		log_program_error(
+		LOG_PROGRAM_ERROR(
 			::part,
 			"Function signature for function '" + get_exposed_function_name(function_address) +
 			"' does not match."
 		);
 
-		return reinterpret_cast<uintptr_t>(nullptr);
+		return reinterpret_cast<std::uintptr_t>(nullptr);
 	}
 	
 	module_mediator::arguments_string_type initializer = get_thread_local_structure()->initializer;
@@ -372,7 +372,7 @@ uintptr_t inner_initialize_thread_stack(void* function_address, char* thread_sta
 		module_mediator::arguments_array_type arguments =
 			module_mediator::arguments_string_builder::convert_to_arguments_array(get_thread_local_structure()->initializer);
 
-		uintptr_t result = inner_apply_initializer_on_thread_stack(thread_stack_memory, thread_stack_end, arguments);
+		std::uintptr_t result = inner_apply_initializer_on_thread_stack(thread_stack_memory, thread_stack_end, arguments);
 
 		delete[] get_thread_local_structure()->initializer;
 		get_thread_local_structure()->initializer = nullptr;
@@ -380,7 +380,7 @@ uintptr_t inner_initialize_thread_stack(void* function_address, char* thread_sta
 		return result;
 	}
 
-	return reinterpret_cast<uintptr_t>(thread_stack_memory);
+	return reinterpret_cast<std::uintptr_t>(thread_stack_memory);
 }
 
 module_mediator::return_value on_thread_creation(module_mediator::arguments_string_type bundle) {
@@ -409,24 +409,24 @@ module_mediator::return_value on_thread_creation(module_mediator::arguments_stri
 	inner_fill_in_reg_array_entry( //function address
 		1, 
 		thread_state_memory, 
-		reinterpret_cast<uintptr_t>(thread_structure->program_function_address)
+		reinterpret_cast<std::uintptr_t>(thread_structure->program_function_address)
 	);
 
 	inner_fill_in_reg_array_entry( //jump table
 		2,
 		thread_state_memory,
-		reinterpret_cast<uintptr_t>(program_jump_table)
+		reinterpret_cast<std::uintptr_t>(program_jump_table)
 	);
 
 	inner_fill_in_reg_array_entry( //thread state
 		3,
 		thread_state_memory,
-		reinterpret_cast<uintptr_t>(thread_state_memory)
+		reinterpret_cast<std::uintptr_t>(thread_state_memory)
 	);
 
-	uintptr_t result = inner_initialize_thread_stack(thread_structure->program_function_address, thread_stack_memory, thread_stack_end, thread_id);
-	if (result == reinterpret_cast<uintptr_t>(nullptr)) {
-		log_program_error(::part, "Thread stack initialization has failed.");
+	std::uintptr_t result = inner_initialize_thread_stack(thread_structure->program_function_address, thread_stack_memory, thread_stack_end, thread_id);
+	if (result == reinterpret_cast<std::uintptr_t>(nullptr)) {
+		LOG_PROGRAM_ERROR(::part, "Thread stack initialization has failed.");
 		return 1;
 	}
 	
@@ -439,13 +439,13 @@ module_mediator::return_value on_thread_creation(module_mediator::arguments_stri
 	inner_fill_in_reg_array_entry( //stack end
 		5,
 		thread_state_memory,
-		reinterpret_cast<uintptr_t>(thread_stack_end) //account for the space that will be used to save the state of one variable between function calls
+		reinterpret_cast<std::uintptr_t>(thread_stack_end) //account for the space that will be used to save the state of one variable between function calls
 	);
 
 	inner_fill_in_reg_array_entry( //program control functions
 		6,
 		thread_state_memory,
-		reinterpret_cast<uintptr_t>(program_control_functions_addresses)
+		reinterpret_cast<std::uintptr_t>(program_control_functions_addresses)
 	);
 	//fill in thread state - end
 
@@ -457,7 +457,7 @@ module_mediator::return_value on_thread_creation(module_mediator::arguments_stri
 		program_jump_table
 	);
 
-	log_program_info(::part, "New thread has been successfully created.");
+	LOG_PROGRAM_INFO(::part, "New thread has been successfully created.");
 	return 0;
 }
 module_mediator::return_value on_container_creation(module_mediator::arguments_string_type bundle) {
@@ -466,7 +466,7 @@ module_mediator::return_value on_container_creation(module_mediator::arguments_s
 	void* program_main = std::get<1>(arguments);
 
 	manager.add_thread_group(container_id);
-	log_program_info(::part, "New thread group has been successfully created.");
+	LOG_PROGRAM_INFO(::part, "New thread group has been successfully created.");
 
 	return inner_create_thread(container_id, 0, program_main);
 }
@@ -490,7 +490,7 @@ module_mediator::return_value get_thread_saved_variable(module_mediator::argumen
 	module_mediator::pointer thread_stack_end{};
 
 	std::memcpy(&thread_stack_end, thread_state, sizeof(module_mediator::pointer));
-	return reinterpret_cast<uintptr_t>(thread_stack_end);
+	return reinterpret_cast<std::uintptr_t>(thread_stack_end);
 }
 module_mediator::return_value dynamic_call(module_mediator::arguments_string_type bundle) {
 	auto arguments = module_mediator::arguments_string_builder::unpack<void*, void*>(bundle);
@@ -498,7 +498,7 @@ module_mediator::return_value dynamic_call(module_mediator::arguments_string_typ
 	module_mediator::arguments_string_type function_arguments_string = static_cast<module_mediator::arguments_string_type>(std::get<1>(arguments));
 
 	if (inner_check_function_signature(function_address, function_arguments_string) != 0) {
-		log_program_error(
+		LOG_PROGRAM_ERROR(
 			::part, "A function signature for function '" + get_exposed_function_name(function_address) +
 			"' does not match passed arguments. (dynamic call)"
 		);
@@ -510,40 +510,40 @@ module_mediator::return_value dynamic_call(module_mediator::arguments_string_typ
 		static_cast<char*>(get_thread_local_structure()->currently_running_thread_information.thread_state) 
 	};
 
-	uintptr_t program_return_address = state_manager.get_return_address();
+	std::uintptr_t program_return_address = state_manager.get_return_address();
 	module_mediator::arguments_array_type function_arguments = module_mediator::arguments_string_builder::convert_to_arguments_array(
 		function_arguments_string
 	);
 
 	function_arguments.insert(
 		function_arguments.cbegin(),
-		{ static_cast<module_mediator::arguments_string_element>(module_mediator::arguments_string_builder::get_type_index<uintptr_t>), &program_return_address }
+		{ static_cast<module_mediator::arguments_string_element>(module_mediator::arguments_string_builder::get_type_index<std::uintptr_t>), &program_return_address }
 	);
 
-	uintptr_t new_current_stack_position = inner_apply_initializer_on_thread_stack(
+	std::uintptr_t new_current_stack_position = inner_apply_initializer_on_thread_stack(
 		reinterpret_cast<char*>(state_manager.get_current_stack_position()),
 		reinterpret_cast<char*>(state_manager.get_stack_end()),
 		function_arguments
 	);
 
-	if (new_current_stack_position == reinterpret_cast<uintptr_t>(nullptr)) {
-		log_program_error(::part, "The thread stack initialization has failed. (dynamic call)");
+	if (new_current_stack_position == reinterpret_cast<std::uintptr_t>(nullptr)) {
+		LOG_PROGRAM_ERROR(::part, "The thread stack initialization has failed. (dynamic call)");
 		return 1;
 	}
 
 	state_manager.set_current_stack_position(
-		new_current_stack_position - module_mediator::arguments_string_builder::get_type_size_by_index(module_mediator::arguments_string_builder::get_type_index<uintptr_t>)
+		new_current_stack_position - module_mediator::arguments_string_builder::get_type_size_by_index(module_mediator::arguments_string_builder::get_type_index<std::uintptr_t>)
 	);
 	
 	state_manager.set_return_address(
-		reinterpret_cast<uintptr_t>(static_cast<char*>(function_address) + function_save_return_address_size)
+		reinterpret_cast<std::uintptr_t>(static_cast<char*>(function_address) + function_save_return_address_size)
 	);
 
 	return 0;
 }
 
 module_mediator::return_value self_block(module_mediator::arguments_string_type) {
-	log_program_info(::part, "Was blocked.");
+	LOG_PROGRAM_INFO(::part, "Was blocked.");
 	manager.block(get_thread_local_structure()->currently_running_thread_information.thread_id);
 
 	return 0;
@@ -558,7 +558,7 @@ module_mediator::return_value make_runnable(module_mediator::arguments_string_ty
 	auto arguments = module_mediator::arguments_string_builder::unpack<module_mediator::return_value>(bundle);
 
 	module_mediator::return_value thread_id = std::get<0>(arguments);
-	log_program_info(::part, "Made a thread with id '" + std::to_string(thread_id) + "' runnable again.");
+	LOG_PROGRAM_INFO(::part, "Made a thread with id '" + std::to_string(thread_id) + "' runnable again.");
 
 	manager.make_runnable(thread_id);
 	return 0;
@@ -567,7 +567,7 @@ module_mediator::return_value start(module_mediator::arguments_string_type bundl
 	auto arguments = module_mediator::arguments_string_builder::unpack<module_mediator::return_value>(bundle);
 	std::uint16_t thread_count = static_cast<std::uint16_t>(std::get<0>(arguments));
 
-	log_info(::part, "Creating execution daemons. Count: " + std::to_string(thread_count));
+	LOG_INFO(::part, "Creating execution daemons. Count: " + std::to_string(thread_count));
 	manager.startup(thread_count);
 
 	return 0;
@@ -589,7 +589,7 @@ module_mediator::return_value create_thread(module_mediator::arguments_string_ty
 module_mediator::return_value run_program(module_mediator::arguments_string_type bundle) {
 	//excm(run_program)->prog_load(load_program_to_memory)->resm(create_new_prog_container)->excm(on_container_creation)
 	auto arguments = module_mediator::arguments_string_builder::unpack<void*>(bundle);
-	log_program_info(::part, "Starting new program.");
+	LOG_PROGRAM_INFO(::part, "Starting new program.");
 
 	module_mediator::fast_call<void*>(
 		::part,
@@ -612,24 +612,24 @@ void initialize_m(module_mediator::module_part* part) {
 	inner_fill_in_reg_array_entry(
 		0,
 		::program_control_functions_addresses,
-		reinterpret_cast<uintptr_t>(&special_call_modulef)
+		reinterpret_cast<std::uintptr_t>(&special_call_modulef)
 	);
 
 	inner_fill_in_reg_array_entry(
 		1,
 		::program_control_functions_addresses,
-		reinterpret_cast<uintptr_t>(&inner_call_module)
+		reinterpret_cast<std::uintptr_t>(&inner_call_module)
 	);
 
 	inner_fill_in_reg_array_entry(
 		2,
 		::program_control_functions_addresses,
-		reinterpret_cast<uintptr_t>(&inner_terminate)
+		reinterpret_cast<std::uintptr_t>(&inner_terminate)
 	);
 
 	inner_fill_in_reg_array_entry(
 		3,
 		::program_control_functions_addresses,
-		reinterpret_cast<uintptr_t>(&end_program)
+		reinterpret_cast<std::uintptr_t>(&end_program)
 	);
 }

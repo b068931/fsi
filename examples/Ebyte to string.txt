@@ -85,9 +85,10 @@ ebyte-to-string {
 function main()
 main {
     $declare pointer message
+    $declare pointer null
 
     ebyte-to-string(immediate eight-bytes 22082023)
     load-value variable pointer message;
 
-    void: prts->io.log.info(variable pointer message)
+    void: prts->io.log.info(variable pointer null, immediate eight-bytes 0, variable pointer null, variable pointer message)
 }

@@ -33,7 +33,7 @@ namespace generic_parser {
 			this->current_loaded_block = block_index;
 		}
 		void delete_file_stream() { delete this->file_stream; }
-		void delete_block() { delete this->block; }
+		void delete_block() { delete[] this->block; }
 	public:
 		block_reader()
 			:current_loaded_block{ 0 },

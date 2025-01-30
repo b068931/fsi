@@ -12,6 +12,9 @@
     <Filter Include="Examples">
       <UniqueIdentifier>{7ad379c7-cca2-479f-8187-d01ec66f7e66}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Parse Map States">
+      <UniqueIdentifier>{965a3e98-2ff5-4a9d-85ce-7ff2d511545e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bytecode_translator.h">

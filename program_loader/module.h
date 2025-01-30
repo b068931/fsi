@@ -3,9 +3,9 @@
 
 #include "variable_with_id.h"
 
-class module : public variable_with_id {
+class engine_module : public variable_with_id {
 public:
-	module(entity_id id)
+	engine_module(entity_id id)
 		: variable_with_id{ id }
 	{}
 

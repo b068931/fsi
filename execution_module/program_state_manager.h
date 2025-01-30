@@ -41,43 +41,43 @@ public:
 		this->generic_write_state_entry<std::uint64_t>(comparsion_state_displacement, value);
 	}
 
-	uintptr_t get_return_address() {
-		return this->generic_read_state_entry<uintptr_t>(return_address_displacement);
+	std::uintptr_t get_return_address() {
+		return this->generic_read_state_entry<std::uintptr_t>(return_address_displacement);
 	}
-	void set_return_address(uintptr_t value) {
-		this->generic_write_state_entry<uintptr_t>(return_address_displacement, value);
+	void set_return_address(std::uintptr_t value) {
+		this->generic_write_state_entry<std::uintptr_t>(return_address_displacement, value);
 	}
 
-	uintptr_t get_jump_table_address() {
-		return this->generic_read_state_entry<uintptr_t>(jump_table_displacement);
+	std::uintptr_t get_jump_table_address() {
+		return this->generic_read_state_entry<std::uintptr_t>(jump_table_displacement);
 	}
-	void set_jump_table_address(uintptr_t value) {
+	void set_jump_table_address(std::uintptr_t value) {
 		this->generic_write_state_entry(jump_table_displacement, value);
 	}
 
-	uintptr_t get_my_state_address() {
-		return this->generic_read_state_entry<uintptr_t>(my_state_address_displacement);
+	std::uintptr_t get_my_state_address() {
+		return this->generic_read_state_entry<std::uintptr_t>(my_state_address_displacement);
 	}
 
-	uintptr_t get_current_stack_position() {
-		return this->generic_read_state_entry<uintptr_t>(current_stack_position_displacement);
+	std::uintptr_t get_current_stack_position() {
+		return this->generic_read_state_entry<std::uintptr_t>(current_stack_position_displacement);
 	}
-	void set_current_stack_position(uintptr_t value) {
-		this->generic_write_state_entry<uintptr_t>(current_stack_position_displacement, value);
-	}
-
-	uintptr_t get_stack_end() {
-		return this->generic_read_state_entry<uintptr_t>(stack_end_displacement);
-	}
-	void set_stack_end(uintptr_t value) {
-		this->generic_write_state_entry<uintptr_t>(stack_end_displacement, value);
+	void set_current_stack_position(std::uintptr_t value) {
+		this->generic_write_state_entry<std::uintptr_t>(current_stack_position_displacement, value);
 	}
 
-	uintptr_t get_program_control_functions() {
-		return this->generic_read_state_entry<uintptr_t>(program_control_functions_displacement);
+	std::uintptr_t get_stack_end() {
+		return this->generic_read_state_entry<std::uintptr_t>(stack_end_displacement);
 	}
-	void set_program_control_functions(uintptr_t value) {
-		this->generic_write_state_entry<uintptr_t>(program_control_functions_displacement, value);
+	void set_stack_end(std::uintptr_t value) {
+		this->generic_write_state_entry<std::uintptr_t>(stack_end_displacement, value);
+	}
+
+	std::uintptr_t get_program_control_functions() {
+		return this->generic_read_state_entry<std::uintptr_t>(program_control_functions_displacement);
+	}
+	void set_program_control_functions(std::uintptr_t value) {
+		this->generic_write_state_entry<std::uintptr_t>(program_control_functions_displacement, value);
 	}
 };
 

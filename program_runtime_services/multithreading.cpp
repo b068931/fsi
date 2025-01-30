@@ -26,7 +26,7 @@ void* get_function_address(std::uint64_t function_displacement) {
 }
 module_mediator::return_value check_function_signature(void* function_address, module_mediator::arguments_string_type alleged_signature) {
 	std::unique_ptr<module_mediator::arguments_string_element[]> args_string{
-		module_mediator::arguments_string_builder::pack<void*, uintptr_t>(alleged_signature, reinterpret_cast<uintptr_t>(function_address))
+		module_mediator::arguments_string_builder::pack<void*, std::uintptr_t>(alleged_signature, reinterpret_cast<std::uintptr_t>(function_address))
 	};
 
 	return get_module_part()->call_module(index_getter::progload(), index_getter::progload_check_function_arguments(), args_string.get());
@@ -47,7 +47,7 @@ module_mediator::return_value self_priority(module_mediator::arguments_string_ty
 	module_mediator::one_byte type = std::get<1>(arguments);
 
 	if (type != module_mediator::eight_bytes_return_value) {
-		log_program_error(get_module_part(), "Incorrect return type. (self_priority)");
+		LOG_PROGRAM_ERROR(get_module_part(), "Incorrect return type. (self_priority)");
 		return module_mediator::execution_result_terminate;
 	}
 
@@ -66,7 +66,7 @@ module_mediator::return_value thread_id(module_mediator::arguments_string_type b
 	module_mediator::one_byte type = std::get<1>(arguments);
 
 	if (type != module_mediator::eight_bytes_return_value) {
-		log_program_error(get_module_part(), "Incorrect return type. (thread_id)");
+		LOG_PROGRAM_ERROR(get_module_part(), "Incorrect return type. (thread_id)");
 		return module_mediator::execution_result_terminate;
 	}
 
@@ -85,7 +85,7 @@ module_mediator::return_value thread_group_id(module_mediator::arguments_string_
 	module_mediator::one_byte type = std::get<1>(arguments);
 
 	if (type != module_mediator::eight_bytes_return_value) {
-		log_program_error(get_module_part(), "Incorrect return type. (thread_group_id)");
+		LOG_PROGRAM_ERROR(get_module_part(), "Incorrect return type. (thread_group_id)");
 		return module_mediator::execution_result_terminate;
 	}
 
@@ -100,7 +100,7 @@ module_mediator::return_value dynamic_call(module_mediator::arguments_string_typ
 
 	module_mediator::eight_bytes function_displacement{};
 	if (!module_mediator::arguments_string_builder::extract_value_from_arguments_array<module_mediator::eight_bytes>(&function_displacement, 0, arguments)) {
-		log_program_error(get_module_part(), "Dynamic call incorrect structure.");
+		LOG_PROGRAM_ERROR(get_module_part(), "Dynamic call incorrect structure.");
 		return module_mediator::execution_result_terminate;
 	}
 
@@ -121,7 +121,7 @@ module_mediator::return_value dynamic_call(module_mediator::arguments_string_typ
 		);
 
 		if (result != 0) {
-			log_program_error(get_module_part(), "Dynamic call failed.");
+			LOG_PROGRAM_ERROR(get_module_part(), "Dynamic call failed.");
 			return module_mediator::execution_result_terminate;
 		}
 	}
@@ -139,7 +139,7 @@ module_mediator::return_value create_thread(module_mediator::arguments_string_ty
 		!module_mediator::arguments_string_builder::extract_value_from_arguments_array<module_mediator::eight_bytes>(&priority, 0, arguments) ||
 			!module_mediator::arguments_string_builder::extract_value_from_arguments_array<module_mediator::eight_bytes>(&function_displacement, 1, arguments)
 	) {
-		log_program_error(get_module_part(), "Incorrect create_thread call structure.");
+		LOG_PROGRAM_ERROR(get_module_part(), "Incorrect create_thread call structure.");
 		return module_mediator::execution_result_terminate;
 	}
 
@@ -162,7 +162,7 @@ module_mediator::return_value create_thread(module_mediator::arguments_string_ty
 		);
 
 		if (result != 0) {
-			log_program_error(get_module_part(), "Can not create a new thread.");
+			LOG_PROGRAM_ERROR(get_module_part(), "Can not create a new thread.");
 			return module_mediator::execution_result_terminate;
 		}
 	}
@@ -175,7 +175,7 @@ module_mediator::return_value create_thread_group(module_mediator::arguments_str
 
 	module_mediator::eight_bytes function_displacement{};
 	if (!module_mediator::arguments_string_builder::extract_value_from_arguments_array<module_mediator::eight_bytes>(&function_displacement, 0, arguments)) {
-		log_program_error(get_module_part(), "Incorrect create_thread_group call structure.");
+		LOG_PROGRAM_ERROR(get_module_part(), "Incorrect create_thread_group call structure.");
 		return module_mediator::execution_result_terminate;
 	}
 
@@ -197,7 +197,7 @@ module_mediator::return_value create_thread_group(module_mediator::arguments_str
 		);
 
 		if (result != 0) {
-			log_program_error(get_module_part(), "Can not create a new thread group.");
+			LOG_PROGRAM_ERROR(get_module_part(), "Can not create a new thread group.");
 			return module_mediator::execution_result_terminate;
 		}
 	}

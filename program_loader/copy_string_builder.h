@@ -36,7 +36,7 @@ public:
 
 		this->write_bytes('\x48'); //mov rsi, address of the string
 		this->write_bytes('\xbe');
-		this->write_bytes<std::uint64_t>(reinterpret_cast<uintptr_t>(found_string_info.first.get()));
+		this->write_bytes<std::uint64_t>(reinterpret_cast<std::uintptr_t>(found_string_info.first.get()));
 
 		this->write_bytes('\xf3'); //rep movsb + REX.W
 		this->write_bytes('\x48');

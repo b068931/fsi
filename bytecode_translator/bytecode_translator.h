@@ -767,7 +767,7 @@ private:
 		auto saved_position = this->write_run_header(modules_run);
 
 		this->write_8_bytes(static_cast<std::uint64_t>(this->file_structure->modules.size()));
-		for (const structure_builder::module& mod : this->file_structure->modules) {
+		for (const structure_builder::engine_module& mod : this->file_structure->modules) {
 			this->write_8_bytes(static_cast<std::uint64_t>(mod.id));
 			this->write_8_bytes(static_cast<std::uint64_t>(mod.functions_names.size()));
 
@@ -947,13 +947,13 @@ private:
 			this->write_n_bytes(current_string.first.c_str(), program_string_name_size);
 		}
 
-		run_size += this->generic_write_element<structure_builder::module>(
+		run_size += this->generic_write_element<structure_builder::engine_module>(
 			this->file_structure->modules,
 			"",
 			""
 		);
 
-		for (const structure_builder::module& current_module : this->file_structure->modules) {
+		for (const structure_builder::engine_module& current_module : this->file_structure->modules) {
 			run_size += this->generic_write_element<structure_builder::module_function>(
 				current_module.functions_names,
 				"(module function)",

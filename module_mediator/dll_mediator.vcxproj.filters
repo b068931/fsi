@@ -12,7 +12,10 @@
     <Filter Include="Header Files\Export">
       <UniqueIdentifier>{3819a92d-e72d-415d-a124-346ecda49783}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Parse Map States">
+    <Filter Include="Header Files\Module File Parsing">
+      <UniqueIdentifier>{96060b43-5415-407a-bf2e-52c312e46368}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Module File Parsing\Parse Map States">
       <UniqueIdentifier>{4527f85b-349b-4b22-8e7f-12f4f2492168}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -35,19 +38,25 @@
       <Filter>Header Files\Export</Filter>
     </ClInclude>
     <ClInclude Include="inside_header_state.h">
-      <Filter>Header Files\Parse Map States</Filter>
+      <Filter>Header Files\Module File Parsing\Parse Map States</Filter>
     </ClInclude>
     <ClInclude Include="type_definitions.h">
-      <Filter>Header Files\Parse Map States</Filter>
+      <Filter>Header Files\Module File Parsing\Parse Map States</Filter>
     </ClInclude>
     <ClInclude Include="main_state.h">
-      <Filter>Header Files\Parse Map States</Filter>
+      <Filter>Header Files\Module File Parsing\Parse Map States</Filter>
     </ClInclude>
     <ClInclude Include="function_with_exported_name_state.h">
-      <Filter>Header Files\Parse Map States</Filter>
+      <Filter>Header Files\Module File Parsing\Parse Map States</Filter>
     </ClInclude>
     <ClInclude Include="inside_value_state.h">
-      <Filter>Header Files\Parse Map States</Filter>
+      <Filter>Header Files\Module File Parsing\Parse Map States</Filter>
+    </ClInclude>
+    <ClInclude Include="file_components.h">
+      <Filter>Header Files\Module File Parsing</Filter>
+    </ClInclude>
+    <ClInclude Include="file_builder.h">
+      <Filter>Header Files\Module File Parsing</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
