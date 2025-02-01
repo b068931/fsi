@@ -2,10 +2,13 @@
 #include "thread_local_structure.h"
 #include "functions.h"
 #include "thread_manager.h"
+#include "program_state_manager.h"
 #include "executions_backend_functions.h"
 #include "../console_and_debug/logging.h"
 #include "../module_mediator/module_part.h"
 #include "../module_mediator/fsi_types.h"
+
+extern const std::size_t thread_stack_size;
 
 module_mediator::return_value inner_deallocate_thread(module_mediator::return_value thread_id) {
 	return module_mediator::fast_call<module_mediator::return_value>(
@@ -25,8 +28,30 @@ void inner_deallocate_program_container(module_mediator::return_value container_
 }
 void inner_delete_running_thread() {
 	thread_local_structure* thread_structure = get_thread_local_structure();
-	module_mediator::return_value thread_group_id = thread_structure->currently_running_thread_information.thread_group_id;
+
 	module_mediator::return_value thread_id = thread_structure->currently_running_thread_information.thread_id;
+	module_mediator::return_value thread_group_id = thread_structure->currently_running_thread_information.thread_group_id;
+	void* thread_state = thread_structure->currently_running_thread_information.thread_state;
+
+	program_state_manager program_state_manager{ 
+		static_cast<char*>(thread_state) 
+	};
+
+	module_mediator::fast_call<module_mediator::return_value, void*>(
+		get_module_part(),
+		index_getter::resm(),
+		index_getter::resm_deallocate_thread_memory(),
+		thread_id,
+		reinterpret_cast<void*>(program_state_manager.get_stack_start(thread_stack_size))
+	);
+
+	module_mediator::fast_call<module_mediator::return_value, void*>(
+		get_module_part(),
+		index_getter::resm(),
+		index_getter::resm_deallocate_thread_memory(),
+		thread_id,
+		thread_state
+	);
 
 	bool is_delete_container = get_thread_manager().delete_thread(thread_group_id, thread_id);
 
@@ -216,17 +241,11 @@ std::uintptr_t inner_apply_initializer_on_thread_stack(char* thread_stack_memory
 }
 std::uintptr_t inner_initialize_thread_stack(void* function_address, char* thread_stack_memory, char* thread_stack_end, module_mediator::return_value thread_id) {
 	if (inner_check_function_signature(function_address, get_thread_local_structure()->initializer) != 0) {
-		module_mediator::return_value container_id = inner_deallocate_thread(thread_id);
-		if (inner_get_container_running_threads_count(container_id) == 0) {
-			get_thread_manager().forget_thread_group(container_id);
-			inner_deallocate_program_container(container_id);
-		}
-
 		delete[] get_thread_local_structure()->initializer;
 		get_thread_local_structure()->initializer = nullptr;
 
 		LOG_PROGRAM_ERROR(
-			::get_module_part(),
+			get_module_part(),
 			"Function signature for function '" + get_exposed_function_name(function_address) +
 			"' does not match."
 		);

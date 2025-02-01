@@ -10,7 +10,7 @@
 #include "../console_and_debug/logging.h"
 
 const std::size_t thread_state_size = 144;
-std::size_t thread_stack_size = 1000000;
+extern const std::size_t thread_stack_size = 1000000;
 
 module_mediator::return_value on_thread_creation(module_mediator::arguments_string_type bundle) {
 	auto arguments = module_mediator::arguments_string_builder::unpack<module_mediator::return_value, module_mediator::return_value>(bundle);
@@ -56,6 +56,29 @@ module_mediator::return_value on_thread_creation(module_mediator::arguments_stri
 	std::uintptr_t result = inner_initialize_thread_stack(thread_structure->program_function_address, thread_stack_memory, thread_stack_end, thread_id);
 	if (result == reinterpret_cast<std::uintptr_t>(nullptr)) {
 		LOG_PROGRAM_ERROR(get_module_part(), "Thread stack initialization has failed.");
+
+		module_mediator::fast_call<module_mediator::return_value, void*>(
+			get_module_part(),
+			index_getter::resm(),
+			index_getter::resm_deallocate_thread_memory(),
+			thread_id,
+			thread_state_memory
+		);
+		
+		module_mediator::fast_call<module_mediator::return_value, void*>(
+			get_module_part(),
+			index_getter::resm(),
+			index_getter::resm_deallocate_thread_memory(),
+			thread_id,
+			thread_stack_memory
+		);
+
+		module_mediator::return_value container_id = inner_deallocate_thread(thread_id);
+		if (inner_get_container_running_threads_count(container_id) == 0) {
+			get_thread_manager().forget_thread_group(container_id);
+			inner_deallocate_program_container(container_id);
+		}
+
 		return 1;
 	}
 	

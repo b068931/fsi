@@ -47,6 +47,12 @@
     <ClInclude Include="thread_structure.h">
       <Filter>Header Files\Program Objects\Concrete Classes</Filter>
     </ClInclude>
+    <ClInclude Include="id_generator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="module_interoperation.h">
+      <Filter>Header Files\Program Objects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="resource_module.cpp">
@@ -57,6 +63,9 @@
     </ClCompile>
     <ClCompile Include="pch.cpp">
       <Filter>Source Files\Maintenance</Filter>
+    </ClCompile>
+    <ClCompile Include="module_initialization.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

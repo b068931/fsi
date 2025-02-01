@@ -9,34 +9,6 @@
 #define RESOURCEMODULE_API extern "C" __declspec(dllimport) 
 #endif
 
-class id_generator {
-public:
-	using id_type = module_mediator::return_value;
-
-private:
-	static std::stack<id_type> free_ids;
-	static std::mutex lock;
-	static id_type current_id;
-
-public:
-	static id_type get_id() {
-		std::lock_guard lock{ id_generator::lock };
-		if (!free_ids.empty()) {
-			id_type id = free_ids.top();
-			free_ids.pop();
-
-			return id;
-		}
-
-		return current_id++;
-	}
-	static void free_id(id_type id) {
-		std::lock_guard lock{ id_generator::lock };
-		free_ids.push(id);
-		assert(id != 0);
-	}
-};
-
 RESOURCEMODULE_API module_mediator::return_value add_container_on_destroy(module_mediator::arguments_string_type bundle);
 RESOURCEMODULE_API module_mediator::return_value add_thread_on_destroy(module_mediator::arguments_string_type bundle);
 

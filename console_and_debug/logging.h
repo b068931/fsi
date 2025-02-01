@@ -28,7 +28,9 @@ namespace console_and_debug {
 		std::string function_name,
 		std::string message
 	) {
+		assert(part != nullptr && "Null module part");
 		assert(message.size() != 0 && "Empty log message");
+
 		static std::size_t logger = part->find_module_index("logger");
 		if (logger == module_mediator::module_part::module_not_found) {
 			std::cerr << "One of the modules uses logging. 'logger' was not found. Terminating with std::abort." << std::endl;

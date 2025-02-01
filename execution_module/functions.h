@@ -96,6 +96,16 @@ public:
 		static std::size_t index = get_module_part()->find_function_index(index_getter::resm(), "duplicate_container");
 		return index;
 	}
+
+	static std::size_t resm_deallocate_thread_memory() {
+		static std::size_t index = get_module_part()->find_function_index(index_getter::resm(), "deallocate_thread_memory");
+		return index;
+	}
+
+	static std::size_t resm_deallocate_program_memory() {
+		static std::size_t index = get_module_part()->find_function_index(index_getter::resm(), "deallocate_program_memory");
+		return index;
+	}
 };
 
 #endif

@@ -91,4 +91,5 @@ main {
     load-value variable pointer message;
 
     void: prts->io.log.info(variable pointer null, immediate eight-bytes 0, variable pointer null, variable pointer message)
+    message: prts->pointer.deallocate()
 }

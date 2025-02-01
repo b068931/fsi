@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <cstring>
+#include "../module_mediator/fsi_types.h"
 
 class program_state_manager {
 private:
@@ -71,6 +72,9 @@ public:
 	}
 	void set_stack_end(std::uintptr_t value) {
 		this->generic_write_state_entry<std::uintptr_t>(stack_end_displacement, value);
+	}
+	std::uintptr_t get_stack_start(std::size_t thread_stack_size) {
+		return this->generic_read_state_entry<std::uintptr_t>(stack_end_displacement) - thread_stack_size + (sizeof(module_mediator::one_byte) + sizeof(std::uint64_t));
 	}
 
 	std::uintptr_t get_program_control_functions() {

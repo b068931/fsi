@@ -133,5 +133,14 @@
     <CopyFileToFolders Include="..\examples\Dynamic Call.txt">
       <Filter>Examples</Filter>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="..\examples\Dynamic Call With Error.txt">
+      <Filter>Examples</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\examples\Incorrect Main.txt">
+      <Filter>Examples</Filter>
+    </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Dynamic Call With Error.txt" />
   </ItemGroup>
 </Project>

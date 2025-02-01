@@ -2,6 +2,8 @@
 #include "resource_module.h"
 #include "program_container.h"
 #include "thread_structure.h"
+#include "id_generator.h"
+#include "module_interoperation.h"
 #include "../console_and_debug/logging.h"
 
 //remove "#define I_HATE_MICROSOFT_AND_STUPID_ANALYZER_WARNINGS" to disable _Acquires_lock_ and _Releases_lock_
@@ -11,8 +13,6 @@
 	#define _Releases_lock_(a)
 #endif
 
-module_mediator::module_part* part = nullptr;
-
 enum class return_code : module_mediator::return_value {
 	ok,
 	concurrency_error
@@ -20,27 +20,27 @@ enum class return_code : module_mediator::return_value {
 class index_getter {
 public:
 	static std::size_t excm() {
-		static std::size_t index = ::part->find_module_index("excm");
+		static std::size_t index = get_module_part()->find_module_index("excm");
 		return index;
 	}
 
 	static std::size_t excm_on_container_creation() {
-		static std::size_t index = ::part->find_function_index(index_getter::excm(), "on_container_creation");
+		static std::size_t index = get_module_part()->find_function_index(index_getter::excm(), "on_container_creation");
 		return index;
 	}
 
 	static std::size_t excm_on_thread_creation() {
-		static std::size_t index = ::part->find_function_index(index_getter::excm(), "on_thread_creation");
+		static std::size_t index = get_module_part()->find_function_index(index_getter::excm(), "on_thread_creation");
 		return index;
 	}
 
 	static std::size_t progload() {
-		static std::size_t index = ::part->find_module_index("progload");
+		static std::size_t index = get_module_part()->find_module_index("progload");
 		return index;
 	}
 
 	static std::size_t progload_free_program() {
-		static std::size_t index = ::part->find_function_index(index_getter::progload(), "free_program");
+		static std::size_t index = get_module_part()->find_function_index(index_getter::progload(), "free_program");
 		return index;
 	}
 };
@@ -79,6 +79,11 @@ _Acquires_lock_(return.second) auto get_iterator(T& object, std::recursive_mutex
 		return std::pair{ iterator, std::move(object_lock) };
 	}
 	
+	LOG_WARNING(
+		get_module_part(), 
+		std::format("Object with ID {} does not exist.", id)
+	);
+
 	return 
 		std::pair{ 
 			object.end(), //won't be actually accessed anywhere in the program because map can be modified after this function
@@ -91,7 +96,7 @@ _Acquires_lock_(return.second) auto get_iterator(T& object, std::recursive_mutex
 }
 
 template<typename T>
-void add_destory_callback_generic(std::recursive_mutex& mutex, T& object, id_generator::id_type id, void(*callback)(module_mediator::return_value, module_mediator::return_value, void*), void* paired_information) {
+void add_destory_callback_generic(std::recursive_mutex& mutex, T& object, id_generator::id_type id, void(*callback)(void*), void* paired_information) {
 	auto iterator_lock = get_iterator(object, mutex, id);
 	if (iterator_lock.second) {
 		iterator_lock.first->second.destroy_callbacks.push_back(std::pair{callback, paired_information});
@@ -114,7 +119,7 @@ intptr_t allocate_memory_generic(std::recursive_mutex& mutex, T& object, id_gene
 		return reinterpret_cast<std::uintptr_t>(iterator_lock.first->second.allocated_memory.back());
 	}
 	
-	LOG_PROGRAM_WARNING(::part, "Concurrency error. (allocate_memory_generic)");
+	LOG_PROGRAM_WARNING(get_module_part(), "Concurrency error.");
 
 	return reinterpret_cast<std::uintptr_t>(nullptr);
 	_Releases_lock_(iterator_lock->second);
@@ -138,7 +143,7 @@ void deallocate_memory_generic(std::recursive_mutex& mutex, T& object, id_genera
 			allocated_memory.erase(found_address);
 		}
 		else {
-			LOG_PROGRAM_WARNING(::part, "Deallocated memory does not belong to the object. (deallocate_memory_generic)");
+			LOG_PROGRAM_WARNING(get_module_part(), "Deallocated memory does not belong to the object.");
 		}
 	}
 }
@@ -151,7 +156,6 @@ std::conditional_t<
 > 
 	deallocate_generic(std::recursive_mutex& mutex, T& object, id_generator::id_type id) {
 	constexpr bool thread_structure_switch = std::is_same_v<T, std::map<id_generator::id_type, thread_structure>>;
-	std::vector<std::pair<void(*)(module_mediator::return_value, module_mediator::return_value, void*), void*>> destroy_callbacks{};
 
 	[[maybe_unused]] id_generator::id_type program_container_id = 0;
 	id_generator::id_type free_id = 0;
@@ -176,18 +180,12 @@ std::conditional_t<
 			object.erase(iterator_lock.first);
 
 			lock.unlock(); //at this point the object is deleted and if several other threads were waiting on the mutex while we were deleting the object they will find nothing
-
-			destroy_callbacks = std::move(container.destroy_callbacks);
 			free_id = id;
-
+			
 			if constexpr (thread_structure_switch) {
 				program_container_id = container.program_container;
 			}
 		}
-	}
-
-	for (const auto& destroy_callback : destroy_callbacks) {
-		destroy_callback.first(free_id, program_container_id, destroy_callback.second);
 	}
 
 	if(free_id != 0) {
@@ -202,11 +200,11 @@ std::conditional_t<
 	}
 
 	if constexpr (thread_structure_switch) {
-		LOG_PROGRAM_WARNING(::part, "Concurrency error. (deallocate_generic/thread)");
+		LOG_PROGRAM_WARNING(get_module_part(), "Concurrency error.");
 		return std::pair{ return_code::concurrency_error, 0 };
 	}
 	else {
-		LOG_PROGRAM_WARNING(::part, "Concurrency error. (deallocate_generic/thread_group)");
+		LOG_PROGRAM_WARNING(get_module_part(), "Concurrency error.");
 		return return_code::concurrency_error;
 	}
 }
@@ -220,7 +218,7 @@ void insert_new_container(id_generator::id_type id, program_context* context) {
 }
 module_mediator::return_value notify_excm_new_container(id_generator::id_type id, void* main_function) {
 	return module_mediator::fast_call<module_mediator::return_value, void*>(
-		::part,
+		get_module_part(),
 		index_getter::excm(),
 		index_getter::excm_on_container_creation(),
 		id,
@@ -234,7 +232,7 @@ module_mediator::return_value add_container_on_destroy(module_mediator::argument
 		containers_mutex,
 		containers,
 		std::get<0>(arguments),
-		static_cast<void(*)(module_mediator::return_value, module_mediator::return_value, void*)>(std::get<1>(arguments)),
+		static_cast<void(*)(void*)>(std::get<1>(arguments)),
 		std::get<2>(arguments)
 	);
 
@@ -246,7 +244,7 @@ module_mediator::return_value add_thread_on_destroy(module_mediator::arguments_s
 		thread_structures_mutex,
 		thread_structures,
 		std::get<0>(arguments),
-		static_cast<void(*)(module_mediator::return_value, module_mediator::return_value, void*)>(std::get<1>(arguments)),
+		static_cast<void(*)(void*)>(std::get<1>(arguments)),
 		std::get<2>(arguments)
 	);
 
@@ -268,7 +266,7 @@ module_mediator::return_value duplicate_container(module_mediator::arguments_str
 
 		iterator_lock.second.unlock();
 
-		LOG_PROGRAM_INFO(::part, "Duplicating the program context.");
+		LOG_PROGRAM_INFO(get_module_part(), "Duplicating the program context.");
 		return notify_excm_new_container(
 			new_container_id,
 			main_function
@@ -334,7 +332,7 @@ module_mediator::return_value create_new_thread(module_mediator::arguments_strin
 	}
 
 	return module_mediator::fast_call<module_mediator::return_value, module_mediator::return_value>(
-		::part,
+		get_module_part(),
 		index_getter::excm(),
 		index_getter::excm_on_thread_creation(),
 		container_id,
@@ -425,9 +423,6 @@ module_mediator::return_value get_jump_table_size(module_mediator::arguments_str
 	return 0;
 }
 
-void initialize_m(module_mediator::module_part* part) {
-	::part = part;
-}
 program_container::~program_container() noexcept {
 	if (this->context && (this->context->decrease_references_count() == 0)) {
 		delete this->context;
@@ -439,7 +434,7 @@ program_container::~program_container() noexcept {
 program_context::~program_context() noexcept {
 	assert(this->references_count == 0);
 	module_mediator::fast_call<void*, std::uint32_t, void*, std::uint32_t, void*, void*, std::uint64_t>(
-		::part,
+		get_module_part(),
 		index_getter::progload(),
 		index_getter::progload_free_program(),
 		this->code,
