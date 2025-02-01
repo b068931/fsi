@@ -1,9 +1,9 @@
 #ifndef THREAD_MANAGER_H
 #define THREAD_MANAGER_H
 
-#include "pch.h"
 #include "scheduler.h"
 #include "functions.h"
+#include "../console_and_debug/logging.h"
 
 class thread_manager {
 private:
@@ -16,14 +16,23 @@ private:
 	*/
 
 	scheduler scheduler;
-	void executor_thread() {
+	std::atomic_size_t active_threads_counter = 0;
+
+	void executor_thread(module_mediator::return_value executor_id) {
+		LOG_INFO(get_module_part(), std::format("Executor {} is starting.", executor_id));
+
 		thread_local_structure* thread_structure = get_thread_local_structure();
 		scheduler::schedule_information* currently_running_thread_information = 
 			&(thread_structure->currently_running_thread_information);
 
 		while (true) {
-			this->scheduler.choose(currently_running_thread_information);
+			bool choose_result = this->scheduler.choose(currently_running_thread_information);
+			if (!choose_result) {
+				LOG_INFO(get_module_part(), std::format("Executor {} is shutting down.", executor_id));
+				break;
+			}
 
+			this->active_threads_counter.fetch_add(1, std::memory_order_relaxed); //all other modifications are synchronized with mutexes. this is one just needs atomicity
 			load_programf(
 				thread_structure->execution_thread_state, 
 				currently_running_thread_information->thread_state,
@@ -31,8 +40,15 @@ private:
 					? 1 : 0
 			);
 
+			size_t previous_active_threads_count = this->active_threads_counter.fetch_sub(1, std::memory_order_relaxed);
 			if (currently_running_thread_information->put_back_structure) {
 				this->scheduler.put_back(currently_running_thread_information->put_back_structure);
+			}
+			else {
+				if ((previous_active_threads_count == 1) && (!this->scheduler.has_available_jobs())) {
+					LOG_INFO(get_module_part(), "No available jobs found. Initiating shutdown."); //for this LOG_INFO the order is very important: it must be before the scheduler.initiate_shutdown() call
+					this->scheduler.initiate_shutdown();
+				}
 			}
 		}
 	}
@@ -63,9 +79,18 @@ public:
 		this->scheduler.make_runnable(thread_id);
 	}
 	void startup(std::uint16_t thread_count) {
+		if(!this->scheduler.has_available_jobs()) {
+			LOG_WARNING(get_module_part(), "No available jobs found. Executors won't start.");
+			return;
+		}
+
+		std::vector<std::thread> executors{};
 		for (std::uint16_t counter = 0; counter < thread_count; ++counter) {
-			std::thread executor_daemon{ &thread_manager::executor_thread, this };
-			executor_daemon.detach();
+			executors.emplace_back(&thread_manager::executor_thread, this, counter);
+		}
+
+		for (std::thread& executor : executors) {
+			executor.join();
 		}
 	}
 };

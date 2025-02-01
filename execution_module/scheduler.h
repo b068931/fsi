@@ -4,6 +4,7 @@
 #include "pch.h"
 #include "clock_list.h"
 #include "priority_list.h"
+#include "../module_mediator/module_part.h"
 
 /*
 * GENERAL PRECONDITIONS. if these preconditions are met, following algorithms should work properly
@@ -227,6 +228,9 @@ private:
 	* are only invalidated by erasing that element, even when the corresponding iterator is invalidated."
 	* https://en.cppreference.com/w/cpp/container/unordered_map
 	*/
+	
+	//synchronized with clock_list_mutex
+	bool shutdown_sequence = false;
 
 	std::unordered_map<module_mediator::return_value, clock_list<thread_group>::proxy> thread_groups_hash_table;
 	std::mutex thread_groups_hash_table_mutex;
@@ -234,10 +238,10 @@ private:
 	std::unordered_map<module_mediator::return_value, priority_list<executable_thread, module_mediator::return_value>::proxy> threads_hash_table;
 	std::mutex threads_hash_table_mutex;
 
-	module_mediator::return_value runnable_threads_count{};
 	clock_list<thread_group> thread_groups;
 	std::mutex clock_list_mutex;
 
+	module_mediator::return_value runnable_threads_count{};
 	std::condition_variable runnable_thread_notify;
 
 	using thread_group_proxy = clock_list<thread_group>::proxy;
@@ -273,19 +277,23 @@ private:
 	}
 
 public:
-	void choose(schedule_information* destination) {
+	bool choose(schedule_information* destination) {
 		std::unique_lock<std::mutex> clock_list_lock{ this->clock_list_mutex };
 
 		while (true) {
 			if (this->runnable_threads_count == 0) {
+				//this variable is synchronized on a clock_list_mutex. look into "initiate_shutdown" function
+				if (this->shutdown_sequence) {
+					return false;
+				}
+
 				this->runnable_thread_notify.wait(
 					clock_list_lock, 
-					[this] { return this->runnable_threads_count > 0; }
+					[this] { return (this->runnable_threads_count > 0) || this->shutdown_sequence; }
 				);
 			}
 			else {
 				--this->runnable_threads_count;
-
 				while (true) {
 					thread_group* current_thread_group = this->thread_groups.get_current();
 					this->thread_groups.make_step(); //move to the next thread group
@@ -334,7 +342,7 @@ public:
 						destination->put_back_structure = thread.first;
 
 						thread.first->state = thread_states::running;
-						return;
+						return true;
 					}
 
 					clock_list_lock.lock(); 
@@ -462,6 +470,16 @@ public:
 		else {
 			thread->lock.unlock();
 		}
+	}
+	bool has_available_jobs() {
+		std::lock_guard<std::mutex> thread_groups_hash_table_lock{ this->thread_groups_hash_table_mutex };
+		return this->thread_groups_hash_table.size() > 0;
+	}
+	void initiate_shutdown() { 
+		//locking on this mutex is required in order to ensure that all executors are either already waiting on a condition variable or are yet to enter the "choose" function.
+		std::lock_guard<std::mutex> clock_list_lock{ this->clock_list_mutex };
+		this->shutdown_sequence = true;
+		this->runnable_thread_notify.notify_all();
 	}
 };
 

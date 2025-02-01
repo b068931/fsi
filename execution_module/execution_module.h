@@ -1,7 +1,7 @@
 #ifndef EXECUTION_MODULE
 #define EXECUTION_MODULE
 
-#include "pch.h"
+#include "../module_mediator/module_part.h"
 
 #ifdef EXECUTIONMODULE_EXPORTS
 #define EXECUTIONMODULE_API extern "C" __declspec(dllexport)

@@ -7,7 +7,7 @@ int main(int argc, char** argv) {
 	if (argc != 3) {
 		std::cout << "You need to provide two arguments: executors count and a compiled file." << std::endl;
 
-		system("pause");
+		std::cin.get();
 		return 1;
 	}
 
@@ -18,17 +18,16 @@ int main(int argc, char** argv) {
 	if (!converter.eof()) {
 		std::cout << "The second argument must be an integer." << std::endl;
 
-		system("pause");
+		std::cin.get();
 		return 1;
 	}
-
-	std::cout << "Type 'okimdone' to exit. Make sure that your program is actually done executing." << std::endl;
 
 	module_mediator::engine_module_mediator module_mediator{};
 	std::string error_message = module_mediator.load_modules("dlls.txt");
 
 	module_mediator::module_part* part = module_mediator.get_module_part();
 	if (error_message.empty()) {
+		std::cout << "All modules were loaded successfully. Commencing program execution." << std::endl;
 
 		std::size_t excm = part->find_module_index("excm");
 		std::size_t startup = part->find_function_index(excm, "start");
@@ -44,10 +43,6 @@ int main(int argc, char** argv) {
 		std::cout << "Could not correctly parse dlls.txt: " << error_message << std::endl;
 	}
 
-	std::string user_input{};
-	do {
-		std::cin >> user_input;
-	} while (user_input != "okimdone");
-
+	std::cin.get();
 	return 0;
 }

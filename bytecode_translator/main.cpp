@@ -10,7 +10,7 @@ int main(int argc, char** argv) {
 	if (argc != 4) {
 		std::cout << "Provide the name of the file to compile and its output destination. And add 'include-debug' or 'no-debug' at the end. It is only three arguments." << std::endl;
 
-		system("pause");
+		std::cin.get();
 		return 1;
 	}
 
@@ -131,7 +131,7 @@ int main(int argc, char** argv) {
 	catch (const std::exception& exception) {
 		std::cout << "Unable to process the file. The following exception might contain some information (or useless gibberish depending on your luck): " << exception.what() << std::endl;
 
-		system("pause");
+		std::cin.get();
 		return 1;
 	}
 
@@ -142,7 +142,7 @@ int main(int argc, char** argv) {
 		std::cout << error.second << std::endl;
 		std::cout << " NEAR LINE " << error.first << std::endl;
 
-		system("pause");
+		std::cin.get();
 		return 1;
 	}
 
@@ -154,19 +154,19 @@ int main(int argc, char** argv) {
 	if (!check_instructions_arugments(parser_value)) {
 		std::cout << "SYNTAX ERROR: each instruction can have no more than " << max_instruction_arguments_count << " arguments" << std::endl;
 
-		system("pause");
+		std::cin.get();
 		return 1;
 	}
 	else if (!check_functions_count(parser_value)) {
 		std::cout << "SYNTAX ERROR: you can have no more than " << max_functions_count << " functions in one file" << std::endl;
 
-		system("pause");
+		std::cin.get();
 		return 1;
 	}
 	else if (!check_functions_size(parser_value)) {
 		std::cout << "SYNTAX ERROR: you can have no more than " << max_instructions_count << " instructions in each function" << std::endl;
 
-		system("pause");
+		std::cin.get();
 		return 1;
 	}
 	else {
@@ -200,6 +200,6 @@ int main(int argc, char** argv) {
 		<< " seconds"
 		<< std::endl;
 
-	system("pause");
+	std::cin.get();
 	return 0;
 }
