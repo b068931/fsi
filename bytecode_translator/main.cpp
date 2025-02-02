@@ -151,6 +151,10 @@ int main(int argc, char** argv) {
 		std::cout << "PROGRAM LOGIC WARNING: function with name '" + name + "' has empty body." << std::endl;
 	}
 
+	if (parser_value.stack_size == 0) {
+		std::cout << "PROGRAM LOGIC ERROR: You must explicitly specify the stack size that your program will use." << std::endl;
+	}
+
 	if (!check_instructions_arugments(parser_value)) {
 		std::cout << "SYNTAX ERROR: each instruction can have no more than " << max_instruction_arguments_count << " arguments" << std::endl;
 

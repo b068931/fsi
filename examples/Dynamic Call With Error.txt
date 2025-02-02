@@ -1,3 +1,4 @@
+$stack-size 100
 from prts import <
     io.log.info, 
     pointer.allocate,

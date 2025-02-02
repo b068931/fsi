@@ -13,6 +13,7 @@ RESOURCEMODULE_API module_mediator::return_value add_container_on_destroy(module
 RESOURCEMODULE_API module_mediator::return_value add_thread_on_destroy(module_mediator::arguments_string_type bundle);
 
 RESOURCEMODULE_API module_mediator::return_value duplicate_container(module_mediator::arguments_string_type bundle);
+RESOURCEMODULE_API module_mediator::return_value get_preferred_stack_size(module_mediator::arguments_string_type bundle);
 
 RESOURCEMODULE_API module_mediator::return_value create_new_program_container(module_mediator::arguments_string_type bundle);
 RESOURCEMODULE_API module_mediator::return_value create_new_thread(module_mediator::arguments_string_type bundle);

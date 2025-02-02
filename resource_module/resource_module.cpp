@@ -216,13 +216,18 @@ void insert_new_container(id_generator::id_type id, program_context* context) {
 	std::lock_guard lock{ containers_mutex };
 	containers[id] = std::move(new_container);
 }
-module_mediator::return_value notify_excm_new_container(id_generator::id_type id, void* main_function) {
+module_mediator::return_value notify_excm_new_container(
+	id_generator::id_type id, 
+	void* main_function, 
+	std::uint64_t preferred_stack_size
+) {
 	return module_mediator::fast_call<module_mediator::return_value, void*>(
 		get_module_part(),
 		index_getter::excm(),
 		index_getter::excm_on_container_creation(),
 		id,
-		main_function
+		main_function,
+		preferred_stack_size
 	);
 }
 
@@ -269,28 +274,47 @@ module_mediator::return_value duplicate_container(module_mediator::arguments_str
 		LOG_PROGRAM_INFO(get_module_part(), "Duplicating the program context.");
 		return notify_excm_new_container(
 			new_container_id,
-			main_function
+			main_function,
+			iterator_lock.first->second.context->preferred_stack_size
 		);
 	}
 
 	return 1;
 }
+module_mediator::return_value get_preferred_stack_size(module_mediator::arguments_string_type bundle) {
+	constexpr std::uint64_t fallback_stack_size = 1024;
+
+	auto arguments = module_mediator::arguments_string_builder::unpack<id_generator::id_type>(bundle);
+	auto iterator_lock = get_iterator(containers, containers_mutex, std::get<0>(arguments));
+	if (iterator_lock.second) {
+		return iterator_lock.first->second.context->preferred_stack_size;
+	}
+
+	LOG_PROGRAM_WARNING(
+		get_module_part(),
+		std::format("Using fallback stack size of {}.", std::get<0>(arguments), fallback_stack_size)
+	);
+
+	return fallback_stack_size;
+}
 
 module_mediator::return_value create_new_program_container(module_mediator::arguments_string_type bundle) {
 	id_generator::id_type id = id_generator::get_id();
-	auto arguments = module_mediator::arguments_string_builder::unpack<void*, std::uint32_t, void*, std::uint32_t, void*, std::uint64_t, void*, std::uint64_t>(bundle);
+	auto arguments = module_mediator::arguments_string_builder::unpack<std::uint64_t, void*, std::uint32_t, void*, std::uint32_t, void*, std::uint64_t, void*, std::uint64_t>(bundle);
+
+	std::uint64_t preferred_stack_size = std::get<0>(arguments);
 	
-	void** code = static_cast<void**>(std::get<0>(arguments));
-	std::uint32_t functions_count = std::get<1>(arguments);
+	void** code = static_cast<void**>(std::get<1>(arguments));
+	std::uint32_t functions_count = std::get<2>(arguments);
 
-	void** exposed_functions = static_cast<void**>(std::get<2>(arguments));
-	std::uint32_t exposed_functions_count = std::get<3>(arguments);
+	void** exposed_functions = static_cast<void**>(std::get<3>(arguments));
+	std::uint32_t exposed_functions_count = std::get<4>(arguments);
 
-	void* jump_table = std::get<4>(arguments);
-	std::uint64_t jump_table_size = std::get<5>(arguments);
+	void* jump_table = std::get<5>(arguments);
+	std::uint64_t jump_table_size = std::get<6>(arguments);
 
-	void** program_strings = static_cast<void**>(std::get<6>(arguments));
-	std::uint64_t program_strings_size = std::get<7>(arguments);
+	void** program_strings = static_cast<void**>(std::get<7>(arguments));
+	std::uint64_t program_strings_size = std::get<8>(arguments);
 	
 	/*
 	* a newly created object can not be deleted or modified if excm does not know about it,
@@ -300,6 +324,7 @@ module_mediator::return_value create_new_program_container(module_mediator::argu
 	insert_new_container(
 		id,
 		program_context::create(
+			preferred_stack_size,
 			code, functions_count, 
 			exposed_functions, exposed_functions_count, 
 			jump_table, jump_table_size,
@@ -307,12 +332,13 @@ module_mediator::return_value create_new_program_container(module_mediator::argu
 		)
 	);
 
-	return notify_excm_new_container(id, code[functions_count - 1]);
+	return notify_excm_new_container(id, code[functions_count - 1], preferred_stack_size);
 }
 module_mediator::return_value create_new_thread(module_mediator::arguments_string_type bundle) {
 	auto arguments = module_mediator::arguments_string_builder::unpack<id_generator::id_type>(bundle);
-	id_generator::id_type container_id = std::get<0>(arguments);
+	std::uint64_t preferred_stack_size{};
 
+	id_generator::id_type container_id = std::get<0>(arguments);
 	id_generator::id_type id = id_generator::get_id();
 
 	/*
@@ -328,6 +354,7 @@ module_mediator::return_value create_new_thread(module_mediator::arguments_strin
 		std::lock_guard lock{ thread_structures_mutex };
 		thread_structures[id] = thread_structure{ iterator_lock.first->first };
 
+		preferred_stack_size = iterator_lock.first->second.context->preferred_stack_size;
 		++iterator_lock.first->second.threads_count;
 	}
 
@@ -336,7 +363,8 @@ module_mediator::return_value create_new_thread(module_mediator::arguments_strin
 		index_getter::excm(),
 		index_getter::excm_on_thread_creation(),
 		container_id,
-		id
+		id,
+		preferred_stack_size
 	);
 }
 

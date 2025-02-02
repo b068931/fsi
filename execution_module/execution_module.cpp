@@ -9,20 +9,19 @@
 #include "../program_loader/functions.h"
 #include "../console_and_debug/logging.h"
 
-const std::size_t thread_state_size = 144;
-extern const std::size_t thread_stack_size = 1000000;
-
 module_mediator::return_value on_thread_creation(module_mediator::arguments_string_type bundle) {
-	auto arguments = module_mediator::arguments_string_builder::unpack<module_mediator::return_value, module_mediator::return_value>(bundle);
+	auto arguments = module_mediator::arguments_string_builder::unpack<module_mediator::return_value, module_mediator::return_value, std::uint64_t>(bundle);
+
 	module_mediator::return_value container_id = std::get<0>(arguments);
 	module_mediator::return_value thread_id = std::get<1>(arguments);
+	std::uint64_t preferred_stack_size = std::get<2>(arguments);
 
 	thread_local_structure* thread_structure = get_thread_local_structure();
 
-	char* thread_state_memory = inner_allocate_thread_memory(thread_id, thread_state_size);
-	char* thread_stack_memory = inner_allocate_thread_memory(thread_id, thread_stack_size);
+	char* thread_state_memory = inner_allocate_thread_memory(thread_id, program_state_manager::thread_state_size);
+	char* thread_stack_memory = inner_allocate_thread_memory(thread_id, preferred_stack_size);
 	
-	char* thread_stack_end = thread_stack_memory + thread_stack_size - (sizeof(module_mediator::one_byte) + sizeof(std::uint64_t));
+	char* thread_stack_end = thread_stack_memory + preferred_stack_size - (sizeof(module_mediator::one_byte) + sizeof(std::uint64_t));
 
 	//get program jump table from resm
 	void* program_jump_table = reinterpret_cast<void*>(
@@ -113,11 +112,13 @@ module_mediator::return_value on_thread_creation(module_mediator::arguments_stri
 	return 0;
 }
 module_mediator::return_value on_container_creation(module_mediator::arguments_string_type bundle) {
-	auto arguments = module_mediator::arguments_string_builder::unpack<module_mediator::return_value, void*>(bundle);
+	auto arguments = module_mediator::arguments_string_builder::unpack<module_mediator::return_value, void*, std::uint64_t>(bundle);
+
 	module_mediator::return_value container_id = std::get<0>(arguments);
 	void* program_main = std::get<1>(arguments);
+	std::uint64_t preferred_stack_size = std::get<2>(arguments);
 
-	get_thread_manager().add_thread_group(container_id);
+	get_thread_manager().add_thread_group(container_id, preferred_stack_size);
 	LOG_PROGRAM_INFO(get_module_part(), "New thread group has been successfully created.");
 
 	return inner_create_thread(container_id, 0, program_main);

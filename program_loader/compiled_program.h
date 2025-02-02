@@ -4,6 +4,8 @@
 #include <cstdint>
 
 struct compiled_program {
+	std::uint64_t preferred_stack_size;
+
 	void** compiled_functions;
 	std::uint32_t functions_count;
 

@@ -54,8 +54,8 @@ private:
 	}
 
 public:
-	void add_thread_group(module_mediator::return_value id) {
-		this->scheduler.add_thread_group(id);
+	void add_thread_group(module_mediator::return_value id, std::uint64_t preferred_stack_size) {
+		this->scheduler.add_thread_group(id, preferred_stack_size);
 	}
 	void add_thread(
 		module_mediator::return_value thread_group_id,

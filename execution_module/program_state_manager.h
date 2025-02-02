@@ -6,6 +6,9 @@
 #include "../module_mediator/fsi_types.h"
 
 class program_state_manager {
+public:
+	static const std::size_t thread_state_size = 144;
+
 private:
 	char* program_state;
 	

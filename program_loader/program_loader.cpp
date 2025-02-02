@@ -18,15 +18,17 @@ std::mutex exposed_functions_mutex{};
 std::unordered_map<std::uintptr_t, std::pair<std::unique_ptr<module_mediator::arguments_string_element[]>, std::string>> exposed_functions{};
 
 module_mediator::return_value add_program(
+	std::uint64_t preferred_stack_size,
 	void** code, std::uint32_t functions_count, 
 	void** exposed_functions, std::uint32_t exposed_functions_count, 
 	void* jump_table, std::uint64_t jump_table_size,
 	void** program_strings, std::uint64_t program_strings_count
 ) {
-	return module_mediator::fast_call<void*, std::uint32_t, void*, std::uint32_t, void*, std::uint64_t, void*, std::uint64_t>(
+	return module_mediator::fast_call<std::uint64_t, void*, std::uint32_t, void*, std::uint32_t, void*, std::uint64_t, void*, std::uint64_t>(
 		get_module_part(),
 		index_getter::resm(), 
 		index_getter::resm_create_new_program_container(),
+		preferred_stack_size,
 		code, functions_count, 
 		exposed_functions, exposed_functions_count, 
 		jump_table, jump_table_size,
@@ -264,6 +266,11 @@ compiled_program compile(
 	std::map<std::uint8_t, std::vector<char>>& machine_codes,
 	std::vector<std::pair<memory_layouts_builder::memory_addresses, memory_layouts_builder::memory_addresses>>& memory_layouts
 ) {
+	constexpr std::uint64_t minimum_stack_size = 32;
+	if (container.preferred_stack_size < minimum_stack_size) {
+		throw program_compilation_error{ std::format("Minimum stack size is {} bytes.", minimum_stack_size) };
+	}
+
 	std::uint32_t functions_count = static_cast<std::uint32_t>(container.function_bodies.size());
 	if (functions_count == 0) {
 		throw program_compilation_error{ "Loaded program has no executable code." };
@@ -305,6 +312,7 @@ compiled_program compile(
 
 		merge_exposed_functions(loaded_exposed_functions);
 		return compiled_program{
+			container.preferred_stack_size,
 			loaded_functions_addresses,
 			functions_count,
 			exposed_functions_addresses,
@@ -354,6 +362,7 @@ module_mediator::return_value load_program_to_memory(module_mediator::arguments_
 		);
 
 		return add_program(
+			result.preferred_stack_size,
 			result.compiled_functions,
 			result.functions_count,
 			result.exposed_functions,

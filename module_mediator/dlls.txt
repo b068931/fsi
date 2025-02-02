@@ -1,7 +1,7 @@
 --part that actually makes everything work
 [excm:Dynamic Libraries/Core/Execution Module.dll]
-on_container_creation=ullong pointer
-on_thread_creation=ullong ullong
+on_container_creation=ullong pointer ullong
+on_thread_creation=ullong ullong ullong
 
 create_thread=ullong pointer pointer ullong
 self_duplicate=pointer pointer ullong
@@ -24,8 +24,9 @@ add_container_on_destroy=ullong pointer pointer
 add_thread_on_destroy=ullong pointer pointer
 
 duplicate_container=ullong pointer
+get_preferred_stack_size=ullong
 
-create_new_program_container=pointer uint pointer uint pointer ullong pointer ullong
+create_new_program_container=ullong pointer uint pointer uint pointer ullong pointer ullong
 create_new_thread=ullong
 
 allocate_program_memory=ullong ullong

@@ -158,15 +158,17 @@ public:
 	};
 
 	struct schedule_information {
-		module_mediator::return_value thread_id;
-		module_mediator::return_value thread_group_id;
+		module_mediator::return_value thread_id{};
+		module_mediator::return_value thread_group_id{};
 
-		module_mediator::return_value priority;
-		thread_states state;
+		module_mediator::return_value priority{};
+		thread_states state{};
 		
-		void* thread_state;
-		const void* jump_table;
-		put_back_structure_type put_back_structure; //must be used with scheduler::put_back
+		void* thread_state{};
+		const void* jump_table{};
+		std::uint64_t preferred_stack_size{};
+
+		put_back_structure_type put_back_structure{}; //must be used with scheduler::put_back
 	};
 
 private:
@@ -205,21 +207,25 @@ private:
 
 	struct thread_group {
 		module_mediator::return_value id;
+		std::uint64_t preferred_stack_size;
 
 		std::mutex lock;
 		priority_list<executable_thread, module_mediator::return_value> threads;
 
-		thread_group(module_mediator::return_value id)
-			:id{id}
+		thread_group(module_mediator::return_value id, std::uint64_t preferred_stack_size)
+			:id{ id },
+			preferred_stack_size{ preferred_stack_size }
 		{}
 
 		thread_group(thread_group&& thread_group) noexcept
 			:id{ thread_group.id },
-			threads{ std::move(thread_group.threads) }
+			threads{ std::move(thread_group.threads) },
+			preferred_stack_size{ thread_group.preferred_stack_size }
 		{}
 		void operator= (thread_group&& thread_group) noexcept {
 			this->id = thread_group.id;
 			this->threads = std::move(thread_group.threads);
+			this->preferred_stack_size = thread_group.preferred_stack_size;
 		}
 	};
 
@@ -302,13 +308,14 @@ public:
 					clock_list_lock.unlock();
 
 					std::pair<executable_thread*, module_mediator::return_value> thread = current_thread_group->threads.find(
-						[](executable_thread& thread_obj) {
+						[destination, current_thread_group](executable_thread& thread_obj) {
 							if (thread_obj.lock.try_lock()) { //check if thread is already taken
 								if (
 									(thread_obj.state == thread_states::runnable) || 
 									(thread_obj.state == thread_states::startup)
 								) { //check if thread is runnable
 									//lock will be released in put_back
+									destination->preferred_stack_size = current_thread_group->preferred_stack_size;
 									return true;
 								}
 								else {
@@ -353,12 +360,12 @@ public:
 			}
 		}
 	}
-	void add_thread_group(module_mediator::return_value id) {
+	void add_thread_group(module_mediator::return_value id, std::uint64_t preferred_stack_size) {
 		thread_group_proxy proxy{};
 		
 		{
 			std::lock_guard<std::mutex> clock_list_lock{ this->clock_list_mutex };
-			proxy = this->thread_groups.push_after(id);
+			proxy = this->thread_groups.push_after(id, preferred_stack_size);
 		}
 
 		std::lock_guard<std::mutex> thread_groups_hash_table_lock{ this->thread_groups_hash_table_mutex };

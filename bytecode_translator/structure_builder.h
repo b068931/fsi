@@ -358,7 +358,7 @@ public:
 		{}
 	};
 	struct file {
-		std::uint64_t stack_size{1000000};
+		std::uint64_t stack_size{ 0 };
 		
 		std::vector<function*> exposed_functions;
 		std::map<std::string, string> program_strings;

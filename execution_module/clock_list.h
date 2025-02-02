@@ -85,7 +85,7 @@ public:
 
 	template<typename... args>
 	proxy push_after(args&&... values) {
-		list_element* new_element = new list_element{ std::forward<args>(values)... };
+		list_element* new_element = new list_element{ T{ std::forward<args>(values)... }, nullptr, nullptr };
 		if (this->elements_count == 0) {
 			this->hand = new_element;
 			

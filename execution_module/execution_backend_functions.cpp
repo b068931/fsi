@@ -8,8 +8,6 @@
 #include "../module_mediator/module_part.h"
 #include "../module_mediator/fsi_types.h"
 
-extern const std::size_t thread_stack_size;
-
 module_mediator::return_value inner_deallocate_thread(module_mediator::return_value thread_id) {
 	return module_mediator::fast_call<module_mediator::return_value>(
 		get_module_part(),
@@ -32,6 +30,7 @@ void inner_delete_running_thread() {
 	module_mediator::return_value thread_id = thread_structure->currently_running_thread_information.thread_id;
 	module_mediator::return_value thread_group_id = thread_structure->currently_running_thread_information.thread_group_id;
 	void* thread_state = thread_structure->currently_running_thread_information.thread_state;
+	std::uint64_t preferred_stack_size = thread_structure->currently_running_thread_information.preferred_stack_size;
 
 	program_state_manager program_state_manager{ 
 		static_cast<char*>(thread_state) 
@@ -42,7 +41,7 @@ void inner_delete_running_thread() {
 		index_getter::resm(),
 		index_getter::resm_deallocate_thread_memory(),
 		thread_id,
-		reinterpret_cast<void*>(program_state_manager.get_stack_start(thread_stack_size))
+		reinterpret_cast<void*>(program_state_manager.get_stack_start(preferred_stack_size))
 	);
 
 	module_mediator::fast_call<module_mediator::return_value, void*>(

@@ -10,12 +10,14 @@ private:
 	std::mutex references_mutex{};
 
 	program_context(
+		std::uint64_t preferred_stack_size,
 		void** code, std::uint32_t functions_count, 
 		void** exposed_functions, std::uint32_t exposed_functions_count, 
 		void* jump_table, std::uint64_t jump_table_size,
 		void** program_strings, std::uint64_t program_strings_size
 	)
-		:code{ code },
+		:preferred_stack_size{ preferred_stack_size },
+		code{ code },
 		functions_count{ functions_count },
 		exposed_functions{ exposed_functions },
 		exposed_functions_count{ exposed_functions_count },
@@ -26,6 +28,8 @@ private:
 	{}
 
 public:
+	std::uint64_t preferred_stack_size{};
+
 	void** code{};
 	std::uint32_t functions_count{};
 
@@ -39,12 +43,14 @@ public:
 	std::uint64_t program_strings_size{};
 
 	static program_context* create(
+		std::uint64_t preferred_stack_size,
 		void** code, std::uint32_t functions_count, 
 		void** exposed_functions, std::uint32_t exposed_functions_count, 
 		void* jump_table, std::uint64_t jump_table_size,
 		void** program_strings, std::uint64_t program_strings_size
 	) {
 		return new program_context{ 
+			preferred_stack_size,
 			code, functions_count, 
 			exposed_functions, exposed_functions_count, 
 			jump_table, jump_table_size,

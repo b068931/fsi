@@ -1,3 +1,4 @@
+$stack-size 100
 from prts import <io.log.info, io.log.warning, pointer.allocate, pointer.deallocate, this-thread.yield, threading.create-group>
 
 $define-string ping ''''ping''''

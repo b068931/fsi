@@ -140,7 +140,4 @@
       <Filter>Examples</Filter>
     </CopyFileToFolders>
   </ItemGroup>
-  <ItemGroup>
-    <Text Include="Dynamic Call With Error.txt" />
-  </ItemGroup>
 </Project>
