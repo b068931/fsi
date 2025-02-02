@@ -32,9 +32,12 @@ public:
 			helper.current_function.set_current_function(nullptr);
 			helper.instruction_index = 0;
 		}
-		else if ((token != structure_builder::source_file_token::function_body_end) && (token != structure_builder::source_file_token::jump_point) && (token != structure_builder::source_file_token::endif_keyword)) {
+		else if ((token != structure_builder::source_file_token::function_body_end) && (token != structure_builder::source_file_token::jump_point) && (token != structure_builder::source_file_token::endif_keyword) && (!read_map.is_token_generator_name_empty())) {
 			helper.current_function.add_new_instruction(token);
 			++helper.instruction_index;
+		}
+		else if ((token == structure_builder::source_file_token::expression_end) && (!read_map.is_token_generator_name_empty())) {
+			read_map.exit_with_error();
 		}
 	}
 };

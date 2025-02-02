@@ -1,12 +1,11 @@
-$stack-size 100
+$stack-size 100;
 from prts import <io.log.info, pointer.allocate, pointer.deallocate>
 
 $define-string message ''''Hello World!''''
 
-function main()
-main {
-    $declare pointer message-storage
-    $declare pointer null
+function main() {
+    $declare pointer message-storage;
+    $declare pointer null;
     
     message-storage: prts->pointer.allocate(size-of message)
     copy-string variable pointer message-storage, string message;

@@ -1,4 +1,4 @@
-$stack-size 100
+$stack-size 100;
 from prts import <
     io.log.info, 
     pointer.allocate,
@@ -7,18 +7,17 @@ from prts import <
 >
 
 function hello-world(pointer the-message)
-hello-world {
-    $declare pointer null
-    void: prts->io.log.info(variable pointer null, immediate eight-bytes 0, variable pointer null, variable pointer the-message)
-    the-message: prts->pointer.deallocate()
-}
+ {
+    $declare pointer null;
+    void: prts->io.log.info(variable pointer null, immediate eight-bytes 0, variable pointer null, variable pointer the-message);
+    the-message: prts->pointer.deallocate();
+};
 
 $define-string message ''''Hello World! With extra steps.''''
 
-function main()
-main {
-    $declare pointer message-storage
-    $declare eight-bytes function-address
+function main(){
+    $declare pointer message-storage;
+    $declare eight-bytes function-address;
     
     message-storage: prts->pointer.allocate(size-of message)
     copy-string variable pointer message-storage, string message;
@@ -28,5 +27,5 @@ main {
 	    variable eight-bytes function-address, 
 	    variable pointer message-storage,
         variable pointer message-storage 
-    )
-}
+    );;;
+};

@@ -62,4 +62,20 @@ public:
 	}
 };
 
+class declaration_or_definition_state : public state_type {
+public:
+	virtual void handle_token(
+		structure_builder::file& output_file_structure,
+		structure_builder::builder_parameters& helper,
+		structure_builder::read_map_type& read_map
+	) override {
+		if (!read_map.is_token_generator_name_empty()) {
+			read_map.exit_with_error();
+		}
+
+		helper.current_function.set_current_function(&output_file_structure.functions.back());
+	}
+
+};
+
 #endif

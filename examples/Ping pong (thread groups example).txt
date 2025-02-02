@@ -1,4 +1,4 @@
-$stack-size 100
+$stack-size 100;
 from prts import <io.log.info, io.log.warning, pointer.allocate, pointer.deallocate, this-thread.yield, threading.create-group>
 
 $define-string ping ''''ping''''
@@ -6,18 +6,11 @@ $define-string pong ''''pong''''
 
 $define-string warning ''''You should start this application with only one executor, or the output may look strange.''''
 
-function get-ping-string()
-get-ping-string {
-    $declare pointer ping-storage
-    ping-storage: prts->pointer.allocate(size-of ping)
-
-    copy-string variable pointer ping-storage, string ping;
-    save-value variable pointer ping-storage;
-}
+function get-ping-string() ;
 
 function get-pong-string()
-get-pong-string {
-    $declare pointer pong-storage
+{
+    $declare pointer pong-storage;
     pong-storage: prts->pointer.allocate(size-of pong)
 
     copy-string variable pointer pong-storage, string pong;
@@ -25,7 +18,8 @@ get-pong-string {
 }
 
 function choose-string(one-byte is-ping)
-choose-string {
+
+{
     compare variable one-byte is-ping, immediate one-byte 1;
     jump-equal point ping;
 
@@ -39,9 +33,9 @@ choose-string {
 }
 
 function show-passed-message-and-switch(eight-bytes counter, one-byte is-ping)
-show-passed-message-and-switch {
-    $declare pointer message
-    $declare pointer null
+{
+    $declare pointer message;
+    $declare pointer null;
 
     choose-string(variable one-byte is-ping)
     load-value variable pointer message;
@@ -62,9 +56,9 @@ show-passed-message-and-switch {
 }
 
 function show-warning()
-show-warning {
-    $declare pointer warning-message
-    $declare pointer null
+{
+    $declare pointer warning-message;
+    $declare pointer null;
 
     warning-message: prts->pointer.allocate(size-of warning)
     copy-string variable pointer warning-message, string warning;
@@ -73,10 +67,19 @@ show-warning {
     warning-message: prts->pointer.deallocate()
 }
 
-function main()
-main {
+function main();
+main
+{
     show-warning()
 
     void: prts->threading.create-group(function-name show-passed-message-and-switch, immediate eight-bytes 5, immediate one-byte 0)
     void: prts->threading.create-group(function-name show-passed-message-and-switch, immediate eight-bytes 5, immediate one-byte 1)
+}
+
+get-ping-string {
+    $declare pointer ping-storage;
+    ping-storage: prts->pointer.allocate(size-of ping)
+
+    copy-string variable pointer ping-storage, string ping;
+    save-value variable pointer ping-storage;
 }

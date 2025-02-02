@@ -1,25 +1,27 @@
-$stack-size 100
-from prts import <io.log.info, pointer.allocate, pointer.deallocate>
+$stack-size 100;
+from prts import <io.log.info, pointer.allocate, pointer.deallocate>; /*in this context ';' is considered to be a trailing expression end token, it will be ignored*/
 
-$define DEFINE-MESSAGE
-$undefine DEFINE-MESSAGE
+$define DEFINE-MESSAGE;
+$undefine DEFINE-MESSAGE;
 
-$if-defined DEFINE-MESSAGE
-$define-string message ''''Hello World!''''
-$endif
+$if-defined DEFINE-MESSAGE;
+$define-string message ''''Hello World!'''';
+$endif;
 
-$if-not-defined DEFINE-MESSAGE
-$define-string message ''''This is the wrong message. Remove undefine.''''
-$endif
+$if-not-defined DEFINE-MESSAGE;
+$define-string message ''''This is the wrong message. Remove undefine.'''';
+$endif;
 
-function main()
-main {
-    $declare pointer message-storage
-    $declare pointer null
-    
-    message-storage: prts->pointer.allocate(size-of message)
+function main() {
+    $declare pointer message-storage;
+    $declare pointer null;
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    message-storage: prts->pointer.allocate(size-of message);
     copy-string variable pointer message-storage, string message;
 
-    void: prts->io.log.info(variable pointer null, immediate eight-bytes 0, variable pointer null, variable pointer message-storage)
-    message-storage: prts->pointer.deallocate()
+    void: prts->io.log.info(variable pointer null, immediate eight-bytes 0, variable pointer null, variable pointer message-storage);
+    message-storage: prts->pointer.deallocate();
 }
+
+$endif; /*I guess we are making trailing endifs now*/
+

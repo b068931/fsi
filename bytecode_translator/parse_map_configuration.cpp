@@ -91,7 +91,7 @@ state_settings& configure_comment(states_builder_type& builder) {
 void configure_special_instruction_end(state_settings& last_state) {
 	last_state
 		.set_redirection_for_token(
-			structure_builder::source_file_token::name,
+			structure_builder::source_file_token::expression_end,
 			generic_parser::state_action::pop_top,
 			nullptr
 		);
@@ -103,16 +103,16 @@ state_settings& configure_special_instructions(states_builder_type& builder) {
 	};
 
 	state_settings& define = builder.create_state<define_state>()
-		.set_error_message("$define expects one name, got another token instead.")
-		.set_handle_tokens({ structure_builder::source_file_token::name });
+		.set_error_message("';' was expected for $define.")
+		.set_handle_tokens({ structure_builder::source_file_token::expression_end });
 
 	state_settings& undefine = builder.create_state<undefine_state>()
-		.set_error_message("$undefine expects one name, got another token instead.")
-		.set_handle_tokens({ structure_builder::source_file_token::name });
+		.set_error_message("';' was expected for $undefine.")
+		.set_handle_tokens({ structure_builder::source_file_token::expression_end });
 
 	state_settings& redefine_value = builder.create_state<redefine_value_state>()
-		.set_error_message("$redefine expects two names, got another token instead.")
-		.set_handle_tokens({ structure_builder::source_file_token::name });
+		.set_error_message("';' was expected for $redefine.")
+		.set_handle_tokens({ structure_builder::source_file_token::expression_end });
 
 	state_settings& redefine_name = builder.create_state<redefine_name_state>()
 		.set_error_message("$redefine expects two names, got another token instead.")
@@ -133,40 +133,40 @@ state_settings& configure_special_instructions(states_builder_type& builder) {
 		);
 
 	state_settings& if_defined = builder.create_state<if_defined_state>()
-		.set_error_message("$ifdef expects only one name, got another token instead")
-		.set_handle_tokens({ structure_builder::source_file_token::name })
+		.set_error_message("';' was expected for $if-defined.")
+		.set_handle_tokens({ structure_builder::source_file_token::expression_end })
 		.add_custom_function(
 			ifdef_ifndef_pop_check_custom_function,
 			generic_parser::state_action::pop_top,
 			nullptr
 		)
 		.set_redirection_for_token(
-			structure_builder::source_file_token::name,
+			structure_builder::source_file_token::expression_end,
 			generic_parser::state_action::change_top,
 			ignore_all_until_endif
 		);
 
 	state_settings& if_not_defined = builder.create_state<if_not_defined_state>()
-		.set_error_message("$ifndef expects only one name, got another token instead.")
-		.set_handle_tokens({ structure_builder::source_file_token::name })
+		.set_error_message("';' was expected for $if-not-defined")
+		.set_handle_tokens({ structure_builder::source_file_token::expression_end })
 		.add_custom_function(
 			ifdef_ifndef_pop_check_custom_function,
 			generic_parser::state_action::pop_top,
 			nullptr
 		)
 		.set_redirection_for_token(
-			structure_builder::source_file_token::name,
+			structure_builder::source_file_token::expression_end,
 			generic_parser::state_action::change_top,
 			ignore_all_until_endif
 		);
 		
 	state_settings& stack_size = builder.create_state<stack_size_state>()
-		.set_error_message("$stack_size expects only one number.")
-		.set_handle_tokens({ structure_builder::source_file_token::name });
+		.set_error_message("';' was expected for $stack-size.")
+		.set_handle_tokens({ structure_builder::source_file_token::expression_end });
 
 	state_settings& declare_name = builder.create_state<declare_name_state>()
-		.set_error_message("$decl expects a type and only one name.")
-		.set_handle_tokens({ structure_builder::source_file_token::name });
+		.set_error_message("';' was expected for $declare.")
+		.set_handle_tokens({ structure_builder::source_file_token::expression_end });
 
 	state_settings& declare_type = builder.create_state<declare_type_state>()
 		.set_error_message("Unexpected type.")
@@ -420,14 +420,30 @@ state_settings& configure_instruction_arguments(states_builder_type& builder) {
 	return instruction_arguments_base;
 }
 
-state_settings& configure_function_declaration(states_builder_type& builder) {
+state_settings& configure_function_declaration(states_builder_type& builder, state_settings& function_body) {
+	state_settings& declaration_or_definition = builder.create_state<declaration_or_definition_state>()
+		.set_error_message("Expected ';' or '{'.")
+		.set_handle_tokens(
+			{ structure_builder::source_file_token::function_body_start }
+		)
+		.set_redirection_for_token(
+			structure_builder::source_file_token::expression_end,
+			generic_parser::state_action::pop_top,
+			nullptr
+		)
+		.set_redirection_for_token(
+			structure_builder::source_file_token::function_body_start,
+			generic_parser::state_action::change_top,
+			function_body
+		);
+
 	state_settings& function_argument_name = builder.create_state<function_argument_name_state>()
 		.set_error_message("Unexpected token inside function arguments. A name for a function argument was expected.")
 		.set_handle_tokens({ structure_builder::source_file_token::coma, structure_builder::source_file_token::function_args_end })
 		.set_redirection_for_token(
 			structure_builder::source_file_token::function_args_end,
-			generic_parser::state_action::pop_top,
-			nullptr
+			generic_parser::state_action::change_top,
+			declaration_or_definition
 		);
 
 
@@ -442,8 +458,8 @@ state_settings& configure_function_declaration(states_builder_type& builder) {
 		)
 		.set_redirection_for_token(
 			structure_builder::source_file_token::function_args_end,
-			generic_parser::state_action::pop_top,
-			nullptr
+			generic_parser::state_action::change_top,
+			declaration_or_definition
 		);
 
 	state_settings& function_name = builder.create_state<function_name_state>()
@@ -497,7 +513,7 @@ state_settings& configure_inside_function(states_builder_type& builder, state_se
 		.set_error_message("Unexpected token inside function. You were expected to introduce a jump point, instruction, function or module call, etc.")
 		.set_handle_tokens( //jump_point and function_body_end are useless? -- i have zero idea what this thing means after several months (or years?) of it being here
 				{ //it is actually kind of funny that I did not manage to come up with something better than this
-				structure_builder::source_file_token::function_args_start,
+				structure_builder::source_file_token::function_args_start, structure_builder::source_file_token::expression_end,
 				structure_builder::source_file_token::module_return_value, structure_builder::source_file_token::jump_point,
 				structure_builder::source_file_token::function_body_end, structure_builder::source_file_token::add_instruction_keyword,
 				structure_builder::source_file_token::signed_add_instruction_keyword, structure_builder::source_file_token::multiply_instruction_keyword,
@@ -576,8 +592,8 @@ void structure_builder::configure_parse_map() {
 	state_settings& modules_import = configure_modules_import(builder);
 	state_settings& comment = configure_comment(builder);
 	state_settings& special_instruction = configure_special_instructions(builder);
-	state_settings& function_declaration = configure_function_declaration(builder);
 	state_settings& function_body = configure_inside_function(builder, comment, special_instruction);
+	state_settings& function_declaration = configure_function_declaration(builder, function_body);
 	
 	state_settings& base = builder.create_state<main_state>()
 		.set_as_starting_state()
@@ -586,6 +602,7 @@ void structure_builder::configure_parse_map() {
 			{
 				source_file_token::end_of_file,
 				source_file_token::endif_keyword,
+				source_file_token::expression_end,
 				source_file_token::function_body_start
 			}
 		)

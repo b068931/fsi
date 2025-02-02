@@ -1,11 +1,10 @@
-$stack-size 1024
+$stack-size 1024;
 from prts import <io.log.info, pointer.allocate, pointer.deallocate>
 
-$redefine symbol-base 48
+$redefine symbol-base 48;
 
-function copy(pointer destination, pointer source, eight-bytes size)
-copy {
-    $declare one-byte why-not
+function copy(pointer destination, pointer source, eight-bytes size) {
+    $declare one-byte why-not;
     move variable one-byte why-not, immediate one-byte 0;
 
     @repeat;
@@ -20,9 +19,8 @@ copy {
     @end;
 }
 
-function reversed-copy(pointer destination, pointer source, eight-bytes size)
-reversed-copy {
-    $declare eight-bytes destination-index
+function reversed-copy(pointer destination, pointer source, eight-bytes size) {
+    $declare eight-bytes destination-index;
     move variable eight-bytes destination-index, immediate eight-bytes 0;
 
     @repeat;
@@ -38,18 +36,17 @@ reversed-copy {
     @end;
 }
 
-function ebyte-to-string(eight-bytes value)
-ebyte-to-string {
-    $declare pointer result
-    $declare pointer result-copy
+function ebyte-to-string(eight-bytes value) {
+    $declare pointer result;
+    $declare pointer result-copy;
 
-    $declare eight-bytes result-size
+    $declare eight-bytes result-size;
     move variable eight-bytes result-size, immediate eight-bytes 0;
 
-    $declare eight-bytes result-copy-size
+    $declare eight-bytes result-copy-size;
     move variable eight-bytes result-copy-size, immediate eight-bytes 0;
 
-    $declare eight-bytes symbol
+    $declare eight-bytes symbol;
 
     @repeat;
     divide variable eight-bytes value, immediate eight-bytes 10;
@@ -83,10 +80,9 @@ ebyte-to-string {
     save-value variable pointer result-copy;
 }
 
-function main()
-main {
-    $declare pointer message
-    $declare pointer null
+function main() {
+    $declare pointer message;
+    $declare pointer null;
 
     ebyte-to-string(immediate eight-bytes 22082023)
     load-value variable pointer message;

@@ -102,7 +102,7 @@ int main(int argc, char** argv) {
 						{":", structure_builder::source_file_token::module_return_value},
 						{"@", structure_builder::source_file_token::jump_point},
 						{"->", structure_builder::source_file_token::module_call},
-						{"$endif", structure_builder::source_file_token::endif_keyword},
+						{"$endif;", structure_builder::source_file_token::endif_keyword},
 						{"\r\n", structure_builder::source_file_token::new_line}, //despite the fact that new line is a hard symbol, it won't be passed to the generic_builder. it is used to find the line with invalid syntax
 						{"\n", structure_builder::source_file_token::new_line},
 						{"''''", structure_builder::source_file_token::string_separator}
@@ -151,6 +151,7 @@ int main(int argc, char** argv) {
 		std::cout << "PROGRAM LOGIC WARNING: function with name '" + name + "' has empty body." << std::endl;
 	}
 
+	std::cout << "Chosen stack size: " << parser_value.stack_size << " bytes." << std::endl;
 	if (parser_value.stack_size == 0) {
 		std::cout << "PROGRAM LOGIC ERROR: You must explicitly specify the stack size that your program will use." << std::endl;
 	}
