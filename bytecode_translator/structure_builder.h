@@ -4,9 +4,12 @@
 #include <vector>
 #include <tuple>
 #include <iostream>
-#include <sstream>
+#include <string>
+#include <cstdlib>
 #include <list>
 #include <stdexcept>
+#include <format>
+#include <cerrno>
 
 #include "../generic_parser/token_generator.h"
 #include "../generic_parser/read_map.h"
@@ -462,16 +465,38 @@ public:
 
 			template<typename T>
 			T translate_name_to_integer(std::string name) const {
-				std::stringstream value{ this->translate_name(std::move(name)) };
-				T new_value = 0;
+				std::string value{ this->translate_name(std::move(name)) };
+				if (!value.empty()) {
+					int base = 0;
+					switch (value[0]) {
+					case 'd':
+						base = 10;
+						break;
+					case 'b':
+						base = 2;
+						break;
+					case 'o':
+						base = 8;
+						break;
+					case 'h':
+						base = 16;
+						break;
+					default:
+						throw std::invalid_argument{ "Unknown base." };
+					}
 
-				value >> new_value;
-				if (!value.eof()) {
-					throw std::invalid_argument{"Value is not an integer."};
-					return {};
+					char* last_symbol = nullptr;
+					unsigned long long result = std::strtoull(value.c_str() + 1, &last_symbol, base);
+					if ((last_symbol - value.c_str()) == value.size()) {
+						if ((errno == ERANGE) || (result != static_cast<T>(result))) {
+							throw std::invalid_argument{ "Value is too big to be converted." };
+						}
+						
+						return static_cast<T>(result);
+					}
 				}
-
-				return new_value;
+				
+				throw std::invalid_argument{ std::format("Was unable to convert {} to a number.", value) };
 			}
 			std::string translate_name(std::string name) const { //translate redefined name to a normal name
 				std::string generated_name = std::move(name);

@@ -2,5 +2,5 @@ function
 
 
 main( );main	{main
-()$stack-size 100;}
+()$stack-size d1000000000;}
 $main-function main;

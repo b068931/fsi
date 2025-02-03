@@ -1,4 +1,4 @@
-$stack-size 100;
+$stack-size hff;
 from prts import <io.log.info, pointer.allocate, pointer.deallocate>
 
 $define-string stack-size ''''Hello World! With tons of shady redefinitions.''''
@@ -18,7 +18,7 @@ fun function() {
 
     void: prts->io.log.info(
         variable pointer copy-string , 
-        immediate eight-bytes 0, 
+        immediate eight-bytes d0, 
         variable pointer copy-string
         , 
         variable pointer pointer

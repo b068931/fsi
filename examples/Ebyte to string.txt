@@ -1,14 +1,14 @@
-$stack-size 1024;
+$stack-size d1024;
 from prts import <io.log.info, pointer.allocate, pointer.deallocate>
 
-$redefine symbol-base 48;
+$redefine symbol-base d48;
 
 function copy(pointer destination, pointer source, eight-bytes size) {
     $declare one-byte why-not;
-    move variable one-byte why-not, immediate one-byte 0;
+    move variable one-byte why-not, immediate one-byte d0;
 
     @repeat;
-    compare variable eight-bytes size, immediate eight-bytes 0;
+    compare variable eight-bytes size, immediate eight-bytes d0;
     jump-equal point end;
 
     decrement variable eight-bytes size;
@@ -21,10 +21,10 @@ function copy(pointer destination, pointer source, eight-bytes size) {
 
 function reversed-copy(pointer destination, pointer source, eight-bytes size) {
     $declare eight-bytes destination-index;
-    move variable eight-bytes destination-index, immediate eight-bytes 0;
+    move variable eight-bytes destination-index, immediate eight-bytes d0;
 
     @repeat;
-    compare variable eight-bytes size, immediate eight-bytes 0;
+    compare variable eight-bytes size, immediate eight-bytes d0;
     jump-equal point end;
 
     decrement variable eight-bytes size;
@@ -41,15 +41,15 @@ function ebyte-to-string(eight-bytes value) {
     $declare pointer result-copy;
 
     $declare eight-bytes result-size;
-    move variable eight-bytes result-size, immediate eight-bytes 0;
+    move variable eight-bytes result-size, immediate eight-bytes d0;
 
     $declare eight-bytes result-copy-size;
-    move variable eight-bytes result-copy-size, immediate eight-bytes 0;
+    move variable eight-bytes result-copy-size, immediate eight-bytes d0;
 
     $declare eight-bytes symbol;
 
     @repeat;
-    divide variable eight-bytes value, immediate eight-bytes 10;
+    divide variable eight-bytes value, immediate eight-bytes d10;
     increment variable eight-bytes result-copy-size;
 
     result-copy: prts->pointer.allocate(variable eight-bytes result-copy-size)
@@ -65,7 +65,7 @@ function ebyte-to-string(eight-bytes value) {
     move-pointer variable pointer result, variable pointer result-copy;
     move variable eight-bytes result-size, variable eight-bytes result-copy-size;
 
-    compare variable eight-bytes value, immediate eight-bytes 0;
+    compare variable eight-bytes value, immediate eight-bytes d0;
 
     jump-equal point end;
     jump point repeat;
@@ -85,9 +85,9 @@ function main() {
     $declare pointer message;
     $declare pointer null;
 
-    ebyte-to-string(immediate eight-bytes 22082023)
+    ebyte-to-string(immediate eight-bytes d22082023)
     load-value variable pointer message;
 
-    void: prts->io.log.info(variable pointer null, immediate eight-bytes 0, variable pointer null, variable pointer message)
+    void: prts->io.log.info(variable pointer null, immediate eight-bytes d0, variable pointer null, variable pointer message)
     message: prts->pointer.deallocate()
 }

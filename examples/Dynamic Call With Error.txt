@@ -1,4 +1,4 @@
-$stack-size 100;
+$stack-size d100;
 from prts import <
     io.log.info, 
     pointer.allocate,
@@ -9,7 +9,7 @@ from prts import <
 function hello-world(pointer the-message)
  {
     $declare pointer null;
-    void: prts->io.log.info(variable pointer null, immediate eight-bytes 0, variable pointer null, variable pointer the-message);
+    void: prts->io.log.info(variable pointer null, immediate eight-bytes d0, variable pointer null, variable pointer the-message);
     the-message: prts->pointer.deallocate();
 };
 

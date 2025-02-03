@@ -1,7 +1,8 @@
 #include "pch.h"
 #include "console_and_debug.h"
 
-std::mutex global_output_lock;
+std::chrono::steady_clock::time_point starting_time;
+std::mutex global_debug_output_lock;
 
 enum class message_type {
 	info,
@@ -32,16 +33,19 @@ void decode_message_type(message_type type) {
 	std::cerr << ']';
 }
 void log_message(message_type type, const char* file_name, std::size_t file_line, const char* function_name, const char* message) {
-	std::lock_guard<std::mutex> lock{::global_output_lock};
-	
-	decode_message_type(type);
-	std::cerr << std::format(
-		"[FILE NAME: {}, FILE LINE: {}, FUNCTION NAME: {}] \x1b[97m{}\033[0m", 
+	auto timestamp = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - ::starting_time).count();
+	std::string result_message = std::format(
+		" [TIME: {}] [FILE NAME: {}, FILE LINE: {}, FUNCTION NAME: {}] \x1b[97m{}\033[0m",
+		timestamp,
 		(file_name == nullptr) ? "UNSPECIFIED" : file_name,
 		(file_line == 0) ? "UNSPECIFIED" : std::to_string(file_line),
 		(function_name == nullptr) ? "UNSPECIFIED" : function_name,
 		message
-	) << std::endl;
+	);
+
+	std::lock_guard<std::mutex> lock{ ::global_debug_output_lock };
+	decode_message_type(type);
+	std::cerr << result_message << std::endl;
 }
 
 void generic_log_message(message_type type, module_mediator::arguments_string_type bundle) {
@@ -127,6 +131,7 @@ module_mediator::return_value program_fatal(module_mediator::arguments_string_ty
 
 void initialize_m(module_mediator::module_part* part) {
 	::part = part;
+	::starting_time = std::chrono::steady_clock::now();
 
 	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
 	if (hOut == INVALID_HANDLE_VALUE)
