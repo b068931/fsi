@@ -139,6 +139,10 @@ namespace generic_parser {
 		}
 
 		bool is_token_from_names_stack() const { return this->is_names_stack_token; }
+		void set_token_from_names_stack(bool value) {
+			this->is_names_stack_token = value;
+		}
+
 		bool is_name_empty() const { return this->name.empty(); }
 		token_type translate_string_through_names_stack(const std::string& name) {
 			auto found_token = this->find_name_in_names_stack(name);

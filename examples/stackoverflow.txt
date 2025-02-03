@@ -3,3 +3,4 @@ function
 
 main( );main	{main
 ()$stack-size 100;}
+$main-function main;

@@ -4,6 +4,7 @@ from prts import <io.log.info, pointer.allocate, pointer.deallocate>
 $define-string message ''''Hello World!''''
 
 function main() {
+    $main-function main;
     $declare pointer message-storage;
     $declare pointer null;
     

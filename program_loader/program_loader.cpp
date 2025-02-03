@@ -18,17 +18,17 @@ std::mutex exposed_functions_mutex{};
 std::unordered_map<std::uintptr_t, std::pair<std::unique_ptr<module_mediator::arguments_string_element[]>, std::string>> exposed_functions{};
 
 module_mediator::return_value add_program(
-	std::uint64_t preferred_stack_size,
+	std::uint64_t preferred_stack_size, std::uint32_t main_function_index,
 	void** code, std::uint32_t functions_count, 
 	void** exposed_functions, std::uint32_t exposed_functions_count, 
 	void* jump_table, std::uint64_t jump_table_size,
 	void** program_strings, std::uint64_t program_strings_count
 ) {
-	return module_mediator::fast_call<std::uint64_t, void*, std::uint32_t, void*, std::uint32_t, void*, std::uint64_t, void*, std::uint64_t>(
+	return module_mediator::fast_call<std::uint64_t, std::uint32_t, void*, std::uint32_t, void*, std::uint32_t, void*, std::uint64_t, void*, std::uint64_t>(
 		get_module_part(),
 		index_getter::resm(), 
 		index_getter::resm_create_new_program_container(),
-		preferred_stack_size,
+		preferred_stack_size, main_function_index,
 		code, functions_count, 
 		exposed_functions, exposed_functions_count, 
 		jump_table, jump_table_size,
@@ -279,10 +279,15 @@ compiled_program compile(
 	void** exposed_functions_addresses = new void* [container.exposed_functions.size()] { nullptr };
 	void** loaded_functions_addresses = new void* [functions_count] { nullptr };
 
+	std::uint32_t main_function_index = functions_count;
 	try {
 		std::unordered_map<std::uintptr_t, std::pair<std::unique_ptr<module_mediator::arguments_string_element[]>, std::string>> loaded_exposed_functions{};
 		for (std::uint32_t function_index = 0; function_index < functions_count; ++function_index) {
 			runs_container::function& current_function = container.function_bodies[function_index];
+			if (current_function.function_signature == container.main_function_id) {
+				main_function_index = function_index;
+			}
+
 			auto[loaded_function, prologue_size] = compile_function(
 				function_index,
 				current_function,
@@ -307,11 +312,16 @@ compiled_program compile(
 			jump_table.remap_function_address(current_function.function_signature, reinterpret_cast<std::uintptr_t>(loaded_function));
 		}
 
+		if (main_function_index >= functions_count) {
+			throw program_compilation_error{ std::format("Unknown starting function id specified.") };
+		}
+
 		std::pair<void*, std::uint64_t> program_jump_table = jump_table.create_raw_table(reinterpret_cast<std::uintptr_t>(get_default_function_address));
 		auto [program_strings, program_strings_size] = create_program_strings(container);
 
 		merge_exposed_functions(loaded_exposed_functions);
 		return compiled_program{
+			main_function_index,
 			container.preferred_stack_size,
 			loaded_functions_addresses,
 			functions_count,
@@ -363,6 +373,7 @@ module_mediator::return_value load_program_to_memory(module_mediator::arguments_
 
 		return add_program(
 			result.preferred_stack_size,
+			result.main_function_index,
 			result.compiled_functions,
 			result.functions_count,
 			result.exposed_functions,

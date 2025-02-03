@@ -26,7 +26,7 @@ add_thread_on_destroy=ullong pointer pointer
 duplicate_container=ullong pointer
 get_preferred_stack_size=ullong
 
-create_new_program_container=ullong pointer uint pointer uint pointer ullong pointer ullong
+create_new_program_container=ullong uint pointer uint pointer uint pointer ullong pointer ullong
 create_new_thread=ullong
 
 allocate_program_memory=ullong ullong

@@ -26,14 +26,16 @@ public:
 		run_reader<runs_container>::run function_body;
 	};
 
+	entity_id main_function_id{};
 	std::uint64_t preferred_stack_size{};
 	std::map<entity_id, std::string> entities_names{};
 
 	std::map<entity_id, engine_module> modules;
 	std::vector<std::tuple<entity_id, std::uint32_t, std::uint32_t>> jump_points;
+	std::map<entity_id, std::pair<std::unique_ptr<char[]>, std::size_t>> program_strings;
+
 	std::map<entity_id, function_signature> function_signatures;
 	std::map<entity_id, std::string> exposed_functions;
-	std::map<entity_id, std::pair<std::unique_ptr<char[]>, std::size_t>> program_strings;
 	std::vector<function> function_bodies;
 
 	void modules_reader(run_reader<runs_container>::run);

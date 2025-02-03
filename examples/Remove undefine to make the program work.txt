@@ -13,6 +13,7 @@ $define-string message ''''This is the wrong message. Remove undefine.'''';
 $endif;
 
 function main() {
+    $main-function main;
     $declare pointer message-storage;
     $declare pointer null;
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

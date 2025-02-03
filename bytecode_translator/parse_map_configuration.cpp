@@ -8,6 +8,7 @@
 #include "if_defined_states.h"
 #include "stack_size_state.h"
 #include "declaration_states.h"
+#include "main_function_name_state.h"
 #include "program_strings_states.h"
 #include "function_address_argument_state.h"
 #include "immediate_argument_states.h"
@@ -194,6 +195,10 @@ state_settings& configure_special_instructions(states_builder_type& builder) {
 			string_value
 		);
 
+	state_settings& main_function_name = builder.create_state<main_function_name_state>()
+		.set_error_message("$main-function expects the name of the function that will start the application.")
+		.set_handle_tokens({ structure_builder::source_file_token::expression_end });
+
 	state_settings& inside_special_instruction = builder.create_state<state_type>()
 		.set_error_message("Invalid special instruction.")
 		.set_redirection_for_token(
@@ -235,6 +240,11 @@ state_settings& configure_special_instructions(states_builder_type& builder) {
 			structure_builder::source_file_token::define_string_keyword,
 			generic_parser::state_action::change_top,
 			string_name
+		)
+		.set_redirection_for_token(
+			structure_builder::source_file_token::main_function_keyword,
+			generic_parser::state_action::change_top,
+			main_function_name
 		);
 
 	configure_special_instruction_end(define);
@@ -242,6 +252,7 @@ state_settings& configure_special_instructions(states_builder_type& builder) {
 	configure_special_instruction_end(redefine_value);
 	configure_special_instruction_end(stack_size);
 	configure_special_instruction_end(declare_name);
+	configure_special_instruction_end(main_function_name);
 
 	return inside_special_instruction;
 }

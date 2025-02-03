@@ -1,5 +1,6 @@
 #include <iostream>
 #include <sstream>
+#include <cstdlib>
 
 #include "module_mediator.h"
 
@@ -8,7 +9,7 @@ int main(int argc, char** argv) {
 		std::cout << "You need to provide two arguments: executors count and a compiled file." << std::endl;
 
 		std::cin.get();
-		return 1;
+		return EXIT_FAILURE;
 	}
 
 	int executors_count = 0;
@@ -19,7 +20,7 @@ int main(int argc, char** argv) {
 		std::cout << "The second argument must be an integer." << std::endl;
 
 		std::cin.get();
-		return 1;
+		return EXIT_FAILURE;
 	}
 
 	module_mediator::engine_module_mediator module_mediator{};
@@ -44,5 +45,5 @@ int main(int argc, char** argv) {
 	}
 
 	std::cin.get();
-	return 0;
+	return EXIT_SUCCESS;
 }

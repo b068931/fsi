@@ -53,6 +53,7 @@ void runs_container::function_signatures_reader(run_reader<runs_container>::run 
 }
 void runs_container::exposed_functions_reader(run_reader<runs_container>::run run) {
 	this->preferred_stack_size = run.get_object<std::uint64_t>();
+	this->main_function_id = run.get_object<entity_id>();
 	for (std::uint64_t counter = 0, exposed_functions_count = run.get_object<std::uint64_t>(); counter < exposed_functions_count; ++counter) {
 		entity_id function_entity_id = run.get_object<entity_id>();
 		this->exposed_functions[function_entity_id] = this->read_name(run);

@@ -74,6 +74,7 @@ public:
 		endif_keyword,
 		stack_size_keyword,
 		declare_keyword,
+		main_function_keyword,
 		function_declaration_keyword, //function
 		function_args_start, //(
 		function_args_end, //)
@@ -139,7 +140,8 @@ public:
 		copy_string_instruction_keyword
 	};
 	enum class parameters_enumeration {
-		ifdef_ifndef_pop_check
+		ifdef_ifndef_pop_check,
+		names_stack
 	};
 	enum class context_key {
 		main_context,
@@ -359,6 +361,7 @@ public:
 	};
 	struct file {
 		std::uint64_t stack_size{ 0 };
+		function* main_function{};
 		
 		std::vector<function*> exposed_functions;
 		std::map<std::string, string> program_strings;
@@ -442,7 +445,7 @@ public:
 			void add(std::string what, std::string new_value) {
 				this->names_remapping.push_back({ std::move(what), std::move(new_value) });
 			}
-			void remove(std::string what) {
+			void remove(const std::string& what) {
 				auto found_remapping = this->find_remapped_name(what);
 				if (found_remapping != this->names_remapping.end()) {
 					this->names_remapping.erase(found_remapping);
@@ -533,7 +536,10 @@ private:
 	builder_parameters helper{};
 	file output_file_structure;
 public:
-	structure_builder(std::vector<std::pair<std::string, structure_builder::source_file_token>>* names_stack, generic_parser::token_generator<structure_builder::source_file_token, context_key>* token_generator)
+	structure_builder(
+		std::vector<std::pair<std::string, structure_builder::source_file_token>>* names_stack, 
+		generic_parser::token_generator<structure_builder::source_file_token, context_key>* token_generator
+	)
 		:working{ true },
 		generator{ token_generator },
 		names_stack{ names_stack },
@@ -542,7 +548,8 @@ public:
 	{
 		this->parse_map
 			.get_parameters_container()
-			.assign_parameter(parameters_enumeration::ifdef_ifndef_pop_check, false);
+			.assign_parameter(parameters_enumeration::ifdef_ifndef_pop_check, false)
+			.assign_parameter(parameters_enumeration::names_stack, names_stack);
 
 		this->configure_parse_map();
 	}
@@ -556,6 +563,7 @@ public:
 
 				if (this->generator->get_additional_token() != source_file_token::end_of_file) { //check if the name is a keyword that has a special token
 					token = this->generator->get_additional_token();
+					this->generator->set_token_from_names_stack(true); //this is just a hack and this function exists solely to accomodate this case
 				}
 				else {
 					token = source_file_token::name;

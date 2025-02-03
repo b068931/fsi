@@ -872,18 +872,22 @@ private:
 
 		this->write_run_footer(saved_position, run_size);
 	}
-	void create_exposed_functions_run() { //8 bytes: preferred stack size, 8 bytes: exposed functions count, 8 bytes: exposed function's entity_id, 1 byte: exposed function name size, exposed function name
-		std::uint64_t run_size = 16;
+	void create_exposed_functions_run() { //8 bytes: preferred stack size, 8 bytes: starting function, 8 bytes: exposed functions count, 8 bytes: exposed function's entity_id, 1 byte: exposed function name size, exposed function name
+		std::uint64_t run_size = 24;
 		auto saved_position = this->write_run_header(program_exposed_functions_run);
 
-		structure_builder::function& main_function = this->file_structure->functions.back();
-		auto found_main =
-			std::find(this->file_structure->exposed_functions.begin(), this->file_structure->exposed_functions.end(), &main_function);
+		auto found_main = std::find(
+			this->file_structure->exposed_functions.begin(), 
+			this->file_structure->exposed_functions.end(), 
+			this->file_structure->main_function
+		);
+
 		if (found_main == this->file_structure->exposed_functions.end()) {
-			this->file_structure->exposed_functions.push_back(&main_function);
+			this->file_structure->exposed_functions.push_back(this->file_structure->main_function);
 		}
 
 		this->write_8_bytes(static_cast<std::uint64_t>(this->file_structure->stack_size));
+		this->write_8_bytes(static_cast<std::uint64_t>(this->file_structure->main_function->id));
 		this->write_8_bytes(static_cast<std::uint64_t>(this->file_structure->exposed_functions.size()));
 		for (structure_builder::function* exposed_function : this->file_structure->exposed_functions) {
 			this->write_8_bytes(static_cast<std::uint64_t>(exposed_function->id));

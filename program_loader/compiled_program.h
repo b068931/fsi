@@ -4,6 +4,7 @@
 #include <cstdint>
 
 struct compiled_program {
+	std::uint32_t main_function_index;
 	std::uint64_t preferred_stack_size;
 
 	void** compiled_functions;

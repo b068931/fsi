@@ -159,6 +159,7 @@
     <ClInclude Include="immediate_argument_states.h" />
     <ClInclude Include="inside_function_body_state.h" />
     <ClInclude Include="jump_point_argument_state.h" />
+    <ClInclude Include="main_function_name_state.h" />
     <ClInclude Include="main_state.h" />
     <ClInclude Include="module_call_states.h" />
     <ClInclude Include="module_import_state.h" />
@@ -304,6 +305,16 @@
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\Examples</DestinationFolders>
     </CopyFileToFolders>
     <CopyFileToFolders Include="..\examples\Incorrect Main.txt">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\Examples</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">$(OutDir)\Examples</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\Examples</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release (Installer)|x64'">$(OutDir)\Examples</DestinationFolders>
+    </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="..\examples\Keywords As Names.txt">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\Examples</DestinationFolders>

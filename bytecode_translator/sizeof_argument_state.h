@@ -14,20 +14,17 @@ public:
 		structure_builder::immediate_type element_size{};
 		structure_builder::source_file_token element_token = read_map.get_token_generator_additional_token();
 
-		std::string variable_name{};
-		if (element_token == structure_builder::source_file_token::end_of_file) {
-			variable_name = helper.names_remapping.translate_name(read_map.get_token_generator_name());
-			structure_builder::function& current_function = helper.current_function.get_current_function();
+		std::string variable_name{ helper.names_remapping.translate_name(read_map.get_token_generator_name()) };
+		structure_builder::function& current_function = helper.current_function.get_current_function();
 
-			auto found_local = helper.current_function.find_local_variable_by_name(variable_name);
-			if (found_local != current_function.locals.end()) {
-				element_token = found_local->type;
-			}
-			else {
-				auto found_argument = helper.current_function.find_argument_variable_by_name(variable_name);
-				if (found_argument != current_function.arguments.end()) {
-					element_token = found_argument->type;
-				}
+		auto found_local = helper.current_function.find_local_variable_by_name(variable_name);
+		if (found_local != current_function.locals.end()) {
+			element_token = found_local->type;
+		}
+		else {
+			auto found_argument = helper.current_function.find_argument_variable_by_name(variable_name);
+			if (found_argument != current_function.arguments.end()) {
+				element_token = found_argument->type;
 			}
 		}
 

@@ -300,21 +300,33 @@ module_mediator::return_value get_preferred_stack_size(module_mediator::argument
 
 module_mediator::return_value create_new_program_container(module_mediator::arguments_string_type bundle) {
 	id_generator::id_type id = id_generator::get_id();
-	auto arguments = module_mediator::arguments_string_builder::unpack<std::uint64_t, void*, std::uint32_t, void*, std::uint32_t, void*, std::uint64_t, void*, std::uint64_t>(bundle);
+	auto arguments = module_mediator::arguments_string_builder::unpack<
+		std::uint64_t, 
+		std::uint32_t, 
+		void*, 
+		std::uint32_t, 
+		void*, 
+		std::uint32_t, 
+		void*, 
+		std::uint64_t, 
+		void*, 
+		std::uint64_t
+	>(bundle);
 
 	std::uint64_t preferred_stack_size = std::get<0>(arguments);
+	std::uint32_t main_function_index = std::get<1>(arguments);
 	
-	void** code = static_cast<void**>(std::get<1>(arguments));
-	std::uint32_t functions_count = std::get<2>(arguments);
+	void** code = static_cast<void**>(std::get<2>(arguments));
+	std::uint32_t functions_count = std::get<3>(arguments);
 
-	void** exposed_functions = static_cast<void**>(std::get<3>(arguments));
-	std::uint32_t exposed_functions_count = std::get<4>(arguments);
+	void** exposed_functions = static_cast<void**>(std::get<4>(arguments));
+	std::uint32_t exposed_functions_count = std::get<5>(arguments);
 
-	void* jump_table = std::get<5>(arguments);
-	std::uint64_t jump_table_size = std::get<6>(arguments);
+	void* jump_table = std::get<6>(arguments);
+	std::uint64_t jump_table_size = std::get<7>(arguments);
 
-	void** program_strings = static_cast<void**>(std::get<7>(arguments));
-	std::uint64_t program_strings_size = std::get<8>(arguments);
+	void** program_strings = static_cast<void**>(std::get<8>(arguments));
+	std::uint64_t program_strings_size = std::get<9>(arguments);
 	
 	/*
 	* a newly created object can not be deleted or modified if excm does not know about it,
@@ -332,7 +344,7 @@ module_mediator::return_value create_new_program_container(module_mediator::argu
 		)
 	);
 
-	return notify_excm_new_container(id, code[functions_count - 1], preferred_stack_size);
+	return notify_excm_new_container(id, code[main_function_index], preferred_stack_size);
 }
 module_mediator::return_value create_new_thread(module_mediator::arguments_string_type bundle) {
 	auto arguments = module_mediator::arguments_string_builder::unpack<id_generator::id_type>(bundle);

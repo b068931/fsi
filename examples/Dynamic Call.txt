@@ -16,6 +16,7 @@ $define-string message ''''Hello World! With extra steps.''''
 
 function main(
 ) {
+    $main-function main;
     $declare pointer message-storage;
     $declare eight-bytes function-address;
     

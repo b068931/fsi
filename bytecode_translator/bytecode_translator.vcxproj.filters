@@ -101,6 +101,9 @@
     <ClInclude Include="main_state.h">
       <Filter>Header Files\Parse Map States</Filter>
     </ClInclude>
+    <ClInclude Include="main_function_name_state.h">
+      <Filter>Header Files\Parse Map States\Special Instructions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="parse_map_configuration.cpp">
@@ -137,6 +140,9 @@
       <Filter>Examples</Filter>
     </CopyFileToFolders>
     <CopyFileToFolders Include="..\examples\Incorrect Main.txt">
+      <Filter>Examples</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\examples\Keywords As Names.txt">
       <Filter>Examples</Filter>
     </CopyFileToFolders>
   </ItemGroup>

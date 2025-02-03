@@ -1,5 +1,6 @@
 #include <iostream>
 #include <chrono>
+#include <cstdlib>
 
 #include "structure_builder.h"
 #include "bytecode_translator.h"
@@ -11,7 +12,7 @@ int main(int argc, char** argv) {
 		std::cout << "Provide the name of the file to compile and its output destination. And add 'include-debug' or 'no-debug' at the end. It is only three arguments." << std::endl;
 
 		std::cin.get();
-		return 1;
+		return EXIT_FAILURE;
 	}
 
 	generic_parser::parser_facade<structure_builder::source_file_token, structure_builder::context_key, structure_builder> parser
@@ -30,6 +31,7 @@ int main(int argc, char** argv) {
 			{ "declare", structure_builder::source_file_token::declare_keyword },
 			{ "stack-size", structure_builder::source_file_token::stack_size_keyword },
 			{ "define-string", structure_builder::source_file_token::define_string_keyword },
+			{ "main-function", structure_builder::source_file_token::main_function_keyword },
 
 			{ "immediate", structure_builder::source_file_token::immediate_argument_keyword },
 			{ "signed", structure_builder::source_file_token::signed_argument_keyword },
@@ -132,7 +134,7 @@ int main(int argc, char** argv) {
 		std::cout << "Unable to process the file. The following exception might contain some information (or useless gibberish depending on your luck): " << exception.what() << std::endl;
 
 		std::cin.get();
-		return 1;
+		return EXIT_FAILURE;
 	}
 
 	auto error = parser.error();
@@ -143,7 +145,7 @@ int main(int argc, char** argv) {
 		std::cout << " NEAR LINE " << error.first << std::endl;
 
 		std::cin.get();
-		return 1;
+		return EXIT_FAILURE;
 	}
 
 	std::vector<std::string> empty_functions{ check_functions_bodies(parser_value) };
@@ -156,23 +158,30 @@ int main(int argc, char** argv) {
 		std::cout << "PROGRAM LOGIC ERROR: You must explicitly specify the stack size that your program will use." << std::endl;
 	}
 
+	if (parser_value.main_function == nullptr) {
+		std::cout << "PROGRAM LOGIC FATAL ERROR: You must specify the starting function for your program." << std::endl;
+
+		std::cin.get();
+		return EXIT_FAILURE;
+	}
+
 	if (!check_instructions_arugments(parser_value)) {
 		std::cout << "SYNTAX ERROR: each instruction can have no more than " << max_instruction_arguments_count << " arguments" << std::endl;
 
 		std::cin.get();
-		return 1;
+		return EXIT_FAILURE;
 	}
 	else if (!check_functions_count(parser_value)) {
 		std::cout << "SYNTAX ERROR: you can have no more than " << max_functions_count << " functions in one file" << std::endl;
 
 		std::cin.get();
-		return 1;
+		return EXIT_FAILURE;
 	}
 	else if (!check_functions_size(parser_value)) {
 		std::cout << "SYNTAX ERROR: you can have no more than " << max_instructions_count << " instructions in each function" << std::endl;
 
 		std::cin.get();
-		return 1;
+		return EXIT_FAILURE;
 	}
 	else {
 		std::ofstream file_stream{ argv[2], std::ios::binary | std::ios::out };
@@ -206,5 +215,5 @@ int main(int argc, char** argv) {
 		<< std::endl;
 
 	std::cin.get();
-	return 0;
+	return EXIT_SUCCESS;
 }

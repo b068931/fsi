@@ -1,0 +1,31 @@
+$stack-size 100;
+from prts import <io.log.info, pointer.allocate, pointer.deallocate>
+
+$define-string stack-size ''''Hello World! With tons of shady redefinitions.''''
+$redefine fun function; /*you are allowed to create only new keywords. you cannot remove the old ones, this should not be a problem because you should be able to use a keyword as a name for any program element you want.*/
+$redefine decl declare;
+$redefine strcpy copy-string;
+
+fun function() {
+    $main-function function;
+    $decl pointer pointer;
+    $declare pointer copy-string 
+    ;
+    
+    pointer
+    : prts->pointer.allocate(size-of stack-size);
+    strcpy variable pointer pointer, string stack-size;
+
+    void: prts->io.log.info(
+        variable pointer copy-string , 
+        immediate eight-bytes 0, 
+        variable pointer copy-string
+        , 
+        variable pointer pointer
+    );
+
+    pointer
+    : prts 
+    ->
+    pointer.deallocate();
+}

@@ -2,6 +2,7 @@ $stack-size 100;
 from prts import <io.log.info, pointer.allocate, pointer.deallocate>
 
 function main() {
+    $main-function main;
     $define-string message ''''Hello World!''''
     $declare pointer message-storage;
     

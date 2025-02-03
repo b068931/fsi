@@ -1,3 +1,4 @@
 $stack-size 32;
 function main(eight-bytes wrong);
+$main-function main;
 main {;;;};;

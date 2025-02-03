@@ -81,6 +81,7 @@ function ebyte-to-string(eight-bytes value) {
 }
 
 function main() {
+    $main-function main;
     $declare pointer message;
     $declare pointer null;
 
