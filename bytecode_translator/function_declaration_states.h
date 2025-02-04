@@ -51,6 +51,11 @@ public:
 		structure_builder::builder_parameters& helper,
 		structure_builder::read_map_type& read_map
 	) override {
+		//this exists solely to make comments work
+		if (!output_file_structure.functions.back().arguments.back().name.empty()) {
+			return;
+		}
+
 		std::string generated_name = helper.names_remapping.translate_name(read_map.get_token_generator_name());
 		if (!generated_name.empty()) {
 			output_file_structure.functions.back().arguments.back().name =

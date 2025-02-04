@@ -1,14 +1,17 @@
 $stack-size d512;
-from prts import <
+/*trailing comas everywhere*/
+from prts import<
     io.log.info, 
     pointer.allocate,
     pointer.deallocate, 
-    this-thread.dynamic-call
+    this-thread.dynamic-call ,  
 >
 
-function hello-world(pointer the-message) {;;
+function hello-world(pointer the-message 
+,
+) {;;
     $declare pointer null;
-    void: prts->io.log.info(variable pointer null, immediate eight-bytes d0, variable pointer null, variable pointer the-message)
+    void: prts->io.log.info(variable pointer null, immediate eight-bytes d0, variable pointer null, variable pointer the-message,)
     the-message: prts->pointer.deallocate()
 }
 
@@ -26,6 +29,6 @@ function main(
     get-function-address variable eight-bytes function-address, function-name hello-world;
     void: prts->this-thread.dynamic-call(
 	    variable eight-bytes function-address, 
-	    variable pointer message-storage
+	    variable pointer message-storage,
     )
 }

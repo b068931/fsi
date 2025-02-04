@@ -2,6 +2,7 @@
 #include "type_definitions.h"
 #include "module_import_state.h"
 #include "functions_import_state.h"
+#include "import_keyword_token_state.h"
 #include "define_state.h"
 #include "redefine_states.h"
 #include "undefine_state.h"
@@ -39,14 +40,46 @@ std::vector<structure_builder::source_file_token> argument_end_tokens {
 		structure_builder::source_file_token::expression_end
 };
 
-state_settings& configure_modules_import(states_builder_type& builder) {
+state_settings& configure_comment(states_builder_type& builder) {
+	state_settings& inside_comment = builder.create_anonymous_state(
+		[](structure_builder::file& output_file_structure,
+			structure_builder::builder_parameters& helper,
+			structure_builder::read_map_type& read_map) -> void {
+				read_map
+					.get_parameters_container()
+					.assign_parameter(structure_builder::parameters_enumeration::has_just_left_comment, true);
+		}
+	)
+		.set_handle_tokens({ structure_builder::source_file_token::comment_end })
+		.detached_name(false)
+		.whitelist(false)
+		.set_redirection_for_token(
+			structure_builder::source_file_token::comment_end,
+			generic_parser::state_action::pop_top,
+			nullptr
+		);
+
+	return inside_comment;
+}
+state_settings& configure_modules_import(states_builder_type& builder, state_settings& comment) {
 	state_settings& inside_functions_import = builder.create_state<functions_import_state>()
 		.set_error_message("',' or '>' are expected, got another token instead.")
-		.set_handle_tokens({ structure_builder::source_file_token::coma, structure_builder::source_file_token::import_end })
+		.set_handle_tokens(
+			{ 
+				structure_builder::source_file_token::coma, 
+				structure_builder::source_file_token::import_end, 
+				structure_builder::source_file_token::comment_start 
+			}
+		)
 		.set_redirection_for_token(
 			structure_builder::source_file_token::import_end,
 			generic_parser::state_action::pop_top,
 			nullptr
+		)
+		.set_redirection_for_token(
+			structure_builder::source_file_token::comment_start,
+			generic_parser::state_action::push_state,
+			comment
 		);
 
 	state_settings& import_start = builder.create_state<state_type>()
@@ -57,8 +90,14 @@ state_settings& configure_modules_import(states_builder_type& builder) {
 			inside_functions_import
 		);
 
-	state_settings& import_token = builder.create_state<state_type>()
+	state_settings& import_keyword_token = builder.create_state<import_keyword_token_state>()
 		.set_error_message("'import' was expected, got another token instead.")
+		.set_handle_tokens({ structure_builder::source_file_token::import_start })
+		.set_redirection_for_token(
+			structure_builder::source_file_token::import_start,
+			generic_parser::state_action::change_top,
+			inside_functions_import
+		)
 		.set_redirection_for_token(
 			structure_builder::source_file_token::import_keyword,
 			generic_parser::state_action::change_top,
@@ -71,22 +110,10 @@ state_settings& configure_modules_import(states_builder_type& builder) {
 		.set_redirection_for_token(
 			structure_builder::source_file_token::name,
 			generic_parser::state_action::change_top,
-			import_token
+			import_keyword_token
 		);
 
 	return inside_module_import;
-}
-state_settings& configure_comment(states_builder_type& builder) {
-	state_settings& inside_comment = builder.create_state<state_type>()
-		.detached_name(false)
-		.whitelist(false)
-		.set_redirection_for_token(
-			structure_builder::source_file_token::comment_end,
-			generic_parser::state_action::pop_top,
-			nullptr
-		);
-
-	return inside_comment;
 }
 
 void configure_special_instruction_end(state_settings& last_state) {
@@ -257,7 +284,7 @@ state_settings& configure_special_instructions(states_builder_type& builder) {
 	return inside_special_instruction;
 }
 
-void configure_instruction_argument_end(state_settings& argument_last_state, state_settings& instruction_arguments_base) {
+void configure_instruction_argument_end(state_settings& argument_last_state, state_settings& instruction_arguments_base, state_settings& comment) {
 	argument_last_state
 		.set_redirection_for_tokens(
 			{
@@ -270,9 +297,15 @@ void configure_instruction_argument_end(state_settings& argument_last_state, sta
 			structure_builder::source_file_token::coma,
 			generic_parser::state_action::change_top,
 			instruction_arguments_base
-		);
+		)
+		.set_redirection_for_token(
+			structure_builder::source_file_token::comment_start,
+			generic_parser::state_action::push_state,
+			comment
+		)
+		.add_handle_token(structure_builder::source_file_token::comment_start);
 }
-state_settings& configure_instruction_arguments(states_builder_type& builder) {
+state_settings& configure_instruction_arguments(states_builder_type& builder, state_settings& comment) {
 	state_settings& function_address_argument = builder.create_state<function_address_argument_state>()
 		.set_error_message("Unexpected token inside instruction. Function name was expected.")
 		.set_handle_tokens(
@@ -330,12 +363,21 @@ state_settings& configure_instruction_arguments(states_builder_type& builder) {
 	state_settings& add_new_dereference_variable = builder.create_state<pointer_dereference_argument_dereference_variables_state>()
 		.set_error_message("Unexpected token inside instruction. ',', or ']' were expected.")
 		.set_handle_tokens(
-			{ structure_builder::source_file_token::coma, structure_builder::source_file_token::dereference_end }
+			{
+				structure_builder::source_file_token::coma,
+				structure_builder::source_file_token::dereference_end,
+				structure_builder::source_file_token::comment_start
+			}
 		)
 		.set_redirection_for_token(
 			structure_builder::source_file_token::dereference_end,
 			generic_parser::state_action::change_top,
 			dereference_variables_add_end
+		)
+		.set_redirection_for_token(
+			structure_builder::source_file_token::comment_start,
+			generic_parser::state_action::push_state,
+			comment
 		);
 
 	state_settings& map_dereferenced_variable_name = builder.create_state<pointer_dereference_argument_pointer_name_state>()
@@ -418,20 +460,25 @@ state_settings& configure_instruction_arguments(states_builder_type& builder) {
 			structure_builder::source_file_token::string_argument_keyword,
 			generic_parser::state_action::change_top,
 			add_string_argument
+		)
+		.set_redirection_for_token(
+			structure_builder::source_file_token::comment_start,
+			generic_parser::state_action::push_state,
+			comment
 		);
 
-	configure_instruction_argument_end(function_address_argument, instruction_arguments_base);
-	configure_instruction_argument_end(sizeof_argument, instruction_arguments_base);
-	configure_instruction_argument_end(immediate_argument_value, instruction_arguments_base);
-	configure_instruction_argument_end(regular_variable_argument_name, instruction_arguments_base);
-	configure_instruction_argument_end(dereference_variables_add_end, instruction_arguments_base);
-	configure_instruction_argument_end(add_jump_data_argument, instruction_arguments_base);
-	configure_instruction_argument_end(add_string_argument, instruction_arguments_base);
+	configure_instruction_argument_end(function_address_argument, instruction_arguments_base, comment);
+	configure_instruction_argument_end(sizeof_argument, instruction_arguments_base, comment);
+	configure_instruction_argument_end(immediate_argument_value, instruction_arguments_base, comment);
+	configure_instruction_argument_end(regular_variable_argument_name, instruction_arguments_base, comment);
+	configure_instruction_argument_end(dereference_variables_add_end, instruction_arguments_base, comment);
+	configure_instruction_argument_end(add_jump_data_argument, instruction_arguments_base, comment);
+	configure_instruction_argument_end(add_string_argument, instruction_arguments_base, comment);
 
 	return instruction_arguments_base;
 }
 
-state_settings& configure_function_declaration(states_builder_type& builder, state_settings& function_body) {
+state_settings& configure_function_declaration(states_builder_type& builder, state_settings& function_body, state_settings& comment) {
 	state_settings& declaration_or_definition = builder.create_state<declaration_or_definition_state>()
 		.set_error_message("Expected ';' or '{'.")
 		.set_handle_tokens(
@@ -446,15 +493,31 @@ state_settings& configure_function_declaration(states_builder_type& builder, sta
 			structure_builder::source_file_token::function_body_start,
 			generic_parser::state_action::change_top,
 			function_body
+		)
+		.set_redirection_for_token(
+			structure_builder::source_file_token::comment_start,
+			generic_parser::state_action::push_state,
+			comment
 		);
 
 	state_settings& function_argument_name = builder.create_state<function_argument_name_state>()
 		.set_error_message("Unexpected token inside function arguments. A name for a function argument was expected.")
-		.set_handle_tokens({ structure_builder::source_file_token::coma, structure_builder::source_file_token::function_args_end })
+		.set_handle_tokens(
+			{
+				structure_builder::source_file_token::coma,
+				structure_builder::source_file_token::function_args_end,
+				structure_builder::source_file_token::comment_start
+			}
+		)
 		.set_redirection_for_token(
 			structure_builder::source_file_token::function_args_end,
 			generic_parser::state_action::change_top,
 			declaration_or_definition
+		)
+		.set_redirection_for_token(
+			structure_builder::source_file_token::comment_start,
+			generic_parser::state_action::push_state,
+			comment
 		);
 
 
@@ -471,6 +534,11 @@ state_settings& configure_function_declaration(states_builder_type& builder, sta
 			structure_builder::source_file_token::function_args_end,
 			generic_parser::state_action::change_top,
 			declaration_or_definition
+		)
+		.set_redirection_for_token(
+			structure_builder::source_file_token::comment_start,
+			generic_parser::state_action::push_state,
+			comment
 		);
 
 	state_settings& function_name = builder.create_state<function_name_state>()
@@ -492,7 +560,7 @@ state_settings& configure_function_declaration(states_builder_type& builder, sta
 	return function_name;
 }
 state_settings& configure_inside_function(states_builder_type& builder, state_settings& comment, state_settings& special_instruction) {
-	state_settings& instruction_arguments = configure_instruction_arguments(builder);
+	state_settings& instruction_arguments = configure_instruction_arguments(builder, comment);
 	state_settings& new_jump_point = builder.create_state<new_jump_point_state>()
 		.set_error_message("';' was expected.")
 		.set_handle_tokens({ structure_builder::source_file_token::expression_end })
@@ -600,11 +668,11 @@ state_settings& configure_inside_function(states_builder_type& builder, state_se
 void structure_builder::configure_parse_map() {
 	states_builder_type builder{};
 
-	state_settings& modules_import = configure_modules_import(builder);
 	state_settings& comment = configure_comment(builder);
+	state_settings& modules_import = configure_modules_import(builder, comment);
 	state_settings& special_instruction = configure_special_instructions(builder);
 	state_settings& function_body = configure_inside_function(builder, comment, special_instruction);
-	state_settings& function_declaration = configure_function_declaration(builder, function_body);
+	state_settings& function_declaration = configure_function_declaration(builder, function_body, comment);
 	
 	state_settings& base = builder.create_state<main_state>()
 		.set_as_starting_state()

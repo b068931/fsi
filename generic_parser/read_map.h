@@ -723,6 +723,8 @@ namespace generic_parser {
 				action,
 				this->get_state_from_state_settings(other)
 			);
+
+			return *this;
 		}
 
 		state_settings& set_error_message(

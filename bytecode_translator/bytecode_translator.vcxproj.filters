@@ -104,6 +104,9 @@
     <ClInclude Include="main_function_name_state.h">
       <Filter>Header Files\Parse Map States\Special Instructions</Filter>
     </ClInclude>
+    <ClInclude Include="import_keyword_token_state.h">
+      <Filter>Header Files\Parse Map States\Modules Import</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="parse_map_configuration.cpp">
@@ -143,6 +146,9 @@
       <Filter>Examples</Filter>
     </CopyFileToFolders>
     <CopyFileToFolders Include="..\examples\Keywords As Names.txt">
+      <Filter>Examples</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\examples\Comments Everywhere.txt">
       <Filter>Examples</Filter>
     </CopyFileToFolders>
   </ItemGroup>

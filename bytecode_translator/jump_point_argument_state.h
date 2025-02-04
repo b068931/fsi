@@ -10,9 +10,25 @@ public:
 		structure_builder::builder_parameters& helper,
 		structure_builder::read_map_type& read_map
 	) override {
-		std::string name = helper.names_remapping.translate_name(read_map.get_token_generator_name());
-		structure_builder::function& current_function = helper.current_function.get_current_function();
+		bool just_left_comment = read_map
+			.get_parameters_container()
+			.retrieve_parameter<bool>(structure_builder::parameters_enumeration::has_just_left_comment);
 
+		if (just_left_comment) {
+			if (!read_map.is_token_generator_name_empty()) {
+				read_map.exit_with_error();
+			}
+
+			return;
+		}
+
+		std::string name = helper.names_remapping.translate_name(read_map.get_token_generator_name());
+		if (name.empty()) {
+			read_map.exit_with_error("Expected the name of the jump point, got another token instead.");
+			return;
+		}
+
+		structure_builder::function& current_function = helper.current_function.get_current_function();
 		auto found_jump_point =
 			std::find_if(current_function.jump_points.begin(), current_function.jump_points.end(),
 				[&name](const structure_builder::jump_point& jmp) {

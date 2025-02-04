@@ -13,7 +13,13 @@ function copy(pointer destination, pointer source, eight-bytes size) {
 
     decrement variable eight-bytes size;
     /*technically pointer dereference is supported for many variables, but it is not shown anywhere so it is here for demonstration purposes*/
-    move dereference one-byte destination[size, why-not], dereference one-byte source[size];
+    move 
+        dereference one-byte destination[
+            /*test*/size,/*test*/
+            why-not/*test*/
+        ]/*test*/, 
+        dereference one-byte source[/*test*/size/*test*/];
+
     jump point repeat;
 
     @end;
@@ -29,7 +35,7 @@ function reversed-copy(pointer destination, pointer source, eight-bytes size) {
 
     decrement variable eight-bytes size;
 
-    move dereference one-byte destination[destination-index], dereference one-byte source[size];
+    move dereference one-byte destination[destination-index,], dereference one-byte source[size,/*test*/];
     increment variable eight-bytes destination-index;
 
     jump point repeat;

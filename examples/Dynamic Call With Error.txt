@@ -1,5 +1,5 @@
 $stack-size d100;
-from prts import <
+from prts import<
     io.log.info, 
     pointer.allocate,
     pointer.deallocate, 

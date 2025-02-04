@@ -144,7 +144,8 @@ public:
 	};
 	enum class parameters_enumeration {
 		ifdef_ifndef_pop_check,
-		names_stack
+		names_stack,
+		has_just_left_comment
 	};
 	enum class context_key {
 		main_context,
@@ -514,6 +515,8 @@ public:
 		names_remapping names_remapping{};
 
 		line_type instruction_index; //used for jump points, resets back to zero when new function is declared
+
+		std::list<engine_module>::iterator current_module{};
 		std::map<std::string, string>::iterator current_string{};
 
 		static entity_id get_id() {
@@ -574,7 +577,8 @@ public:
 		this->parse_map
 			.get_parameters_container()
 			.assign_parameter(parameters_enumeration::ifdef_ifndef_pop_check, false)
-			.assign_parameter(parameters_enumeration::names_stack, names_stack);
+			.assign_parameter(parameters_enumeration::names_stack, names_stack)
+			.assign_parameter(parameters_enumeration::has_just_left_comment, false);
 
 		this->configure_parse_map();
 	}
@@ -598,6 +602,13 @@ public:
 
 		if (!(this->generator->is_name_empty() && (token == source_file_token::name))) { //empty names will not be handled in any way
 			this->parse_map.handle_token(&this->output_file_structure, token, &this->helper);
+			bool& just_left_comment = this->parse_map
+				.get_parameters_container()
+				.retrieve_parameter<bool>(parameters_enumeration::has_just_left_comment);
+
+			if ((token != source_file_token::comment_end) && just_left_comment) {
+				just_left_comment = false;
+			}
 		}
 	}
 
