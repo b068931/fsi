@@ -169,7 +169,7 @@
     <ClInclude Include="program_strings_states.h" />
     <ClInclude Include="redefine_states.h" />
     <ClInclude Include="regular_variable_argument_states.h" />
-    <ClInclude Include="sizeof_argument_state.h" />
+    <ClInclude Include="sizeof_argument_states.h" />
     <ClInclude Include="stack_size_state.h" />
     <ClInclude Include="string_argument_state.h" />
     <ClInclude Include="structure_builder.h" />

@@ -13,7 +13,7 @@ fun function() {
     ;
     
     pointer
-    : prts->pointer.allocate(size-of stack-size);
+    : prts->pointer.allocate(size-of eight-bytes stack-size);
     strcpy variable pointer pointer, string stack-size;
 
     void: prts->io.log.info(

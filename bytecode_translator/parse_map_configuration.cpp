@@ -13,7 +13,7 @@
 #include "program_strings_states.h"
 #include "function_address_argument_state.h"
 #include "immediate_argument_states.h"
-#include "sizeof_argument_state.h"
+#include "sizeof_argument_states.h"
 #include "regular_variable_argument_states.h"
 #include "pointer_dereference_argument_states.h"
 #include "jump_point_argument_state.h"
@@ -325,10 +325,21 @@ state_settings& configure_instruction_arguments(states_builder_type& builder, st
 			immediate_argument_value
 		);
 
-	state_settings& sizeof_argument = builder.create_state<sizeof_argument_state>()
+	state_settings& sizeof_argument_value = builder.create_state<sizeof_argument_value_state>()
 		.set_error_message("Unexpected token inside instruction. A name of the string, type, etc. was expected for sizeof.")
 		.set_handle_tokens(
 			std::vector<structure_builder::source_file_token>{ argument_end_tokens }
+		);
+
+	state_settings& sizeof_argument_type = builder.create_state<sizeof_argument_type_state>()
+		.set_error_message("Unexpected token inside instruction. The size for the size-of argument was expected.")
+		.set_handle_tokens(
+			std::vector<structure_builder::source_file_token>{ all_types }
+		)
+		.set_redirection_for_tokens(
+			std::vector<structure_builder::source_file_token>{ all_types },
+			generic_parser::state_action::change_top,
+			sizeof_argument_value
 		);
 
 	state_settings& regular_variable_argument_name = builder.create_state<regular_variable_argument_name_state>()
@@ -454,7 +465,7 @@ state_settings& configure_instruction_arguments(states_builder_type& builder, st
 		.set_redirection_for_token(
 			structure_builder::source_file_token::sizeof_argument_keyword,
 			generic_parser::state_action::change_top,
-			sizeof_argument
+			sizeof_argument_type
 		)
 		.set_redirection_for_token(
 			structure_builder::source_file_token::string_argument_keyword,
@@ -468,7 +479,7 @@ state_settings& configure_instruction_arguments(states_builder_type& builder, st
 		);
 
 	configure_instruction_argument_end(function_address_argument, instruction_arguments_base, comment);
-	configure_instruction_argument_end(sizeof_argument, instruction_arguments_base, comment);
+	configure_instruction_argument_end(sizeof_argument_value, instruction_arguments_base, comment);
 	configure_instruction_argument_end(immediate_argument_value, instruction_arguments_base, comment);
 	configure_instruction_argument_end(regular_variable_argument_name, instruction_arguments_base, comment);
 	configure_instruction_argument_end(dereference_variables_add_end, instruction_arguments_base, comment);

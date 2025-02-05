@@ -71,7 +71,7 @@
     <ClInclude Include="immediate_argument_states.h">
       <Filter>Header Files\Parse Map States\Instruction Arguments</Filter>
     </ClInclude>
-    <ClInclude Include="sizeof_argument_state.h">
+    <ClInclude Include="sizeof_argument_states.h">
       <Filter>Header Files\Parse Map States\Instruction Arguments</Filter>
     </ClInclude>
     <ClInclude Include="regular_variable_argument_states.h">

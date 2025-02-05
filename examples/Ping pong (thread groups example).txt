@@ -11,7 +11,7 @@ function main();
 function get-pong-string()
 {
     $declare pointer pong-storage;
-    pong-storage: prts->pointer.allocate(size-of pong)
+    pong-storage: prts->pointer.allocate(size-of eight-bytes pong)
 
     copy-string variable pointer pong-storage, string pong;
     save-value variable pointer pong-storage;
@@ -60,7 +60,7 @@ function show-warning()
     $declare pointer warning-message;
     $declare pointer null;
 
-    warning-message: prts->pointer.allocate(size-of warning)
+    warning-message: prts->pointer.allocate(size-of eight-bytes warning)
     copy-string variable pointer warning-message, string warning;
 
     void: prts->io.log.warning(variable pointer null, immediate eight-bytes d0, variable pointer null, variable pointer warning-message)
@@ -77,7 +77,7 @@ main
 
 get-ping-string {
     $declare pointer ping-storage;
-    ping-storage: prts->pointer.allocate(size-of ping)
+    ping-storage: prts->pointer.allocate(size-of eight-bytes ping)
 
     copy-string variable pointer ping-storage, string ping;
     save-value variable pointer ping-storage;

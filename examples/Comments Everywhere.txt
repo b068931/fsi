@@ -17,7 +17,7 @@ add variable one-byte nothing-one, variable one-byte nothing-two, variable one-b
     $declare pointer null;
     
     /*test*/throwaway(/*test*/);
-    /*test*/message-storage: prts->pointer.allocate(/*test*/size-of message/*test*/)
+    /*test*/message-storage: prts->pointer.allocate(/*test*/size-of eight-bytes message/*test*/)
     /*test*/copy-string /*test*/ 
         variable pointer message-storage/*test*/, /*test*/
         string message;

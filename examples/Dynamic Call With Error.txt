@@ -20,7 +20,7 @@ function main(){
     $declare pointer message-storage;
     $declare eight-bytes function-address;
     
-    message-storage: prts->pointer.allocate(size-of message)
+    message-storage: prts->pointer.allocate(size-of eight-bytes message)
     copy-string variable pointer message-storage, string message;
 
     get-function-address variable eight-bytes function-address, function-name hello-world;
