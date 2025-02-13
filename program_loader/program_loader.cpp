@@ -399,12 +399,8 @@ module_mediator::return_value load_program_to_memory(module_mediator::arguments_
 			LOG_ERROR(get_module_part(), exc.what());
 		}
 	}
-	catch (const std::filesystem::filesystem_error&) {
-		LOG_ERROR(get_module_part(), "Got a filesystem error. Most likely, provided file does not exist or it is not accessible.");
-	}
 	catch (const std::exception& exc) {
-		LOG_ERROR(get_module_part(), "Unexpected exception was caught during compilation.");
-		LOG_ERROR(get_module_part(), exc.what());
+		LOG_ERROR(get_module_part(), std::format("Compilation error: {}", exc.what()));
 	}
 
 	LOG_FATAL(get_module_part(), "Program compilation has failed.");

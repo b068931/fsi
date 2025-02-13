@@ -119,13 +119,13 @@ namespace generic_parser {
 		}
 	public:
 		token_generator(
-			std::map<context_key_type, symbols_pair>&& contexts,
+			const std::map<context_key_type, symbols_pair>& contexts,
 			const std::vector<std::pair<std::string, token_type>>* names_stack,
 			token_type name_token,
 			token_type end_token,
 			context_key_type starting_context
 		)
-			:symbols_list{ std::move(contexts) },
+			:symbols_list{ contexts },
 			is_names_stack_token{ false },
 			names_stack{ names_stack },
 			reader{},
@@ -207,8 +207,11 @@ namespace generic_parser {
 			this->name_start = 0;
 			this->name_end = 0;
 		}
-		void open_file(const std::string& file_name) {
-			this->reader.set_file_stream(new std::ifstream{ file_name, std::ios::binary | std::ios::in }, std::filesystem::file_size(file_name));
+		void open_file(const std::filesystem::path& file_name) {
+			this->reader.set_file_stream(
+				new std::ifstream{ file_name, std::ios::binary | std::ios::in }, 
+				std::filesystem::file_size(file_name)
+			);
 		}
 	};
 }

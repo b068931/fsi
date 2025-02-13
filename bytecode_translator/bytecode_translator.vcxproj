@@ -158,13 +158,16 @@
     <ClInclude Include="if_defined_states.h" />
     <ClInclude Include="immediate_argument_states.h" />
     <ClInclude Include="import_keyword_token_state.h" />
+    <ClInclude Include="include_file_state.h" />
     <ClInclude Include="inside_function_body_state.h" />
+    <ClInclude Include="inside_special_instruction_state.h" />
     <ClInclude Include="jump_point_argument_state.h" />
     <ClInclude Include="main_function_name_state.h" />
     <ClInclude Include="main_state.h" />
     <ClInclude Include="module_call_states.h" />
     <ClInclude Include="module_import_state.h" />
     <ClInclude Include="new_jump_point_state.h" />
+    <ClInclude Include="parser_options.h" />
     <ClInclude Include="pointer_dereference_argument_states.h" />
     <ClInclude Include="program_strings_states.h" />
     <ClInclude Include="redefine_states.h" />
@@ -177,6 +180,7 @@
     <ClInclude Include="undefine_state.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="parser_options.cpp" />
     <ClCompile Include="parse_map_configuration.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
@@ -294,6 +298,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\Examples</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release (Installer)|x64'">$(OutDir)\Examples</DestinationFolders>
     </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
@@ -332,6 +337,36 @@
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\Examples</DestinationFolders>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">$(OutDir)\Examples</DestinationFolders>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\Examples</DestinationFolders>
+    </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="..\examples\Cyclic1.txt">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\Examples</DestinationFolders>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">true</DeploymentContent>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">$(OutDir)\Examples</DestinationFolders>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\Examples</DestinationFolders>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release (Installer)|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release (Installer)|x64'">true</DeploymentContent>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release (Installer)|x64'">$(OutDir)\Examples</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\examples\Cyclic2.txt">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\Examples</DestinationFolders>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">true</DeploymentContent>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">$(OutDir)\Examples</DestinationFolders>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\Examples</DestinationFolders>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release (Installer)|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release (Installer)|x64'">true</DeploymentContent>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release (Installer)|x64'">$(OutDir)\Examples</DestinationFolders>
     </CopyFileToFolders>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

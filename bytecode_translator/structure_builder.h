@@ -30,7 +30,7 @@ public:
 	using line_type = std::uint64_t;
 	using immediate_type = std::uint64_t;
 
-	enum class error_t {
+	enum class error_type {
 		no_error,
 		outside_function,
 		inside_module_import,
@@ -78,6 +78,7 @@ public:
 		stack_size_keyword,
 		declare_keyword,
 		main_function_keyword,
+		include_keyword,
 		function_declaration_keyword, //function
 		function_args_start, //(
 		function_args_end, //)
@@ -149,7 +150,8 @@ public:
 	};
 	enum class context_key {
 		main_context,
-		inside_string
+		inside_string,
+		inside_include
 	};
 
 	struct function;

@@ -194,15 +194,17 @@
     <ClInclude Include="inside_value_state.h" />
     <ClInclude Include="main_state.h" />
     <ClInclude Include="module_part.h" />
+    <ClInclude Include="parser_options.h" />
     <ClInclude Include="type_definitions.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="module_mediator.h" />
+    <ClCompile Include="parser_options.cpp" />
     <ClCompile Include="parse_map_configuration.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="dlls.txt">
+    <CopyFileToFolders Include="modules.txt">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>

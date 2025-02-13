@@ -1,0 +1,7 @@
+$include Incorrect Main.txt;
+function 
+
+
+main( );main	{main
+()$stack-size d1000000000;}
+$main-function main;

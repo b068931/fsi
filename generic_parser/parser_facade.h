@@ -1,6 +1,12 @@
 #ifndef PARSER_FACADE_H
 #define PARSER_FACADE_H
 
+#include <vector>
+#include <utility>
+#include <string>
+#include <map>
+#include <filesystem>
+
 #include "token_generator.h"
 
 namespace generic_parser {
@@ -11,20 +17,20 @@ namespace generic_parser {
 		std::vector<std::pair<std::string, token_type>> names_stack; //this field will be passed as parameter to both builder and token_generator, builder will use names_stack to get tokens instead of names
 		token_type end_of_file;
 
-		token_generator<typename token_type, context_key_type> generator;
+		token_generator<token_type, context_key_type> generator;
 		builder builder;
 	public:
 		template<typename... builder_args> //names_stack, hard_symbols, separators, name_token, end_token, args that will be passed to initialize builder
 		parser_facade(
-			std::vector<std::pair<std::string, token_type>>&& names_stack,
-			std::map<context_key_type, typename token_generator<token_type, context_key_type>::symbols_pair>&& contexts,
+			const std::vector<std::pair<std::string, token_type>>& names_stack,
+			const std::map<context_key_type, typename token_generator<token_type, context_key_type>::symbols_pair>& contexts,
 			token_type name_token,
 			token_type end_token,
 			context_key_type starting_context,
 			builder_args&&... args
 		)
-			:names_stack{ std::move(names_stack) },
-			generator{ std::move(contexts), &this->names_stack, name_token, end_token, starting_context },
+			:names_stack{ names_stack },
+			generator{ contexts, &this->names_stack, name_token, end_token, starting_context },
 			builder{ &this->names_stack, &this->generator, std::forward<builder_args>(args)... },
 			end_of_file{ end_token }
 		{
@@ -36,7 +42,7 @@ namespace generic_parser {
 		void operator=(parser_facade&&) = delete;
 
 		decltype(auto) error() { return this->builder.error(); }
-		void start(const std::string& file_name) {
+		void start(const std::filesystem::path& file_name) {
 			this->generator.reset_names();
 			this->generator.open_file(file_name);
 

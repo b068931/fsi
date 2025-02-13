@@ -18,16 +18,22 @@
     <Filter Include="Header Files\Module File Parsing\Parse Map States">
       <UniqueIdentifier>{4527f85b-349b-4b22-8e7f-12f4f2492168}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Module File Parsing">
+      <UniqueIdentifier>{33e14a88-65bc-4ce9-af82-f7157ffda10e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="module_mediator.h">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="parse_map_configuration.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="parse_map_configuration.cpp">
+      <Filter>Source Files\Module File Parsing</Filter>
+    </ClCompile>
+    <ClCompile Include="parser_options.cpp">
+      <Filter>Source Files\Module File Parsing</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -58,8 +64,11 @@
     <ClInclude Include="file_builder.h">
       <Filter>Header Files\Module File Parsing</Filter>
     </ClInclude>
+    <ClInclude Include="parser_options.h">
+      <Filter>Header Files\Module File Parsing</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="dlls.txt" />
+    <CopyFileToFolders Include="modules.txt" />
   </ItemGroup>
 </Project>

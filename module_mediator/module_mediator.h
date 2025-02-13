@@ -9,8 +9,10 @@
 #include <string_view>
 #include <algorithm>
 #include <stdexcept>
+#include <filesystem>
 
 #include "file_builder.h"
+#include "parser_options.h"
 #include "file_components.h"
 #include "../generic_parser/parser_facade.h"
 #include "../console_and_debug/logging.h"
@@ -132,31 +134,14 @@ namespace module_mediator {
 		{
 		}
 
-		std::string load_modules(std::string file_name) {
+		std::string load_modules(const std::filesystem::path& file_name) {
 			generic_parser::parser_facade<
 				parser::components::engine_module_builder::file_tokens, 
 				parser::components::engine_module_builder::context_keys, 
 				parser::components::engine_module_builder
 			> parser{
-				{},
-				{
-					{
-						parser::components::engine_module_builder::context_keys::main_context,
-						generic_parser::token_generator<parser::components::engine_module_builder::file_tokens, parser::components::engine_module_builder::context_keys>::symbols_pair{
-							{
-								{":", parser::components::engine_module_builder::file_tokens::name_and_public_name_separator},
-								{"!", parser::components::engine_module_builder::file_tokens::program_callable_function},
-								{"--", parser::components::engine_module_builder::file_tokens::comment},
-								{"[", parser::components::engine_module_builder::file_tokens::header_open},
-								{"]", parser::components::engine_module_builder::file_tokens::header_close},
-								{"=", parser::components::engine_module_builder::file_tokens::value_assign},
-								{"\n", parser::components::engine_module_builder::file_tokens::new_line},
-								{"\r\n", parser::components::engine_module_builder::file_tokens::new_line}
-							},
-							{}
-						}
-					}
-				},
+				parser::parser_options::keywords,
+				parser::parser_options::contexts,
 				parser::components::engine_module_builder::file_tokens::name,
 				parser::components::engine_module_builder::file_tokens::end_of_file,
 				parser::components::engine_module_builder::context_keys::main_context,
@@ -166,8 +151,8 @@ namespace module_mediator {
 			try {
 				parser.start(file_name);
 			}
-			catch (const std::filesystem::filesystem_error&) {
-				return std::string{ "Can not find 'dlls.txt', it is required in order to load appropriate modules." };
+			catch (const std::exception& exc) {
+				return exc.what();
 			}
 
 			this->loaded_modules = parser.get_builder_value();

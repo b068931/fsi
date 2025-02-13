@@ -3,6 +3,8 @@
 #include "module_import_state.h"
 #include "functions_import_state.h"
 #include "import_keyword_token_state.h"
+#include "inside_special_instruction_state.h"
+#include "include_file_state.h"
 #include "define_state.h"
 #include "redefine_states.h"
 #include "undefine_state.h"
@@ -226,8 +228,13 @@ state_settings& configure_special_instructions(states_builder_type& builder) {
 		.set_error_message("$main-function expects the name of the function that will start the application.")
 		.set_handle_tokens({ structure_builder::source_file_token::expression_end });
 
-	state_settings& inside_special_instruction = builder.create_state<state_type>()
+	state_settings& include_file = builder.create_state<include_file_state>()
+		.set_error_message("';' was expected for include, got another token instead.")
+		.set_handle_tokens({ structure_builder::source_file_token::expression_end });
+
+	state_settings& inside_special_instruction = builder.create_state<inside_special_instruction_state>()
 		.set_error_message("Invalid special instruction.")
+		.set_handle_tokens({ structure_builder::source_file_token::include_keyword })
 		.set_redirection_for_token(
 			structure_builder::source_file_token::define_keyword,
 			generic_parser::state_action::change_top,
@@ -272,6 +279,11 @@ state_settings& configure_special_instructions(states_builder_type& builder) {
 			structure_builder::source_file_token::main_function_keyword,
 			generic_parser::state_action::change_top,
 			main_function_name
+		)
+		.set_redirection_for_token(
+			structure_builder::source_file_token::include_keyword,
+			generic_parser::state_action::change_top,
+			include_file
 		);
 
 	configure_special_instruction_end(define);
@@ -280,6 +292,7 @@ state_settings& configure_special_instructions(states_builder_type& builder) {
 	configure_special_instruction_end(stack_size);
 	configure_special_instruction_end(declare_name);
 	configure_special_instruction_end(main_function_name);
+	configure_special_instruction_end(include_file);
 
 	return inside_special_instruction;
 }

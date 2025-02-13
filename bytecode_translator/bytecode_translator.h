@@ -12,7 +12,7 @@ constexpr auto max_instruction_arguments_count = 15;
 constexpr auto max_name_length = std::numeric_limits<std::uint8_t>::max();
 constexpr auto max_function_arguments_count = std::numeric_limits<std::uint8_t>::max();
 
-bool check_instructions_arugments(structure_builder::file& file) {
+bool check_instructions_arugments(const structure_builder::file& file) {
 	for (const structure_builder::function& func : file.functions) {
 		for (const structure_builder::instruction& inst : func.body) {
 			if (inst.operands_in_order.size() > max_instruction_arguments_count) {
@@ -23,8 +23,8 @@ bool check_instructions_arugments(structure_builder::file& file) {
 
 	return true;
 }
-bool check_functions_count(structure_builder::file& file) { return file.functions.size() <= max_functions_count; }
-bool check_functions_size(structure_builder::file& file) { 
+bool check_functions_count(const structure_builder::file& file) { return file.functions.size() <= max_functions_count; }
+bool check_functions_size(const structure_builder::file& file) { 
 	for (const structure_builder::function& func : file.functions) {
 		if (func.body.size() > max_instructions_count) {
 			return false;
@@ -33,7 +33,7 @@ bool check_functions_size(structure_builder::file& file) {
 
 	return true;
 }
-std::vector<std::string> check_functions_bodies(structure_builder::file& file) {
+std::vector<std::string> check_functions_bodies(const structure_builder::file& file) {
 	std::vector<std::string> result{};
 	for (const structure_builder::function& function : file.functions) {
 		if (function.body.size() == 0) {
@@ -50,7 +50,7 @@ public:
 	//there are four types of runs: modules run(0), jump points run(1), function signatures run(2), function body run(3)
 	//run structure: 1 byte: type, 8 bytes: run length.
 
-	enum class error_t {
+	enum class error_type {
 		name_too_long,
 		too_many_function_arguments,
 		general_instruction,
@@ -88,7 +88,7 @@ private:
 
 		template<template<typename> class templ, typename filter>
 		struct filter_wrapper<templ<filter>> {
-			error_t error_message;
+			error_type error_message;
 			bool check(const structure_builder::instruction& instruction) {
 				if (!filter::check(instruction)) { //and only after that we apply our current filter. this way we will not modify error message if one of the filters higher in class hierarchy returns false
 					this->error_message = filter::error_message;
@@ -120,7 +120,7 @@ private:
 		using type = filter_wrapper<typename_array::typename_array<filters...>>;
 	};
 	struct general_instruction {
-		static constexpr error_t error_message{ error_t::general_instruction };
+		static constexpr error_type error_message{ error_type::general_instruction };
 		static bool check(const structure_builder::instruction& instruction) {
 			//at first we make sure that this insturction won't use arguments specific to function calls
 			bool function_arguments = (instruction.func_addresses.size() == 0) && (instruction.modules.size() == 0) && (instruction.module_functions.size() == 0);
@@ -137,7 +137,7 @@ private:
 		}
 	};
 	struct jump_instruction { //jump pnt name - example
-		static constexpr error_t error_message{ error_t::jump_instruction };
+		static constexpr error_type error_message{ error_type::jump_instruction };
 		static bool check(const structure_builder::instruction& instruction) {
 			return (instruction.dereferences.size() == 0) && //jump instructions use only point variables
 				(instruction.immediates.size() == 0) &&
@@ -146,13 +146,13 @@ private:
 		}
 	};
 	struct data_instruction {
-		static constexpr error_t error_message{ error_t::data_instruction };
+		static constexpr error_type error_message{ error_type::data_instruction };
 		static bool check(const structure_builder::instruction& instruction) {
 			return (instruction.jump_variables.size() == 0);
 		}
 	};
 	struct var_instruction { //var instructions can only dereference pointers and can not use them as pure arguments
-		static constexpr error_t error_message{ error_t::var_instruction };
+		static constexpr error_type error_message{ error_type::var_instruction };
 		static bool check(const structure_builder::instruction& instruction) {
 			for (std::size_t index = 0, size = instruction.operands_in_order.size(); index < size; ++index) {
 				structure_builder::regular_variable* current_argument = 
@@ -167,7 +167,7 @@ private:
 		}
 	};
 	struct apply_on_first_operand_instruction {
-		static constexpr error_t error_message{ error_t::apply_on_first_operand_instruction };
+		static constexpr error_type error_message{ error_type::apply_on_first_operand_instruction };
 		static bool check(const structure_builder::instruction& instruction) {
 			if (instruction.operands_in_order.size() != 0) {
 				return (typeid(*std::get<1>(instruction.operands_in_order[0])) !=
@@ -178,7 +178,7 @@ private:
 		}
 	};
 	struct same_type_instruction {
-		static constexpr error_t error_message{ error_t::same_type_instruction };
+		static constexpr error_type error_message{ error_type::same_type_instruction };
 		static bool check(const structure_builder::instruction& instruction) {
 			if (instruction.operands_in_order.size() >= 2) {
 				structure_builder::source_file_token main_active_type = std::get<0>(instruction.operands_in_order[0]);
@@ -195,49 +195,49 @@ private:
 		}
 	};
 	struct binary_instruction {
-		static constexpr error_t error_message{ error_t::binary_instruction };
+		static constexpr error_type error_message{ error_type::binary_instruction };
 		static bool check(const structure_builder::instruction& instruction) {
 			return (instruction.operands_in_order.size() == 2);
 		}
 	};
 	struct multi_instruction {
-		static constexpr error_t error_message{ error_t::multi_instruction };
+		static constexpr error_type error_message{ error_type::multi_instruction };
 		static bool check(const structure_builder::instruction& instruction) {
 			return (instruction.operands_in_order.size() <= 15);
 		}
 	};
 	struct different_type_instruction {
-		static constexpr error_t error_message{ error_t::different_type_instruction };
+		static constexpr error_type error_message{ error_type::different_type_instruction };
 		static bool check(const structure_builder::instruction& instruction) {
 			return (instruction.immediates.size() == 0);
 		}
 	};
 	struct different_type_multi_instruction {
-		static constexpr error_t error_message{ error_t::different_type_multi_instruction };
+		static constexpr error_type error_message{ error_type::different_type_multi_instruction };
 		static bool check(const structure_builder::instruction& instruction) {
 			return (instruction.operands_in_order.size() >= 1) && (instruction.operands_in_order.size() <= 15);
 		}
 	};
 	struct save_variable_state_instruction {
-		static constexpr error_t error_message{ error_t::save_variable_state_instruction };
+		static constexpr error_type error_message{ error_type::save_variable_state_instruction };
 		static bool check(const structure_builder::instruction& instruction) {
 			return (instruction.operands_in_order.size() == 1);
 		}
 	};
 	struct load_variable_state_instruction {
-		static constexpr error_t error_message{ error_t::load_variable_state_instruction };
+		static constexpr error_type error_message{ error_type::load_variable_state_instruction };
 		static bool check(const structure_builder::instruction& instruction) {
 			return (instruction.immediates.size() == 0);
 		}
 	};
 	struct function_call_instruction {
-		static constexpr error_t error_message{ error_t::function_call };
+		static constexpr error_type error_message{ error_type::function_call };
 		static bool check(const structure_builder::instruction& instruction) {
 			return (instruction.operands_in_order.size() >= 0) && (instruction.operands_in_order.size() <= max_instruction_arguments_count);
 		}
 	};
 	struct program_function_call_instruction {
-		static constexpr error_t error_message{ error_t::program_function_call };
+		static constexpr error_type error_message{ error_type::program_function_call };
 		static bool check(const structure_builder::instruction& instruction) {
 			bool program_function_call = (instruction.modules.size() == 0) && (instruction.module_functions.size() == 0);
 			if (program_function_call) {
@@ -254,13 +254,13 @@ private:
 		}
 	};
 	struct module_function_call_instruction {
-		static constexpr error_t error_message{ error_t::module_function_call };
+		static constexpr error_type error_message{ error_type::module_function_call };
 		static bool check(const structure_builder::instruction& instruction) {
 			return (instruction.modules.size() == 1) && (instruction.module_functions.size() == 1);
 		}
 	};
 	struct pointer_ref_instruction {
-		static constexpr error_t error_message{ error_t::pointer_ref_instruction };
+		static constexpr error_type error_message{ error_type::pointer_ref_instruction };
 		static bool check(const structure_builder::instruction& instruction) {
 			bool initial_check = instruction.immediates.size() == 0;
 
@@ -281,7 +281,7 @@ private:
 		}
 	};
 	struct ctjtd_instruction {
-		static constexpr error_t error_message{ error_t::ctjtd_instruction };
+		static constexpr error_type error_message{ error_type::ctjtd_instruction };
 		static bool check(const structure_builder::instruction& instruction) {
 			bool initial_check =
 				(instruction.modules.size() == 0) && (instruction.module_functions.size() == 0);
@@ -302,7 +302,7 @@ private:
 		}
 	};
 	struct string_instruction {
-		static constexpr error_t error_message{ error_t::string_instruction };
+		static constexpr error_type error_message{ error_type::string_instruction };
 		static bool check(const structure_builder::instruction& instruction) {
 			if ((instruction.strings.size() == 1) && (instruction.operands_in_order.size() >= 2)) {
 				return (std::get<0>(instruction.operands_in_order[0]) == structure_builder::source_file_token::pointer_type_keyword) &&
@@ -313,7 +313,7 @@ private:
 		}
 	};
 	struct non_string_instruction {
-		static constexpr error_t error_message{ error_t::non_string_instruction };
+		static constexpr error_type error_message{ error_type::non_string_instruction };
 		static bool check(const structure_builder::instruction& instruction) {
 			return instruction.strings.size() == 0;
 		}
@@ -322,7 +322,7 @@ private:
 	class instruction_check {
 	public:
 		virtual bool is_match(structure_builder::source_file_token instr) = 0;
-		virtual void check_errors(const structure_builder::instruction& instr, std::vector<error_t>& err_list) = 0;
+		virtual void check_errors(const structure_builder::instruction& instr, std::vector<error_type>& err_list) = 0;
 		virtual ~instruction_check() = default;
 	};
 	template<typename filter_t>
@@ -340,7 +340,7 @@ private:
 		virtual bool is_match(structure_builder::source_file_token instr) override {
 			return std::find(this->instruction_list.begin(), this->instruction_list.end(), instr) != this->instruction_list.end();
 		}
-		virtual void check_errors(const structure_builder::instruction& instr, std::vector<error_t>& err_list) {
+		virtual void check_errors(const structure_builder::instruction& instr, std::vector<error_type>& err_list) {
 			if (!this->filter.check(instr)) {
 				err_list.push_back(this->filter.error_message);
 			}
@@ -355,7 +355,7 @@ private:
 			}
 		}
 
-		this->logic_errors.push_back(error_t::unknown_instruction);
+		this->logic_errors.push_back(error_type::unknown_instruction);
 	}
 
 	class instruction_encoder : public structure_builder::variable_visitor {
@@ -537,8 +537,8 @@ private:
 	structure_builder::file* file_structure;
 	std::ofstream* file_stream;
 
-	std::vector<error_t> logic_errors;
-	void add_new_logic_error(error_t err) { this->logic_errors.push_back(err); }
+	std::vector<error_type> logic_errors;
+	void add_new_logic_error(error_type err) { this->logic_errors.push_back(err); }
 
 	template<typename type>
 	void write_bytes(type value) {
@@ -773,7 +773,7 @@ private:
 
 			std::size_t module_name_size = mod.name.size();
 			if (module_name_size > max_name_length) {
-				this->add_new_logic_error(error_t::name_too_long);
+				this->add_new_logic_error(error_type::name_too_long);
 			}
 
 			this->write_1_byte(static_cast<std::uint8_t>(mod.name.size()));
@@ -786,7 +786,7 @@ private:
 
 				std::size_t module_function_name_size = mod_fnc.name.size();
 				if (module_function_name_size > max_name_length) {
-					this->add_new_logic_error(error_t::name_too_long);
+					this->add_new_logic_error(error_type::name_too_long);
 				}
 
 				this->file_stream->write(mod_fnc.name.c_str(), module_function_name_size);
@@ -824,7 +824,7 @@ private:
 			this->write_8_bytes(static_cast<std::uint64_t>(fnc.id));
 			std::size_t function_arguments_count = fnc.arguments.size();
 			if (function_arguments_count > max_function_arguments_count) {
-				this->add_new_logic_error(error_t::too_many_function_arguments);
+				this->add_new_logic_error(error_type::too_many_function_arguments);
 			}
 
 			this->write_1_byte(static_cast<std::uint8_t>(function_arguments_count));
@@ -1023,96 +1023,96 @@ public:
 		}
 	}
 
-	const std::vector<error_t>& errors() const { return this->logic_errors; }
+	const std::vector<error_type>& errors() const { return this->logic_errors; }
 };
 
-void translate_error(bytecode_translator::error_t error, std::ostream& stream) {
+void translate_error(bytecode_translator::error_type error, std::ostream& stream) {
 	switch (error) {
-		case bytecode_translator::error_t::general_instruction: {
+		case bytecode_translator::error_type::general_instruction: {
 			stream << "You can not use signed variables and function calls inside general instructions";
 			break;
 		}
-		case bytecode_translator::error_t::jump_instruction: {
+		case bytecode_translator::error_type::jump_instruction: {
 			stream << "You can use ONLY one point variable inside 'jump' instructions";
 			break;
 		}
-		case bytecode_translator::error_t::data_instruction: {
+		case bytecode_translator::error_type::data_instruction: {
 			stream << "You can not use point variables inside data instructions";
 			break;
 		}
-		case bytecode_translator::error_t::var_instruction: {
+		case bytecode_translator::error_type::var_instruction: {
 			stream << "You can not use pointer ARGUMENTS inside var instructions";
 			break;
 		}
-		case bytecode_translator::error_t::apply_on_first_operand_instruction: {
+		case bytecode_translator::error_type::apply_on_first_operand_instruction: {
 			stream << "This instruction changes the value of the first operand, so you can not use immediate as the first operand here.";
 			break;
 		}
-		case bytecode_translator::error_t::same_type_instruction: {
+		case bytecode_translator::error_type::same_type_instruction: {
 			stream << "You can not use different active types inside same type instructions and you can not use less than two arguments. Also you can not use immediate data as your first argument";
 			break;
 		}
-		case bytecode_translator::error_t::binary_instruction: {
+		case bytecode_translator::error_type::binary_instruction: {
 			stream << "Binary instructions use only one pair of arguments";
 			break;
 		}
-		case bytecode_translator::error_t::multi_instruction: {
+		case bytecode_translator::error_type::multi_instruction: {
 			stream << "Multi instructions can use up to 15 arguments";
 			break;
 		}
-		case bytecode_translator::error_t::different_type_instruction: {
+		case bytecode_translator::error_type::different_type_instruction: {
 			stream << "Different type instructions can not use immediates";
 			break;
 		}
-		case bytecode_translator::error_t::different_type_multi_instruction: {
+		case bytecode_translator::error_type::different_type_multi_instruction: {
 			stream << "Different type multi instructions can use up to 15 arguments";
 			break;
 		}
-		case bytecode_translator::error_t::empty_instruction: {
+		case bytecode_translator::error_type::empty_instruction: {
 			stream << "You can not use arguments inside empty instruction";
 			break;
 		}
-		case bytecode_translator::error_t::pointer_instruction: {
+		case bytecode_translator::error_type::pointer_instruction: {
 			stream << "You can not use more than two arguments inside pointer instruction. Also you need to specify one argument with type POINTER";
 			break;
 		}
-		case bytecode_translator::error_t::function_call: {
+		case bytecode_translator::error_type::function_call: {
 			stream << "You can not use more than 250 arguments inside function call instruction";
 			break;
 		}
-		case bytecode_translator::error_t::program_function_call: {
+		case bytecode_translator::error_type::program_function_call: {
 			stream << "You can not use signed variables inside program function call";
 			break;
 		}
-		case bytecode_translator::error_t::module_function_call: {
+		case bytecode_translator::error_type::module_function_call: {
 			stream << "Invalid module function call";
 			break;
 		}
-		case bytecode_translator::error_t::save_variable_state_instruction: {
+		case bytecode_translator::error_type::save_variable_state_instruction: {
 			stream << "save instruction takes only one argument, excluding signed variables, jump points, etc.";
 			break;
 		}
-		case bytecode_translator::error_t::load_variable_state_instruction: {
+		case bytecode_translator::error_type::load_variable_state_instruction: {
 			stream << "load instruction takes only one argument, excluding immediates, signed variables, jump points, etc.";
 			break;
 		}
-		case bytecode_translator::error_t::pointer_ref_instruction: {
+		case bytecode_translator::error_type::pointer_ref_instruction: {
 			stream << "ref instruction must be used to store pointer value from one pointer variable to another or you can use it to store pointer value to another pointer's memory";
 			break;
 		}
-		case bytecode_translator::error_t::ctjtd_instruction: {
+		case bytecode_translator::error_type::ctjtd_instruction: {
 			stream << "ctjtd (convert to jump table displacement) instruction must be used with fnc as the second argument while the first argument is the place to store the eight_bytes displacement";
 			break;
 		}
-		case bytecode_translator::error_t::non_string_instruction: {
+		case bytecode_translator::error_type::non_string_instruction: {
 			stream << "Only copy_string instruction can use string as the second argument.";
 			break;
 		}
-		case bytecode_translator::error_t::string_instruction: {
+		case bytecode_translator::error_type::string_instruction: {
 			stream << "copy_string instruction uses 'str' as its second argument.";
 			break;
 		}
-		case bytecode_translator::error_t::unknown_instruction: {
+		case bytecode_translator::error_type::unknown_instruction: {
 			stream << "Unknown instruction";
 			break;
 		}
