@@ -2,6 +2,7 @@
 #define RESOURCE_MODULE
 
 #include "pch.h"
+#include "../module_mediator/module_part.h"
 
 #ifdef RESOURCEMODULE_EXPORTS
 #define RESOURCEMODULE_API extern "C" __declspec(dllexport)

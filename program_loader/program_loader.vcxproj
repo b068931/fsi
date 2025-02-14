@@ -29,12 +29,11 @@
     <ClInclude Include="complex_arithmetic_instruction_builder.h" />
     <ClInclude Include="copy_string_builder.h" />
     <ClInclude Include="ctjtd_builder.h" />
-    <ClInclude Include="declarations.h" />
+    <ClInclude Include="module_interoperation.h" />
     <ClInclude Include="dereferenced_pointer.h" />
     <ClInclude Include="div_builder.h" />
-    <ClInclude Include="framework.h" />
     <ClInclude Include="function.h" />
-    <ClInclude Include="functions.h" />
+    <ClInclude Include="program_functions.h" />
     <ClInclude Include="function_call_builder.h" />
     <ClInclude Include="general_function_call_bulider.h" />
     <ClInclude Include="generic_variable.h" />
@@ -56,7 +55,6 @@
     <ClInclude Include="program_loader.h" />
     <ClInclude Include="ref_builder.h" />
     <ClInclude Include="regular_variable.h" />
-    <ClInclude Include="resource.h" />
     <ClInclude Include="run_container.h" />
     <ClInclude Include="run_reader.h" />
     <ClInclude Include="save_builder.h" />
@@ -68,9 +66,8 @@
     <ClInclude Include="variable_with_id.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="dll_mediator_init.cpp" />
-    <ClCompile Include="functions.cpp" />
+    <ClCompile Include="module_initialization.cpp" />
+    <ClCompile Include="program_functions.cpp" />
     <ClCompile Include="instruction_arguments_visitor_function_implementation.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

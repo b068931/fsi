@@ -1,9 +1,7 @@
 #ifndef JMP_BUILDER_H
 #define JMP_BUILDER_H
 
-#include <memory> //std::unique_ptr
-#include <utility> //std::forward
-#include <cstdint>
+#include "pch.h"
 #include "machine_codes_instruction_builder.h"
 
 class jmp_builder : public machine_codes_instruction_builder {

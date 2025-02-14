@@ -2,7 +2,8 @@
 #define THREAD_MANAGER_H
 
 #include "scheduler.h"
-#include "functions.h"
+#include "module_interoperation.h"
+#include "assembly_functions.h"
 #include "../console_and_debug/logging.h"
 
 class thread_manager {

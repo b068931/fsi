@@ -1,9 +1,8 @@
 #ifndef DEREFERENCED_POINTER_H
 #define DEREFERENCED_POINTER_H
 
-#include <vector>
+#include "pch.h"
 #include "variable_with_id.h"
-#include <cstdint>
 
 class dereferenced_pointer : public variable_with_id {
 private:

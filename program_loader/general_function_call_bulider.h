@@ -1,9 +1,7 @@
 #ifndef GENERAL_FUNCTION_CALL_BUILDER_H
 #define GENERAL_FUNCTION_CALL_BUILDER_H
 
-#include <cstdint>
-#include <utility>
-#include <vector>
+#include "pch.h"
 #include "instruction_builder.h"
 
 class general_function_call_builder : public instruction_builder {

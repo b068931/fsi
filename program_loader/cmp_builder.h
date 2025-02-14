@@ -1,8 +1,7 @@
 #ifndef CMP_BUILDER_H
 #define CMP_BULIDER_H
 
-#include <memory> //std::unique_ptr
-#include <utility> //std::forward
+#include "pch.h"
 #include "machine_codes_instruction_builder.h"
 
 class cmp_builder : public machine_codes_instruction_builder {

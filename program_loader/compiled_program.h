@@ -1,7 +1,7 @@
 #ifndef COMPILED_PROGRAM_STRUCTURE_H
 #define COMPILED_PROGRAM_STRUCTURE_H
 
-#include <cstdint>
+#include "pch.h"
 
 struct compiled_program {
 	std::uint32_t main_function_index;

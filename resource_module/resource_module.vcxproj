@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="framework.h" />
     <ClInclude Include="id_generator.h" />
     <ClInclude Include="module_interoperation.h" />
     <ClInclude Include="pch.h" />
@@ -30,7 +29,6 @@
     <ClInclude Include="thread_structure.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="module_initialization.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

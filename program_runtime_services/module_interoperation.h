@@ -1,5 +1,5 @@
-#ifndef PRTS_DECLARATIONS_H
-#define PRTS_DECLARATIONS_H
+#ifndef PROGRAM_RUNTIME_SERVICES_MODULE_INTEROPERATION_H
+#define PROGRAM_RUNTIME_SERVICES_MODULE_INTEROPERATION_H
 
 #include "../module_mediator/module_part.h"
 #include "../module_mediator/fsi_types.h"
@@ -11,11 +11,10 @@
 #define PROGRAMRUNTIMESERVICES_API extern "C" __declspec(dllimport) 
 #endif
 
-module_mediator::module_part* get_module_part();
 module_mediator::return_value get_current_thread_group_id();
-
 std::pair<module_mediator::pointer, module_mediator::eight_bytes> decay_pointer(module_mediator::pointer);
 
+module_mediator::module_part* get_module_part();
 class index_getter {
 public:
 	static std::size_t progload() {

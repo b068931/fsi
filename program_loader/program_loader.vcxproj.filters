@@ -15,9 +15,6 @@
     <Filter Include="Source Files\Reading Bytecode File And Machine Code Generation">
       <UniqueIdentifier>{f1d98ec4-504b-4870-918c-f91477723030}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\PCH">
-      <UniqueIdentifier>{47d93394-1c4a-4770-aa8f-a49b567346f0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Machine Code Generation">
       <UniqueIdentifier>{32233a6b-9d96-4250-a008-8f1f23c7d150}</UniqueIdentifier>
     </Filter>
@@ -42,17 +39,11 @@
     <Filter Include="Header Files\Machine Code Generation\Program Variables\Concrete Variables">
       <UniqueIdentifier>{16e68216-6378-4dcc-8cb3-397aa021f01d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Module Mediator">
+      <UniqueIdentifier>{4b8bc538-8b20-4be9-9ab6-9e04a9dd4c28}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="declarations.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="program_loader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="instruction_arguments_classes.h">
       <Filter>Header Files\Machine Code Generation\Program Variables</Filter>
     </ClInclude>
@@ -158,12 +149,6 @@
     <ClInclude Include="sdiv_builder.h">
       <Filter>Header Files\Machine Code Generation\Instruction Builders\Concrete Builders</Filter>
     </ClInclude>
-    <ClInclude Include="framework.h">
-      <Filter>Header Files\PCH</Filter>
-    </ClInclude>
-    <ClInclude Include="pch.h">
-      <Filter>Header Files\PCH</Filter>
-    </ClInclude>
     <ClInclude Include="jump_table_builder.h">
       <Filter>Header Files\Machine Code Generation\Bytecode File Readers</Filter>
     </ClInclude>
@@ -182,24 +167,30 @@
     <ClInclude Include="compiled_program.h">
       <Filter>Header Files\Machine Code Generation</Filter>
     </ClInclude>
-    <ClInclude Include="functions.h">
+    <ClInclude Include="program_functions.h">
       <Filter>Header Files\Machine Code Generation</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="module_interoperation.h">
+      <Filter>Header Files\Module Mediator</Filter>
+    </ClInclude>
+    <ClInclude Include="program_loader.h">
+      <Filter>Header Files\Module Mediator</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="program_loader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dll_mediator_init.cpp">
-      <Filter>Source Files\Maintenance</Filter>
-    </ClCompile>
-    <ClCompile Include="dllmain.cpp">
+    <ClCompile Include="module_initialization.cpp">
       <Filter>Source Files\Maintenance</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">
       <Filter>Source Files\Maintenance</Filter>
     </ClCompile>
-    <ClCompile Include="functions.cpp">
+    <ClCompile Include="program_functions.cpp">
       <Filter>Source Files\Reading Bytecode File And Machine Code Generation</Filter>
     </ClCompile>
     <ClCompile Include="instruction_arguments_visitor_function_implementation.cpp">

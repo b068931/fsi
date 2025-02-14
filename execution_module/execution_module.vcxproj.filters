@@ -12,58 +12,52 @@
     <Filter Include="Source Files\Maintenance">
       <UniqueIdentifier>{0be71acf-f167-4869-bef0-82bdfaf0169e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\PCH">
-      <UniqueIdentifier>{15bc15c1-4d05-4a9a-84aa-f947e88430f0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Thread Management">
-      <UniqueIdentifier>{f2316853-74eb-42ed-8b43-62fc2c7e8c73}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Thread Management\Scheduling">
-      <UniqueIdentifier>{51888b01-abd7-4207-99dd-12ee1fb5a0ff}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Executors Management">
       <UniqueIdentifier>{c03f3ed6-8fdb-4e23-9c9a-9ef111dc4cb6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Base">
-      <UniqueIdentifier>{d7e14ebb-2334-43e1-b63d-56a528adbd34}</UniqueIdentifier>
+    <Filter Include="Header Files\Module Mediator">
+      <UniqueIdentifier>{b7981b77-2050-4825-8851-fff04c431402}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Base">
-      <UniqueIdentifier>{a114299a-a058-4732-b58f-680e2370f9c4}</UniqueIdentifier>
+    <Filter Include="Header Files\Program Threads Management">
+      <UniqueIdentifier>{f2316853-74eb-42ed-8b43-62fc2c7e8c73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Program Threads Management\Scheduling">
+      <UniqueIdentifier>{51888b01-abd7-4207-99dd-12ee1fb5a0ff}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="execution_module.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="pch.h">
-      <Filter>Header Files\PCH</Filter>
-    </ClInclude>
-    <ClInclude Include="framework.h">
-      <Filter>Header Files\PCH</Filter>
-    </ClInclude>
     <ClInclude Include="clock_list.h">
-      <Filter>Header Files\Thread Management\Scheduling</Filter>
+      <Filter>Header Files\Program Threads Management\Scheduling</Filter>
     </ClInclude>
     <ClInclude Include="priority_list.h">
-      <Filter>Header Files\Thread Management\Scheduling</Filter>
+      <Filter>Header Files\Program Threads Management\Scheduling</Filter>
     </ClInclude>
     <ClInclude Include="scheduler.h">
-      <Filter>Header Files\Thread Management\Scheduling</Filter>
+      <Filter>Header Files\Program Threads Management\Scheduling</Filter>
     </ClInclude>
     <ClInclude Include="program_state_manager.h">
-      <Filter>Header Files\Thread Management</Filter>
+      <Filter>Header Files\Program Threads Management</Filter>
     </ClInclude>
     <ClInclude Include="thread_manager.h">
-      <Filter>Header Files\Thread Management</Filter>
-    </ClInclude>
-    <ClInclude Include="functions.h">
-      <Filter>Header Files\Executors Management</Filter>
+      <Filter>Header Files\Program Threads Management</Filter>
     </ClInclude>
     <ClInclude Include="thread_local_structure.h">
       <Filter>Header Files\Executors Management</Filter>
     </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="execution_module.h">
+      <Filter>Header Files\Module Mediator</Filter>
+    </ClInclude>
     <ClInclude Include="executions_backend_functions.h">
-      <Filter>Header Files\Base</Filter>
+      <Filter>Header Files\Program Threads Management</Filter>
+    </ClInclude>
+    <ClInclude Include="assembly_functions.h">
+      <Filter>Header Files\Executors Management</Filter>
+    </ClInclude>
+    <ClInclude Include="module_interoperation.h">
+      <Filter>Header Files\Module Mediator</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -76,11 +70,11 @@
     <ClCompile Include="pch.cpp">
       <Filter>Source Files\Maintenance</Filter>
     </ClCompile>
-    <ClCompile Include="module_initialization.cpp">
-      <Filter>Source Files\Base</Filter>
-    </ClCompile>
     <ClCompile Include="execution_backend_functions.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="module_initialization.cpp">
+      <Filter>Source Files\Maintenance</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

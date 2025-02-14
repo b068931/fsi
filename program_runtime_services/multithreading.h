@@ -1,7 +1,7 @@
 #ifndef PRTS_MULTITHREADING_H
 #define PRTS_MULTITHREADING_H
 
-#include "declarations.h"
+#include "module_interoperation.h"
 
 PROGRAMRUNTIMESERVICES_API module_mediator::return_value yield(module_mediator::arguments_string_type bundle);
 PROGRAMRUNTIMESERVICES_API module_mediator::return_value self_terminate(module_mediator::arguments_string_type bundle);

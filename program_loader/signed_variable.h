@@ -1,8 +1,8 @@
 #ifndef SIGNED_VARIABLE_H
 #define SIGNED_VARIABLE_H
 
+#include "pch.h"
 #include "generic_variable.h"
-#include <cstdint>
 
 class signed_variable : public generic_variable {
 public:

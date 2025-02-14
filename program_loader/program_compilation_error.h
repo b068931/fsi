@@ -1,7 +1,7 @@
 #ifndef PROGRAM_COMPILATION_ERROR_H
 #define PROGRAM_COMPILATION_ERROR_H
 
-#include <stdexcept>
+#include "pch.h"
 #include "variable_with_id.h"
 
 class program_compilation_error : public std::logic_error {

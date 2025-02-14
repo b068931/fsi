@@ -9,11 +9,6 @@ extern thread_local_structure* get_thread_local_structure();
 module_mediator::module_part* get_module_part();
 char* get_program_control_functions_addresses();
 
-extern "C" [[noreturn]] void load_execution_threadf(void*);
-extern "C" void load_programf(void*, void*, std::size_t is_startup);
-extern "C" module_mediator::return_value special_call_modulef();
-extern "C" [[noreturn]] void resume_program_executionf(void*);
-
 class index_getter { 
 //i guess this class is thread safe https://stackoverflow.com/questions/8102125/is-local-static-variable-initialization-thread-safe-in-c11
 public:

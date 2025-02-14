@@ -1,16 +1,22 @@
 #ifndef PCH_H
 #define PCH_H
 
-#include "framework.h"
+#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
 
 #include <windows.h>
-#include "../module_mediator/module_part.h"
-#include <memory>
 #include <map>
+#include <memory>
 #include <fstream>
 #include <filesystem>
 #include <cassert>
 #include <mutex>
 #include <format>
+#include <utility> //std::pair
+#include <cstdint> //uintX_t, intX_t types
+#include <vector>
+#include <stdexcept>
+#include <unordered_map>
+#include <iostream>
 
 #endif

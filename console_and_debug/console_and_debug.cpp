@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "console_and_debug.h"
+#include "module_interoperation.h"
 
 std::chrono::steady_clock::time_point starting_time;
 std::mutex global_debug_output_lock;
@@ -65,13 +66,13 @@ void generic_log_message_with_thread_information(message_type type, module_media
 		module_mediator::arguments_string_builder::unpack<void*, module_mediator::return_value, void*, void*>(bundle);
 
 	module_mediator::return_value current_thread_id = module_mediator::fast_call(
-		::part,
+		get_module_part(),
 		index_getter::excm(),
 		index_getter::excm_get_current_thread_id()
 	);
 
 	module_mediator::return_value current_thread_group_id = module_mediator::fast_call(
-		::part,
+		get_module_part(),
 		index_getter::excm(),
 		index_getter::excm_get_current_thread_group_id()
 	);
@@ -127,27 +128,4 @@ module_mediator::return_value program_error(module_mediator::arguments_string_ty
 module_mediator::return_value program_fatal(module_mediator::arguments_string_type bundle) {
 	generic_log_message_with_thread_information(message_type::fatal, bundle);
 	return 0;
-}
-
-void initialize_m(module_mediator::module_part* part) {
-	::part = part;
-	::starting_time = std::chrono::steady_clock::now();
-
-	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-	if (hOut == INVALID_HANDLE_VALUE)
-	{
-		std::cerr << "Unable to set virtual terminal mode. Output may look strange." << std::endl;
-	}
-
-	DWORD dwMode = 0;
-	if (!GetConsoleMode(hOut, &dwMode))
-	{
-		std::cerr << "Unable to set virtual terminal mode. Output may look strange." << std::endl;
-	}
-
-	dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-	if (!SetConsoleMode(hOut, dwMode))
-	{
-		std::cerr << "Unable to set virtual terminal mode. Output may look strange." << std::endl;
-	}
 }

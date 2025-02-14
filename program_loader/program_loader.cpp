@@ -3,9 +3,9 @@
 
 #include "run_reader.h"
 #include "run_container.h"
-#include "functions.h"
+#include "program_functions.h"
 #include "instruction_builder_classes.h"
-#include "declarations.h"
+#include "module_interoperation.h"
 
 #include "jump_table_builder.h"
 #include "memory_layouts_builder.h"

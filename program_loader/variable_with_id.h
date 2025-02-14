@@ -1,8 +1,8 @@
 #ifndef AUXILIARY_VARIABLE_WITH_ID_H
 #define AUXILIARY_VARIABLE_WITH_ID_H
 
+#include "pch.h"
 #include "variable.h"
-#include <cstdint>
 
 using entity_id = std::uint64_t;
 

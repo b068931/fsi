@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "run_container.h"
-
-extern module_mediator::module_part* part;
+#include "module_interoperation.h"
+#include "../module_mediator/module_part.h"
 
 void runs_container::modules_reader(run_reader<runs_container>::run run) { //every run has its own specific structure, so we need to use different functions for each type of run (see bytecode_translator.h)
 	for (std::uint64_t counter = 0, modules_count = run.get_object<std::uint64_t>(); counter < modules_count; ++counter) {
@@ -11,15 +11,15 @@ void runs_container::modules_reader(run_reader<runs_container>::run run) { //eve
 		std::uint64_t number_of_functions = run.get_object<std::uint64_t>();
 
 		const std::string& module_name = this->read_name(run);
-		std::size_t found_module = ::part->find_module_index(module_name.c_str()); //now we try to find module's index inside engine_module mediator
-		if (found_module != ::part->module_not_found) {
+		std::size_t found_module = get_module_part()->find_module_index(module_name.c_str()); //now we try to find module's index inside engine_module mediator
+		if (found_module != get_module_part()->module_not_found) {
 			new_module.module_id = found_module; //add new_module to the list of modules
 
 			for (std::uint64_t functions_counter = 0; functions_counter < number_of_functions; ++functions_counter) {
 				entity_id function_entityid = run.get_object<entity_id>();
 				const std::string& function_name = this->read_name(run);
-				std::size_t found_function = ::part->find_function_index(found_module, function_name.c_str());
-				if (found_function != ::part->function_not_found) {
+				std::size_t found_function = get_module_part()->find_function_index(found_module, function_name.c_str());
+				if (found_function != get_module_part()->function_not_found) {
 					new_module.module_functions[function_entityid] = found_function;
 				}
 			}

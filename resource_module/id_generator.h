@@ -1,8 +1,7 @@
 #ifndef RESOURCE_MODULE_ID_GENERATOR_H
 #define RESOURCE_MODULE_ID_GENERATOR_H
 
-#include <stack>
-#include <mutex>
+#include "pch.h"
 #include "../module_mediator/module_part.h"
 
 class id_generator {

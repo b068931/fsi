@@ -1,12 +1,8 @@
 #ifndef JUMP_TABLE_BUILDER_H
 #define JUMP_TABLE_BUILDER_H
 
+#include "pch.h"
 #include "variable_with_id.h" //entity_id
-
-#include <cstdint> //std::uint32_t, std::uint64_t
-#include <vector>
-#include <utility> //std::pair
-#include <tuple>
 
 class jump_table_builder {
 private:

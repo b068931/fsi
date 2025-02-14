@@ -1,8 +1,7 @@
 #ifndef INC_DEC_BUILDER_H
 #define INC_DEC_BUILDER_H
 
-#include <memory> //std::unique_ptr
-#include <utility> //std::forward
+#include "pch.h"
 #include "machine_codes_instruction_builder.h"
 
 class apply_on_memory : public machine_codes_instruction_builder {

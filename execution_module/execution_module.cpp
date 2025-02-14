@@ -1,12 +1,12 @@
 #include "pch.h"
-#include "functions.h"
+#include "module_interoperation.h"
 #include "execution_module.h"
 #include "program_state_manager.h"
 #include "executions_backend_functions.h"
 #include "thread_local_structure.h"
 #include "../module_mediator/fsi_types.h"
 #include "../module_mediator/module_part.h"
-#include "../program_loader/functions.h"
+#include "../program_loader/program_functions.h"
 #include "../console_and_debug/logging.h"
 
 module_mediator::return_value on_thread_creation(module_mediator::arguments_string_type bundle) {

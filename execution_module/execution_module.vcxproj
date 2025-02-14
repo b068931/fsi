@@ -19,11 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="assembly_functions.h" />
     <ClInclude Include="clock_list.h" />
     <ClInclude Include="executions_backend_functions.h" />
     <ClInclude Include="execution_module.h" />
-    <ClInclude Include="framework.h" />
-    <ClInclude Include="functions.h" />
+    <ClInclude Include="module_interoperation.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="priority_list.h" />
     <ClInclude Include="program_state_manager.h" />

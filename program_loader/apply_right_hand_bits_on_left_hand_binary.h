@@ -1,8 +1,7 @@
 #ifndef APPLY_RIGHT_HAND_BITS_ON_LEFT_HAND_BINARY_H
 #define APPLY_RIGHT_HAND_BITS_ON_LEFT_HAND_BINARY_H
 
-#include <memory> //std::unique_ptr
-#include <utility> //std::forward
+#include "pch.h"
 #include "arithmetic_instruction_builder.h"
 
 class apply_right_hand_bits_on_left_hand_binary : public arithmetic_instruction_builder {

@@ -1,5 +1,14 @@
 #include "pch.h"
-#include "declarations.h"
+#include "module_interoperation.h"
+
+module_mediator::module_part* part = nullptr;
+module_mediator::module_part* get_module_part() {
+	return ::part;
+}
+
+ PROGRAMRUNTIMESERVICES_API void initialize_m(module_mediator::module_part* part) {
+	::part = part;
+}
 
 module_mediator::return_value get_current_thread_group_id() {
 	return module_mediator::fast_call(

@@ -1,8 +1,7 @@
 #ifndef AUXILIARY_FUNCTIONS_H
 #define AUXILIARY_FUNCTIONS_H
 
-#include <cstdint>
-#include <vector>
+#include "pch.h"
 #include "memory_layouts_builder.h"
 
 enum class termination_codes : std::int32_t {

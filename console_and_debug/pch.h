@@ -1,10 +1,10 @@
 #ifndef PCH_H
 #define PCH_H
 
-#include "framework.h"
+#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
 
-#include "../module_mediator/module_part.h"
-#include "../module_mediator/fsi_types.h"
+#include <windows.h>
 #include <iostream>
 #include <mutex>
 #include <sstream>

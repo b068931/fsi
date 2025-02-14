@@ -1,20 +1,15 @@
 #ifndef INSTRUCTION_BUILDER_H
 #define INSTRUCTION_BUILDER_H
 
+#include "pch.h"
 #include "variable_with_id.h" //entity_id
 #include "run_reader.h"
 #include "run_container.h"
 #include "instruction_arguments_classes.h"
-#include "functions.h"
+#include "program_functions.h"
 #include "jump_table_builder.h"
 #include "memory_layouts_builder.h"
 #include "program_compilation_error.h"
-
-#include <utility> //std::pair
-#include <cstdint> //uintX_t, intX_t types
-#include <vector>
-#include <map>
-#include <cassert>
 
 class instruction_builder {
 private:

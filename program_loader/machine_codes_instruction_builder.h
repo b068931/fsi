@@ -1,8 +1,7 @@
 #ifndef MACHINE_CODES_INSTRUCTION_BUILDER_H
 #define MACHINE_CODES_INSTRUCTION_BUILDER_H
 
-#include <vector>
-#include <utility> //std::forward
+#include "pch.h"
 #include "instruction_builder.h"
 
 class machine_codes_instruction_builder : public instruction_builder {

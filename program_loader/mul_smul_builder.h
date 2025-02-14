@@ -1,8 +1,7 @@
 #ifndef MUL_SMUL_BUILDER_H
 #define MUL_SMUL_BUILDER_H
 
-#include <memory> //std::unique_ptr
-#include <utility> //std::forward
+#include "pch.h"
 #include "complex_arithmetic_instruction_builder.h"
 
 class mul_smul_builder : public complex_arithmetic_instruction_builder {

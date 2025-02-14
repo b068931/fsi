@@ -1,6 +1,6 @@
 #include "pch.h"
-#include "declarations.h"
-#include "functions.h"
+#include "module_interoperation.h"
+#include "program_functions.h"
 #include "program_loader.h"
 
 module_mediator::module_part* part = nullptr;

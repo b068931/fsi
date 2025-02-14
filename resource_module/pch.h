@@ -1,11 +1,12 @@
 #ifndef PCH_H
 #define PCH_H
 
-#include "framework.h"
+#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
 
+#include <windows.h>
 #include <cstdint>
 #include <mutex>
-#include "../module_mediator/module_part.h"
 #include <vector>
 #include <map>
 #include <iterator>
@@ -13,5 +14,6 @@
 #include <stack>
 #include <format>
 #include <cassert>
+#include <utility>
 
 #endif

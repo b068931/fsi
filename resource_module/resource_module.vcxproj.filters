@@ -9,9 +9,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Header Files\PCH">
-      <UniqueIdentifier>{b7e1aec0-2175-46a1-b4b6-c0a05809c6ff}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Program Objects">
       <UniqueIdentifier>{a2d09236-ca32-4174-ac1f-9fe8a2d5c126}</UniqueIdentifier>
     </Filter>
@@ -21,20 +18,14 @@
     <Filter Include="Header Files\Program Objects\Concrete Classes">
       <UniqueIdentifier>{45718911-73a5-41c1-9429-f3511e6d7cd3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Module Mediator">
+      <UniqueIdentifier>{a00677fc-138c-4360-80b3-19770c929926}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Source Files\Maintenance">
-      <UniqueIdentifier>{d1b769a6-a0ba-441e-a080-e76d327bb317}</UniqueIdentifier>
+      <UniqueIdentifier>{985161c8-5ddb-4faa-aa5c-21438e678913}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="resource_module.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="framework.h">
-      <Filter>Header Files\PCH</Filter>
-    </ClInclude>
-    <ClInclude Include="pch.h">
-      <Filter>Header Files\PCH</Filter>
-    </ClInclude>
     <ClInclude Include="resource_container.h">
       <Filter>Header Files\Program Objects\Abstract</Filter>
     </ClInclude>
@@ -47,25 +38,28 @@
     <ClInclude Include="thread_structure.h">
       <Filter>Header Files\Program Objects\Concrete Classes</Filter>
     </ClInclude>
-    <ClInclude Include="id_generator.h">
+    <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="module_interoperation.h">
+    <ClInclude Include="id_generator.h">
       <Filter>Header Files\Program Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="module_interoperation.h">
+      <Filter>Header Files\Module Mediator</Filter>
+    </ClInclude>
+    <ClInclude Include="resource_module.h">
+      <Filter>Header Files\Module Mediator</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="resource_module.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dllmain.cpp">
-      <Filter>Source Files\Maintenance</Filter>
-    </ClCompile>
     <ClCompile Include="pch.cpp">
       <Filter>Source Files\Maintenance</Filter>
     </ClCompile>
     <ClCompile Include="module_initialization.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Maintenance</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

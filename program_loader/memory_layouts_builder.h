@@ -1,11 +1,8 @@
 #ifndef MEMORY_LAYOUTS_BUILDER_H
 #define MEMORY_LAYOUTS_BUILDER_H
 
+#include "pch.h"
 #include "variable_with_id.h" //entity_id
-
-#include <cstdint> //std::uint8_t, int32_t
-#include <vector>
-#include <map>
 
 class memory_layouts_builder {
 public:

@@ -1,10 +1,7 @@
 #ifndef RESOURCE_CONTAINER_H
 #define RESOURCE_CONTAINER_H
 
-#include <vector>
-#include <mutex>
-#include <utility>
-
+#include "pch.h"
 #include "id_generator.h"
 #include "module_interoperation.h"
 #include "../console_and_debug/logging.h"

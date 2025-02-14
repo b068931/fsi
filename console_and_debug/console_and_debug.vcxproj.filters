@@ -9,38 +9,38 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Header Files\PCH">
-      <UniqueIdentifier>{5f2fd6a4-4c36-4e13-afd3-289bfa97e49f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Export">
       <UniqueIdentifier>{90ed4e5a-cde8-4212-b989-19eaa81f5b7a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Maintenance">
       <UniqueIdentifier>{0271741f-d9c4-4a18-881b-1c6d7963ff92}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Module Mediator">
+      <UniqueIdentifier>{8301c2f1-3141-4db2-975a-21a576400450}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="console_and_debug.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="pch.h">
-      <Filter>Header Files\PCH</Filter>
-    </ClInclude>
-    <ClInclude Include="framework.h">
-      <Filter>Header Files\PCH</Filter>
-    </ClInclude>
     <ClInclude Include="logging.h">
       <Filter>Header Files\Export</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="console_and_debug.h">
+      <Filter>Header Files\Module Mediator</Filter>
+    </ClInclude>
+    <ClInclude Include="module_interoperation.h">
+      <Filter>Header Files\Module Mediator</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="console_and_debug.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dllmain.cpp">
+    <ClCompile Include="pch.cpp">
       <Filter>Source Files\Maintenance</Filter>
     </ClCompile>
-    <ClCompile Include="pch.cpp">
+    <ClCompile Include="module_initialization.cpp">
       <Filter>Source Files\Maintenance</Filter>
     </ClCompile>
   </ItemGroup>

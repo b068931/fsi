@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "functions.h"
+#include "program_functions.h"
 
 std::uint32_t nullify_function_pointer_variables(std::vector<char>& destination, const memory_layouts_builder::memory_addresses& locals) {
 	std::uint32_t instructions_size = 0;

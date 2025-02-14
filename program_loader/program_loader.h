@@ -2,7 +2,7 @@
 #define PROGRAM_LOADER
 
 #include "pch.h"
-#include "declarations.h"
+#include "module_interoperation.h"
 
 COMPILERMODULE_API module_mediator::return_value load_program_to_memory(module_mediator::arguments_string_type bundle);
 COMPILERMODULE_API module_mediator::return_value free_program(module_mediator::arguments_string_type bundle);

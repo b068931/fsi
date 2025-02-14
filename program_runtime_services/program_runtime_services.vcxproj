@@ -19,18 +19,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="declarations.h" />
-    <ClInclude Include="module_mediator_declarations.h" />
-    <ClInclude Include="framework.h" />
+    <ClInclude Include="module_interoperation.h" />
     <ClInclude Include="logging.h" />
     <ClInclude Include="multithreading.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="pointers.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="definitions.cpp" />
-    <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="dll_mediator_init.cpp" />
+    <ClCompile Include="module_initialization.cpp" />
     <ClCompile Include="logging.cpp" />
     <ClCompile Include="multithreading.cpp" />
     <ClCompile Include="pch.cpp">

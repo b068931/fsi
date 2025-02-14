@@ -1,8 +1,8 @@
 #ifndef AUXILIARY_GENERIC_VARIABLE_H
 #define AUXILIARY_GENERIC_VARIABLE_H
 
+#include "pch.h"
 #include "variable_with_id.h"
-#include <cstdint>
 
 class generic_variable : public variable_with_id {
 private:

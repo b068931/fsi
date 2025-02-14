@@ -1,8 +1,8 @@
 #ifndef REGULAR_VARIABLE_H
 #define REGULAR_VARIABLE_H
 
+#include "pch.h"
 #include "generic_variable.h"
-#include <cstdint>
 
 class regular_variable : public generic_variable {
 public:
