@@ -11,13 +11,13 @@ public:
 		structure_builder::builder_parameters& helper,
 		structure_builder::read_map_type& read_map
 	) override {
-		helper.current_function.get_last_instruction().immediates.push_back(
+		helper.active_function.get_last_instruction().immediates.push_back(
 			structure_builder::imm_variable{ read_map.get_current_token() }
 		);
 
-		helper.current_function.add_new_operand_to_last_instruction(
+		helper.active_function.add_new_operand_to_last_instruction(
 			read_map.get_current_token(),
-			&helper.current_function.get_last_instruction().immediates.back(),
+			&helper.active_function.get_last_instruction().immediates.back(),
 			false
 		);
 	}
@@ -45,15 +45,15 @@ public:
 		structure_builder::immediate_type element_size{};
 		structure_builder::source_file_token element_token = read_map.get_token_generator_additional_token();
 
-		std::string variable_name{ helper.names_remapping.translate_name(read_map.get_token_generator_name()) };
-		structure_builder::function& current_function = helper.current_function.get_current_function();
+		std::string variable_name{ helper.name_translations.translate_name(read_map.get_token_generator_name()) };
+		structure_builder::function& current_function = helper.active_function.get_current_function();
 
-		auto found_local = helper.current_function.find_local_variable_by_name(variable_name);
+		auto found_local = helper.active_function.find_local_variable_by_name(variable_name);
 		if (found_local != current_function.locals.end()) {
 			element_token = found_local->type;
 		}
 		else {
-			auto found_argument = helper.current_function.find_argument_variable_by_name(variable_name);
+			auto found_argument = helper.active_function.find_argument_variable_by_name(variable_name);
 			if (found_argument != current_function.arguments.end()) {
 				element_token = found_argument->type;
 			}
@@ -87,7 +87,7 @@ public:
 			return;
 		}
 
-		helper.current_function.get_last_instruction().immediates.back().imm_val = element_size;
+		helper.active_function.get_last_instruction().immediates.back().imm_val = element_size;
 	}
 };
 

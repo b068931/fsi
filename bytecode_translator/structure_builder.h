@@ -377,7 +377,7 @@ public:
 	};
 
 	class builder_parameters {
-	private:
+	public:
 		struct current_function {
 		private:
 			function* current_function_value{};
@@ -437,9 +437,9 @@ public:
 		};
 		struct names_remapping {
 		private:
-			std::vector<std::pair<std::string, std::string>> names_remapping; //used with redefine
+			std::vector<std::pair<std::string, std::string>> remappings; //used with redefine
 			auto find_remapped_name(const std::string& name_to_find) const {
-				auto found_defined_name = std::find_if(this->names_remapping.begin(), this->names_remapping.end(),
+				auto found_defined_name = std::find_if(this->remappings.begin(), this->remappings.end(),
 					[&name_to_find](const std::pair<std::string, std::string>& val) {
 						return name_to_find == val.first;
 					});
@@ -448,22 +448,32 @@ public:
 			}
 
 		public:
+			void merge(names_remapping&& other) {
+				//this is actually diabolical
+				for (auto begin = other.remappings.begin(); begin != other.remappings.end(); ++begin) {
+					auto found = this->find_remapped_name(begin->first);
+					if (found == remappings.end()) {
+						remappings.push_back(std::move(*begin));
+					}
+				}
+			}
+
 			void add(std::string what, std::string new_value) {
-				this->names_remapping.push_back({ std::move(what), std::move(new_value) });
+				this->remappings.push_back({ std::move(what), std::move(new_value) });
 			}
 			void remove(const std::string& what) {
 				auto found_remapping = this->find_remapped_name(what);
-				if (found_remapping != this->names_remapping.end()) {
-					this->names_remapping.erase(found_remapping);
+				if (found_remapping != this->remappings.end()) {
+					this->remappings.erase(found_remapping);
 				}
 			}
 
 			std::pair<std::string, std::string>& back() {
-				return this->names_remapping.back();
+				return this->remappings.back();
 			}
 			bool has_remapping(const std::string& name) const {
 				auto found_remapping = this->find_remapped_name(name);
-				return found_remapping != this->names_remapping.end();
+				return found_remapping != this->remappings.end();
 			}
 
 			template<typename T>
@@ -504,7 +514,7 @@ public:
 			std::string translate_name(std::string name) const { //translate redefined name to a normal name
 				std::string generated_name = std::move(name);
 				auto found_name = this->find_remapped_name(generated_name);
-				if (found_name != this->names_remapping.end()) {
+				if ((found_name != this->remappings.end()) && (found_name->second != "")) {
 					generated_name = found_name->second;
 				}
 
@@ -512,9 +522,8 @@ public:
 			}
 		};
 
-	public:
-		current_function current_function{};
-		names_remapping names_remapping{};
+		current_function active_function{};
+		names_remapping name_translations{};
 
 		line_type instruction_index; //used for jump points, resets back to zero when new function is declared
 
@@ -526,10 +535,10 @@ public:
 			return id++;
 		}
 		void add_function_address_argument(file& output_file_structure, builder_parameters& helper, generic_parser::read_map<source_file_token, context_key, file, builder_parameters, parameters_enumeration>& read_map) {
-			helper.current_function.get_last_instruction().func_addresses.push_back(function_address{}); //add new function address to the list function addresses of specific instruction
+			helper.active_function.get_last_instruction().func_addresses.push_back(function_address{}); //add new function address to the list function addresses of specific instruction
 
-			function_address* func = &helper.current_function.get_last_instruction().func_addresses.back();
-			std::string function_name = helper.names_remapping.translate_name(read_map.get_token_generator_name());
+			function_address* func = &helper.active_function.get_last_instruction().func_addresses.back();
+			std::string function_name = helper.name_translations.translate_name(read_map.get_token_generator_name());
 			auto found_function = std::find_if(output_file_structure.functions.begin(), output_file_structure.functions.end(), //try to find function with specific name inside functions list
 				[&function_name](const function& func) {
 					return func.name == function_name;
@@ -548,7 +557,7 @@ public:
 				output_file_structure.exposed_functions.push_back(function);
 			}
 
-			helper.current_function.add_new_operand_to_last_instruction(source_file_token::function_address_argument_keyword, func, false);
+			helper.active_function.add_new_operand_to_last_instruction(source_file_token::function_address_argument_keyword, func, false);
 		}
 	};
 	using read_map_type = generic_parser::read_map<source_file_token, context_key, file, builder_parameters, parameters_enumeration>;
@@ -616,6 +625,7 @@ public:
 
 	//line number is used when an error occures
 	file get_value() { return std::move(this->output_file_structure); }
+	builder_parameters::names_remapping& get_names_translations() { return this->helper.name_translations; }
 };
 
 #endif

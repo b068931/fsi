@@ -34,6 +34,7 @@ public:
 			return;
 		}
 
+		//this is really should not be here but at the moment there is no other option
 		std::cout << "Now parsing: " << include_file.generic_string() << std::endl;
 		active_parsing_files.push_back(include_file);
 		
@@ -71,9 +72,15 @@ public:
 			parser_value.exposed_functions.end()
 		);
 
+		std::size_t expected_program_strings_size = output_file_structure.program_strings.size() + parser_value.program_strings.size();
 		output_file_structure.program_strings.merge(parser_value.program_strings);
+		if (output_file_structure.program_strings.size() != expected_program_strings_size) {
+			read_map.exit_with_error("Could not correctly merge program strings with included file.");
+		}
+
 		output_file_structure.modules.splice(output_file_structure.modules.end(), parser_value.modules);
 		output_file_structure.functions.splice(output_file_structure.functions.end(), parser_value.functions);
+		helper.name_translations.merge(std::move(parser.get_builder().get_names_translations()));
 
 		active_parsing_files.pop_back();
 		read_map.switch_context(structure_builder::context_key::main_context);

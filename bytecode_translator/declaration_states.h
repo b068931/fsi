@@ -10,8 +10,8 @@ public:
 		structure_builder::builder_parameters& helper,
 		structure_builder::read_map_type& read_map
 	) override {
-		if (helper.current_function.is_current_function_present()) {
-			helper.current_function.get_current_function().locals
+		if (helper.active_function.is_current_function_present()) {
+			helper.active_function.get_current_function().locals
 				.push_back(
 					structure_builder::regular_variable{
 						helper.get_id(),
@@ -32,8 +32,8 @@ public:
 		structure_builder::builder_parameters& helper,
 		structure_builder::read_map_type& read_map
 	) override {
-		helper.current_function.get_current_function().locals.back().name =
-			helper.names_remapping.translate_name(read_map.get_token_generator_name());
+		helper.active_function.get_current_function().locals.back().name =
+			helper.name_translations.translate_name(read_map.get_token_generator_name());
 	};
 };
 

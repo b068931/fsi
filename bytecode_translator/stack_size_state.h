@@ -11,7 +11,7 @@ public:
 		structure_builder::read_map_type& read_map
 	) override {
 		try {
-			output_file_structure.stack_size = helper.names_remapping.translate_name_to_integer<std::size_t>(
+			output_file_structure.stack_size = helper.name_translations.translate_name_to_integer<std::size_t>(
 				read_map.get_token_generator_name()
 			);
 		}

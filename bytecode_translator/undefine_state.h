@@ -10,7 +10,7 @@ public:
 		structure_builder::builder_parameters& helper,
 		structure_builder::read_map_type& read_map
 	) override {
-		helper.names_remapping.remove(read_map.get_token_generator_name());
+		helper.name_translations.remove(read_map.get_token_generator_name());
 	}
 };
 

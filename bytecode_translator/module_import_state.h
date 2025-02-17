@@ -10,7 +10,7 @@ public:
 		structure_builder::builder_parameters& helper,
 		structure_builder::read_map_type& read_map
 	) override {
-		std::string module_name = helper.names_remapping.translate_name(read_map.get_token_generator_name());
+		std::string module_name = helper.name_translations.translate_name(read_map.get_token_generator_name());
 		auto found_module = std::find_if(
 			output_file_structure.modules.begin(),
 			output_file_structure.modules.end(),

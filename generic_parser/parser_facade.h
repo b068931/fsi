@@ -10,7 +10,7 @@
 #include "token_generator.h"
 
 namespace generic_parser {
-	template<typename token_type, typename context_key_type, typename builder>
+	template<typename token_type, typename context_key_type, typename builder_type>
 	class parser_facade {
 	private:
 		//values are initialized in the order they appear in class, so generator and builder will both get valid pointers to this class
@@ -18,7 +18,7 @@ namespace generic_parser {
 		token_type end_of_file;
 
 		token_generator<token_type, context_key_type> generator;
-		builder builder;
+		builder_type builder;
 	public:
 		template<typename... builder_args> //names_stack, hard_symbols, separators, name_token, end_token, args that will be passed to initialize builder
 		parser_facade(
@@ -53,6 +53,7 @@ namespace generic_parser {
 			} while (this->builder.is_working());
 		}
 		decltype(auto) get_builder_value() { return this->builder.get_value(); } //auto will ignore const qualifier, references, etc. so this function returns decltype(auto)
+		builder_type& get_builder() { return this->builder; }
 	};
 }
 

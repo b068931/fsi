@@ -10,7 +10,7 @@ public:
 		structure_builder::builder_parameters& helper,
 		structure_builder::read_map_type& read_map
 	) override {
-		std::string name = helper.names_remapping.translate_name(read_map.get_token_generator_name());
+		std::string name = helper.name_translations.translate_name(read_map.get_token_generator_name());
 
 		auto found_module = std::find_if(output_file_structure.modules.begin(), output_file_structure.modules.end(),
 			[&name](const structure_builder::engine_module& mod) {
@@ -18,10 +18,10 @@ public:
 			}
 		);
 		if (found_module != output_file_structure.modules.end()) {
-			helper.current_function.get_last_instruction().modules.push_back({ &(*found_module) });
-			helper.current_function.add_new_operand_to_last_instruction(
+			helper.active_function.get_last_instruction().modules.push_back({ &(*found_module) });
+			helper.active_function.add_new_operand_to_last_instruction(
 				structure_builder::source_file_token::module_call,
-				&helper.current_function.get_last_instruction().modules.back(),
+				&helper.active_function.get_last_instruction().modules.back(),
 				false
 			);
 		}
@@ -38,8 +38,8 @@ public:
 		structure_builder::builder_parameters& helper,
 		structure_builder::read_map_type& read_map
 	) override {
-		std::string name = helper.names_remapping.translate_name(read_map.get_token_generator_name());
-		structure_builder::variable* module_var = std::get<1>(helper.current_function.get_last_operand());
+		std::string name = helper.name_translations.translate_name(read_map.get_token_generator_name());
+		structure_builder::variable* module_var = std::get<1>(helper.active_function.get_last_operand());
 
 		structure_builder::engine_module* referenced_module = static_cast<structure_builder::module_variable*>(module_var)->mod; //it is guaranteed that previous variable has module_variable type
 		auto found_module_function = std::find_if(referenced_module->functions_names.begin(), referenced_module->functions_names.end(),
@@ -49,10 +49,10 @@ public:
 		);
 
 		if (found_module_function != referenced_module->functions_names.end()) {
-			helper.current_function.get_last_instruction().module_functions.push_back({ &(*found_module_function) });
-			helper.current_function.add_new_operand_to_last_instruction(
+			helper.active_function.get_last_instruction().module_functions.push_back({ &(*found_module_function) });
+			helper.active_function.add_new_operand_to_last_instruction(
 				structure_builder::source_file_token::module_call,
-				&helper.current_function.get_last_instruction().module_functions.back(),
+				&helper.active_function.get_last_instruction().module_functions.back(),
 				false
 			);
 		}

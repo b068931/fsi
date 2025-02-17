@@ -13,7 +13,7 @@ public:
 		output_file_structure.functions.push_back(
 			structure_builder::function{
 				helper.get_id(),
-				helper.names_remapping.translate_name(read_map.get_token_generator_name())
+				helper.name_translations.translate_name(read_map.get_token_generator_name())
 			}
 		);
 	}
@@ -56,7 +56,7 @@ public:
 			return;
 		}
 
-		std::string generated_name = helper.names_remapping.translate_name(read_map.get_token_generator_name());
+		std::string generated_name = helper.name_translations.translate_name(read_map.get_token_generator_name());
 		if (!generated_name.empty()) {
 			output_file_structure.functions.back().arguments.back().name =
 				std::move(generated_name);
@@ -78,7 +78,7 @@ public:
 			read_map.exit_with_error();
 		}
 
-		helper.current_function.set_current_function(&output_file_structure.functions.back());
+		helper.active_function.set_current_function(&output_file_structure.functions.back());
 	}
 
 };

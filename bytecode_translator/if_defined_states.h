@@ -14,7 +14,7 @@ public:
 			.get_parameters_container()
 			.assign_parameter(
 				structure_builder::parameters_enumeration::ifdef_ifndef_pop_check,
-				helper.names_remapping.has_remapping(read_map.get_token_generator_name())
+				helper.name_translations.has_remapping(read_map.get_token_generator_name())
 			);
 	}
 };
@@ -30,7 +30,7 @@ public:
 			.get_parameters_container()
 			.assign_parameter(
 				structure_builder::parameters_enumeration::ifdef_ifndef_pop_check,
-				!helper.names_remapping.has_remapping(read_map.get_token_generator_name())
+				!helper.name_translations.has_remapping(read_map.get_token_generator_name())
 			);
 	}
 };

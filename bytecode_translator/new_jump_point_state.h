@@ -10,8 +10,8 @@ public:
 		structure_builder::builder_parameters& helper,
 		structure_builder::read_map_type& read_map
 	) override {
-		std::string name = helper.names_remapping.translate_name(read_map.get_token_generator_name());
-		structure_builder::function& current_function = helper.current_function.get_current_function();
+		std::string name = helper.name_translations.translate_name(read_map.get_token_generator_name());
+		structure_builder::function& current_function = helper.active_function.get_current_function();
 
 		auto found_jump_point =
 			std::find_if(current_function.jump_points.begin(), current_function.jump_points.end(),

@@ -34,10 +34,10 @@ public:
 			return;
 		}
 
-		helper.current_function.get_last_instruction().strings.push_back({ &(found_string->second) });
-		helper.current_function.add_new_operand_to_last_instruction(
+		helper.active_function.get_last_instruction().strings.push_back({ &(found_string->second) });
+		helper.active_function.add_new_operand_to_last_instruction(
 			structure_builder::source_file_token::string_argument_keyword,
-			&helper.current_function.get_last_instruction().strings.back(),
+			&helper.active_function.get_last_instruction().strings.back(),
 			false
 		);
 	}

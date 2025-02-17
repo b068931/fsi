@@ -10,10 +10,10 @@ public:
 		structure_builder::builder_parameters& helper,
 		structure_builder::read_map_type& read_map
 	) override {
-		helper.current_function.get_last_instruction().dereferences.push_back(structure_builder::pointer_dereference{});
-		helper.current_function.add_new_operand_to_last_instruction(
+		helper.active_function.get_last_instruction().dereferences.push_back(structure_builder::pointer_dereference{});
+		helper.active_function.add_new_operand_to_last_instruction(
 			read_map.get_current_token(),
-			&helper.current_function.get_last_instruction().dereferences.back(),
+			&helper.active_function.get_last_instruction().dereferences.back(),
 			false
 		);
 	}
@@ -26,9 +26,9 @@ public:
 		structure_builder::builder_parameters& helper,
 		structure_builder::read_map_type& read_map
 	) override {
-		helper.current_function.map_operand_with_variable(
-			helper.names_remapping.translate_name(read_map.get_token_generator_name()),
-			&helper.current_function.get_last_instruction().dereferences.back().pointer_variable,
+		helper.active_function.map_operand_with_variable(
+			helper.name_translations.translate_name(read_map.get_token_generator_name()),
+			&helper.active_function.get_last_instruction().dereferences.back().pointer_variable,
 			read_map
 		);
 	}
@@ -53,7 +53,7 @@ public:
 			return;
 		}
 
-		std::string dereference_variable_name = helper.names_remapping.translate_name(read_map.get_token_generator_name());
+		std::string dereference_variable_name = helper.name_translations.translate_name(read_map.get_token_generator_name());
 		if (dereference_variable_name.empty()) {
 			if (
 				(read_map.get_current_token() != structure_builder::source_file_token::dereference_end)
@@ -64,10 +64,10 @@ public:
 			return;
 		}
 
-		helper.current_function.get_last_instruction().dereferences.back().derefernce_indexes.push_back(nullptr);
-		helper.current_function.map_operand_with_variable(
+		helper.active_function.get_last_instruction().dereferences.back().derefernce_indexes.push_back(nullptr);
+		helper.active_function.map_operand_with_variable(
 			std::move(dereference_variable_name),
-			&helper.current_function.get_last_instruction().dereferences.back().derefernce_indexes.back(),
+			&helper.active_function.get_last_instruction().dereferences.back().derefernce_indexes.back(),
 			read_map
 		);
 	}

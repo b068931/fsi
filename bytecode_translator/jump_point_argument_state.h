@@ -22,13 +22,13 @@ public:
 			return;
 		}
 
-		std::string name = helper.names_remapping.translate_name(read_map.get_token_generator_name());
+		std::string name = helper.name_translations.translate_name(read_map.get_token_generator_name());
 		if (name.empty()) {
 			read_map.exit_with_error("Expected the name of the jump point, got another token instead.");
 			return;
 		}
 
-		structure_builder::function& current_function = helper.current_function.get_current_function();
+		structure_builder::function& current_function = helper.active_function.get_current_function();
 		auto found_jump_point =
 			std::find_if(current_function.jump_points.begin(), current_function.jump_points.end(),
 				[&name](const structure_builder::jump_point& jmp) {
@@ -45,10 +45,10 @@ public:
 			jump_point = &(*found_jump_point);
 		}
 
-		helper.current_function.get_last_instruction().jump_variables.push_back({ jump_point });
-		helper.current_function.add_new_operand_to_last_instruction(
+		helper.active_function.get_last_instruction().jump_variables.push_back({ jump_point });
+		helper.active_function.add_new_operand_to_last_instruction(
 			structure_builder::source_file_token::jump_point_argument_keyword,
-			&helper.current_function.get_last_instruction().jump_variables.back(),
+			&helper.active_function.get_last_instruction().jump_variables.back(),
 			false
 		);
 	}

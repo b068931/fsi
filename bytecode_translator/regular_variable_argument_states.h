@@ -10,7 +10,7 @@ public:
 		structure_builder::builder_parameters& helper,
 		structure_builder::read_map_type& read_map
 	) override {
-		helper.current_function.add_new_operand_to_last_instruction(read_map.get_current_token(), nullptr, false);
+		helper.active_function.add_new_operand_to_last_instruction(read_map.get_current_token(), nullptr, false);
 	}
 };
 
@@ -33,15 +33,15 @@ public:
 			return;
 		}
 
-		std::string variable_name = helper.names_remapping.translate_name(read_map.get_token_generator_name());
+		std::string variable_name = helper.name_translations.translate_name(read_map.get_token_generator_name());
 		if (variable_name.empty()) {
 			read_map.exit_with_error("Expected the name of the regular variable, got another token instead.");
 			return;
 		}
 
-		helper.current_function.map_operand_with_variable(
+		helper.active_function.map_operand_with_variable(
 			std::move(variable_name),
-			&std::get<1>(helper.current_function.get_last_operand()),
+			&std::get<1>(helper.active_function.get_last_operand()),
 			read_map
 		);
 	}
@@ -54,7 +54,7 @@ public:
 		structure_builder::builder_parameters& helper,
 		structure_builder::read_map_type& read_map
 	) override {
-		helper.current_function.add_new_operand_to_last_instruction(read_map.get_current_token(), nullptr, true);
+		helper.active_function.add_new_operand_to_last_instruction(read_map.get_current_token(), nullptr, true);
 	}
 };
 
