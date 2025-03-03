@@ -52,7 +52,7 @@ free_program=pointer uint pointer uint pointer pointer ullong
 check_function_arguments=pointer ullong
 get_function_name=ullong
 
-[logger:dynamic-libraries/core/logger.dll]
+[logger:dynamic-libraries/core/logger-module.dll]
 info=pointer ullong pointer pointer
 warning=pointer ullong pointer pointer
 error=pointer ullong pointer pointer

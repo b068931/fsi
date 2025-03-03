@@ -26,7 +26,7 @@
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="console_and_debug.h">
+    <ClInclude Include="logger_module.h">
       <Filter>Header Files\Module Mediator</Filter>
     </ClInclude>
     <ClInclude Include="module_interoperation.h">
@@ -34,7 +34,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="console_and_debug.cpp">
+    <ClCompile Include="logger_module.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">

@@ -19,7 +19,7 @@
 
 #define ONLY_FILE_NAME strrchr("\\" __FILE__, '\\') + 1 
 
-namespace console_and_debug {
+namespace logger_module {
 	inline void generic_log_message(
 		module_mediator::module_part* part,
 		std::size_t message_type,
@@ -68,15 +68,15 @@ namespace console_and_debug {
 	}
 }
 
-#define LOG_INFO(part, message) console_and_debug::generic_log_message(part, 0, ONLY_FILE_NAME, __LINE__, __func__, message)
-#define LOG_WARNING(part, message) console_and_debug::generic_log_message(part, 1, ONLY_FILE_NAME, __LINE__, __func__, message)
-#define LOG_ERROR(part, message) console_and_debug::generic_log_message(part, 2, ONLY_FILE_NAME, __LINE__, __func__, message)
-#define LOG_FATAL(part, message) console_and_debug::generic_log_message(part, 3, ONLY_FILE_NAME, __LINE__, __func__, message)
+#define LOG_INFO(part, message) logger_module::generic_log_message(part, 0, ONLY_FILE_NAME, __LINE__, __func__, message)
+#define LOG_WARNING(part, message) logger_module::generic_log_message(part, 1, ONLY_FILE_NAME, __LINE__, __func__, message)
+#define LOG_ERROR(part, message) logger_module::generic_log_message(part, 2, ONLY_FILE_NAME, __LINE__, __func__, message)
+#define LOG_FATAL(part, message) logger_module::generic_log_message(part, 3, ONLY_FILE_NAME, __LINE__, __func__, message)
 
-#define LOG_PROGRAM_INFO(part, message) console_and_debug::generic_log_message(part, 4, ONLY_FILE_NAME, __LINE__, __func__, message)
-#define LOG_PROGRAM_WARNING(part, message) console_and_debug::generic_log_message(part, 5, ONLY_FILE_NAME, __LINE__, __func__, message)
-#define LOG_PROGRAM_ERROR(part, message) console_and_debug::generic_log_message(part, 6, ONLY_FILE_NAME, __LINE__, __func__, message)
-#define LOG_PROGRAM_FATAL(part, message) console_and_debug::generic_log_message(part, 7, ONLY_FILE_NAME, __LINE__, __func__, message)
+#define LOG_PROGRAM_INFO(part, message) logger_module::generic_log_message(part, 4, ONLY_FILE_NAME, __LINE__, __func__, message)
+#define LOG_PROGRAM_WARNING(part, message) logger_module::generic_log_message(part, 5, ONLY_FILE_NAME, __LINE__, __func__, message)
+#define LOG_PROGRAM_ERROR(part, message) logger_module::generic_log_message(part, 6, ONLY_FILE_NAME, __LINE__, __func__, message)
+#define LOG_PROGRAM_FATAL(part, message) logger_module::generic_log_message(part, 7, ONLY_FILE_NAME, __LINE__, __func__, message)
 #endif
 
 #endif

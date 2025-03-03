@@ -4,7 +4,7 @@
 #include "pch.h"
 #include "id_generator.h"
 #include "module_interoperation.h"
-#include "../console_and_debug/logging.h"
+#include "../logger_module/logging.h"
 
 struct resource_container {
 	std::vector<std::pair<void(*)(void*), void*>> destroy_callbacks{};

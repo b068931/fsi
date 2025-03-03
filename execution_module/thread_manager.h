@@ -4,7 +4,7 @@
 #include "scheduler.h"
 #include "module_interoperation.h"
 #include "assembly_functions.h"
-#include "../console_and_debug/logging.h"
+#include "../logger_module/logging.h"
 
 class thread_manager {
 private:

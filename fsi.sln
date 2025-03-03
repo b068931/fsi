@@ -5,8 +5,6 @@ VisualStudioVersion = 17.7.34009.444
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bytecode_translator", "bytecode_translator\bytecode_translator.vcxproj", "{E3EEA055-1FCF-456D-96D9-0297F9866563}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "console_and_debug", "console_and_debug\console_and_debug.vcxproj", "{EFFA46AB-91B0-4C85-9B61-998018F77CBC}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "execution_module", "execution_module\execution_module.vcxproj", "{C32F169C-7C46-4F51-B67C-B7E732B9ED14}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "program_loader", "program_loader\program_loader.vcxproj", "{A455276F-6B76-4598-878B-8C250A0CD49F}"
@@ -35,6 +33,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "typename_array", "typename_
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "module_mediator", "module_mediator\module_mediator.vcxproj", "{18C883CB-68CE-4787-8017-76D8BBEA5F71}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "logger_module", "logger_module\logger_module.vcxproj", "{EFFA46AB-91B0-4C85-9B61-998018F77CBC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug Sanitaizer|x64 = Debug Sanitaizer|x64
@@ -51,14 +51,6 @@ Global
 		{E3EEA055-1FCF-456D-96D9-0297F9866563}.Release (Installer)|x64.Build.0 = Release (Installer)|x64
 		{E3EEA055-1FCF-456D-96D9-0297F9866563}.Release|x64.ActiveCfg = Release|x64
 		{E3EEA055-1FCF-456D-96D9-0297F9866563}.Release|x64.Build.0 = Release|x64
-		{EFFA46AB-91B0-4C85-9B61-998018F77CBC}.Debug Sanitaizer|x64.ActiveCfg = Debug Sanitaizer|x64
-		{EFFA46AB-91B0-4C85-9B61-998018F77CBC}.Debug Sanitaizer|x64.Build.0 = Debug Sanitaizer|x64
-		{EFFA46AB-91B0-4C85-9B61-998018F77CBC}.Debug|x64.ActiveCfg = Debug|x64
-		{EFFA46AB-91B0-4C85-9B61-998018F77CBC}.Debug|x64.Build.0 = Debug|x64
-		{EFFA46AB-91B0-4C85-9B61-998018F77CBC}.Release (Installer)|x64.ActiveCfg = Release (Installer)|x64
-		{EFFA46AB-91B0-4C85-9B61-998018F77CBC}.Release (Installer)|x64.Build.0 = Release (Installer)|x64
-		{EFFA46AB-91B0-4C85-9B61-998018F77CBC}.Release|x64.ActiveCfg = Release|x64
-		{EFFA46AB-91B0-4C85-9B61-998018F77CBC}.Release|x64.Build.0 = Release|x64
 		{C32F169C-7C46-4F51-B67C-B7E732B9ED14}.Debug Sanitaizer|x64.ActiveCfg = Debug Sanitaizer|x64
 		{C32F169C-7C46-4F51-B67C-B7E732B9ED14}.Debug Sanitaizer|x64.Build.0 = Debug Sanitaizer|x64
 		{C32F169C-7C46-4F51-B67C-B7E732B9ED14}.Debug|x64.ActiveCfg = Debug|x64
@@ -119,13 +111,20 @@ Global
 		{18C883CB-68CE-4787-8017-76D8BBEA5F71}.Release (Installer)|x64.Build.0 = Release (Installer)|x64
 		{18C883CB-68CE-4787-8017-76D8BBEA5F71}.Release|x64.ActiveCfg = Release|x64
 		{18C883CB-68CE-4787-8017-76D8BBEA5F71}.Release|x64.Build.0 = Release|x64
+		{EFFA46AB-91B0-4C85-9B61-998018F77CBC}.Debug Sanitaizer|x64.ActiveCfg = Debug Sanitaizer|x64
+		{EFFA46AB-91B0-4C85-9B61-998018F77CBC}.Debug Sanitaizer|x64.Build.0 = Debug Sanitaizer|x64
+		{EFFA46AB-91B0-4C85-9B61-998018F77CBC}.Debug|x64.ActiveCfg = Debug|x64
+		{EFFA46AB-91B0-4C85-9B61-998018F77CBC}.Debug|x64.Build.0 = Debug|x64
+		{EFFA46AB-91B0-4C85-9B61-998018F77CBC}.Release (Installer)|x64.ActiveCfg = Release (Installer)|x64
+		{EFFA46AB-91B0-4C85-9B61-998018F77CBC}.Release (Installer)|x64.Build.0 = Release (Installer)|x64
+		{EFFA46AB-91B0-4C85-9B61-998018F77CBC}.Release|x64.ActiveCfg = Release|x64
+		{EFFA46AB-91B0-4C85-9B61-998018F77CBC}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{E3EEA055-1FCF-456D-96D9-0297F9866563} = {C857E16E-4CDC-448E-9A2E-6079AFEFC914}
-		{EFFA46AB-91B0-4C85-9B61-998018F77CBC} = {7DFDF923-97C5-48D9-B6F5-ABC6CA5523B2}
 		{C32F169C-7C46-4F51-B67C-B7E732B9ED14} = {7DFDF923-97C5-48D9-B6F5-ABC6CA5523B2}
 		{A455276F-6B76-4598-878B-8C250A0CD49F} = {7DFDF923-97C5-48D9-B6F5-ABC6CA5523B2}
 		{FFFB66E6-5E8C-4F95-B0E8-A546ABEB983D} = {7DFDF923-97C5-48D9-B6F5-ABC6CA5523B2}
@@ -133,6 +132,7 @@ Global
 		{8D62A4D1-ACFE-44A6-A647-A51AC37C6D9C} = {F9BEAC84-0B37-4963-9819-2F4B59FBC48F}
 		{232BD395-3279-4BFF-930F-B72C87E919EA} = {F9BEAC84-0B37-4963-9819-2F4B59FBC48F}
 		{18C883CB-68CE-4787-8017-76D8BBEA5F71} = {C857E16E-4CDC-448E-9A2E-6079AFEFC914}
+		{EFFA46AB-91B0-4C85-9B61-998018F77CBC} = {7DFDF923-97C5-48D9-B6F5-ABC6CA5523B2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0389860B-44F1-4F73-9967-3737FD94893C}

@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "console_and_debug.h"
+#include "logger_module.h"
 #include "module_interoperation.h"
 #include "../module_mediator/module_part.h"
 

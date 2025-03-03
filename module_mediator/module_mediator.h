@@ -15,7 +15,7 @@
 #include "parser_options.h"
 #include "file_components.h"
 #include "../generic_parser/parser_facade.h"
-#include "../console_and_debug/logging.h"
+#include "../logger_module/logging.h"
 
 /*
 * "When an evaluation of an expression writes to a memory location and another evaluation reads or modifies

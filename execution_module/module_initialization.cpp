@@ -4,7 +4,7 @@
 #include "thread_manager.h"
 #include "assembly_functions.h"
 #include "executions_backend_functions.h"
-#include "../console_and_debug/logging.h"
+#include "../logger_module/logging.h"
 #include "../program_loader/program_functions.h"
 
 module_mediator::module_part* part = nullptr;

@@ -1,5 +1,5 @@
-#ifndef CONSOLE_AND_DEBUG_MODULE_INTEROPERATION_H
-#define CONSOLE_AND_DEBUG_MODULE_INTEROPERATION_H
+#ifndef LOGGER_MODULE_INTEROPERATION_H
+#define LOGGER_MODULE_INTEROPERATION_H
 
 #include "pch.h"
 #include "../module_mediator/module_part.h"

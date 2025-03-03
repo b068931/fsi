@@ -7,7 +7,7 @@
 #include "../module_mediator/fsi_types.h"
 #include "../module_mediator/module_part.h"
 #include "../program_loader/program_functions.h"
-#include "../console_and_debug/logging.h"
+#include "../logger_module/logging.h"
 
 module_mediator::return_value on_thread_creation(module_mediator::arguments_string_type bundle) {
 	auto arguments = module_mediator::arguments_string_builder::unpack<module_mediator::return_value, module_mediator::return_value, std::uint64_t>(bundle);

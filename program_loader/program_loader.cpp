@@ -12,7 +12,7 @@
 #include "compiled_program.h"
 #include "program_compilation_error.h"
 
-#include "../console_and_debug/logging.h"
+#include "../logger_module/logging.h"
 
 std::mutex exposed_functions_mutex{};
 std::unordered_map<std::uintptr_t, std::pair<std::unique_ptr<module_mediator::arguments_string_element[]>, std::string>> exposed_functions{};

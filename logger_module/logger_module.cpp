@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "console_and_debug.h"
+#include "logger_module.h"
 #include "module_interoperation.h"
 
 std::chrono::steady_clock::time_point starting_time;

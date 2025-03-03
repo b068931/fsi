@@ -3,7 +3,7 @@
 
 #include "../module_mediator/module_part.h"
 #include "../module_mediator/fsi_types.h"
-#include "../console_and_debug/logging.h"
+#include "../logger_module/logging.h"
 
 #ifdef PROGRAMRUNTIMESERVICES_EXPORTS
 #define PROGRAMRUNTIMESERVICES_API extern "C" __declspec(dllexport)
