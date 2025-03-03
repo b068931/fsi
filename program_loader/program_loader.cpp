@@ -403,7 +403,7 @@ module_mediator::return_value load_program_to_memory(module_mediator::arguments_
 		LOG_ERROR(get_module_part(), std::format("Compilation error: {}", exc.what()));
 	}
 
-	LOG_FATAL(get_module_part(), "Program compilation has failed.");
+	LOG_ERROR(get_module_part(), "Program compilation has failed.");
 	return 1;
 }
 module_mediator::return_value free_program(module_mediator::arguments_string_type bundle) {
