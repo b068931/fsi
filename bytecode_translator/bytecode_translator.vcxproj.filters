@@ -135,46 +135,46 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="..\examples\Ebyte To String.txt">
+    <CopyFileToFolders Include="..\examples\eight-bytes-to-string.txt">
       <Filter>Examples</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\examples\Hello World!.txt">
+    <CopyFileToFolders Include="..\examples\hello-world.txt">
       <Filter>Examples</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\examples\Ping Pong %28Thread Groups Example%29.txt">
+    <CopyFileToFolders Include="..\examples\thread-groups-example.txt">
       <Filter>Examples</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\examples\Program Logic Error.txt">
+    <CopyFileToFolders Include="..\examples\program-logic-error.txt">
       <Filter>Examples</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\examples\Remove Undefine To Make The Program Work.txt">
+    <CopyFileToFolders Include="..\examples\remove-undefine.txt">
       <Filter>Examples</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\examples\Stackoverflow.txt">
+    <CopyFileToFolders Include="..\examples\stackoverflow.txt">
       <Filter>Examples</Filter>
     </CopyFileToFolders>
     <CopyFileToFolders Include="..\examples\make.bat" />
-    <CopyFileToFolders Include="..\examples\Dynamic Call.txt">
+    <CopyFileToFolders Include="..\examples\dynamic-call.txt">
       <Filter>Examples</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\examples\Dynamic Call With Error.txt">
+    <CopyFileToFolders Include="..\examples\dynamic-call-with-error.txt">
       <Filter>Examples</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\examples\Incorrect Main.txt">
+    <CopyFileToFolders Include="..\examples\incorrect-main.txt">
       <Filter>Examples</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\examples\Keywords As Names.txt">
+    <CopyFileToFolders Include="..\examples\keywords-as-names.txt">
       <Filter>Examples</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\examples\Comments Everywhere.txt">
-      <Filter>Examples</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="..\examples\Cyclic1.txt">
+    <CopyFileToFolders Include="..\examples\comments-everywhere.txt">
       <Filter>Examples</Filter>
     </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\examples\Cyclic2.txt">
+    <Text Include="..\examples\cyclic1.txt">
+      <Filter>Examples</Filter>
+    </Text>
+    <Text Include="..\examples\cyclic2.txt">
       <Filter>Examples</Filter>
     </Text>
   </ItemGroup>

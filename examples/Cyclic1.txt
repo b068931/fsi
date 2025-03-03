@@ -1,1 +1,1 @@
-$include ./Examples/Cyclic2.txt;
+$include ./examples/cyclic2.txt;

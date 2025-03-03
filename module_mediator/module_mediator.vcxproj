@@ -74,19 +74,19 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\Engine\</OutDir>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\engine\</OutDir>
     <TargetName>mediator</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\Engine\</OutDir>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\engine\</OutDir>
     <TargetName>mediator</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\Engine\</OutDir>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\engine\</OutDir>
     <TargetName>mediator</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release (Installer)|x64'">
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\Engine\</OutDir>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\engine\</OutDir>
     <TargetName>mediator</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
