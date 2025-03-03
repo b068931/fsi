@@ -33,6 +33,9 @@
     <Filter Include="Header Files\Source Code Parsing\Parse Map States\Special Instructions">
       <UniqueIdentifier>{72403354-6394-4eed-a866-08b07ccbf7d1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Libraries">
+      <UniqueIdentifier>{e547b3e6-c06e-4689-bd43-0feaaf113e94}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bytecode_translator.h">
@@ -169,12 +172,15 @@
     <CopyFileToFolders Include="..\examples\comments-everywhere.txt">
       <Filter>Examples</Filter>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="..\libraries\memory.txt">
+      <Filter>Libraries</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\examples\cyclic2.txt">
+      <Filter>Examples</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\examples\cyclic1.txt">
-      <Filter>Examples</Filter>
-    </Text>
-    <Text Include="..\examples\cyclic2.txt">
       <Filter>Examples</Filter>
     </Text>
   </ItemGroup>

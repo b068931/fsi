@@ -1,0 +1,33 @@
+$if-not-defined BYTECODE-TRANSLATOR-MEMORY-LIBRARY;
+$define BYTECODE-TRANSLATOR-MEMORY-LIBRARY;
+
+function memory-copy(pointer destination, pointer source, eight-bytes size) {
+    @repeat;
+    compare variable eight-bytes size, immediate eight-bytes d0;
+    jump-equal point end;
+
+    decrement variable eight-bytes size;
+    move dereference one-byte destination[size], dereference one-byte source[size];
+
+    jump point repeat;
+    @end;
+}
+
+function memory-copy-reversed(pointer destination, pointer source, eight-bytes size) {
+    $declare eight-bytes destination-index;
+    move variable eight-bytes destination-index, immediate eight-bytes d0;
+
+    @repeat;
+    compare variable eight-bytes size, immediate eight-bytes d0;
+    jump-equal point end;
+
+    decrement variable eight-bytes size;
+
+    move dereference one-byte destination[destination-index], dereference one-byte source[size];
+    increment variable eight-bytes destination-index;
+
+    jump point repeat;
+    @end;
+}
+
+$endif;
