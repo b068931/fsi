@@ -3,12 +3,12 @@
 > A toy programming language built from scratch to explore how software works at a lower level.
 
 ## 📋 Table of Contents
-- [Introduction](#introduction)
-- [What is FSI?](#what-is-fsi)
-- [How It Works](#how-it-works)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [Current Limitations](#current-limitations)
+- [Introduction](#-introduction)
+- [What is FSI?](#-what-is-fsi)
+- [How It Works](#-how-it-works)
+- [Project Structure](#-project-structure)
+- [Getting Started](#-getting-started)
+- [Current Limitations](#-current-limitations)
 
 ## 🚀 Introduction
 
