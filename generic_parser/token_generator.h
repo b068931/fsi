@@ -12,7 +12,6 @@
 #include <stack>
 #include <map>
 
-#include "../typename_array/typename_array.h"
 #include "block_reader.h"
 
 namespace generic_parser {

@@ -8,7 +8,7 @@
 #include <utility>
 #include <memory>
 
-#include "../typename_array/typename_array.h"
+#include "../submodule_typename_array/typename-array/typename-array-primitives/include-all-namespace.hpp"
 
 namespace module_mediator {
 	using return_value = std::uint64_t;
@@ -45,7 +45,7 @@ namespace module_mediator {
 			static constexpr std::size_t sizes[]{ sizeof(types)... };
 		};
 
-		using map_array = typename_array::typename_array<char, unsigned char, short, unsigned short, int, unsigned int, long, unsigned long, long long, unsigned long long, void*>;
+		using map_array = typename_array_primitives::typename_array<char, unsigned char, short, unsigned short, int, unsigned int, long, unsigned long, long long, unsigned long long, void*>;
 		using type_sizes_container = map_array::template acquire<enumarate_type_sizes>;
 
 		template<typename type>
@@ -53,12 +53,12 @@ namespace module_mediator {
 			static constexpr decltype(auto) value = sizeof(type);
 		};
 
-		template<typename type, typename_array::typename_array_size_t index>
+		template<typename type, typename_array_primitives::typename_array_size_type index>
 		struct get_arguments_types {
 			using new_value =
-				typename_array::typename_array<
-				typename_array::value<typename_array::find<map_array, type>::index>,
-				typename_array::value<index + 1> //+1 because the first byte is the amount of arguments in a string
+				typename_array_primitives::typename_array<
+				typename_array_primitives::value_wrapper<typename_array_primitives::find<map_array, type>::index>,
+				typename_array_primitives::value_wrapper<index + 1> //+1 because the first byte is the amount of arguments in a string
 				>;
 		};
 
@@ -67,7 +67,7 @@ namespace module_mediator {
 		private:
 			template<typename T>
 			static void do_assign(arguments_string_type string) {
-				string[typename_array::get<1, T>::value::get_value] = typename_array::get<0, T>::value::get_value;
+				string[typename_array_primitives::get<1, T>::value::get_value] = typename_array_primitives::get<0, T>::value::get_value;
 			}
 
 		public:
@@ -84,12 +84,12 @@ namespace module_mediator {
 
 		template<typename... types>
 		static arguments_string_type build_types_string(std::size_t size) {
-			using types_array = typename_array::typename_array<types...>;
+			using types_array = typename_array_primitives::typename_array<types...>;
 
 			arguments_string_type types_string = new arguments_string_element[size]{};
 			types_string[0] = sizeof... (types);
 
-			using types_assign = typename typename_array::apply<types_array, get_arguments_types>::new_array::template acquire<assign_arguments_types>;
+			using types_assign = typename typename_array_primitives::apply<types_array, get_arguments_types>::new_array::template acquire<assign_arguments_types>;
 			types_assign::assign(types_string);
 
 			return types_string;
@@ -115,7 +115,7 @@ namespace module_mediator {
 
 	public:
 		template<typename type>
-		static constexpr typename_array::typename_array_size_t get_type_index = typename_array::find<map_array, type>::index;
+		static constexpr typename_array_primitives::typename_array_size_type get_type_index = typename_array_primitives::find<map_array, type>::index;
 
 		static std::size_t get_type_size_by_index(arguments_string_element index) {
 			assert(index < map_array::size && "invalid index");
@@ -223,7 +223,7 @@ namespace module_mediator {
 			const arguments_array_type& arguments_array
 		) {
 			constexpr auto type_index = arguments_string_builder::get_type_index<destination_type>;
-			static_assert(type_index != typename_array::npos);
+			static_assert(type_index != typename_array_primitives::npos);
 
 			if (index < arguments_array.size()) {
 				if (arguments_array[index].first == type_index) {
@@ -237,8 +237,8 @@ namespace module_mediator {
 
 		template<typename... types>
 		static arguments_string_type pack(types... values) {
-			using types_array = typename_array::typename_array<types...>;
-			constexpr std::size_t arguments_string_size = typename_array::sum<types_array, functor_sum, std::size_t>::new_value + sizeof... (types) + 1; //+1 because of the first byte
+			using types_array = typename_array_primitives::typename_array<types...>;
+			constexpr std::size_t arguments_string_size = typename_array_primitives::sum<types_array, functor_sum, std::size_t>::new_value + sizeof... (types) + 1; //+1 because of the first byte
 
 			arguments_string_type arguments_string = build_types_string<types...>(arguments_string_size);
 			arguments_string_type arguments_string_pointer_copy = arguments_string + sizeof... (types) + 1;
@@ -249,7 +249,7 @@ namespace module_mediator {
 
 		template<typename... types>
 		static std::tuple<types...> unpack(arguments_string_type arguments_string) {
-			assert(check_arguments_string_types<types...>(arguments_string) && "types do not match. update dlls.txt.");
+			assert(check_arguments_string_types<types...>(arguments_string) && "Types do not match. Update modules descriptor file.");
 			arguments_string += sizeof... (types) + 1;
 
 			return std::tuple<types...>{

@@ -1,0 +1,3 @@
+[submodule "submodule_typename_array"]
+	path = submodule_typename_array
+	url = https://github.com/b068931/typename-array.git

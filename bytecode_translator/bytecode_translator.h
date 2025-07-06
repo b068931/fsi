@@ -1,10 +1,12 @@
 #ifndef BYTECODE_TRANSLATOR
 #define BYTECODE_TRANSLATOR
 
-#include "structure_builder.h"
 #include <vector>
 #include <limits>
 #include <cstdint>
+
+#include "structure_builder.h"
+#include "../submodule_typename_array/typename-array/typename-array-primitives/include-all-namespace.hpp"
 
 constexpr auto max_functions_count = std::numeric_limits<std::uint32_t>::max();
 constexpr auto max_instructions_count = std::numeric_limits<std::uint32_t>::max();
@@ -100,8 +102,8 @@ private:
 		};
 
 		template<template<typename, typename...> class templ, typename filter, typename... other>
-		struct filter_wrapper<templ<filter, other...>> : public filter_wrapper<typename_array::typename_array<other...>> {
-			using base_class = filter_wrapper<typename_array::typename_array<other...>>;
+		struct filter_wrapper<templ<filter, other...>> : public filter_wrapper<typename_array_primitives::typename_array<other...>> {
+			using base_class = filter_wrapper<typename_array_primitives::typename_array<other...>>;
 			bool check(const structure_builder::instruction& instruction) {
 				if (this->base_class::check(instruction)) { //at first we use base class filters
 					if (!filter::check(instruction)) { //and only after that we apply our current filter. this way we will not modify error message if one of the filters higher in class hierarchy returns false
@@ -117,7 +119,7 @@ private:
 		};
 
 	public:
-		using type = filter_wrapper<typename_array::typename_array<filters...>>;
+		using type = filter_wrapper<typename_array_primitives::typename_array<filters...>>;
 	};
 	struct general_instruction {
 		static constexpr error_type error_message{ error_type::general_instruction };
