@@ -6,8 +6,8 @@
 
 #include <windows.h>
 #include <iostream>
-#include <mutex>
 #include <sstream>
+#include <syncstream>
 #include <format>
 #include <chrono>
 

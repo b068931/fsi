@@ -3,8 +3,6 @@
 #include "module_interoperation.h"
 
 std::chrono::steady_clock::time_point starting_time;
-std::mutex global_debug_output_lock;
-
 enum class message_type {
 	info,
 	warning,
@@ -12,29 +10,32 @@ enum class message_type {
 	fatal
 };
 
-void decode_message_type(message_type type) {
-	std::cerr << '[';
+void decode_message_type(message_type type, std::osyncstream& synchronized_logger) {
+	synchronized_logger << '[';
 	switch (type) {
 	case message_type::info:
-		std::cerr << "\x1b[34m" << "INFO" << "\033[0m";
+		synchronized_logger << "\x1b[34m" << "INFO" << "\033[0m";
 		break;
 
 	case message_type::warning:
-		std::cerr << "\x1b[33m" << "WARNING" << "\033[0m";
+		synchronized_logger << "\x1b[33m" << "WARNING" << "\033[0m";
 		break;
 
 	case message_type::error:
-		std::cerr << "\x1b[91m" << "ERROR" << "\033[0m";
+		synchronized_logger << "\x1b[91m" << "ERROR" << "\033[0m";
 		break;
 
 	case message_type::fatal:
-		std::cerr << "\x1b[31m" << "FATAL" << "\033[0m";
+		synchronized_logger << "\x1b[31m" << "FATAL" << "\033[0m";
 		break;
 	}
-	std::cerr << ']';
+
+    synchronized_logger << ']';
 }
 void log_message(message_type type, const char* file_name, std::size_t file_line, const char* function_name, const char* message) {
 	auto timestamp = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - ::starting_time).count();
+	std::osyncstream synchronized_logger{ std::cerr };
+
 	std::string result_message = std::format(
 		" [TIME: {}] [FILE NAME: {}, FILE LINE: {}, FUNCTION NAME: {}] \x1b[97m{}\033[0m",
 		timestamp,
@@ -44,9 +45,8 @@ void log_message(message_type type, const char* file_name, std::size_t file_line
 		message
 	);
 
-	std::lock_guard<std::mutex> lock{ ::global_debug_output_lock };
-	decode_message_type(type);
-	std::cerr << result_message << std::endl;
+	decode_message_type(type, synchronized_logger);
+	synchronized_logger << result_message << '\n'; // std::cerr already flushes all output, no need for std::endl
 }
 
 void generic_log_message(message_type type, module_mediator::arguments_string_type bundle) {
