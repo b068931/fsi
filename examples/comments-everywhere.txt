@@ -1,14 +1,14 @@
-/*test*/$ stack-size d100; /*the use of comments inside expressions is very limited due to the parser limitations*/
-/*test*/from prts import < pointer.allocate/*test*/,/*test*/pointer.deallocate/*test*/> /*their use is mostly limited to expressions where you enumerate things*/
+/*test*/$ /*sdf*/stack-size/*rr3*/ d100/*fa*/; /*the use of comments inside expressions is very limited due to the parser limitations*/
+/*test*/from/*fsg*/ prts/*af*/ import /*fga*/</*fasd*/ pointer.allocate/*test*/,/*test*/pointer.deallocate/*test*/> /*their use is mostly limited to expressions where you enumerate things*/
 from prts import </*test*/io.log.info,/*test*/>
 
 $define-string message ''''Hello World! In order to allow comments in these places I had to make so many questionable decisions.''''
 
 function throwaway(
-/*test*/    one-byte nothing-one,/*test*/
-    /*test*/one-byte nothing-two,   /*test*/one-byte nothing-three/*test*/
+/*test*/    one-byte/*fs*/ nothing-one,/*test*/
+    /*test*/one-byte /*fs*/ nothing-two,   /*test*/one-byte nothing-three/*test*/
 ) {
-add variable one-byte nothing-one, variable one-byte nothing-two, variable one-byte nothing-three;
+/*fsdf*/add /*fs*/ variable /*fsfd*/one-byte /*ghe*/nothing-one/*fsgd*/, /*fsg*/variable/*fsf*/ one-byte/*gsd*/ nothing-two, variable one-byte nothing-three;
 }
 
 /*test*/function main(/*test*/)/*test*/ {
@@ -17,17 +17,17 @@ add variable one-byte nothing-one, variable one-byte nothing-two, variable one-b
     $declare pointer null;
     
     /*test*/throwaway(/*test*/);
-    /*test*/message-storage: prts->pointer.allocate(/*test*/size-of eight-bytes message/*test*/)
+    /*test*/message-storage/*sdf*/:/*sdf*/ prts->pointer.allocate/*sdf*/(/*test*/size-of eight-bytes message/*test*/)
     /*test*/copy-string /*test*/ 
         variable pointer message-storage/*test*/, /*test*/
-        string message;
+        string/*fgs*/ message/*gsd*/;
 
-    void: prts->io.log.info(
-        variable pointer null,/*test*/
+    /*sdf*/void/*gsd*/:/*gsdg*/ prts->io.log.info/*gsd*/(
+        variable /*gsdgsd*/pointer/*gsd*/ null,/*test*/
         /*test*/immediate eight-bytes d0,       /*test*/
         /*test*/variable pointer null, 
         variable pointer message-storage/*test*/
-    )
+    )/*gd*/
 
     message-storage: prts->pointer.deallocate()
 }

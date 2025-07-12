@@ -10,18 +10,6 @@ public:
 		structure_builder::builder_parameters& helper,
 		structure_builder::read_map_type& read_map
 	) override {
-		bool just_left_comment = read_map
-			.get_parameters_container()
-			.retrieve_parameter<bool>(structure_builder::parameters_enumeration::has_just_left_comment);
-
-		if (just_left_comment) {
-			if (!read_map.is_token_generator_name_empty()) {
-				read_map.exit_with_error();
-			}
-
-			return;
-		}
-
 		std::string string_name = read_map.get_token_generator_name();
 		if (string_name.empty()) {
 			read_map.exit_with_error("Expected the name of the string, got empty string instead.");

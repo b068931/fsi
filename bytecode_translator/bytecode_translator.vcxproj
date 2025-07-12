@@ -180,9 +180,13 @@
     <ClInclude Include="undefine_state.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="configure_instruction_arguments.cpp" />
+    <ClCompile Include="modules_import.cpp" />
     <ClCompile Include="parser_options.cpp" />
     <ClCompile Include="parse_map_configuration.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="program_functions.cpp" />
+    <ClCompile Include="special_instructions.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="..\examples\eight-bytes-to-string.txt">

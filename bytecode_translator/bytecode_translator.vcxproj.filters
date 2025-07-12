@@ -36,6 +36,9 @@
     <Filter Include="Libraries">
       <UniqueIdentifier>{e547b3e6-c06e-4689-bd43-0feaaf113e94}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Source Code Parsing\Major State Machines">
+      <UniqueIdentifier>{2afa9937-88b4-47f2-bf79-97ba3901dc20}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bytecode_translator.h">
@@ -136,6 +139,18 @@
     <ClCompile Include="parse_map_configuration.cpp">
       <Filter>Source Files\Source Code Parsing</Filter>
     </ClCompile>
+    <ClCompile Include="special_instructions.cpp">
+      <Filter>Source Files\Source Code Parsing\Major State Machines</Filter>
+    </ClCompile>
+    <ClCompile Include="modules_import.cpp">
+      <Filter>Source Files\Source Code Parsing\Major State Machines</Filter>
+    </ClCompile>
+    <ClCompile Include="configure_instruction_arguments.cpp">
+      <Filter>Source Files\Source Code Parsing\Major State Machines</Filter>
+    </ClCompile>
+    <ClCompile Include="program_functions.cpp">
+      <Filter>Source Files\Source Code Parsing\Major State Machines</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="..\examples\eight-bytes-to-string.txt">
@@ -178,10 +193,6 @@
     <CopyFileToFolders Include="..\examples\cyclic2.txt">
       <Filter>Examples</Filter>
     </CopyFileToFolders>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="..\examples\cyclic1.txt">
-      <Filter>Examples</Filter>
-    </Text>
+    <CopyFileToFolders Include="..\examples\cyclic1.txt" />
   </ItemGroup>
 </Project>

@@ -41,18 +41,6 @@ public:
 		structure_builder::builder_parameters& helper,
 		structure_builder::read_map_type& read_map
 	) override {
-		bool just_left_comment = read_map
-			.get_parameters_container()
-			.retrieve_parameter<bool>(structure_builder::parameters_enumeration::has_just_left_comment);
-
-		if (just_left_comment && (read_map.get_current_token() == structure_builder::source_file_token::dereference_end)) {
-			if (!read_map.is_token_generator_name_empty()) {
-				read_map.exit_with_error();
-			}
-
-			return;
-		}
-
 		std::string dereference_variable_name = helper.name_translations.translate_name(read_map.get_token_generator_name());
 		if (dereference_variable_name.empty()) {
 			if (

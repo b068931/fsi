@@ -152,6 +152,14 @@ namespace generic_parser {
 			return found_token->second;
 		}
 
+		void set_additional_token(token_type token) {
+			this->additional_token = token;
+		}
+
+		void set_name(std::string&& new_name) {
+			this->name = std::move(new_name);
+        }
+
 		token_type get_next_token() {
 			this->is_names_stack_token = false;
 			this->additional_token = this->end_token;

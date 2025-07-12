@@ -323,7 +323,7 @@ namespace generic_parser {
 			name_token{ name_token },
 			current_token{ end_token },
 			handle_error_exit{ false },
-			working{ false },
+			working{ true },
 			generator{ token_generator },
 			detached_name{ nullptr },
 			is_additional_token{ false }

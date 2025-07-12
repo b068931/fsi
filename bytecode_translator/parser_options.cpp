@@ -1,12 +1,27 @@
 #include "parser_options.h"
 
+const std::vector<structure_builder::source_file_token> parser_options::all_types {
+	structure_builder::source_file_token::one_byte_type_keyword, structure_builder::source_file_token::two_bytes_type_keyword,
+		structure_builder::source_file_token::four_bytes_type_keyword, structure_builder::source_file_token::eight_bytes_type_keyword,
+		structure_builder::source_file_token::pointer_type_keyword
+};
+
+const std::vector<structure_builder::source_file_token> parser_options::integer_types {
+	structure_builder::source_file_token::one_byte_type_keyword, structure_builder::source_file_token::two_bytes_type_keyword,
+		structure_builder::source_file_token::four_bytes_type_keyword, structure_builder::source_file_token::eight_bytes_type_keyword
+};
+
+const std::vector<structure_builder::source_file_token> parser_options::argument_end_tokens {
+	structure_builder::source_file_token::coma, structure_builder::source_file_token::function_args_end,
+		structure_builder::source_file_token::expression_end
+};
+
 const generic_parser::token_generator<
 	structure_builder::source_file_token,
 	structure_builder::context_key
 >::symbols_pair parser_options::main_context{
 	{
 		{"/*", structure_builder::source_file_token::comment_start},
-		{"*/", structure_builder::source_file_token::comment_end},
 		{",", structure_builder::source_file_token::coma},
 		{"$", structure_builder::source_file_token::special_instruction},
 		{"<", structure_builder::source_file_token::import_start},
@@ -45,6 +60,16 @@ const generic_parser::token_generator<
 >::symbols_pair parser_options::inside_include{
 	{
 		{";", structure_builder::source_file_token::expression_end}
+	},
+	{}
+};
+
+const generic_parser::token_generator<
+	structure_builder::source_file_token,
+	structure_builder::context_key
+>::symbols_pair parser_options::inside_comment{
+	{
+		{"*/", structure_builder::source_file_token::comment_end}
 	},
 	{}
 };
@@ -135,5 +160,9 @@ const std::map<
 	{
 		structure_builder::context_key::inside_include,
 		parser_options::inside_include
+	},
+	{
+		structure_builder::context_key::inside_comment,
+		parser_options::inside_comment
 	}
 };
