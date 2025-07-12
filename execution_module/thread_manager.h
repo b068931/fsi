@@ -34,7 +34,7 @@ private:
 			}
 
 			this->active_threads_counter.fetch_add(1, std::memory_order_relaxed); //all other modifications are synchronized with mutexes. this is one just needs atomicity
-			load_programf(
+			load_program(
 				thread_structure->execution_thread_state, 
 				currently_running_thread_information->thread_state,
 				(currently_running_thread_information->state == scheduler::thread_states::startup)

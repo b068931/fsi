@@ -239,17 +239,3 @@ module_mediator::return_value create_thread(module_mediator::arguments_string_ty
 
 	return 0;
 }
-module_mediator::return_value run_program(module_mediator::arguments_string_type bundle) {
-	//excm(run_program)->prog_load(load_program_to_memory)->resm(create_new_prog_container)->excm(on_container_creation)
-	auto arguments = module_mediator::arguments_string_builder::unpack<void*>(bundle);
-	LOG_PROGRAM_INFO(get_module_part(), "Starting new program.");
-
-	module_mediator::fast_call<void*>(
-		get_module_part(),
-		index_getter::progload(),
-		index_getter::progload_load_program_to_memory(),
-		std::get<0>(arguments)
-	);
-
-	return 0;
-}

@@ -15,7 +15,14 @@ private:
 	void prologue() {
 		std::uint8_t translated_type = this->translate_current_type_to_memory_layouts_builder_type();
 
-		this->assert_statement(this->get_argument_index() < this->fnc_signature->argument_types.size(), "Too many arguments passed to the function body.");
+		this->assert_statement(
+			this->get_argument_index() <= this->fnc_signature->argument_types.size(), 
+			std::format(
+                "Too many arguments passed to function body. Expected {}.",
+                this->fnc_signature->argument_types.size()
+			)
+		);
+
 		this->assert_statement(
 			(this->fnc_signature->argument_types[this->get_argument_index() - 1].second == translated_type) &&
 			((this->get_current_variable_type() & 0b1100) != 0),

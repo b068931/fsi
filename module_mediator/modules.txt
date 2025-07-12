@@ -6,7 +6,6 @@ on_thread_creation=ullong ullong ullong
 create_thread=ullong pointer pointer ullong
 self_duplicate=pointer pointer ullong
 
-run_program=pointer
 start=ullong
 
 get_current_thread_id=

@@ -2,7 +2,9 @@
 #define RUN_READER_H
 
 #include "pch.h"
+#include "module_interoperation.h"
 #include "../generic_parser/block_reader.h"
+#include "../logger_module/logging.h"
 
 template<typename container>
 class run_reader {
@@ -74,6 +76,15 @@ public:
 			auto found_run = run_initializers.find(run_type); //check if container recognizes this type of run
 			if (found_run != run_initializers.end()) { //if not then we simply ignore this run
 				(cont->*(found_run->second))(run{ index, run_size, reader });
+			}
+			else {
+				LOG_PROGRAM_WARNING(
+					get_module_part(),
+					std::format(
+						"Unknown run with index {}. It will be ignored.",
+						static_cast<int>(run_type) //Otherwise it'll be printed as a character
+					)
+				);
 			}
 
 			index += run_size;

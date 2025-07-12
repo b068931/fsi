@@ -21,7 +21,7 @@ function ebyte-to-string(eight-bytes value) {
     increment variable eight-bytes result-copy-size;
 
     result-copy: prts->pointer.allocate(variable eight-bytes result-copy-size)
-    memory-copy(variable pointer result-copy, variable pointer result, variable eight-bytes result-size, immediate eight-bytes d0, immediate eight-bytes d0)
+    memory-copy(variable pointer result-copy, variable pointer result, variable eight-bytes result-size)
 
     result: prts->pointer.deallocate()
 

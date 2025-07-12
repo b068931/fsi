@@ -23,7 +23,6 @@ EXECUTIONMODULE_API module_mediator::return_value get_current_thread_group_id(mo
 EXECUTIONMODULE_API module_mediator::return_value make_runnable(module_mediator::arguments_string_type bundle);
 EXECUTIONMODULE_API module_mediator::return_value start(module_mediator::arguments_string_type bundle);
 EXECUTIONMODULE_API module_mediator::return_value create_thread(module_mediator::arguments_string_type bundle);
-EXECUTIONMODULE_API module_mediator::return_value run_program(module_mediator::arguments_string_type bundle);
 
 EXECUTIONMODULE_API void initialize_m(module_mediator::module_part*);
 

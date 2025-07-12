@@ -2,6 +2,7 @@
 #include "run_container.h"
 #include "module_interoperation.h"
 #include "../module_mediator/module_part.h"
+#include "../logger_module/logging.h"
 
 void runs_container::modules_reader(run_reader<runs_container>::run run) { //every run has its own specific structure, so we need to use different functions for each type of run (see bytecode_translator.h)
 	for (std::uint64_t counter = 0, modules_count = run.get_object<std::uint64_t>(); counter < modules_count; ++counter) {

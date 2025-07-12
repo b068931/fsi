@@ -60,11 +60,11 @@ void show_error(std::uint64_t error_code) {
 	show_error(error_code);
 
 	thread_terminate();
-	load_execution_threadf(get_thread_local_structure()->execution_thread_state);
+	load_execution_thread(get_thread_local_structure()->execution_thread_state);
 }
 [[noreturn]] void end_program() {
 	thread_terminate();
-	load_execution_threadf(get_thread_local_structure()->execution_thread_state);
+	load_execution_thread(get_thread_local_structure()->execution_thread_state);
 }
 
 void initialize_m(module_mediator::module_part* part) {
@@ -74,7 +74,7 @@ void initialize_m(module_mediator::module_part* part) {
 	inner_fill_in_reg_array_entry(
 		0,
 		::program_control_functions_addresses,
-		reinterpret_cast<std::uintptr_t>(&special_call_modulef)
+		reinterpret_cast<std::uintptr_t>(&special_call_module)
 	);
 
 	inner_fill_in_reg_array_entry(

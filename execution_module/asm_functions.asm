@@ -1,13 +1,13 @@
-PUBLIC load_execution_threadf
-PUBLIC load_programf
-PUBLIC special_call_modulef
-PUBLIC resume_program_executionf
+PUBLIC load_execution_thread
+PUBLIC load_program
+PUBLIC special_call_module
+PUBLIC resume_program_execution
 
 .data
 .code
 
 ;loads the state of a thread that switched to a program. allows swiching between programs
-load_execution_threadf PROC
+load_execution_thread PROC
 	mov rax, [rcx]
 	mov rdx, [rcx + 16]
 	mov r8, [rcx + 24]
@@ -28,10 +28,10 @@ load_execution_threadf PROC
 	mov rcx, [rcx + 8]
 
 	ret
-load_execution_threadf ENDP
+load_execution_thread ENDP
 
 ;saves the state of this thread and loads the state of a program, third argument is used to determine whether this thread needs additional configuration for startup or not
-load_programf PROC
+load_program PROC
 	;--------------------
 	;save executor state
 	
@@ -79,10 +79,10 @@ load_programf PROC
 
 	program_start:
 	jmp qword ptr [rdx + 8]
-load_programf ENDP
+load_program ENDP
 
 ;saves the state of a program and calls a "call_module" function
-special_call_modulef PROC
+special_call_module PROC
 	;--------------------
 	;save program state
 	
@@ -101,10 +101,10 @@ special_call_modulef PROC
 	mov r8, r15
 	jmp qword ptr [r10 + 8]
 
-special_call_modulef ENDP
+special_call_module ENDP
 
 ;used to continue an execution of a program (after module has done its work)
-resume_program_executionf PROC
+resume_program_execution PROC
 	mov r11, [rcx + 16]
 	mov rcx, [rcx + 24]
 	mov rbp, [rcx + 32]
@@ -113,6 +113,6 @@ resume_program_executionf PROC
 	mov rsp, [rcx + 56]
 
 	jmp qword ptr [rcx + 8]
-resume_program_executionf ENDP
+resume_program_execution ENDP
 
 END

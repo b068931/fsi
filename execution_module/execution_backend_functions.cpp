@@ -89,7 +89,7 @@ void thread_terminate() {
 	}
 
 	thread_terminate();
-	load_execution_threadf(get_thread_local_structure()->execution_thread_state);
+	load_execution_thread(get_thread_local_structure()->execution_thread_state);
 }
 [[noreturn]] void inner_call_module(std::uint64_t module_id, std::uint64_t function_id, module_mediator::arguments_string_type args_string) {
 	module_mediator::return_value action_code = get_module_part()->call_module_visible_only(module_id, function_id, args_string, &inner_call_module_error);
@@ -99,16 +99,16 @@ void thread_terminate() {
 	{
 	case 0:
 		program_resume();
-		resume_program_executionf(get_thread_local_structure()->currently_running_thread_information.thread_state);
+		resume_program_execution(get_thread_local_structure()->currently_running_thread_information.thread_state);
 
 	case 1:
-		load_execution_threadf(get_thread_local_structure()->execution_thread_state);
+		load_execution_thread(get_thread_local_structure()->execution_thread_state);
 
 	case 2:
 		LOG_PROGRAM_INFO(get_module_part(), "Requested thread termination.");
 
 		thread_terminate();
-		load_execution_threadf(get_thread_local_structure()->execution_thread_state);
+		load_execution_thread(get_thread_local_structure()->execution_thread_state);
 
 	default:
 		LOG_PROGRAM_FATAL(get_module_part(), "Incorrect return code. Process will be killed with abort.");
@@ -129,7 +129,11 @@ module_mediator::return_value inner_self_duplicate(void* main_function, module_m
 				delete[] initializer;
 				get_thread_local_structure()->initializer = nullptr;
 
-				LOG_PROGRAM_ERROR(get_module_part(), "You can not pass pointers as arguments for thread groups because this can easily lead to a data race.");
+				LOG_PROGRAM_ERROR(
+					get_module_part(), 
+					"Shared memory between thread groups is not allowed. Thread group cannot depend on another thread group."
+				);
+
 				return 1;
 			}
 		}
@@ -157,7 +161,7 @@ void inner_fill_in_reg_array_entry(std::uint64_t entry_index, char* memory, std:
 }
 module_mediator::return_value inner_create_thread(module_mediator::return_value thread_group_id, module_mediator::return_value priority, void* function_address) {
 	thread_local_structure* thread_structure = get_thread_local_structure();
-	LOG_PROGRAM_INFO(get_module_part(), "Creating new thread.");
+	LOG_PROGRAM_INFO(get_module_part(), "Creating a new thread.");
 
 	thread_structure->program_function_address = function_address;
 	thread_structure->priority = priority;
