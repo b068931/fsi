@@ -13,7 +13,7 @@ namespace module_mediator {
 	using signed_four_bytes = std::int32_t;
 	using eight_bytes = std::uint64_t;
 	using signed_eight_bytes = std::int64_t;
-	using pointer = void*;
+	using memory = void*;
 
 	constexpr std::uint8_t one_byte_return_value = 0;
 	constexpr std::uint8_t two_bytes_return_value = 1;

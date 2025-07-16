@@ -12,7 +12,7 @@
 #endif
 
 module_mediator::return_value get_current_thread_group_id();
-std::pair<module_mediator::pointer, module_mediator::eight_bytes> decay_pointer(module_mediator::pointer);
+std::pair<module_mediator::memory, module_mediator::eight_bytes> decay_pointer(module_mediator::memory);
 
 module_mediator::module_part* get_module_part();
 class index_getter {

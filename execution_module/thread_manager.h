@@ -74,10 +74,13 @@ public:
 		return this->scheduler.delete_thread(thread_group_id, thread_id);
 	}
 	void block(module_mediator::return_value thread_id) {
+		assert(get_thread_local_structure()->currently_running_thread_information.thread_id == thread_id &&
+            "Thread manager can only block the currently running thread.");
+
 		this->scheduler.block(thread_id);
 	}
-	void make_runnable(module_mediator::return_value thread_id) {
-		this->scheduler.make_runnable(thread_id);
+	bool make_runnable(module_mediator::return_value thread_id) {
+		return this->scheduler.make_runnable(thread_id);
 	}
 	void startup(std::uint16_t thread_count) {
 		if(!this->scheduler.has_available_jobs()) {

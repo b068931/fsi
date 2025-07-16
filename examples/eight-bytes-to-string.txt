@@ -1,12 +1,12 @@
 $stack-size d1024;
-from prts import <io.log.info, pointer.allocate, pointer.deallocate>
+from prts import <io.log.info, memory.allocate, memory.deallocate>
 
 $include libraries/memory.txt;
 $redefine symbol-base d48;
 
 function ebyte-to-string(eight-bytes value) {
-    $declare pointer result;
-    $declare pointer result-copy;
+    $declare memory result;
+    $declare memory result-copy;
 
     $declare eight-bytes result-size;
     move variable eight-bytes result-size, immediate eight-bytes d0;
@@ -20,17 +20,17 @@ function ebyte-to-string(eight-bytes value) {
     divide variable eight-bytes value, immediate eight-bytes d10;
     increment variable eight-bytes result-copy-size;
 
-    result-copy: prts->pointer.allocate(variable eight-bytes result-copy-size)
-    memory-copy(variable pointer result-copy, variable pointer result, variable eight-bytes result-size)
+    result-copy: prts->memory.allocate(variable eight-bytes result-copy-size)
+    memory-copy(variable memory result-copy, variable memory result, variable eight-bytes result-size)
 
-    result: prts->pointer.deallocate()
+    result: prts->memory.deallocate()
 
     load-value variable eight-bytes symbol;
     add variable eight-bytes symbol, immediate eight-bytes symbol-base;
 
     move dereference one-byte result-copy[result-size], variable one-byte symbol;
 
-    move-pointer variable pointer result, variable pointer result-copy;
+    move-pointer variable memory result, variable memory result-copy;
     move variable eight-bytes result-size, variable eight-bytes result-copy-size;
 
     compare variable eight-bytes value, immediate eight-bytes d0;
@@ -40,22 +40,22 @@ function ebyte-to-string(eight-bytes value) {
 
     @end;
     increment variable eight-bytes result-copy-size;
-    result-copy: prts->pointer.allocate(variable eight-bytes result-copy-size)
+    result-copy: prts->memory.allocate(variable eight-bytes result-copy-size)
    
-    memory-copy-reversed(variable pointer result-copy, variable pointer result, variable eight-bytes result-size)
-    result: prts->pointer.deallocate()
+    memory-copy-reversed(variable memory result-copy, variable memory result, variable eight-bytes result-size)
+    result: prts->memory.deallocate()
 
-    save-value variable pointer result-copy;
+    save-value variable memory result-copy;
 }
 
 function main() {
     $main-function main;
-    $declare pointer message;
-    $declare pointer null;
+    $declare memory message;
+    $declare memory null;
 
     ebyte-to-string(immediate eight-bytes d22082023)
-    load-value variable pointer message;
+    load-value variable memory message;
 
-    void: prts->io.log.info(variable pointer null, immediate eight-bytes d0, variable pointer null, variable pointer message)
-    message: prts->pointer.deallocate()
+    void: prts->io.log.info(variable memory null, immediate eight-bytes d0, variable memory null, variable memory message)
+    message: prts->memory.deallocate()
 }

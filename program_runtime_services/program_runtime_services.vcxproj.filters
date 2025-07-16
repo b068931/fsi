@@ -52,7 +52,7 @@
     <ClCompile Include="multithreading.cpp">
       <Filter>Source Files\Module Mediator\Basic</Filter>
     </ClCompile>
-    <ClCompile Include="pointers.cpp">
+    <ClCompile Include="memory.cpp">
       <Filter>Source Files\Module Mediator\Basic</Filter>
     </ClCompile>
     <ClCompile Include="logging.cpp">

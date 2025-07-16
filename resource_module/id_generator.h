@@ -9,9 +9,9 @@ public:
 	using id_type = module_mediator::return_value;
 
 private:
-	static std::stack<id_type> free_ids;
-	static std::mutex lock;
-	static id_type current_id;
+	inline static std::stack<id_type> free_ids{};
+	inline static std::mutex lock{};
+	inline static id_type current_id = 1;
 
 public:
 	static id_type get_id() {

@@ -1,6 +1,9 @@
 #ifndef INSIDE_VALUE_STATE_H
 #define INSIDE_VALUE_STATE_H
 
+#include <algorithm>
+#include <format>
+
 #include "type_definitions.h"
 
 namespace module_mediator::parser::states {
@@ -23,7 +26,9 @@ namespace module_mediator::parser::states {
 					arguments_string >> argument;
 
 					if (!argument.empty()) {
-						auto found_argument = std::find(parameters.arguments.begin(), parameters.arguments.end(), argument);
+						auto found_argument = 
+							std::ranges::find(parameters.arguments, argument);
+
 						if (found_argument != parameters.arguments.end()) {
 							unsigned char previous_size = static_cast<unsigned char>(arguments_symbols[0]);
 
@@ -36,6 +41,18 @@ namespace module_mediator::parser::states {
 							delete[] arguments_symbols;
 							arguments_symbols = new_arguments_symbols;
 						}
+						else {
+                            read_map.exit_with_error(
+                                    std::format(
+										"Unknown argument '{}' in function '{}' from module '{}'",
+										argument, 
+										parameters.function_name, 
+                                        modules.back().get_name()
+									)
+                            );
+
+							return;
+                        }
 					}
 				}
 			}
@@ -49,9 +66,11 @@ namespace module_mediator::parser::states {
 
 			if (!result) {
 				read_map.exit_with_error(
-					"Unable to load function '" +
-					parameters.function_name + "' from module '" +
-					modules.back().get_name() + "'"
+					std::format(
+						"Unable to load function '{}' from module '{}'",
+						parameters.function_name,
+						modules.back().get_name()
+					)
 				);
 			}
 

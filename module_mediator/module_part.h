@@ -7,6 +7,7 @@
 #include <vector>
 #include <utility>
 #include <memory>
+#include <cstdint>
 
 #include "../submodule_typename_array/typename-array/typename-array-primitives/include-all-namespace.hpp"
 
@@ -41,12 +42,24 @@ namespace module_mediator {
 	class arguments_string_builder {
 	private:
 		template<typename... types>
-		struct enumarate_type_sizes {
+		struct enumerate_type_sizes {
 			static constexpr std::size_t sizes[]{ sizeof(types)... };
 		};
 
-		using map_array = typename_array_primitives::typename_array<char, unsigned char, short, unsigned short, int, unsigned int, long, unsigned long, long long, unsigned long long, void*>;
-		using type_sizes_container = map_array::template acquire<enumarate_type_sizes>;
+		using map_array = typename_array_primitives::typename_array<
+			std::int8_t,
+	        std::uint8_t,
+	        std::int16_t,
+	        std::uint16_t,
+	        std::int32_t,
+	        std::uint32_t,
+			long, //refer to #file_builder.h for more information
+		    unsigned long,
+	        std::int64_t,
+	        std::uint64_t,
+            void* //refer to #file_builder.h for more information
+		>;
+		using type_sizes_container = map_array::acquire<enumerate_type_sizes>;
 
 		template<typename type>
 		struct functor_sum {
@@ -238,7 +251,8 @@ namespace module_mediator {
 		template<typename... types>
 		static arguments_string_type pack(types... values) {
 			using types_array = typename_array_primitives::typename_array<types...>;
-			constexpr std::size_t arguments_string_size = typename_array_primitives::sum<types_array, functor_sum, std::size_t>::new_value + sizeof... (types) + 1; //+1 because of the first byte
+			constexpr std::size_t arguments_string_size = typename_array_primitives::sum<types_array, functor_sum, std::size_t>::new_value + 
+				sizeof... (types) + 1; //+1 because of the first byte
 
 			arguments_string_type arguments_string = build_types_string<types...>(arguments_string_size);
 			arguments_string_type arguments_string_pointer_copy = arguments_string + sizeof... (types) + 1;

@@ -3,7 +3,7 @@
 const std::vector<structure_builder::source_file_token> parser_options::all_types {
 	structure_builder::source_file_token::one_byte_type_keyword, structure_builder::source_file_token::two_bytes_type_keyword,
 		structure_builder::source_file_token::four_bytes_type_keyword, structure_builder::source_file_token::eight_bytes_type_keyword,
-		structure_builder::source_file_token::pointer_type_keyword
+		structure_builder::source_file_token::memory_type_keyword
 };
 
 const std::vector<structure_builder::source_file_token> parser_options::integer_types {
@@ -102,7 +102,7 @@ const std::vector<std::pair<std::string, structure_builder::source_file_token>> 
 	{ "two-bytes", structure_builder::source_file_token::two_bytes_type_keyword },
 	{ "four-bytes", structure_builder::source_file_token::four_bytes_type_keyword },
 	{ "eight-bytes", structure_builder::source_file_token::eight_bytes_type_keyword },
-	{ "pointer", structure_builder::source_file_token::pointer_type_keyword },
+	{ "memory", structure_builder::source_file_token::memory_type_keyword },
 	{ "size-of", structure_builder::source_file_token::sizeof_argument_keyword },
 
 	{ "add", structure_builder::source_file_token::add_instruction_keyword },

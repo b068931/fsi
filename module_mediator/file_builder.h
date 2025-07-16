@@ -18,7 +18,32 @@ namespace module_mediator::parser::components {
 	public:
 		struct builder_parameters {
 			module_mediator::module_part* module_part{};
-			std::vector<std::string> arguments{ "char", "uchar", "short", "ushort", "int", "uint", "long", "ulong", "llong", "ullong", "pointer" };
+			std::vector<std::string> arguments{
+			    "signed-one-byte",
+			    "one-byte",
+			    "signed-two-bytes",
+			    "two-bytes",
+			    "signed-four-bytes",
+			    "four-bytes",
+				/*
+				 * The only reason why this (long, ulong) exists is to keep compatibility with old implementation.
+				 * The entire implementation depends on this module system. And unfortunately enough, I didn't care
+				 * much about it: it is extremely rigid due to heavy reliance on the "type indexes" (that is, char is 0,
+                 * uchar is 1, etc.). So, I can rename types quite easily, but God forbid I change their indexes.
+                 *
+                 * Another thing is that it expects that there will be no padding between the values (which is technically UB).
+                 * There are numerous other problems, and, frankly, it is simply not worth fixing them right now. Like
+                 * the fact that all pointers are just treated as void*, thus they do not preserve the type information.
+                 *
+                 * Modules themselves are not that reliant on these ideas because they use "arguments_string_builder" to
+                 * work with the arguments string. Compilation in program_loader, however, is heavily reliant on this.
+				 */
+                "long",
+                "ulong",
+			    "signed-eight-bytes",
+			    "eight-bytes",
+			    "memory"
+			};
 
 			std::string module_name;
 

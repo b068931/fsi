@@ -160,7 +160,7 @@ private:
 				structure_builder::regular_variable* current_argument = 
 					dynamic_cast<structure_builder::regular_variable*>(std::get<1>(instruction.operands_in_order[index]));
 				
-				if (current_argument && (current_argument->type == structure_builder::source_file_token::pointer_type_keyword)) {
+				if (current_argument && (current_argument->type == structure_builder::source_file_token::memory_type_keyword)) {
 					return false;
 				}
 			}
@@ -271,7 +271,7 @@ private:
 					structure_builder::regular_variable* current_argument =
 						dynamic_cast<structure_builder::regular_variable*>(std::get<1>(instruction.operands_in_order[index]));
 
-					if (current_argument && (current_argument->type != structure_builder::source_file_token::pointer_type_keyword)) {
+					if (current_argument && (current_argument->type != structure_builder::source_file_token::memory_type_keyword)) {
 						return false;
 					}
 				}
@@ -307,7 +307,7 @@ private:
 		static constexpr error_type error_message{ error_type::string_instruction };
 		static bool check(const structure_builder::instruction& instruction) {
 			if ((instruction.strings.size() == 1) && (instruction.operands_in_order.size() >= 2)) {
-				return (std::get<0>(instruction.operands_in_order[0]) == structure_builder::source_file_token::pointer_type_keyword) &&
+				return (std::get<0>(instruction.operands_in_order[0]) == structure_builder::source_file_token::memory_type_keyword) &&
 					(std::get<0>(instruction.operands_in_order[1]) == structure_builder::source_file_token::string_argument_keyword);
 			}
 
@@ -389,7 +389,7 @@ private:
 					type = 1;
 					break;
 				}
-				case structure_builder::source_file_token::pointer_type_keyword: {
+				case structure_builder::source_file_token::memory_type_keyword: {
 					type = 3;
 					break;
 				}
@@ -441,7 +441,7 @@ private:
 				if (active_type == structure_builder::source_file_token::no_return_module_call_keyword) {
 					this->encode_active_type(0b01, 0b11);
 				}
-				else if (active_type == structure_builder::source_file_token::pointer_type_keyword) {
+				else if (active_type == structure_builder::source_file_token::memory_type_keyword) {
 					this->encode_active_type(0b11, 0b11);
 				}
 				else {
@@ -578,7 +578,7 @@ private:
 				type = 3;
 				break;
 			}
-			case structure_builder::source_file_token::pointer_type_keyword: {
+			case structure_builder::source_file_token::memory_type_keyword: {
 				type = 4;
 				break;
 			}

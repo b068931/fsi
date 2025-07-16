@@ -1,32 +1,32 @@
 $stack-size d100;
 from prts import<
     io.log.info, 
-    pointer.allocate,
-    pointer.deallocate, 
+    memory.allocate,
+    memory.deallocate, 
     this-thread.dynamic-call
 >
 
-function hello-world(pointer the-message)
+function hello-world(memory the-message)
  {
-    $declare pointer null;
-    void: prts->io.log.info(variable pointer null, immediate eight-bytes d0, variable pointer null, variable pointer the-message);
-    the-message: prts->pointer.deallocate();
+    $declare memory null;
+    void: prts->io.log.info(variable memory null, immediate eight-bytes d0, variable memory null, variable memory the-message);
+    the-message: prts->memory.deallocate();
 };
 
 $define-string message ''''Hello World! With extra steps.''''
 
 function main(){
     $main-function main;
-    $declare pointer message-storage;
+    $declare memory message-storage;
     $declare eight-bytes function-address;
     
-    message-storage: prts->pointer.allocate(size-of eight-bytes message)
-    copy-string variable pointer message-storage, string message;
+    message-storage: prts->memory.allocate(size-of eight-bytes message)
+    copy-string variable memory message-storage, string message;
 
     get-function-address variable eight-bytes function-address, function-name hello-world;
     void: prts->this-thread.dynamic-call(
 	    variable eight-bytes function-address, 
-	    variable pointer message-storage,
-        variable pointer message-storage 
+	    variable memory message-storage,
+        variable memory message-storage 
     );;;
 };

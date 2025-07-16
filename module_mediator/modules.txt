@@ -1,87 +1,251 @@
---part that actually makes everything work
+-- Contains scheduler, executor threads management, thread creation and initialization.
+-- You should also look at resource module. This module manages data that is only execution related.
 [excm:dynamic-libraries/core/execution-module.dll]
-on_container_creation=ullong pointer ullong
-on_thread_creation=ullong ullong ullong
 
-create_thread=ullong pointer pointer ullong
-self_duplicate=pointer pointer ullong
+-- Called by resource module as a response to container (thread group) creation.
+-- Accepts container id, main function address, preferred stack size.
+on_container_creation=eight-bytes memory eight-bytes
 
-start=ullong
+-- Called by resource module as a response to thread creation.
+-- Both this and on_container_creation are used to ensure that data storage is created first, then execution module adds them to scheduler.
+-- Accepts container id, thread id, preferred stack size.
+on_thread_creation=eight-bytes eight-bytes eight-bytes
 
+-- Used by other modules (notably program runtime services) to create a new program thread.
+-- Accepts thread priority, main function address, initialization data, initialization data size.
+create_thread=eight-bytes memory memory eight-bytes
+
+-- Creates a new thread group (container) with the specified main function.
+-- The only other way to create a new thread group is to use program loader. This will create a new program context.
+-- Accepts main function address, initialization data, initialization data size.
+self_duplicate=memory memory eight-bytes
+
+-- Starts executors: system threads that run the program threads.
+-- They won't start unless there is at least one program thread already present in a scheduler.
+-- Accepts thread count.
+start=two-bytes
+
+-- Gets the id of the current program thread that executor is running.
+-- Doesn't accept any parameters.
 get_current_thread_id=
+
+-- Gets the id of the current thread group (container) that executor is running.
+-- Doesn't accept any parameters.
 get_current_thread_group_id=
 
+-- Blocks the current program thread.
+-- Blocked threads are ignored by the scheduler. In this regard they are similar to already running threads.
+-- Execution module won't initiate a shutdown sequence until there are no program threads left. Even if they are blocked.
+-- Doesn't accept any parameters.
 self_block=
-make_runnable=ullong
+
+-- Unblocks the specified program thread.
+-- Perform additional checks to ensure that the thread is not already running.
+-- Accepts thread id.
+make_runnable=eight-bytes
+
+-- Gets a thread saved variable.
+-- Threads can save a variable using instruction save-value.
+-- Doesn't accept any parameters.
 get_thread_saved_variable=
+
+-- Gets a priority of the current program thread.
+-- Doesn't accept any parameters.
 self_priority=
-dynamic_call=pointer pointer
 
---controls creation and destruction of thread and container objects
+-- Inserts a stack frame into the current program thread.
+-- Mainly intended to be used as a function pointer call.
+-- Accepts a function address, function arguments (in a form of arguments string).
+dynamic_call=memory memory
+
+-- Manages data related to thread groups (containers), threads. Essentially, it manages "counterpart" data structures for
+-- the execution module. I believe this enables a more clear separation of concerns: managing data is complicated enough on its own,
+-- trying to combine it with execution management would make it even more convoluted.
+-- Another thing that resource module is concerned with is notifying other modules about destroying threads and containers.
 [resm:dynamic-libraries/core/resource-module.dll]
-add_container_on_destroy=ullong pointer pointer
-add_thread_on_destroy=ullong pointer pointer
 
-duplicate_container=ullong pointer
-get_preferred_stack_size=ullong
+-- Adds a function that will be called when a thread group (container) is destroyed.
+-- The function gets called BEFORE resource module starts deallocating the memory.
+-- This allows you to remove all your data structures related to the thread group.
+-- Otherwise resource module will just deallocate the memory (without any destructors). This may lead to memory leaks.
+-- It will also generate a warning in the log if there are undeallocated memory blocks.
+-- Does nothing if object does not exist.
+-- Accepts a thread group id, function address, additional data that will be passed to the function.
+add_container_on_destroy=eight-bytes memory memory
 
-create_new_program_container=ullong uint pointer uint pointer uint pointer ullong pointer ullong
-create_new_thread=ullong
+-- Analogous to add_container_on_destroy, but for threads.
+-- Accepts a thread id, function address, additional data that will be passed to the function.
+add_thread_on_destroy=eight-bytes memory memory
 
-allocate_program_memory=ullong ullong
-allocate_thread_memory=ullong ullong
+-- From the point of view of the execution module, each new thread group is a new program.
+-- Resource module, however, does not actually duplicate the program data (compiled functions, string, etc.).
+-- Instead, it treats program data as a shared resource with reference counting.
+-- Does nothing if the program container does not exist.
+-- Accepts a container id, main function address for the first thread.
+duplicate_container=eight-bytes memory
 
-deallocate_program_container=ullong
-deallocate_thread=ullong
+-- Programs may define the stack size they want execution environment to allocate for their threads.
+-- This function returns the preferred stack size for the specified program.
+-- Returns 1024 bytes if the program does not exist.
+-- Accepts a container id.
+get_preferred_stack_size=eight-bytes
 
-get_running_threads_count=ullong
-get_program_container_id=ullong
+-- Creates a new program container with its program context.
+-- Accepts preferred stack size, main function index, compiled functions addresses, compiled functions count,
+-- exposed functions addresses, exposed functions count, jump table address, jump table size,
+-- program strings addresses, program strings count.
+create_new_program_container=eight-bytes four-bytes memory four-bytes memory four-bytes memory eight-bytes memory eight-bytes
 
-get_jump_table=ullong
-get_jump_table_size=ullong
+-- Creates a resource container for a new thread.
+-- Does nothing if the thread group (container) does not exist.
+-- Accepts a thread group id which will "house" the thread.
+create_new_thread=eight-bytes
 
-deallocate_program_memory=ullong pointer
-deallocate_thread_memory=ullong pointer
+-- Allocates memory for a that will attached to a container (thread group).
+-- Memory gets deallocated when its associated resource container is destroyed.
+-- Does nothing if resource container does not exist.
+-- Accepts a thread group id, memory size.
+allocate_program_memory=eight-bytes eight-bytes
 
---the most important part that creates instructions
+-- Analogous to allocate_program_memory, but for threads.
+-- Accepts a thread id, memory size.
+allocate_thread_memory=eight-bytes eight-bytes
+
+-- Destroys a program container (thread group), along with the resources it has.
+-- You are not allowed to destroy it if it has running threads.
+-- Does nothing if the container does not exist.
+-- Accepts a container id to destroy.
+deallocate_program_container=eight-bytes
+
+-- Identical to deallocate_program_container but for threads.
+-- Accepts a thread id to deallocate.
+deallocate_thread=eight-bytes
+
+-- Returns the number of existing threads in a container.
+-- Returns maximum value of module_mediator::return_value if container does not exist.
+-- Accepts a container id.
+get_running_threads_count=eight-bytes
+
+-- Returns the id of the container that the specified thread belongs to.
+-- Returns maximum value of module_mediator::return_value if thread does not exist.
+-- Accepts a thread id.
+get_program_container_id=eight-bytes
+
+-- Returns the jump table address for the specified program container.
+-- Returns nullptr if the container does not exist.
+-- Accepts a container id.
+get_jump_table=eight-bytes
+
+-- Returns the size of the jump table for the specified program container.
+-- Returns 0 if the container does not exist.
+-- Accepts a container id.
+get_jump_table_size=eight-bytes
+
+-- Deallocates memory that was allocated by allocate_program_memory.
+-- Does nothing if the memory address does not exist or does not belong to the resource container.
+-- Accepts a container id, memory address.
+deallocate_program_memory=eight-bytes memory
+
+-- Analogous to deallocate_program_memory but for threads.
+-- Accepts a thread id, memory address.
+deallocate_thread_memory=eight-bytes memory
+
+-- Contains logic required to read binary representation of a program, compile it, and load it into memory.
+-- Also manages some information about compiled functions, such as exposed functions. Also it must be used to
+-- deallocate program context, because this module is the one that creates it (otherwise process would crash,
+-- because each DLL has its own copy of Visual C++ runtime).
 [progload:dynamic-libraries/core/program-loader.dll]
-load_program_to_memory=pointer
-free_program=pointer uint pointer uint pointer pointer ullong
 
-check_function_arguments=pointer ullong
-get_function_name=ullong
+-- Loads a program from the specified binary file. Ensures that the program is correct.
+-- Accepts the name of the binary file.
+load_program_to_memory=memory
 
+-- Frees the program context that was created by load_program_to_memory.
+-- Accepts compiled functions addresses, compiled functions count, 
+-- exposed functions addresses, exposed functions count, jump table address,
+-- program strings addresses, program strings count.
+free_program=memory four-bytes memory four-bytes memory memory eight-bytes
+
+-- Checks whether provided type signature matches the expected type signature of an exposed function.
+-- Accepts function type signature, function address.
+check_function_arguments=memory eight-bytes
+
+-- Returns the name of an exposed function, based on its address.
+-- If the function is not an exposed function, returns nullptr.
+-- Accepts function address.
+get_function_name=eight-bytes
+
+-- All other modules rely on this module to produce log messages.
+-- Outputs all log messages to std::cerr, which can be redirected, if needed.
+-- Functions provided by this module imbue log messages with additional information, such as file name, line number, etc.
 [logger:dynamic-libraries/core/logger-module.dll]
-info=pointer ullong pointer pointer
-warning=pointer ullong pointer pointer
-error=pointer ullong pointer pointer
-fatal=pointer ullong pointer pointer
 
-program_info=pointer ullong pointer pointer
-program_warning=pointer ullong pointer pointer
-program_error=pointer ullong pointer pointer
-program_fatal=pointer ullong pointer pointer
+-- All functions accept file name, line number, function name, and message.
+-- These functions provide log messages without additional information about thread and thread group.
+info=memory eight-bytes memory memory
+warning=memory eight-bytes memory memory
+error=memory eight-bytes memory memory
+fatal=memory eight-bytes memory memory
 
---allows program to interact with the environment
+-- These functions provide log messages with additional information about thread and thread group.
+program_info=memory eight-bytes memory memory
+program_warning=memory eight-bytes memory memory
+program_error=memory eight-bytes memory memory
+program_fatal=memory eight-bytes memory memory
+
+-- Provides a running program with access to the runtime environment functions.
+-- Memory management, thread management, logging, etc.
 [prts:dynamic-libraries/core/program-runtime-services.dll]
---pointers
-!allocate_pointer:pointer.allocate=pointer uchar ullong
-!deallocate_pointer:pointer.deallocate=pointer uchar
-!get_allocated_size:pointer.allocated-size=pointer uchar pointer
 
---this thread
+-- Provides a set of functions to manage memory.
+
+-- Allocates memory that will get attached to a program container.
+-- Accepts return address, return variable type, memory size.
+!allocate_memory:memory.allocate=memory one-byte eight-bytes
+
+-- Deallocates memory that was allocated by allocate_memory.
+-- Accepts return address, return variable type.
+!deallocate_memory:memory.deallocate=memory one-byte
+
+-- Returns the size of the memory chunk that was allocated by allocate_memory.
+-- Accepts return address, return variable type, memory address.
+!get_allocated_size:memory.allocated-size=memory one-byte memory
+
+-- Provides a set of functions to change information about the current program thread.
+
+-- Transfers control to the execution environment, which will call to scheduler to run some other thread.
+-- Scheduler may choose to run the current thread again.
+-- Does not accept any parameters.
 !yield:this-thread.yield=
+
+-- Transfers control to the execution environment, with the "terminate" signal.
+-- Current thread gets instantly killed.
+-- Does not accept any parameters.
 !self_terminate:this-thread.terminate=
-!self_priority:this-thread.priority=pointer uchar
-!thread_id:this-thread.id=pointer uchar
-!thread_group_id:this-thread.group-id=pointer uchar
+
+-- Gets the priority of the current program thread.
+-- Accepts return address, return variable type.
+!self_priority:this-thread.priority=memory one-byte
+
+-- Gets the id of the current program thread.
+-- Accepts return address, return variable type.
+!thread_id:this-thread.id=memory one-byte
+
+-- Gets the id of the current thread group (container) that the current program thread belongs to.
+-- Accepts return address, return variable type.
+!thread_group_id:this-thread.group-id=memory one-byte
+
+-- Creates a stack frame with the specified function address and arguments.
+-- Accepts function address, function arguments.
 !dynamic_call:this-thread.dynamic-call=dynamic
 
---threading
+-- Allow the current program to create new threads and thread groups.
+-- Accepts the main function address, main function arguments.
 !create_thread:threading.create=dynamic
 !create_thread_group:threading.create-group=dynamic
 
---io/logging
-!info:io.log.info=pointer ullong pointer pointer
-!warning:io.log.warning=pointer ullong pointer pointer
-!error:io.log.error=pointer ullong pointer pointer
+-- IO/Logging functions. Pass messages to the logger module.
+-- All functions accept file name, line number, function name, and message.
+!info:io.log.info=memory eight-bytes memory memory
+!warning:io.log.warning=memory eight-bytes memory memory
+!error:io.log.error=memory eight-bytes memory memory

@@ -86,6 +86,8 @@ void thread_terminate() {
 	case module_mediator::module_part::call_error::unknown_index:
 		LOG_PROGRAM_ERROR(get_module_part(), "Module function does not exist. Thread terminated.");
 		break;
+
+	case module_mediator::module_part::call_error::no_error: break;
 	}
 
 	thread_terminate();
@@ -119,8 +121,8 @@ void thread_terminate() {
 module_mediator::return_value inner_self_duplicate(void* main_function, module_mediator::arguments_string_type initializer) {
 	assert(get_thread_local_structure()->initializer == nullptr && "possible memory leak");
 	get_thread_local_structure()->initializer = initializer;
-	if (initializer != nullptr) { //you can not initialize a thread_group with pointer because this can lead to data race
-		constexpr auto pointer_type_index = module_mediator::arguments_string_builder::get_type_index<module_mediator::pointer>;
+	if (initializer != nullptr) { //you can not initialize a thread_group with memory because this can lead to data race
+		constexpr auto pointer_type_index = module_mediator::arguments_string_builder::get_type_index<module_mediator::memory>;
 		
 		module_mediator::arguments_string_element arguments_count = initializer[0];
 		module_mediator::arguments_string_type arguments_types = initializer + 1;

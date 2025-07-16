@@ -1,5 +1,5 @@
 $stack-size o700;
-from prts import <io.log.info, io.log.warning, pointer.allocate, pointer.deallocate, this-thread.yield, threading.create-group>
+from prts import <io.log.info, io.log.warning, memory.allocate, memory.deallocate, this-thread.yield, threading.create-group>
 
 $define-string ping ''''ping''''
 $define-string pong ''''pong''''
@@ -10,11 +10,11 @@ function get-ping-string() ;
 function main();
 function get-pong-string()
 {
-    $declare pointer pong-storage;
-    pong-storage: prts->pointer.allocate(size-of eight-bytes pong)
+    $declare memory pong-storage;
+    pong-storage: prts->memory.allocate(size-of eight-bytes pong)
 
-    copy-string variable pointer pong-storage, string pong;
-    save-value variable pointer pong-storage;
+    copy-string variable memory pong-storage, string pong;
+    save-value variable memory pong-storage;
 }
 
 function choose-string(one-byte is-ping)
@@ -34,14 +34,14 @@ function choose-string(one-byte is-ping)
 
 function show-passed-message-and-switch(eight-bytes counter, one-byte is-ping)
 {
-    $declare pointer message;
-    $declare pointer null;
+    $declare memory message;
+    $declare memory null;
 
     choose-string(variable one-byte is-ping)
-    load-value variable pointer message;
+    load-value variable memory message;
 
     @repeat;
-    void: prts->io.log.info(variable pointer null, immediate eight-bytes d0, variable pointer null, variable pointer message)
+    void: prts->io.log.info(variable memory null, immediate eight-bytes d0, variable memory null, variable memory message)
 
     compare variable eight-bytes counter, immediate eight-bytes d0;
     jump-equal point end;
@@ -52,19 +52,19 @@ function show-passed-message-and-switch(eight-bytes counter, one-byte is-ping)
     jump point repeat;
 
     @end;
-    message: prts->pointer.deallocate()
+    message: prts->memory.deallocate()
 }
 
 function show-warning()
 {
-    $declare pointer warning-message;
-    $declare pointer null;
+    $declare memory warning-message;
+    $declare memory null;
 
-    warning-message: prts->pointer.allocate(size-of eight-bytes warning)
-    copy-string variable pointer warning-message, string warning;
+    warning-message: prts->memory.allocate(size-of eight-bytes warning)
+    copy-string variable memory warning-message, string warning;
 
-    void: prts->io.log.warning(variable pointer null, immediate eight-bytes d0, variable pointer null, variable pointer warning-message)
-    warning-message: prts->pointer.deallocate()
+    void: prts->io.log.warning(variable memory null, immediate eight-bytes d0, variable memory null, variable memory warning-message)
+    warning-message: prts->memory.deallocate()
 }
 
 main
@@ -76,10 +76,10 @@ main
 }
 
 get-ping-string {
-    $declare pointer ping-storage;
-    ping-storage: prts->pointer.allocate(size-of eight-bytes ping)
+    $declare memory ping-storage;
+    ping-storage: prts->memory.allocate(size-of eight-bytes ping)
 
-    copy-string variable pointer ping-storage, string ping;
-    save-value variable pointer ping-storage;
+    copy-string variable memory ping-storage, string ping;
+    save-value variable memory ping-storage;
 }
 $main-function main;

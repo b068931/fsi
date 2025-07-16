@@ -15,8 +15,8 @@ void* get_default_function_address() {
 	return ::default_function_address;
 }
 
-void initialize_m(module_mediator::module_part* part) {
-	::part = part;
+void initialize_m(module_mediator::module_part* module_part) {
+	::part = module_part;
 
 	std::vector<char> default_function_symbols{};
 	default_function_symbols.push_back('\x48'); //add rsp, 8 - remove return address

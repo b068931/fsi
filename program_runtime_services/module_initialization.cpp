@@ -1,13 +1,12 @@
 #include "pch.h"
 #include "module_interoperation.h"
 
-module_mediator::module_part* part = nullptr;
-module_mediator::module_part* get_module_part() {
-	return ::part;
+namespace {
+	module_mediator::module_part* part = nullptr;
 }
 
- PROGRAMRUNTIMESERVICES_API void initialize_m(module_mediator::module_part* part) {
-	::part = part;
+module_mediator::module_part* get_module_part() {
+	return ::part;
 }
 
 module_mediator::return_value get_current_thread_group_id() {
@@ -17,7 +16,7 @@ module_mediator::return_value get_current_thread_group_id() {
 		index_getter::excm_get_current_thread_group_id()
 	);
 }
-std::pair<void*, std::uint64_t> decay_pointer(module_mediator::pointer value) {
+std::pair<void*, std::uint64_t> decay_pointer(module_mediator::memory value) {
 	if (value == nullptr) 
 		return { nullptr, 0 };
 
@@ -29,4 +28,8 @@ std::pair<void*, std::uint64_t> decay_pointer(module_mediator::pointer value) {
 	std::memcpy(&data, pointer + sizeof(std::uint64_t), sizeof(std::uint64_t));
 
 	return { data, size };
+}
+
+PROGRAMRUNTIMESERVICES_API void initialize_m(module_mediator::module_part* module_part) {
+	::part = module_part;
 }

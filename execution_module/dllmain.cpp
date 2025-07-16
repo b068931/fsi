@@ -1,20 +1,21 @@
 #include "pch.h"
 #include "thread_local_structure.h"
 
-static DWORD tls_index;
-extern thread_local_structure* get_thread_local_structure() {
-    return std::launder((thread_local_structure*)TlsGetValue(tls_index));
+namespace {
+    DWORD tls_index;
 }
 
-BOOL APIENTRY DllMain( HMODULE hModule,
-                       DWORD  ul_reason_for_call,
-                       LPVOID lpReserved
-                     )
+extern thread_local_structure* get_thread_local_structure() {
+    return std::launder(static_cast<thread_local_structure*>(TlsGetValue(tls_index)));
+}
+
+BOOL APIENTRY DllMain(HMODULE hModule,  // NOLINT(misc-use-internal-linkage)
+                      DWORD  ul_reason_for_call,
+                      LPVOID lpReserved)
 {
+    LPVOID allocated_memory;
     switch (ul_reason_for_call)
     {
-        LPVOID allocated_memory;
-
         case DLL_PROCESS_ATTACH:
             if ((tls_index = TlsAlloc()) == TLS_OUT_OF_INDEXES) { //allocate tls index 
                 return FALSE;
@@ -55,6 +56,8 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 
             TlsFree(tls_index);
             break;
+        default:
+            return FALSE; // unexpected reason for call
     }
 
     return TRUE;

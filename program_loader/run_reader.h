@@ -55,14 +55,12 @@ public:
 	using container_run_initialize_function = void (container::*)(run);
 
 	run_reader(const std::string& file_name, container* cont, std::map<char, container_run_initialize_function> run_initializers) {
-		std::shared_ptr<generic_parser::block_reader<1024>> reader;
-
-		reader = std::shared_ptr<generic_parser::block_reader<1024>>{
-			new generic_parser::block_reader<1024>{
-				new std::ifstream{file_name, std::ios::binary},
-				std::filesystem::file_size(file_name)
-			}
-		};
+        std::shared_ptr<generic_parser::block_reader<1024>> reader{
+            new generic_parser::block_reader<1024>{
+                new std::ifstream{file_name, std::ios::binary},
+                std::filesystem::file_size(file_name)
+            }
+        };
 		
 		for (generic_parser::filepos index = 0, length = reader->get_symbols_count(); (index < length);) {
 			char run_type = reader->get_symbol(index++);

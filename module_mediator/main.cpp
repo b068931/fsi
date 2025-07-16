@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
 		module_mediator::module_part* part = module_mediator.get_module_part();
 		if (error_message.empty()) {
 			std::cerr << "All modules were loaded successfully." << '\n';
-			int executors_count = std::stoi(argv[2]); //no point in starting an app if unable to parse the executors count
+			std::uint16_t executors_count = static_cast<std::uint16_t>(std::stoi(argv[2])); //no point in starting an app if unable to parse the executors count
 
 			std::size_t progload = part->find_module_index("progload");
 			std::size_t load_program_to_memory = part->find_function_index(progload, "load_program_to_memory");
@@ -35,7 +35,7 @@ int main(int argc, char** argv) {
 
 			std::size_t excm = part->find_module_index("excm");
 			std::size_t startup = part->find_function_index(excm, "start");
-			module_mediator::fast_call<module_mediator::return_value>(
+			module_mediator::fast_call<std::uint16_t>(
 				part, excm, startup,
 				executors_count
 			);

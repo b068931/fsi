@@ -10,7 +10,7 @@ public:
 	private:
 		using iterator_type = typename std::list<std::pair<T, priority_type>>::iterator;
 
-		typename iterator_type* associated_element;
+		iterator_type* associated_element;
 		void free_resource() noexcept {
 			delete this->associated_element;
 			this->associated_element = nullptr;
@@ -48,6 +48,10 @@ public:
 			assert(this->associated_element && "invalid priority_list proxy used");
 			return &((*this->associated_element)->first);
 		}
+
+		bool has_resource() const noexcept {
+			return this->associated_element != nullptr;
+        }
 
 		~proxy() {
 			this->free_resource();

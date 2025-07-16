@@ -3,15 +3,17 @@
 #include "module_interoperation.h"
 #include "../module_mediator/module_part.h"
 
-module_mediator::module_part* part = nullptr;
-extern std::chrono::steady_clock::time_point starting_time;
+namespace {
+	module_mediator::module_part* part = nullptr;
+}
 
 module_mediator::module_part* get_module_part() {
 	return ::part;
 }
 
-void initialize_m(module_mediator::module_part* part) {
-	::part = part;
+extern std::chrono::steady_clock::time_point starting_time;
+void initialize_m(module_mediator::module_part* module_part) {
+	::part = module_part;
 	::starting_time = std::chrono::steady_clock::now();
 
 	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);

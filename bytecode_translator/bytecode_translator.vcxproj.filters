@@ -193,6 +193,13 @@
     <CopyFileToFolders Include="..\examples\cyclic2.txt">
       <Filter>Examples</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\examples\cyclic1.txt" />
+    <CopyFileToFolders Include="..\examples\thread-groups-explosion.txt">
+      <Filter>Examples</Filter>
+    </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\examples\Cyclic1.txt">
+      <Filter>Examples</Filter>
+    </Text>
   </ItemGroup>
 </Project>

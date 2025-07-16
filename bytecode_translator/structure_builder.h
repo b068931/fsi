@@ -87,7 +87,7 @@ public:
         two_bytes_type_keyword,
         four_bytes_type_keyword,
         eight_bytes_type_keyword,
-        pointer_type_keyword,
+        memory_type_keyword,
         function_body_start, //{
         expression_end, //;
         move_instruction_keyword,
@@ -299,7 +299,7 @@ public:
     struct instruction {
         source_file_token instruction_type; //Only tokens that correspond to instructions are allowed
         
-        std::deque<pointer_dereference> dereferences; //functions can combine many pointer dereferences, regular variables, immediates in one instruction
+        std::deque<pointer_dereference> dereferences; //functions can combine many memory dereferences, regular variables, immediates in one instruction
         std::deque<imm_variable> immediates;
         std::deque<function_address> func_addresses;
         std::deque<module_variable> modules;

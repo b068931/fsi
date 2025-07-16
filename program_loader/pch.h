@@ -19,5 +19,7 @@
 #include <unordered_map>
 #include <format>
 #include <iostream>
+#include <algorithm>
+#include <ranges>
 
 #endif

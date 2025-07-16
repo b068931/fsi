@@ -1,0 +1,21 @@
+$stack-size d1024;
+$redefine binary-tree-depth d10;
+
+from prts import <threading.create-group>
+
+function self-duplicate(eight-bytes counter) {
+    compare variable eight-bytes counter, immediate eight-bytes d0;
+    jump-equal point end;
+
+    decrement variable eight-bytes counter;
+
+    void: prts->threading.create-group(function-name self-duplicate, variable eight-bytes counter);
+    void: prts->threading.create-group(function-name self-duplicate, variable eight-bytes counter);
+
+    @end;
+}
+
+function main() {
+    $main-function main;
+    void: prts->threading.create-group(function-name self-duplicate, immediate eight-bytes binary-tree-depth);
+}

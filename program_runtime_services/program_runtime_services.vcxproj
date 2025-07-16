@@ -35,7 +35,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release (Installer)|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="pointers.cpp" />
+    <ClCompile Include="memory.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
