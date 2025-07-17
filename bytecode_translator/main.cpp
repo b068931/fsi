@@ -46,8 +46,6 @@ int main(int argc, char** argv) {
 	auto start_time = std::chrono::high_resolution_clock::now();
 	if (argc != 4) {
 		std::cout << "Provide the name of the file to compile and its output destination. And add 'include-debug' or 'no-debug' at the end. It is only three arguments." << std::endl;
-
-		std::cin.get();
 		return EXIT_FAILURE;
 	}
 
@@ -78,13 +76,11 @@ int main(int argc, char** argv) {
 				<< error.second.c_str()
 				<< " NEAR LINE " << error.first << std::endl;
 
-			std::cin.get();
 			return EXIT_FAILURE;
 		}
 
 		include_file_state::active_parsing_files.pop_back();
 		if (!verify_program(parser_value)) {
-			std::cin.get();
 			return EXIT_FAILURE;
 		}
 
@@ -117,13 +113,11 @@ int main(int argc, char** argv) {
 			<< " seconds."
 			<< std::endl;
 
-		std::cin.get();
 		return EXIT_SUCCESS;
 	}
 	catch (const std::exception& exc) {
 		std::cout << "Unable to process the file: " << exc.what() << std::endl;
 	}
 
-	std::cin.get();
 	return EXIT_FAILURE;
 }

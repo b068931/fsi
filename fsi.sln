@@ -33,6 +33,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "module_mediator", "module_m
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "logger_module", "logger_module\logger_module.vcxproj", "{EFFA46AB-91B0-4C85-9B61-998018F77CBC}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "typename-array", "submodule_typename_array\typename-array\typename-array.vcxproj", "{DB1E244F-2629-402B-A7EA-E6772D475175}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug Sanitaizer|x64 = Debug Sanitaizer|x64
@@ -109,6 +111,10 @@ Global
 		{EFFA46AB-91B0-4C85-9B61-998018F77CBC}.Release (Installer)|x64.Build.0 = Release (Installer)|x64
 		{EFFA46AB-91B0-4C85-9B61-998018F77CBC}.Release|x64.ActiveCfg = Release|x64
 		{EFFA46AB-91B0-4C85-9B61-998018F77CBC}.Release|x64.Build.0 = Release|x64
+		{DB1E244F-2629-402B-A7EA-E6772D475175}.Debug Sanitaizer|x64.ActiveCfg = Debug|x64
+		{DB1E244F-2629-402B-A7EA-E6772D475175}.Debug|x64.ActiveCfg = Debug|x64
+		{DB1E244F-2629-402B-A7EA-E6772D475175}.Release (Installer)|x64.ActiveCfg = Release|x64
+		{DB1E244F-2629-402B-A7EA-E6772D475175}.Release|x64.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -122,6 +128,7 @@ Global
 		{8D62A4D1-ACFE-44A6-A647-A51AC37C6D9C} = {F9BEAC84-0B37-4963-9819-2F4B59FBC48F}
 		{18C883CB-68CE-4787-8017-76D8BBEA5F71} = {C857E16E-4CDC-448E-9A2E-6079AFEFC914}
 		{EFFA46AB-91B0-4C85-9B61-998018F77CBC} = {7DFDF923-97C5-48D9-B6F5-ABC6CA5523B2}
+		{DB1E244F-2629-402B-A7EA-E6772D475175} = {F9BEAC84-0B37-4963-9819-2F4B59FBC48F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0389860B-44F1-4F73-9967-3737FD94893C}

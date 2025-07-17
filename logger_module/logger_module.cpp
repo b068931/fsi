@@ -16,19 +16,19 @@ namespace {
 		synchronized_logger << '[';
 		switch (type) {
 		case message_type::info:
-			synchronized_logger << "\x1b[34m" << "INFO" << "\033[0m";
+			synchronized_logger << "INFO";
 			break;
 
 		case message_type::warning:
-			synchronized_logger << "\x1b[33m" << "WARNING" << "\033[0m";
+			synchronized_logger << "WARNING";
 			break;
 
 		case message_type::error:
-			synchronized_logger << "\x1b[91m" << "ERROR" << "\033[0m";
+			synchronized_logger << "ERROR";
 			break;
 
 		case message_type::fatal:
-			synchronized_logger << "\x1b[31m" << "FATAL" << "\033[0m";
+			synchronized_logger << "FATAL";
 			break;
 		}
 
@@ -39,7 +39,7 @@ namespace {
 		std::osyncstream synchronized_logger{ std::cerr };
 
 		std::string result_message = std::format(
-			" [TIME: {}] [FILE NAME: {}, FILE LINE: {}, FUNCTION NAME: {}] \x1b[97m{}\033[0m",
+			" [TIME: {}] [FILE NAME: {}, FILE LINE: {}, FUNCTION NAME: {}] {}",
 			timestamp,
 			(file_name == nullptr) ? "UNSPECIFIED" : file_name,
 			(file_line == 0) ? "UNSPECIFIED" : std::to_string(file_line),

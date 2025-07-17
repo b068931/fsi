@@ -9,8 +9,6 @@
 int main(int argc, char** argv) {
 	if (argc != 4) {
 		std::cerr << "You need to provide three arguments: text file with the modules descriptions, executors count and a compiled file." << std::endl;
-
-		std::cin.get();
 		return EXIT_FAILURE;
 	}
 
@@ -44,7 +42,6 @@ int main(int argc, char** argv) {
 			std::cout << "Could not correctly parse " << modules_descriptor_file.generic_string() << ": " << error_message << std::endl;
 		}
 
-		std::cin.get();
 		return EXIT_SUCCESS;
 	}
 	catch (const std::exception& exc) {
