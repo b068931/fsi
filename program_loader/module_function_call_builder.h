@@ -81,6 +81,8 @@ private:
 		if (this->is_second_time) {
 			this->general_function_call_builder::place_immediate(value, this->arguments_relative_addresses[this->variable_index], 0b011);
 			++this->variable_index;
+
+			delete value;
 		}
 		else {
 			this->prologue(value);
@@ -92,6 +94,7 @@ private:
 			this->move_value_from_reg000_to_args_string(variable->get_active_type(), this->arguments_relative_addresses[this->variable_index], false);
 
 			++this->variable_index;
+			delete variable;
 		}
 		else {
 			this->prologue(variable);

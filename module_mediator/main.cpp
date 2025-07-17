@@ -1,3 +1,7 @@
+#ifndef NDEBUG
+//#include <vld.h>
+#endif
+
 #include <iostream>
 #include <sstream>
 #include <cstdlib>

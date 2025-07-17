@@ -1,21 +1,23 @@
 #include "pch.h"
 #include "program_functions.h"
 
-std::uint32_t nullify_function_pointer_variables(std::vector<char>& destination, const memory_layouts_builder::memory_addresses& locals) {
-	std::uint32_t instructions_size = 0;
-	for (const auto& variable : locals) {
-		if (variable.second.second == 4) { //if local is a pointer
-			destination.push_back('\x48');
-			destination.push_back('\xc7');
-			destination.push_back('\x85');
-			write_bytes(variable.second.first, destination);
-			write_bytes<std::uint32_t>(0, destination);
+namespace {
+	std::uint32_t nullify_function_pointer_variables(std::vector<char>& destination, const memory_layouts_builder::memory_addresses& locals) {
+		std::uint32_t instructions_size = 0;
+		for (const auto& variable : locals | std::views::values) {
+			if (variable.second == 4) { //if local is a pointer
+				destination.push_back('\x48');
+				destination.push_back('\xc7');
+				destination.push_back('\x85');
+				write_bytes(variable.first, destination);
+				write_bytes<std::uint32_t>(0, destination);
 
-			instructions_size += 11;
+				instructions_size += 11;
+			}
 		}
-	}
 
-	return instructions_size;
+		return instructions_size;
+	}
 }
 
 void generate_program_termination_code(std::vector<char>& destination, termination_codes error_code) {
@@ -95,7 +97,7 @@ void* create_executable_function(const std::vector<char>& source) {
 		return nullptr;
 	}
 
-	std::copy(source.cbegin(), source.cend(), destination);
+	std::ranges::copy(source, destination);
 
 	DWORD previous_protection = 0;
 	PDWORD previous_protection_pointer = &previous_protection;

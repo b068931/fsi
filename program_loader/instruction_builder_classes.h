@@ -38,7 +38,7 @@ instruction_builder* construct_builder_generic(
 	};
 }
 
-std::map<std::uint8_t,
+inline std::map<std::uint8_t,
 	instruction_builder* (*) (
 		const std::vector<char>*,
 		std::uint8_t,
@@ -87,7 +87,7 @@ std::map<std::uint8_t,
 		{ 35, &construct_builder_generic<copy_string_builder> }
 	};
 }
-std::map<std::uint8_t, std::string> get_builders_names() {
+inline std::map<std::uint8_t, std::string> get_builders_names() {
 	return {
 		{ 0, "subtract" },
 		{ 1, "signed-subtract" },
@@ -128,7 +128,7 @@ std::map<std::uint8_t, std::string> get_builders_names() {
 	};
 }
 
-instruction_builder* generate_builder(
+inline instruction_builder* generate_builder(
 	std::uint8_t instruction_prefix,
 	std::uint8_t instruction_operation_code,
 	run_reader<runs_container>::run& run,
@@ -165,7 +165,7 @@ instruction_builder* generate_builder(
 	return nullptr;
 }
 
-std::string decode_builder_name(std::uint8_t instruction_operation_code) {
+inline std::string decode_builder_name(std::uint8_t instruction_operation_code) {
 	std::map<std::uint8_t, std::string> builders_names{ get_builders_names() };
 	auto found_name = builders_names.find(instruction_operation_code);
 	if (found_name != builders_names.end()) {
@@ -175,7 +175,7 @@ std::string decode_builder_name(std::uint8_t instruction_operation_code) {
 	return "[UNKNOWN_BUILDER_NAME]";
 }
 
-std::pair<std::unique_ptr<instruction_builder>, std::string> create_builder(
+inline std::pair<std::unique_ptr<instruction_builder>, std::string> create_builder(
 	run_reader<runs_container>::run& run,
 	std::map<entity_id, std::pair<std::int32_t, std::uint8_t>>& function_memory_layout,
 	jump_table_builder& jump_table,

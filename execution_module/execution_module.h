@@ -25,5 +25,6 @@ EXECUTIONMODULE_API module_mediator::return_value start(module_mediator::argumen
 EXECUTIONMODULE_API module_mediator::return_value create_thread(module_mediator::arguments_string_type bundle);
 
 EXECUTIONMODULE_API void initialize_m(module_mediator::module_part*);
+EXECUTIONMODULE_API void free_m();
 
 #endif // !EXECUTION_MODULE_H

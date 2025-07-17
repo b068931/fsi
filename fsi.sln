@@ -26,6 +26,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Legal", "Legal", "{EDAA1009
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utility", "Utility", "{F9BEAC84-0B37-4963-9819-2F4B59FBC48F}"
+	ProjectSection(SolutionItems) = preProject
+		BuildProperties.props = BuildProperties.props
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "generic_parser", "generic_parser\generic_parser.vcxproj", "{8D62A4D1-ACFE-44A6-A647-A51AC37C6D9C}"
 EndProject
@@ -88,13 +91,9 @@ Global
 		{BB720CD8-9861-4CAC-8B6B-FD54E1A4A7DB}.Release (Installer)|x64.ActiveCfg = Release (Installer)
 		{BB720CD8-9861-4CAC-8B6B-FD54E1A4A7DB}.Release|x64.ActiveCfg = Release
 		{8D62A4D1-ACFE-44A6-A647-A51AC37C6D9C}.Debug Sanitaizer|x64.ActiveCfg = Debug Sanitaizer|x64
-		{8D62A4D1-ACFE-44A6-A647-A51AC37C6D9C}.Debug Sanitaizer|x64.Build.0 = Debug Sanitaizer|x64
 		{8D62A4D1-ACFE-44A6-A647-A51AC37C6D9C}.Debug|x64.ActiveCfg = Debug|x64
-		{8D62A4D1-ACFE-44A6-A647-A51AC37C6D9C}.Debug|x64.Build.0 = Debug|x64
 		{8D62A4D1-ACFE-44A6-A647-A51AC37C6D9C}.Release (Installer)|x64.ActiveCfg = Release|x64
-		{8D62A4D1-ACFE-44A6-A647-A51AC37C6D9C}.Release (Installer)|x64.Build.0 = Release|x64
 		{8D62A4D1-ACFE-44A6-A647-A51AC37C6D9C}.Release|x64.ActiveCfg = Release|x64
-		{8D62A4D1-ACFE-44A6-A647-A51AC37C6D9C}.Release|x64.Build.0 = Release|x64
 		{18C883CB-68CE-4787-8017-76D8BBEA5F71}.Debug Sanitaizer|x64.ActiveCfg = Debug Sanitaizer|x64
 		{18C883CB-68CE-4787-8017-76D8BBEA5F71}.Debug Sanitaizer|x64.Build.0 = Debug Sanitaizer|x64
 		{18C883CB-68CE-4787-8017-76D8BBEA5F71}.Debug|x64.ActiveCfg = Debug|x64

@@ -72,7 +72,6 @@ void initialize_m(module_mediator::module_part* module_part) {
     ::part = module_part;
     ::program_control_functions_addresses = new char[4 * sizeof(std::uint64_t)] {};
 
-    int* val = new int;
     inner_fill_in_reg_array_entry(
         0,
         ::program_control_functions_addresses,
@@ -96,4 +95,8 @@ void initialize_m(module_mediator::module_part* module_part) {
         ::program_control_functions_addresses,
         reinterpret_cast<std::uintptr_t>(&end_program)
     );
+}
+
+void free_m() {
+    delete[] ::program_control_functions_addresses;
 }

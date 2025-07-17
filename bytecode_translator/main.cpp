@@ -1,3 +1,7 @@
+#ifndef NDEBUG
+//#include <vld.h>
+#endif
+
 #include <iostream>
 #include <chrono>
 #include <cstdlib>
@@ -10,36 +14,40 @@
 #include "include_file_state.h"
 #include "../generic_parser/parser_facade.h"
 
-bool verify_program(const structure_builder::file& parser_value) {
-	std::vector<std::string> empty_functions{ check_functions_bodies(parser_value) };
-	for (const std::string& name : empty_functions) {
-		std::cout << "PROGRAM LOGIC WARNING: function with name '" + name + "' has empty body." << std::endl;
-	}
+namespace {
+	bool verify_program(const structure_builder::file& parser_value) {
+		std::vector<std::string> empty_functions{ check_functions_bodies(parser_value) };
+		for (const std::string& name : empty_functions) {
+			std::cout << "PROGRAM LOGIC WARNING: function with name '" + name + "' has empty body." << std::endl;
+		}
 
-	std::cout << "Chosen stack size: " << parser_value.stack_size << " bytes." << std::endl;
-	if (parser_value.stack_size == 0) {
-		std::cout << "PROGRAM LOGIC ERROR: You must explicitly specify the stack size that your program will use." << std::endl;
-	}
+		std::cout << "Chosen stack size: " << parser_value.stack_size << " bytes." << std::endl;
+		if (parser_value.stack_size == 0) {
+			std::cout << "PROGRAM LOGIC ERROR: You must explicitly specify the stack size that your program will use." << std::endl;
+		}
 
-	if (parser_value.main_function == nullptr) {
-		std::cout << "SYNTAX ERROR: You must specify the starting function for your program." << std::endl;
-		return false;
-	}
+		if (parser_value.main_function == nullptr) {
+			std::cout << "SYNTAX ERROR: You must specify the starting function for your program." << std::endl;
+			return false;
+		}
 
-	if (!check_instructions_arugments(parser_value)) {
-		std::cout << "SYNTAX ERROR: each instruction can have no more than " << max_instruction_arguments_count << " arguments." << std::endl;
-		return false;
-	}
-	else if (!check_functions_count(parser_value)) {
-		std::cout << "SYNTAX ERROR: you can have no more than " << max_functions_count << " functions in one file." << std::endl;
-		return false;
-	}
-	else if (!check_functions_size(parser_value)) {
-		std::cout << "SYNTAX ERROR: you can have no more than " << max_instructions_count << " instructions in each function." << std::endl;
-		return false;
-	}
+		if (!check_instructions_arugments(parser_value)) {
+			std::cout << "SYNTAX ERROR: each instruction can have no more than " << max_instruction_arguments_count << " arguments." << std::endl;
+			return false;
+		}
 
-	return true;
+	    if (!check_functions_count(parser_value)) {
+			std::cout << "SYNTAX ERROR: you can have no more than " << max_functions_count << " functions in one file." << std::endl;
+			return false;
+		}
+
+	    if (!check_functions_size(parser_value)) {
+			std::cout << "SYNTAX ERROR: you can have no more than " << max_instructions_count << " instructions in each function." << std::endl;
+			return false;
+		}
+
+		return true;
+	}
 }
 
 int main(int argc, char** argv) {

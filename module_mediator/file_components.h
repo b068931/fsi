@@ -17,25 +17,6 @@ namespace module_mediator::parser::components {
 		bool visible;
 		module_callable_function_type function_address;
 
-		/*
-			Structure:
-			first byte - size of this string (including first byte and arguments' types, but excluding arguments' values)
-			other bytes:
-			0 = char,
-			1 = uchar,
-			2 = short,
-			3 = ushort,
-			4 = int,
-			5 = uint,
-			6 = long,
-			7 = ulong,
-			8 = llong,
-			9 = ullong,
-			10 = pointer
-
-			Values of these arguments
-		*/
-
 		void delete_arguments_symbols() {
 			delete this->arguments_symbols;
 			this->arguments_symbols = nullptr;
