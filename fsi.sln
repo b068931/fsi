@@ -23,6 +23,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Legal", "Legal", "{EDAA1009
 	ProjectSection(SolutionItems) = preProject
 		LICENSE.txt = LICENSE.txt
 		README.md = README.md
+		STYLE.txt = STYLE.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utility", "Utility", "{F9BEAC84-0B37-4963-9819-2F4B59FBC48F}"
@@ -36,7 +37,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "module_mediator", "module_m
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "logger_module", "logger_module\logger_module.vcxproj", "{EFFA46AB-91B0-4C85-9B61-998018F77CBC}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "typename-array", "submodule_typename_array\typename-array\typename-array.vcxproj", "{DB1E244F-2629-402B-A7EA-E6772D475175}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "typename_array", "submodule_typename_array\typename-array\typename-array.vcxproj", "{DB1E244F-2629-402B-A7EA-E6772D475175}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

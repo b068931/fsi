@@ -1,0 +1,13 @@
+!!!For this project, the styling rules are basically just guidelines. This is because most of it was written
+before they were added to the project, so it is not possible to follow them strictly at this point.!!!
+
+1. #include directives start with standard library ones(if any), followed by user-defined headers. The same goes for modules.
+2. Program components are logically grouped with Visual Studio's filters. Each word in the filter name starts with a capital letter.
+3. There must be no classes, structures, functions, ... in global namespace. The only exceptions are: main, exported functions and classes.
+Exported in this context means exported through boundaries of one binary (.exe, .dll, etc) to another, this does not cover C++ modules.
+4. There must be no nested classes, structures, ... The only exceptions are: type aliases, templates. Inside the class declarations and
+definitions should (not required) be in the following order: public, protected, private; fields, constructors, methods, overloads, friend functions, destructors.
+5. Only one class, structure, enum, etc per header file. Header file's guard consists of (project_name)_(namespace path)_(name of the class, ...).
+6. Snake case is used for all identifiers. Type aliases must end with "_type", template parameters must end with "_type". "{" must be on the same line as the declaration.
+Template template arguments must end with "_template". All macros must be in uppercase, with words separated by underscores.
+7. Header files must end with .hpp, source files must end with .cpp. Module primary interface units must end with .ixx.
