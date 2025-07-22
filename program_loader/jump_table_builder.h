@@ -1,6 +1,8 @@
 #ifndef JUMP_TABLE_BUILDER_H
 #define JUMP_TABLE_BUILDER_H
 
+#include <algorithm>
+
 #include "pch.h"
 #include "variable_with_id.h" //entity_id
 
@@ -14,29 +16,29 @@ private:
 	}
 public:
 	void add_new_function_address(entity_id id, std::uint64_t address = {}) {
-		this->function_addresses.push_back({ id, address });
+		this->function_addresses.emplace_back(id, address);
 	}
 	void add_new_jump_address(entity_id id, std::uint32_t function_index, std::uint32_t instruction_index, std::uint64_t address = {}) {
-		this->jump_addresses.push_back({ id, function_index, instruction_index, address });
+		this->jump_addresses.emplace_back(id, function_index, instruction_index, address);
 	}
 
 	void remap_function_address(entity_id id, std::uint64_t new_address) {
-		auto found_function = std::find_if(this->function_addresses.begin(), this->function_addresses.end(),
-			[id](const std::pair<entity_id, std::uint64_t>& value) {
-				return value.first == id;
-			}
-		);
+		auto found_function = std::ranges::find_if(this->function_addresses,
+                                                   [id](const std::pair<entity_id, std::uint64_t>& value) {
+                                                       return value.first == id;
+                                                   });
+
 		if (found_function != this->function_addresses.end()) {
 			found_function->second = new_address;
 		}
 	}
 
 	void remap_jump_address(std::uint32_t function_index, std::uint32_t instruction_index, std::uint64_t new_address) {
-		auto found_jump_point = std::find_if(this->jump_addresses.begin(), this->jump_addresses.end(),
-			[function_index, instruction_index](const std::tuple<entity_id, std::uint32_t, std::uint32_t, std::uint64_t>& value) {
-				return (std::get<1>(value) == function_index) && (std::get<2>(value) == instruction_index);
-			}
-		);
+		auto found_jump_point = std::ranges::find_if(this->jump_addresses,
+                                                     [function_index, instruction_index](const std::tuple<entity_id, std::uint32_t, std::uint32_t, std::uint64_t>& value) {
+                                                         return (std::get<1>(value) == function_index) && (std::get<2>(value) == instruction_index);
+                                                     });
+
 		if (found_jump_point != this->jump_addresses.end()) {
 			std::get<3>(*found_jump_point) = new_address;
 		}
@@ -50,11 +52,11 @@ public:
 	}
 
 	std::size_t get_function_table_index(entity_id id) {
-		auto found_function = std::find_if(this->function_addresses.begin(), this->function_addresses.end(),
-			[id](const std::pair<entity_id, std::uint64_t>& value) {
-				return value.first == id;
-			}
-		);
+		auto found_function = std::ranges::find_if(this->function_addresses,
+                                                   [id](const std::pair<entity_id, std::uint64_t>& value) {
+                                                       return value.first == id;
+                                                   });
+
 		if (found_function != this->function_addresses.end()) {
 			return sizeof(std::uint64_t) + sizeof(std::uint64_t) * (found_function - this->function_addresses.begin());
 		}
@@ -62,11 +64,11 @@ public:
 		return 0;
 	}
 	std::size_t get_jump_point_table_index(entity_id id) {
-		auto found_jump_point = std::find_if(this->jump_addresses.begin(), this->jump_addresses.end(),
-			[id](const std::tuple<entity_id, std::uint32_t, std::uint32_t, std::uint64_t>& value) {
-				return std::get<0>(value) == id;
-			}
-		);
+		auto found_jump_point = std::ranges::find_if(this->jump_addresses,
+                                                     [id](const std::tuple<entity_id, std::uint32_t, std::uint32_t, std::uint64_t>& value) {
+                                                         return std::get<0>(value) == id;
+                                                     });
+
 		if (found_jump_point != this->jump_addresses.end()) {
 			return sizeof(std::uint64_t) + (this->function_addresses.size() * sizeof(std::uint64_t)) + (sizeof(std::uint64_t) * (found_jump_point - this->jump_addresses.begin()));
 		}

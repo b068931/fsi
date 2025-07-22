@@ -1,0 +1,16 @@
+GENERAL PRECONDITIONS. If these preconditions are met, execution module and others should work properly:
+1. Threads from thread group A must NOT manipulate threads from thread group B in any way, except
+from the cases when changing the state from "blocked" to "runnable" (after this any interaction is prohibited).
+This rule mostly stems from the fact that its complicated and unnecessary trying to ensure that threads 
+(thread groups by extension) won't be destroyed in the middle of the action.
+2. A thread can be deleted ONLY by an executor that acquired the schedule_information_structure after a call to scheduler.
+This rule ensures that a newly created empty thread group won't be deleted before the first thread gets added to it.
+3. Module A must not call a function from Module B while holding a mutex of any kind.
+This is the only way to prevent deadlocks across module boundaries. Inside a module you should take care
+to ensure that there exists a total order in which several mutex can be acquired. This will prevent deadlocks
+inside a standalone module.
+
+At its core entire execution engine is intended to be thread-safe, this means that each function from
+every module must be reentrant. It does not matter whether it succeeds or fails, the only requirement
+is that its behaviour must be defined under all conditions, if preconditions are met.
+

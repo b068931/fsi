@@ -20,7 +20,7 @@ const generic_parser::token_generator<
 	structure_builder::source_file_token,
 	structure_builder::context_key
 >::symbols_pair parser_options::main_context{
-	{
+    .hard_symbols = {
 		{"/*", structure_builder::source_file_token::comment_start},
 		{",", structure_builder::source_file_token::coma},
 		{"$", structure_builder::source_file_token::special_instruction},
@@ -41,37 +41,37 @@ const generic_parser::token_generator<
 		{"\n", structure_builder::source_file_token::new_line},
 		{"''''", structure_builder::source_file_token::string_separator}
 	},
-	{ " ", "\t" }
+    .separators = { " ", "\t" }
 };
 
 const generic_parser::token_generator<
 	structure_builder::source_file_token,
 	structure_builder::context_key
 >::symbols_pair parser_options::inside_string{
-	{
+    .hard_symbols = {
 		{"''''", structure_builder::source_file_token::string_separator}
 	},
-	{}
+    .separators = {}
 };
 
 const generic_parser::token_generator<
 	structure_builder::source_file_token,
 	structure_builder::context_key
 >::symbols_pair parser_options::inside_include{
-	{
+    .hard_symbols = {
 		{";", structure_builder::source_file_token::expression_end}
 	},
-	{}
+    .separators = {}
 };
 
 const generic_parser::token_generator<
 	structure_builder::source_file_token,
 	structure_builder::context_key
 >::symbols_pair parser_options::inside_comment{
-	{
+    .hard_symbols = {
 		{"*/", structure_builder::source_file_token::comment_end}
 	},
-	{}
+    .separators = {}
 };
 
 const std::vector<std::pair<std::string, structure_builder::source_file_token>> parser_options::keywords{

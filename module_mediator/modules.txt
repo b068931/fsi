@@ -11,6 +11,12 @@ on_container_creation=eight-bytes memory eight-bytes
 -- Accepts container id, thread id, preferred stack size.
 on_thread_creation=eight-bytes eight-bytes eight-bytes
 
+-- Mostly inteded to be used with execution_result_blocked.
+-- It allows to execute code AFTER the thread lock is unlocked. Allowing other threads to make it runnable.
+-- Otherwise, we can run into a data race: some code may try to unblock the thread while its lock is still held.
+-- Accepts a callback_bundle structure defined by module_mediator.
+register_deferred_callback=memory
+
 -- Used by other modules (notably program runtime services) to create a new program thread.
 -- Accepts thread priority, main function address, initialization data, initialization data size.
 create_thread=eight-bytes memory memory eight-bytes
@@ -32,12 +38,6 @@ get_current_thread_id=
 -- Gets the id of the current thread group (container) that executor is running.
 -- Doesn't accept any parameters.
 get_current_thread_group_id=
-
--- Blocks the current program thread.
--- Blocked threads are ignored by the scheduler. In this regard they are similar to already running threads.
--- Execution module won't initiate a shutdown sequence until there are no program threads left. Even if they are blocked.
--- Doesn't accept any parameters.
-self_block=
 
 -- Unblocks the specified program thread.
 -- Perform additional checks to ensure that the thread is not already running.

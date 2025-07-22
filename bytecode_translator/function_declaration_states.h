@@ -10,12 +10,11 @@ public:
 		structure_builder::builder_parameters& helper,
 		structure_builder::read_map_type& read_map
 	) override {
-		output_file_structure.functions.push_back(
-			structure_builder::function{
-				helper.get_id(),
+		output_file_structure.functions.emplace_back(
+            helper.get_id(),
 				helper.name_translations.translate_name(read_map.get_token_generator_name())
-			}
-		);
+
+        );
 	}
 };
 
@@ -34,12 +33,11 @@ public:
 		}
 		else {
 			output_file_structure.functions.back().arguments
-				.push_back(
-					structure_builder::regular_variable{
-						helper.get_id(),
+				.emplace_back(
+                    helper.get_id(),
 						read_map.get_current_token()
-					}
-			);
+
+                );
 		}
 	}
 };

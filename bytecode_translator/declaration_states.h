@@ -12,12 +12,11 @@ public:
 	) override {
 		if (helper.active_function.is_current_function_present()) {
 			helper.active_function.get_current_function().locals
-				.push_back(
-					structure_builder::regular_variable{
-						helper.get_id(),
+				.emplace_back(
+                    helper.get_id(),
 						read_map.get_current_token()
-					}
-			);
+
+                );
 		}
 		else {
 			read_map.exit_with_error();

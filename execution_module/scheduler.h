@@ -6,15 +6,6 @@
 #include "priority_list.h"
 #include "../module_mediator/module_part.h"
 
-/*
-* GENERAL PRECONDITIONS. if these preconditions are met, following algorithms should work properly
-* 1. threads from thread group A must NOT manipulate threads from thread group B in any way, except
-* from the cases when changing the state from "blocked" to "runnable" (after this any interaction is prohibited).
-* 2. a thread can be deleted ONLY by an executor that acquired the schedule_information_structure after SEARCH
-* (this rule ensures that a newly created empty thread group won't be deleted before the first thread gets added to it).
-* 3. executor can change the state of its current thread to blocked and then switch to another thread.
-*/
-
 class scheduler {
 public:
     using put_back_structure_type = void*;

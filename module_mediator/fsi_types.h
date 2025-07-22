@@ -24,6 +24,7 @@ namespace module_mediator {
 	constexpr return_value execution_result_continue = 0;
 	constexpr return_value execution_result_switch = 1;
 	constexpr return_value execution_result_terminate = 2;
+	constexpr return_value execution_result_block = 3;
 }
 
 #endif

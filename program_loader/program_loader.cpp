@@ -21,7 +21,9 @@ namespace {
         std::lock_guard<std::mutex> lock{ ::exposed_functions_mutex };
         ::exposed_functions.merge(new_exposed_functions);
     }
+}
 
+namespace {
     module_mediator::return_value add_program(
         std::uint64_t preferred_stack_size, std::uint32_t main_function_index,
         void** code, std::uint32_t functions_count,
@@ -526,7 +528,7 @@ module_mediator::return_value load_program_to_memory(module_mediator::arguments_
         )
     );
 
-    return 1;
+    return module_mediator::module_failure;
 }
 module_mediator::return_value free_program(module_mediator::arguments_string_type bundle) {
     auto [compiled_functions, compiled_functions_count, 
@@ -580,17 +582,17 @@ module_mediator::return_value check_function_arguments(module_mediator::argument
     }
 
     if (found_signature_string == module_mediator::arguments_string_type{}) {
-        return 2; //"function was not found"
+        return module_mediator::module_failure; //"function was not found"
     }
 
     if (module_mediator::arguments_string_builder::check_if_arguments_strings_match(
         static_cast<module_mediator::arguments_string_type>(signature_string), 
         found_signature_string)
         ) {
-        return 0; //"signatures match"
+        return module_mediator::module_success; //"signatures match"
     }
 
-    return 1; //"signatures do not match"
+    return module_mediator::module_failure; //"signatures do not match"
 }
 module_mediator::return_value get_function_name(module_mediator::arguments_string_type bundle) {
     auto [function_address] = 

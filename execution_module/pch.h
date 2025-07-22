@@ -24,5 +24,6 @@
 #include <thread>
 #include <format>
 #include <map>
+#include <ranges>
 
 #endif //PCH_H

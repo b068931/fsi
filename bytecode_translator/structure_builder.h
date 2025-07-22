@@ -1,9 +1,9 @@
 #ifndef STRUCTURE_BUILDER
 #define STRUCTURE_BUILDER
 
+#include <algorithm>
 #include <vector>
 #include <tuple>
-#include <iostream>
 #include <string>
 #include <cstdlib>
 #include <list>
@@ -34,28 +34,28 @@ public:
         no_error,
         outside_function,
         inside_module_import,
-        IMPORT_was_expected,
-        import_START_was_expected,
+        import_was_expected,
+        import_start_was_expected,
         coma_or_import_end_were_expected,
         special_symbol,
-        DEFINE_name_expected,
-        REDEFINE_name_expected,
-        IFDEF_name_expected,
-        IFNDEF_name_expected,
-        STACK_SIZE_name_expected,
+        define_name_expected,
+        redefine_name_expected,
+        if_defined_name_expected,
+        if_not_defined_name_expected,
+        stack_size_name_expected,
         invalid_number,
         unexpected_type,
         can_not_declare_variable,
-        DECL_name,
-        FUNCTION_name,
-        args_start_expected,
-        args_end_or_coma,
-        FUNCTION_args_unexpected_type,
-        FUNCTION_args_unexpected_token,
-        FUNCTION_args_empty_name,
-        FUNCTION_body_start_was_expected,
-        FUNCTION_body_token,
-        INSTRUCTION_token,
+        declare_name,
+        function_name,
+        arguments_start_expected,
+        arguments_end_or_coma,
+        function_arguments_unexpected_type,
+        function_arguments_unexpected_token,
+        function_arguments_empty_name,
+        function_body_start_was_expected,
+        function_body_token,
+        instruction_token,
         name_does_not_exist
     };
     enum class source_file_token {
@@ -166,7 +166,7 @@ public:
     };
 
     struct pointer_dereference;
-    struct imm_variable;
+    struct immediate_variable;
     struct function_address;
     struct module_variable;
     struct module_function_variable;
@@ -178,29 +178,30 @@ public:
     public:
         virtual void visit(source_file_token, const pointer_dereference*, bool) = 0;
         virtual void visit(source_file_token, const regular_variable*, bool) = 0;
-        virtual void visit(source_file_token, const imm_variable*, bool) = 0;
+        virtual void visit(source_file_token, const immediate_variable*, bool) = 0;
         virtual void visit(source_file_token, const function_address*, bool) = 0;
         virtual void visit(source_file_token, const module_variable*, bool) = 0;
         virtual void visit(source_file_token, const module_function_variable*, bool) = 0;
         virtual void visit(source_file_token, const jump_point_variable*, bool) = 0;
         virtual void visit(source_file_token, const string_constant*, bool) = 0;
+        virtual ~variable_visitor() noexcept = default;
     };
 
     struct variable {
         virtual void visit(source_file_token active_type, variable_visitor* visitor, bool is_signed) = 0;
         virtual ~variable() = default;
     };
-    struct imm_variable : public variable {
+    struct immediate_variable : public variable {
         immediate_type imm_val;
         source_file_token type;
 
-        imm_variable(source_file_token type)
+        immediate_variable(source_file_token type)
             :variable{},
             imm_val{0},
             type{type}
         {}
 
-        imm_variable(source_file_token type, immediate_type value)
+        immediate_variable(source_file_token type, immediate_type value)
             :variable{},
             imm_val{value},
             type{type}
@@ -214,9 +215,9 @@ public:
         source_file_token type;
         std::string name;
 
-        regular_variable(entity_id id, source_file_token type) 
+        regular_variable(entity_id object_id, source_file_token type) 
             :variable{},
-            entity{id},
+            entity{object_id},
             type{type}
         {}
 
@@ -300,7 +301,7 @@ public:
         source_file_token instruction_type; //Only tokens that correspond to instructions are allowed
         
         std::deque<pointer_dereference> dereferences; //functions can combine many memory dereferences, regular variables, immediates in one instruction
-        std::deque<imm_variable> immediates;
+        std::deque<immediate_variable> immediates;
         std::deque<function_address> func_addresses;
         std::deque<module_variable> modules;
         std::deque<module_function_variable> module_functions;
@@ -317,14 +318,14 @@ public:
         std::uint32_t index;
         std::string name;
 
-        jump_point(entity_id id, std::uint32_t index, std::string&& name)
-            :entity{ id },
+        jump_point(entity_id object_id, std::uint32_t index, std::string&& name)
+            :entity{ object_id },
             name {std::move(name)},
             index{index}
         {}
 
-        jump_point(entity_id id, std::uint32_t index, const std::string& name)
-            :entity{ id },
+        jump_point(entity_id object_id, std::uint32_t index, const std::string& name)
+            :entity{ object_id },
             name{ name },
             index{ index }
         {}
@@ -337,15 +338,15 @@ public:
         std::list<instruction> body;
 
         std::string name;
-        function(entity_id id, std::string&& name)
-            :entity{id},
+        function(entity_id object_id, std::string&& name)
+            :entity{object_id},
             name{std::move(name)}
         {}
     };
     struct module_function : entity {
         std::string name;
-        module_function(entity_id id, std::string&& name)
-            :entity{id},
+        module_function(entity_id object_id, std::string&& name)
+            :entity{object_id},
             name{std::move(name) }
         {}
     };
@@ -353,16 +354,16 @@ public:
         std::string name;
         std::list<module_function> functions_names;
 
-        engine_module(entity_id id, std::string&& module_name)
-            :entity{id},
+        engine_module(entity_id object_id, std::string&& module_name)
+            :entity{object_id},
             name{std::move(module_name)},
             functions_names{}
         {}
     };
     struct string : public entity {
         std::string value;
-        string(entity_id id)
-            :entity{ id },
+        string(entity_id object_id)
+            :entity{ object_id },
             value{}
         {}
     };
@@ -398,29 +399,33 @@ public:
                 return this->get_current_function().body.back();
             }
             void add_new_operand_to_last_instruction(source_file_token token, variable* var, bool is_signed) {
-                this->get_last_instruction().operands_in_order.push_back({ token, var, is_signed });
+                this->get_last_instruction().operands_in_order.emplace_back(token, var, is_signed);
             }
             void add_new_instruction(source_file_token token) {
-                this->get_current_function().body.push_back({ token });
+                this->get_current_function().body.emplace_back(token);
             }
             decltype(auto) get_last_operand() {
                 return this->get_last_instruction().operands_in_order.back();
             }
             decltype(auto) find_argument_variable_by_name(const std::string& name) {
-                return std::find_if(this->get_current_function().arguments.begin(), this->get_current_function().arguments.end(),
-                    [&name](const regular_variable& var) {
-                        return var.name == name;
-                    });
+                return std::ranges::find_if(this->get_current_function().arguments,
+                                            [&name](const regular_variable& var) {
+                                                return var.name == name;
+                                            });
             }
             decltype(auto) find_local_variable_by_name(const std::string& name) {
-                return std::find_if(this->get_current_function().locals.begin(), this->get_current_function().locals.end(),
-                    [&name](const regular_variable& var) {
-                        return var.name == name;
-                    });
+                return std::ranges::find_if(this->get_current_function().locals,
+                                            [&name](const regular_variable& var) {
+                                                return var.name == name;
+                                            });
             }
 
             template<typename type>
-            void map_operand_with_variable(const std::string& name, type** out, generic_parser::read_map<source_file_token, context_key, file, builder_parameters, parameters_enumeration>& parse_map) {
+            void map_operand_with_variable(
+                const std::string& name, 
+                type** out, 
+                generic_parser::read_map<source_file_token, context_key, file, builder_parameters, parameters_enumeration>& parser
+            ) {
                 auto found_argument = this->find_argument_variable_by_name(name);
                 if (found_argument != this->get_current_function().arguments.end()) {
                     *out = &(*found_argument);
@@ -433,23 +438,23 @@ public:
                     return;
                 }
 
-                parse_map.exit_with_error("Name '" + name + "' does not exist.");
+                parser.exit_with_error("Name '" + name + "' does not exist.");
             }
         };
         struct names_remapping {
         private:
             std::vector<std::pair<std::string, std::string>> remappings; //used with redefine
             auto find_remapped_name(const std::string& name_to_find) const {
-                auto found_defined_name = std::find_if(this->remappings.begin(), this->remappings.end(),
-                    [&name_to_find](const std::pair<std::string, std::string>& val) {
-                        return name_to_find == val.first;
-                    });
+                auto found_defined_name = std::ranges::find_if(this->remappings,
+                                                               [&name_to_find](const std::pair<std::string, std::string>& val) {
+                                                                   return name_to_find == val.first;
+                                                               });
 
                 return found_defined_name;
             }
 
         public:
-            void merge(names_remapping&& other) {
+            void merge(names_remapping&& other) {  // NOLINT(cppcoreguidelines-rvalue-reference-param-not-moved)
                 //this is actually diabolical
                 for (auto begin = other.remappings.begin(); begin != other.remappings.end(); ++begin) {
                     auto found = this->find_remapped_name(begin->first);
@@ -460,7 +465,7 @@ public:
             }
 
             void add(std::string what, std::string new_value) {
-                this->remappings.push_back({ std::move(what), std::move(new_value) });
+                this->remappings.emplace_back(std::move(what), std::move(new_value));
             }
             void remove(const std::string& what) {
                 auto found_remapping = this->find_remapped_name(what);
@@ -481,7 +486,7 @@ public:
             T translate_name_to_integer(std::string name) const {
                 std::string value{ this->translate_name(std::move(name)) };
                 if (!value.empty()) {
-                    int base = 0;
+                    int base;
                     switch (value[0]) {
                     case 'd':
                         base = 10;
@@ -501,7 +506,7 @@ public:
 
                     char* last_symbol = nullptr;
                     unsigned long long result = std::strtoull(value.c_str() + 1, &last_symbol, base);
-                    if ((last_symbol - value.c_str()) == value.size()) {
+                    if (static_cast<std::size_t>(last_symbol - value.c_str()) == value.size()) {
                         if ((errno == ERANGE) || (result != static_cast<T>(result))) {
                             throw std::invalid_argument{ "Value is too big to be converted." };
                         }
@@ -515,7 +520,7 @@ public:
             std::string translate_name(std::string name) const { //translate redefined name to a normal name
                 std::string generated_name = std::move(name);
                 auto found_name = this->find_remapped_name(generated_name);
-                if ((found_name != this->remappings.end()) && (found_name->second != "")) {
+                if ((found_name != this->remappings.end()) && (!found_name->second.empty())) {
                     generated_name = found_name->second;
                 }
 
@@ -535,16 +540,21 @@ public:
             static entity_id id = 1;
             return id++;
         }
-        void add_function_address_argument(file& output_file_structure, builder_parameters& helper, generic_parser::read_map<source_file_token, context_key, file, builder_parameters, parameters_enumeration>& read_map) {
-            helper.active_function.get_last_instruction().func_addresses.push_back(function_address{}); //add new function address to the list function addresses of specific instruction
+        void add_function_address_argument(
+            file& file_structure, 
+            builder_parameters& helper_parameters, 
+            generic_parser::read_map<source_file_token, context_key, file, builder_parameters, parameters_enumeration>& read_map
+        ) {
+            helper_parameters.active_function.get_last_instruction().func_addresses.emplace_back(); //add new function address to the list function addresses of specific instruction
 
-            function_address* func = &helper.active_function.get_last_instruction().func_addresses.back();
-            std::string function_name = helper.name_translations.translate_name(read_map.get_token_generator_name());
-            auto found_function = std::find_if(output_file_structure.functions.begin(), output_file_structure.functions.end(), //try to find function with specific name inside functions list
-                [&function_name](const function& func) {
-                    return func.name == function_name;
-                });
-            if (found_function == output_file_structure.functions.end()) { //if search was unsuccessful then exit with error
+            function_address* func = &helper_parameters.active_function.get_last_instruction().func_addresses.back();
+            std::string function_name = helper_parameters.name_translations.translate_name(read_map.get_token_generator_name());
+            auto found_function = std::ranges::find_if(file_structure.functions, //try to find function with specific name inside functions list
+                                                       [&function_name](const function& func) {
+                                                           return func.name == function_name;
+                                                       });
+
+            if (found_function == file_structure.functions.end()) { //if search was unsuccessful then exit with error
                 read_map.exit_with_error("Function with name '" + function_name + "' does not exist.");
                 return;
             }
@@ -553,12 +563,13 @@ public:
             func->func = function; //bind function address argument with specific function
 
             auto found_exposed_function =
-                std::find(output_file_structure.exposed_functions.begin(), output_file_structure.exposed_functions.end(), function);
-            if (found_exposed_function == output_file_structure.exposed_functions.end()) { //insert exposed function if it hasn't been already added to the list
-                output_file_structure.exposed_functions.push_back(function);
+                std::ranges::find(file_structure.exposed_functions, function);
+
+            if (found_exposed_function == file_structure.exposed_functions.end()) { //insert exposed function if it hasn't been already added to the list
+                file_structure.exposed_functions.push_back(function);
             }
 
-            helper.active_function.add_new_operand_to_last_instruction(source_file_token::function_address_argument_keyword, func, false);
+            helper_parameters.active_function.add_new_operand_to_last_instruction(source_file_token::function_address_argument_keyword, func, false);
         }
     };
     using read_map_type = generic_parser::read_map<source_file_token, context_key, file, builder_parameters, parameters_enumeration>;
@@ -597,7 +608,7 @@ public:
             .get_parameters_container()
             .retrieve_parameter<std::pair<bool, std::string>>(parameters_enumeration::inside_comment);
 
-        switch (token) {
+        switch (token) {  // NOLINT(clang-diagnostic-switch)
             case source_file_token::comment_start: {
                 saved_name = this->generator->get_name();
                 this->generator->set_current_context(context_key::inside_comment);
@@ -623,6 +634,7 @@ public:
 
                 break;
             }
+            default: break;
         }
 
         if (just_left_comment) {

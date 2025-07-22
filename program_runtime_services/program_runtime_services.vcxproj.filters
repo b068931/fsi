@@ -35,7 +35,7 @@
     <ClInclude Include="multithreading.h">
       <Filter>Header Files\Module Mediator\Basic</Filter>
     </ClInclude>
-    <ClInclude Include="pointers.h">
+    <ClInclude Include="memory.h">
       <Filter>Header Files\Module Mediator\Basic</Filter>
     </ClInclude>
     <ClInclude Include="logging.h">
@@ -46,6 +46,12 @@
     </ClInclude>
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="standard_input_output.h">
+      <Filter>Header Files\Module Mediator\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="backend_functions.h">
+      <Filter>Header Files\Module Mediator</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -63,6 +69,12 @@
     </ClCompile>
     <ClCompile Include="module_initialization.cpp">
       <Filter>Source Files\Maintenance</Filter>
+    </ClCompile>
+    <ClCompile Include="standard_input_output.cpp">
+      <Filter>Source Files\Module Mediator\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="backend_functions.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

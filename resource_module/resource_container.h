@@ -30,7 +30,7 @@ struct resource_container {
 			callback.first(callback.second);
 		}
 
-		if (this->allocated_memory.size() != 0) {
+		if (!this->allocated_memory.empty()) {
 			LOG_PROGRAM_WARNING(
 				get_module_part(), 
 				std::format("Destroyed resource container had {} dangling memory block(s).", this->allocated_memory.size())
@@ -38,7 +38,7 @@ struct resource_container {
 		}
 
 		for (void* memory : this->allocated_memory) {
-			delete[] memory;
+			delete[] static_cast<char*>(memory);
 		}
 
 		delete this->lock;

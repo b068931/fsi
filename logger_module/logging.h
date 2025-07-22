@@ -29,7 +29,7 @@ namespace logger_module {
 		std::string message
 	) {
 		assert(part != nullptr && "Null module part");
-		assert(message.size() != 0 && "Empty log message");
+		assert(!message.empty() && "Empty log message");
 
 		static std::size_t logger = part->find_module_index("logger");
 		if (logger == module_mediator::module_part::module_not_found) {

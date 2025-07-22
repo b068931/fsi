@@ -44,6 +44,21 @@ private:
 			size_t previous_active_threads_count = this->active_threads_counter.fetch_sub(1, std::memory_order_relaxed);
 			if (currently_running_thread_information->put_back_structure) {
 				this->scheduler.put_back(currently_running_thread_information->put_back_structure);
+				for (const auto& deferred_callback : get_thread_local_structure()->deferred_callbacks) {
+                    std::size_t module_index = get_module_part()->find_module_index(deferred_callback->module_name);
+					std::size_t function_index = get_module_part()->find_function_index(
+						module_index,
+						deferred_callback->function_name
+                    );
+
+					get_module_part()->call_module(
+						module_index,
+						function_index,
+						deferred_callback->arguments_string
+					);
+				}
+
+                get_thread_local_structure()->deferred_callbacks.clear();
 			}
 			else {
 				if ((previous_active_threads_count == 1) && (!this->scheduler.has_available_jobs())) {

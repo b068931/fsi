@@ -1,12 +1,12 @@
 #ifndef INCLUDE_FILE_STATE_H
 #define INCLUDE_FILE_STATE_H
 
+#include <algorithm>
 #include <iostream>
 #include <vector>
 #include <filesystem>
 #include <format>
 #include <exception>
-#include <algorithm>
 
 #include "parser_options.h"
 #include "type_definitions.h"
@@ -21,9 +21,8 @@ public:
 		structure_builder::read_map_type& read_map
 	) override {
 		std::filesystem::path include_file{ std::filesystem::canonical(read_map.get_token_generator_name()) };
-		auto already_seen = std::find_if(
-			active_parsing_files.begin(),
-			active_parsing_files.end(),
+		auto already_seen = std::ranges::find_if(
+            active_parsing_files,
 			[&include_file](const std::filesystem::path& previous_file) -> bool {
 				return std::filesystem::equivalent(previous_file, include_file);
 			}

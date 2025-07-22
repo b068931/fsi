@@ -75,7 +75,7 @@ module_mediator::return_value on_thread_creation(module_mediator::arguments_stri
 			inner_deallocate_program_container(result_container_id);
 		}
 
-		return 1;
+		return module_mediator::module_failure;
 	}
 	
 	inner_fill_in_reg_array_entry( //stack current position
@@ -106,7 +106,7 @@ module_mediator::return_value on_thread_creation(module_mediator::arguments_stri
 	);
 
 	LOG_PROGRAM_INFO(get_module_part(), "New thread has been successfully created.");
-	return 0;
+	return module_mediator::module_success;
 }
 module_mediator::return_value on_container_creation(module_mediator::arguments_string_type bundle) {
 	auto [container_id, program_main, preferred_stack_size] = 
@@ -116,6 +116,15 @@ module_mediator::return_value on_container_creation(module_mediator::arguments_s
 	LOG_PROGRAM_INFO(get_module_part(), "New thread group has been successfully created.");
 
 	return inner_create_thread(container_id, 0, program_main);
+}
+module_mediator::return_value register_deferred_callback(module_mediator::arguments_string_type bundle) {
+	auto [callback_info] = 
+		module_mediator::arguments_string_builder<void*>(bundle);
+
+	module_mediator::callback_bundle* callback = static_cast<module_mediator::callback_bundle>(callback_info);
+	get_thread_local_structure()->deferred_callbacks.push_back(callback);
+
+	return module_mediator::module_success;
 }
 
 module_mediator::return_value self_duplicate(module_mediator::arguments_string_type bundle) {
@@ -144,13 +153,13 @@ module_mediator::return_value dynamic_call(module_mediator::arguments_string_typ
 	module_mediator::arguments_string_type function_arguments_string =
         static_cast<module_mediator::arguments_string_type>(function_arguments_data);
 
-	if (inner_check_function_signature(function_address, function_arguments_string) != 0) {
+	if (inner_check_function_signature(function_address, function_arguments_string) != module_mediator::module_success) {
 		LOG_PROGRAM_ERROR(
 			get_module_part(), "A function signature for function '" + get_exposed_function_name(function_address) +
 			"' does not match passed arguments. (dynamic call)"
 		);
 
-		return 1;
+		return module_mediator::module_failure;
 	}
 
 	program_state_manager state_manager{ 
@@ -175,7 +184,7 @@ module_mediator::return_value dynamic_call(module_mediator::arguments_string_typ
 
 	if (new_current_stack_position == reinterpret_cast<std::uintptr_t>(nullptr)) {
 		LOG_PROGRAM_ERROR(get_module_part(), "The thread stack initialization has failed. (dynamic call)");
-		return 1;
+		return module_mediator::module_failure;
 	}
 
 	state_manager.set_current_stack_position(
@@ -186,15 +195,9 @@ module_mediator::return_value dynamic_call(module_mediator::arguments_string_typ
 		reinterpret_cast<std::uintptr_t>(static_cast<char*>(function_address) + function_save_return_address_size)
 	);
 
-	return 0;
+	return module_mediator::module_success;
 }
 
-module_mediator::return_value self_block(module_mediator::arguments_string_type) {
-	LOG_PROGRAM_INFO(get_module_part(), "Was blocked.");
-	get_thread_manager().block(get_thread_local_structure()->currently_running_thread_information.thread_id);
-
-	return 0;
-}
 module_mediator::return_value get_current_thread_id(module_mediator::arguments_string_type) {
 	return get_thread_local_structure()->currently_running_thread_information.thread_id;
 }
@@ -216,9 +219,11 @@ module_mediator::return_value make_runnable(module_mediator::arguments_string_ty
                 thread_id
 			)
 		);
+
+		return module_mediator::module_failure;
 	}
 
-	return 0;
+	return module_mediator::module_success;
 }
 module_mediator::return_value start(module_mediator::arguments_string_type bundle) {
 	auto [thread_count] =
@@ -230,7 +235,7 @@ module_mediator::return_value start(module_mediator::arguments_string_type bundl
 	);
 
 	get_thread_manager().startup(thread_count);
-	return 0;
+	return module_mediator::module_success;
 }
 module_mediator::return_value create_thread(module_mediator::arguments_string_type bundle) {
 	auto [priority, main_function_address, main_function_parameters, parameters_size] =

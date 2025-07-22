@@ -1,6 +1,7 @@
 #ifndef BYTECODE_TRANSLATOR
 #define BYTECODE_TRANSLATOR
 
+#include <algorithm>
 #include <vector>
 #include <limits>
 #include <cstdint>
@@ -14,7 +15,7 @@ constexpr auto max_instruction_arguments_count = 15;
 constexpr auto max_name_length = std::numeric_limits<std::uint8_t>::max();
 constexpr auto max_function_arguments_count = std::numeric_limits<std::uint8_t>::max();
 
-bool check_instructions_arugments(const structure_builder::file& file) {
+inline bool check_instructions_arugments(const structure_builder::file& file) {
 	for (const structure_builder::function& func : file.functions) {
 		for (const structure_builder::instruction& inst : func.body) {
 			if (inst.operands_in_order.size() > max_instruction_arguments_count) {
@@ -25,8 +26,8 @@ bool check_instructions_arugments(const structure_builder::file& file) {
 
 	return true;
 }
-bool check_functions_count(const structure_builder::file& file) { return file.functions.size() <= max_functions_count; }
-bool check_functions_size(const structure_builder::file& file) { 
+inline bool check_functions_count(const structure_builder::file& file) { return file.functions.size() <= max_functions_count; }
+inline bool check_functions_size(const structure_builder::file& file) { 
 	for (const structure_builder::function& func : file.functions) {
 		if (func.body.size() > max_instructions_count) {
 			return false;
@@ -35,10 +36,10 @@ bool check_functions_size(const structure_builder::file& file) {
 
 	return true;
 }
-std::vector<std::string> check_functions_bodies(const structure_builder::file& file) {
+inline std::vector<std::string> check_functions_bodies(const structure_builder::file& file) {
 	std::vector<std::string> result{};
 	for (const structure_builder::function& function : file.functions) {
-		if (function.body.size() == 0) {
+		if (function.body.empty()) {
 			result.push_back(function.name);
 		}
 	}
@@ -125,13 +126,15 @@ private:
 		static constexpr error_type error_message{ error_type::general_instruction };
 		static bool check(const structure_builder::instruction& instruction) {
 			//at first we make sure that this insturction won't use arguments specific to function calls
-			bool function_arguments = (instruction.func_addresses.size() == 0) && (instruction.modules.size() == 0) && (instruction.module_functions.size() == 0);
+			bool function_arguments = (instruction.func_addresses.empty()) && (instruction.modules.empty()) && (
+                instruction.module_functions.empty());
 			if (function_arguments) {
-				for (std::size_t index = 0, size = instruction.operands_in_order.size(); index < size; ++index) {
-					if (std::get<2>(instruction.operands_in_order[index])) { //now we make sure that this instruction won't use signed variables
+				for (const auto& index : instruction.operands_in_order) {
+					if (std::get<2>(index)) { //now we make sure that this instruction won't use signed variables
 						return false;
 					}
 				}
+				
 				return true;
 			}
 
@@ -141,8 +144,8 @@ private:
 	struct jump_instruction { //jump pnt name - example
 		static constexpr error_type error_message{ error_type::jump_instruction };
 		static bool check(const structure_builder::instruction& instruction) {
-			return (instruction.dereferences.size() == 0) && //jump instructions use only point variables
-				(instruction.immediates.size() == 0) &&
+			return (instruction.dereferences.empty()) && //jump instructions use only point variables
+				(instruction.immediates.empty()) &&
 				(instruction.jump_variables.size() == 1) &&
 				(instruction.operands_in_order.size() == 1);
 		}
@@ -150,15 +153,15 @@ private:
 	struct data_instruction {
 		static constexpr error_type error_message{ error_type::data_instruction };
 		static bool check(const structure_builder::instruction& instruction) {
-			return (instruction.jump_variables.size() == 0);
+			return (instruction.jump_variables.empty());
 		}
 	};
 	struct var_instruction { //var instructions can only dereference pointers and can not use them as pure arguments
 		static constexpr error_type error_message{ error_type::var_instruction };
 		static bool check(const structure_builder::instruction& instruction) {
-			for (std::size_t index = 0, size = instruction.operands_in_order.size(); index < size; ++index) {
+			for (const auto& index : instruction.operands_in_order) {
 				structure_builder::regular_variable* current_argument = 
-					dynamic_cast<structure_builder::regular_variable*>(std::get<1>(instruction.operands_in_order[index]));
+					dynamic_cast<structure_builder::regular_variable*>(std::get<1>(index));
 				
 				if (current_argument && (current_argument->type == structure_builder::source_file_token::memory_type_keyword)) {
 					return false;
@@ -171,9 +174,9 @@ private:
 	struct apply_on_first_operand_instruction {
 		static constexpr error_type error_message{ error_type::apply_on_first_operand_instruction };
 		static bool check(const structure_builder::instruction& instruction) {
-			if (instruction.operands_in_order.size() != 0) {
+			if (!instruction.operands_in_order.empty()) {
 				return (typeid(*std::get<1>(instruction.operands_in_order[0])) !=
-					typeid(structure_builder::imm_variable)) || (instruction.instruction_type == structure_builder::source_file_token::compare_instruction_keyword);
+					typeid(structure_builder::immediate_variable)) || (instruction.instruction_type == structure_builder::source_file_token::compare_instruction_keyword);
 			}
 
 			return false;
@@ -211,13 +214,13 @@ private:
 	struct different_type_instruction {
 		static constexpr error_type error_message{ error_type::different_type_instruction };
 		static bool check(const structure_builder::instruction& instruction) {
-			return (instruction.immediates.size() == 0);
+			return (instruction.immediates.empty());
 		}
 	};
 	struct different_type_multi_instruction {
 		static constexpr error_type error_message{ error_type::different_type_multi_instruction };
 		static bool check(const structure_builder::instruction& instruction) {
-			return (instruction.operands_in_order.size() >= 1) && (instruction.operands_in_order.size() <= 15);
+			return (!instruction.operands_in_order.empty()) && (instruction.operands_in_order.size() <= 15);
 		}
 	};
 	struct save_variable_state_instruction {
@@ -229,7 +232,7 @@ private:
 	struct load_variable_state_instruction {
 		static constexpr error_type error_message{ error_type::load_variable_state_instruction };
 		static bool check(const structure_builder::instruction& instruction) {
-			return (instruction.immediates.size() == 0);
+			return (instruction.immediates.empty());
 		}
 	};
 	struct function_call_instruction {
@@ -241,10 +244,10 @@ private:
 	struct program_function_call_instruction {
 		static constexpr error_type error_message{ error_type::program_function_call };
 		static bool check(const structure_builder::instruction& instruction) {
-			bool program_function_call = (instruction.modules.size() == 0) && (instruction.module_functions.size() == 0);
+			bool program_function_call = (instruction.modules.empty()) && (instruction.module_functions.empty());
 			if (program_function_call) {
-				for (std::size_t index = 0, size = instruction.operands_in_order.size(); index < size; ++index) {
-					if (std::get<2>(instruction.operands_in_order[index])) {
+				for (const auto& index : instruction.operands_in_order) {
+					if (std::get<2>(index)) {
 						return false;
 					}
 				}
@@ -264,12 +267,12 @@ private:
 	struct pointer_ref_instruction {
 		static constexpr error_type error_message{ error_type::pointer_ref_instruction };
 		static bool check(const structure_builder::instruction& instruction) {
-			bool initial_check = instruction.immediates.size() == 0;
+			bool initial_check = instruction.immediates.empty();
 
 			if (initial_check) {
-				for (std::size_t index = 0, size = instruction.operands_in_order.size(); index < size; ++index) {
+				for (const auto& index : instruction.operands_in_order) {
 					structure_builder::regular_variable* current_argument =
-						dynamic_cast<structure_builder::regular_variable*>(std::get<1>(instruction.operands_in_order[index]));
+						dynamic_cast<structure_builder::regular_variable*>(std::get<1>(index));
 
 					if (current_argument && (current_argument->type != structure_builder::source_file_token::memory_type_keyword)) {
 						return false;
@@ -286,11 +289,11 @@ private:
 		static constexpr error_type error_message{ error_type::ctjtd_instruction };
 		static bool check(const structure_builder::instruction& instruction) {
 			bool initial_check =
-				(instruction.modules.size() == 0) && (instruction.module_functions.size() == 0);
+				(instruction.modules.empty()) && (instruction.module_functions.empty());
 
 			if (initial_check && (instruction.operands_in_order.size() >= 2)) {
-				for (std::size_t index = 0, size = instruction.operands_in_order.size(); index < size; ++index) {
-					if (std::get<2>(instruction.operands_in_order[index])) {
+				for (const auto& index : instruction.operands_in_order) {
+					if (std::get<2>(index)) {
 						return false;
 					}
 				}
@@ -317,7 +320,7 @@ private:
 	struct non_string_instruction {
 		static constexpr error_type error_message{ error_type::non_string_instruction };
 		static bool check(const structure_builder::instruction& instruction) {
-			return instruction.strings.size() == 0;
+			return instruction.strings.empty();
 		}
 	};
 
@@ -340,7 +343,7 @@ private:
 		{}
 
 		virtual bool is_match(structure_builder::source_file_token instr) override {
-			return std::find(this->instruction_list.begin(), this->instruction_list.end(), instr) != this->instruction_list.end();
+			return std::ranges::find(this->instruction_list, instr) != this->instruction_list.end();
 		}
 		virtual void check_errors(const structure_builder::instruction& instr, std::vector<error_type>& err_list) {
 			if (!this->filter.check(instr)) {
@@ -424,7 +427,7 @@ private:
 			this->instruction_symbols[byte_index] |= type_bits;
 		}
 	public:
-		virtual void visit(structure_builder::source_file_token active_type, const structure_builder::pointer_dereference* variable, bool is_signed) {
+		virtual void visit(structure_builder::source_file_token active_type, const structure_builder::pointer_dereference* variable, bool is_signed) override {
 			this->encode_active_type(instruction_encoder::convert_type_to_uint8(active_type), 0b10);
 			this->write_id(variable->pointer_variable->id);
 
@@ -433,7 +436,7 @@ private:
 				this->write_id(var->id);
 			}
 		}
-		virtual void visit(structure_builder::source_file_token active_type, const structure_builder::regular_variable* variable, bool is_signed) {
+		virtual void visit(structure_builder::source_file_token active_type, const structure_builder::regular_variable* variable, bool is_signed) override {
 			if (is_signed) {
 				this->encode_active_type(instruction_encoder::convert_type_to_uint8(active_type), 0b00);
 			}
@@ -451,7 +454,7 @@ private:
 
 			this->write_id(variable->id);
 		}
-		virtual void visit(structure_builder::source_file_token active_type, const structure_builder::imm_variable* variable, bool is_signed) {
+		virtual void visit(structure_builder::source_file_token active_type, const structure_builder::immediate_variable* variable, bool is_signed) override {
 			this->encode_active_type(instruction_encoder::convert_type_to_uint8(active_type), 0b01);
 			switch (variable->type) {
 				case structure_builder::source_file_token::one_byte_type_keyword: {
@@ -470,21 +473,22 @@ private:
 					this->write_bytes<std::uint64_t>(static_cast<std::uint64_t>(variable->imm_val));
 					break;
 				}
+				default: break;
 			}
 		}
-		virtual void visit(structure_builder::source_file_token active_type, const structure_builder::function_address* variable, bool is_signed) {
+		virtual void visit(structure_builder::source_file_token active_type, const structure_builder::function_address* variable, bool is_signed) override {
 			this->encode_active_type(2, 0b11);
 			this->write_id(variable->func->id);
 		}
-		virtual void visit(structure_builder::source_file_token active_type, const structure_builder::module_variable* variable, bool is_signed) {
+		virtual void visit(structure_builder::source_file_token active_type, const structure_builder::module_variable* variable, bool is_signed) override {
 			this->encode_active_type(0, 0b11);
 			this->write_id(variable->mod->id);
 		}
-		virtual void visit(structure_builder::source_file_token active_type, const structure_builder::module_function_variable* variable, bool is_signed) {
+		virtual void visit(structure_builder::source_file_token active_type, const structure_builder::module_function_variable* variable, bool is_signed) override {
 			this->encode_active_type(2, 0b11);
 			this->write_id(variable->func->id);
 		}
-		virtual void visit(structure_builder::source_file_token active_type, const structure_builder::jump_point_variable* variable, bool is_signed) {
+		virtual void visit(structure_builder::source_file_token active_type, const structure_builder::jump_point_variable* variable, bool is_signed) override {
 			this->encode_active_type(1, 0b11);
 			this->write_id(variable->point->id);
 		}
@@ -878,9 +882,8 @@ private:
 		std::uint64_t run_size = 24;
 		auto saved_position = this->write_run_header(program_exposed_functions_run);
 
-		auto found_main = std::find(
-			this->file_structure->exposed_functions.begin(), 
-			this->file_structure->exposed_functions.end(), 
+		auto found_main = std::ranges::find(
+            this->file_structure->exposed_functions,
 			this->file_structure->main_function
 		);
 
@@ -1028,7 +1031,7 @@ public:
 	const std::vector<error_type>& errors() const { return this->logic_errors; }
 };
 
-void translate_error(bytecode_translator::error_type error, std::ostream& stream) {
+inline void translate_error(bytecode_translator::error_type error, std::ostream& stream) {
 	switch (error) {
 		case bytecode_translator::error_type::general_instruction: {
 			stream << "You can not use signed variables and function calls inside general instructions";

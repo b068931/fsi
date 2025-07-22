@@ -11,9 +11,8 @@ public:
 		structure_builder::builder_parameters& helper,
 		structure_builder::read_map_type& read_map
 	) override {
-		helper.active_function.get_last_instruction().immediates.push_back(
-			structure_builder::imm_variable{ read_map.get_current_token() }
-		);
+		helper.active_function.get_last_instruction().immediates.emplace_back(read_map.get_current_token()
+        );
 
 		helper.active_function.add_new_operand_to_last_instruction(
 			read_map.get_current_token(),

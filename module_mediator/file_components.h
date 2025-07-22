@@ -188,14 +188,13 @@ namespace module_mediator::parser::components {
 			if (loaded_function == NULL)
 				return false;
 
-			this->functions.push_back(
-				function{
-					std::move(export_name),
+			this->functions.emplace_back(
+                std::move(export_name),
 					(module_callable_function_type)loaded_function,
 					arguments_string,
 					is_visible
-				}
-			);
+
+            );
 
 			return true;
 		}

@@ -19,13 +19,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="backend_functions.h" />
     <ClInclude Include="module_interoperation.h" />
     <ClInclude Include="logging.h" />
     <ClInclude Include="multithreading.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="pointers.h" />
+    <ClInclude Include="memory.h" />
+    <ClInclude Include="standard_input_output.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="backend_functions.cpp" />
     <ClCompile Include="module_initialization.cpp" />
     <ClCompile Include="logging.cpp" />
     <ClCompile Include="multithreading.cpp" />
@@ -36,6 +39,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release (Installer)|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="memory.cpp" />
+    <ClCompile Include="standard_input_output.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

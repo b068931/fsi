@@ -17,6 +17,7 @@ module_mediator::return_value inner_deallocate_thread(module_mediator::return_va
 		thread_id
 	);
 }
+
 void inner_deallocate_program_container(module_mediator::return_value container_id) {
 	module_mediator::fast_call<module_mediator::return_value>(
 		get_module_part(),
@@ -25,6 +26,7 @@ void inner_deallocate_program_container(module_mediator::return_value container_
 		container_id
 	);
 }
+
 void inner_delete_running_thread() {
 	thread_local_structure* thread_structure = get_thread_local_structure();
 
@@ -66,6 +68,7 @@ void inner_delete_running_thread() {
 void program_resume() {
 	get_thread_local_structure()->currently_running_thread_information.state = scheduler::thread_states::running;
 }
+
 void thread_terminate() {
 	LOG_PROGRAM_INFO(get_module_part(), "Thread was terminated.");
 
@@ -93,23 +96,30 @@ void thread_terminate() {
 	thread_terminate();
 	load_execution_thread(get_thread_local_structure()->execution_thread_state);
 }
+
 [[noreturn]] void inner_call_module(std::uint64_t module_id, std::uint64_t function_id, module_mediator::arguments_string_type args_string) {
 	module_mediator::return_value action_code = get_module_part()->call_module_visible_only(module_id, function_id, args_string, &inner_call_module_error);
 	
 	//all these functions are declared as [[noreturn]]
 	switch (action_code)
 	{
-	case 0:
+	case module_mediator::execution_result_continue:
 		program_resume();
 		resume_program_execution(get_thread_local_structure()->currently_running_thread_information.thread_state);
 
-	case 1:
+	case module_mediator::execution_result_switch:
 		load_execution_thread(get_thread_local_structure()->execution_thread_state);
 
-	case 2:
+	case module_mediator::execution_result_terminate:
 		LOG_PROGRAM_INFO(get_module_part(), "Requested thread termination.");
 
 		thread_terminate();
+		load_execution_thread(get_thread_local_structure()->execution_thread_state);
+
+	case module_mediator::execution_result_block:
+		LOG_PROGRAM_INFO(get_module_part(), "Was blocked.");
+
+	    get_thread_manager().block(get_thread_local_structure()->currently_running_thread_information.thread_id);
 		load_execution_thread(get_thread_local_structure()->execution_thread_state);
 
 	default:
@@ -136,7 +146,7 @@ module_mediator::return_value inner_self_duplicate(void* main_function, module_m
 					"Shared memory between thread groups is not allowed. Thread group cannot depend on another thread group."
 				);
 
-				return 1;
+				return module_mediator::module_failure;
 			}
 		}
 	}
@@ -149,6 +159,7 @@ module_mediator::return_value inner_self_duplicate(void* main_function, module_m
 		main_function
 	);
 }
+
 module_mediator::return_value inner_get_container_running_threads_count(module_mediator::return_value container_id) {
 	return module_mediator::fast_call<module_mediator::return_value>(
 		get_module_part(),
@@ -161,6 +172,7 @@ module_mediator::return_value inner_get_container_running_threads_count(module_m
 void inner_fill_in_reg_array_entry(std::uint64_t entry_index, char* memory, std::uint64_t value) {
 	std::memcpy(memory + (sizeof(std::uint64_t) * entry_index), &value, sizeof(std::uint64_t));
 }
+
 module_mediator::return_value inner_create_thread(module_mediator::return_value thread_group_id, module_mediator::return_value priority, void* function_address) {
 	thread_local_structure* thread_structure = get_thread_local_structure();
 	LOG_PROGRAM_INFO(get_module_part(), "Creating a new thread.");
@@ -175,6 +187,7 @@ module_mediator::return_value inner_create_thread(module_mediator::return_value 
 		thread_group_id
 	);
 }
+
 module_mediator::return_value inner_create_thread_with_initializer(module_mediator::return_value priority, void* function_address, module_mediator::arguments_string_type initializer) {
 	assert(get_thread_local_structure()->initializer == nullptr && "possible memory leak");
 	get_thread_local_structure()->initializer = initializer;
@@ -184,6 +197,7 @@ module_mediator::return_value inner_create_thread_with_initializer(module_mediat
 		function_address
 	);
 }
+
 char* inner_allocate_thread_memory(module_mediator::return_value thread_id, std::uint64_t size) {
 	return reinterpret_cast<char*>(
 		module_mediator::fast_call<module_mediator::return_value, std::uint64_t>(
@@ -195,6 +209,7 @@ char* inner_allocate_thread_memory(module_mediator::return_value thread_id, std:
 		)
 	);
 }
+
 module_mediator::return_value inner_check_function_signature(void* function_address, module_mediator::arguments_string_type initializer) {
 	std::unique_ptr<module_mediator::arguments_string_element[]> default_signature{ module_mediator::arguments_string_builder::get_types_string() };
 	module_mediator::arguments_string_type alleged_signature = default_signature.get();
@@ -210,6 +225,7 @@ module_mediator::return_value inner_check_function_signature(void* function_addr
 		reinterpret_cast<std::uintptr_t>(function_address)
 	);
 }
+
 [[maybe_unused]] std::string get_exposed_function_name(void* function_address) {
 	module_mediator::return_value functions_symbols_address = module_mediator::fast_call(
 		::get_module_part(),
@@ -226,17 +242,18 @@ module_mediator::return_value inner_check_function_signature(void* function_addr
 
 	return function_name;
 }
+
 std::uintptr_t inner_apply_initializer_on_thread_stack(char* thread_stack_memory, char* thread_stack_end, const module_mediator::arguments_array_type& arguments) {
-	for (module_mediator::arguments_array_type::const_reverse_iterator begin = arguments.rbegin(), end = arguments.rend(); begin != end; ++begin) {
-		std::size_t type_size = module_mediator::arguments_string_builder::get_type_size_by_index(begin->first);
+	for (auto argument : std::ranges::reverse_view(arguments)) {
+		std::size_t type_size = module_mediator::arguments_string_builder::get_type_size_by_index(argument.first);
 		if ((thread_stack_memory + type_size) >= thread_stack_end) {
 			LOG_PROGRAM_ERROR(::get_module_part(), "Not enough stack space to initialize thread stack.");
-			reinterpret_cast<std::uintptr_t>(nullptr);
+			return reinterpret_cast<std::uintptr_t>(nullptr);
 		}
 
 		std::memcpy(
 			thread_stack_memory,
-			begin->second,
+            argument.second,
 			type_size
 		);
 
@@ -245,8 +262,9 @@ std::uintptr_t inner_apply_initializer_on_thread_stack(char* thread_stack_memory
 
 	return reinterpret_cast<std::uintptr_t>(thread_stack_memory);
 }
+
 std::uintptr_t inner_initialize_thread_stack(void* function_address, char* thread_stack_memory, char* thread_stack_end, module_mediator::return_value thread_id) {
-	if (inner_check_function_signature(function_address, get_thread_local_structure()->initializer) != 0) {
+	if (inner_check_function_signature(function_address, get_thread_local_structure()->initializer) != module_mediator::module_success) {
 		delete[] get_thread_local_structure()->initializer;
 		get_thread_local_structure()->initializer = nullptr;
 

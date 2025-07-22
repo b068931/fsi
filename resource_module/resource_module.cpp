@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "resource_module.h"
+
+#include <algorithm>
 #include "program_container.h"
 #include "thread_structure.h"
 #include "id_generator.h"
@@ -14,11 +16,6 @@
 #endif
 
 namespace {
-    enum class return_code : module_mediator::return_value {
-        ok,
-        concurrency_error
-    };
-
     std::map<id_generator::id_type, program_container> containers;
     std::recursive_mutex containers_mutex;
 
@@ -115,9 +112,8 @@ namespace {
         auto iterator_lock = get_iterator(object, mutex, id);
         if (iterator_lock.second) {
             std::vector<void*>& allocated_memory = iterator_lock.first->second.allocated_memory;
-            auto found_address = std::find(
-                allocated_memory.begin(),
-                allocated_memory.end(),
+            auto found_address = std::ranges::find(
+                allocated_memory,
                 address
             );
 
@@ -151,8 +147,8 @@ namespace {
     template<typename T>
     std::conditional_t<
         std::is_same_v<T, std::map<id_generator::id_type, thread_structure>>, //for thread_structure this function also returns id of the asscociated program_container
-        std::pair<return_code, id_generator::id_type>,
-        return_code
+        std::pair<module_mediator::return_value, id_generator::id_type>,
+        module_mediator::return_value
     >
         deallocate_generic(std::recursive_mutex& mutex, T& object, id_generator::id_type id) {
         constexpr bool thread_structure_switch = std::is_same_v<T, std::map<id_generator::id_type, thread_structure>>;
@@ -192,10 +188,10 @@ namespace {
             id_generator::free_id(free_id);
 
             if constexpr (thread_structure_switch) {
-                return std::pair{ return_code::ok, program_container_id };
+                return std::pair{ module_mediator::module_success, program_container_id };
             }
             else {
-                return return_code::ok;
+                return module_mediator::module_success;
             }
         }
 
@@ -208,7 +204,7 @@ namespace {
                 )
             );
 
-            return std::pair{ return_code::concurrency_error, 0 };
+            return std::pair{ module_mediator::module_failure, 0 };
         }
         else {
             LOG_PROGRAM_WARNING(
@@ -219,7 +215,7 @@ namespace {
                 )
             );
 
-            return return_code::concurrency_error;
+            return module_mediator::module_failure;
         }
     }
 
@@ -258,7 +254,7 @@ module_mediator::return_value add_container_on_destroy(module_mediator::argument
         user_data
     );
 
-    return 0;
+    return module_mediator::module_success;
 }
 module_mediator::return_value add_thread_on_destroy(module_mediator::arguments_string_type bundle) {
     auto [thread_id, destroy_callback, user_data] = 
@@ -272,7 +268,7 @@ module_mediator::return_value add_thread_on_destroy(module_mediator::arguments_s
         user_data
     );
 
-    return 0;
+    return module_mediator::module_success;
 }
 
 module_mediator::return_value duplicate_container(module_mediator::arguments_string_type bundle) {
@@ -307,7 +303,7 @@ module_mediator::return_value duplicate_container(module_mediator::arguments_str
         )
     );
 
-    return 1;
+    return module_mediator::module_failure;
 }
 module_mediator::return_value get_preferred_stack_size(module_mediator::arguments_string_type bundle) {
     constexpr std::uint64_t fallback_stack_size = 1024;
@@ -373,7 +369,7 @@ module_mediator::return_value create_new_thread(module_mediator::arguments_strin
     auto [container_id] = 
         module_mediator::arguments_string_builder::unpack<id_generator::id_type>(bundle);
 
-    std::uint64_t preferred_stack_size{};
+    std::uint64_t preferred_stack_size;
     id_generator::id_type id = id_generator::get_id();
 
     /*
@@ -406,7 +402,7 @@ module_mediator::return_value create_new_thread(module_mediator::arguments_strin
                 )
             );
 
-            return 1;
+            return module_mediator::module_failure;
         }
     }
 
@@ -438,21 +434,21 @@ module_mediator::return_value deallocate_program_memory(module_mediator::argumen
         module_mediator::arguments_string_builder::unpack<id_generator::id_type, void*>(bundle);
 
     deallocate_memory_generic(containers_mutex, containers, container_id, memory_address);
-    return 0;
+    return module_mediator::module_success;
 }
 module_mediator::return_value deallocate_thread_memory(module_mediator::arguments_string_type bundle) {
     auto [thread_id, memory_address] = 
         module_mediator::arguments_string_builder::unpack<id_generator::id_type, void*>(bundle);
 
     deallocate_memory_generic(thread_structures_mutex, thread_structures, thread_id, memory_address);
-    return 0;
+    return module_mediator::module_success;
 }
 
 module_mediator::return_value deallocate_program_container(module_mediator::arguments_string_type bundle) {
     auto [container_id] = 
         module_mediator::arguments_string_builder::unpack<id_generator::id_type>(bundle);
 
-    return static_cast<module_mediator::return_value>(deallocate_generic(containers_mutex, containers, container_id));
+    return deallocate_generic(containers_mutex, containers, container_id);
 }
 module_mediator::return_value deallocate_thread(module_mediator::arguments_string_type bundle) {
     auto [thread_id] = 
@@ -461,7 +457,7 @@ module_mediator::return_value deallocate_thread(module_mediator::arguments_strin
     auto [return_code, container_id] = 
         deallocate_generic(thread_structures_mutex, thread_structures, thread_id);
 
-    if (return_code != return_code::concurrency_error) {
+    if (return_code != module_mediator::module_failure) {
         auto [iterator, lock] = 
             get_iterator(containers, containers_mutex, container_id);
 
@@ -477,14 +473,14 @@ module_mediator::return_value deallocate_thread(module_mediator::arguments_strin
                 )
             );
 
-            return 0;
+            return module_mediator::module_failure;
         }
 
         return container_id;
     }
 
     // deallocate generic will generate a warning
-    return 0;
+    return module_mediator::module_failure;
 }
 
 module_mediator::return_value get_running_threads_count(module_mediator::arguments_string_type bundle) {
@@ -506,7 +502,7 @@ module_mediator::return_value get_running_threads_count(module_mediator::argumen
         )
     );
 
-    return std::numeric_limits<module_mediator::return_value>::max(); 
+    return module_mediator::module_failure; 
 }
 module_mediator::return_value get_program_container_id(module_mediator::arguments_string_type bundle) {
     auto [thread_id] =
@@ -532,7 +528,7 @@ module_mediator::return_value get_program_container_id(module_mediator::argument
     * we don't return 0 because an index to this program container might have already been reused
     */
 
-    return std::numeric_limits<module_mediator::return_value>::max();
+    return module_mediator::module_failure;
 }
 
 module_mediator::return_value get_jump_table(module_mediator::arguments_string_type bundle) {
@@ -575,7 +571,7 @@ module_mediator::return_value get_jump_table_size(module_mediator::arguments_str
         )
     );
 
-    return 0;
+    return module_mediator::module_failure;
 }
 
 program_container::~program_container() noexcept {

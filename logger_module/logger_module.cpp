@@ -101,34 +101,34 @@ namespace {
 
 module_mediator::return_value info(module_mediator::arguments_string_type bundle) {
 	generic_log_message(message_type::info, bundle);
-	return 0;
+	return module_mediator::module_success;
 }
 module_mediator::return_value warning(module_mediator::arguments_string_type bundle) {
 	generic_log_message(message_type::warning, bundle);
-	return 0;
+	return module_mediator::module_success;
 }
 module_mediator::return_value error(module_mediator::arguments_string_type bundle) {
 	generic_log_message(message_type::error, bundle);
-	return 0;
+	return module_mediator::module_success;
 }
 module_mediator::return_value fatal(module_mediator::arguments_string_type bundle) {
 	generic_log_message(message_type::fatal, bundle);
-	return 0;
+	return module_mediator::module_success;
 }
 
 module_mediator::return_value program_info(module_mediator::arguments_string_type bundle) {
 	generic_log_message_with_thread_information(message_type::info, bundle);
-	return 0;
+	return module_mediator::module_success;
 }
 module_mediator::return_value program_warning(module_mediator::arguments_string_type bundle) {
 	generic_log_message_with_thread_information(message_type::warning, bundle);
-	return 0;
+	return module_mediator::module_success;
 }
 module_mediator::return_value program_error(module_mediator::arguments_string_type bundle) {
 	generic_log_message_with_thread_information(message_type::error, bundle);
-	return 0;
+	return module_mediator::module_success;
 }
 module_mediator::return_value program_fatal(module_mediator::arguments_string_type bundle) {
 	generic_log_message_with_thread_information(message_type::fatal, bundle);
-	return 0;
+	return module_mediator::module_success;
 }

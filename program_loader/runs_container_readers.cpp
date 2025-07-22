@@ -2,7 +2,6 @@
 #include "run_container.h"
 #include "module_interoperation.h"
 #include "../module_mediator/module_part.h"
-#include "../logger_module/logging.h"
 
 void runs_container::modules_reader(run_reader<runs_container>::run run) { //every run has its own specific structure, so we need to use different functions for each type of run (see bytecode_translator.h)
 	for (std::uint64_t counter = 0, modules_count = run.get_object<std::uint64_t>(); counter < modules_count; ++counter) {
@@ -35,7 +34,7 @@ void runs_container::jump_points_reader(run_reader <runs_container>::run run) {
 		std::uint32_t instruction_index = run.get_object<std::uint32_t>();
 		entity_id id = run.get_object<entity_id>();
 
-		this->jump_points.push_back({ id, function_index, instruction_index });
+		this->jump_points.emplace_back(id, function_index, instruction_index);
 	}
 }
 void runs_container::function_signatures_reader(run_reader<runs_container>::run run) {
@@ -46,7 +45,7 @@ void runs_container::function_signatures_reader(run_reader<runs_container>::run 
 			std::uint8_t arg_type = run.get_object<std::uint8_t>();
 			entity_id arg_entityid = run.get_object<std::uint64_t>();
 
-			args.argument_types.push_back({ arg_entityid, arg_type });
+			args.argument_types.emplace_back(arg_entityid, arg_type);
 		}
 
 		this->function_signatures[signature_entityid] = std::move(args);
@@ -92,8 +91,13 @@ void runs_container::function_bodies_reader(run_reader<runs_container>::run run)
 	for (std::uint32_t counter = 0, locals_count = run.get_object<std::uint32_t>(); counter < locals_count; ++counter) {
 		std::uint8_t local_type = run.get_object<std::uint8_t>();
 		entity_id local_entityid = run.get_object<entity_id>();
-		locals.push_back({ local_entityid, local_type });
+		locals.emplace_back(local_entityid, local_type);
 	}
 
-	this->function_bodies.push_back({ signature_id, std::move(locals), std::move(run) });
+	this->function_bodies.push_back(
+		{
+		    .function_signature = signature_id,
+		    .locals = std::move(locals),
+		    .function_body = std::move(run)
+		});
 }

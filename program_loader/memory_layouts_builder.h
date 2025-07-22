@@ -8,36 +8,39 @@ class memory_layouts_builder {
 public:
 	enum class variable_size : std::uint8_t {
 		BYTE_SIZE = 1,
-		DBYTE_SIZE = 2,
-		FBYTE_SIZE = 4,
-		EBYTE_SIZE = 8,
+		TWO_BYTES_SIZE = 2,
+		FOUR_BYTES_SIZE = 4,
+		EIGHT_BYTES_SIZE = 8,
 		POINTER_SIZE = 8,
 		UNKNOWN = 0
 	};
 
 	static variable_size get_variable_size(std::uint8_t variable_type) {
-		variable_size size = variable_size::UNKNOWN;
+		variable_size size;
 		switch (variable_type) {
-		case 0: {
-			size = variable_size::BYTE_SIZE;
-			break;
-		}
-		case 1: {
-			size = variable_size::DBYTE_SIZE;
-			break;
-		}
-		case 2: {
-			size = variable_size::FBYTE_SIZE;
-			break;
-		}
-		case 3: {
-			size = variable_size::EBYTE_SIZE;
-			break;
-		}
-		case 4: {
-			size = variable_size::POINTER_SIZE;
-			break;
-		}
+            case 0: {
+                size = variable_size::BYTE_SIZE;
+                break;
+            }
+            case 1: {
+                size = variable_size::TWO_BYTES_SIZE;
+                break;
+            }
+            case 2: {
+                size = variable_size::FOUR_BYTES_SIZE;
+                break;
+            }
+            case 3: {
+                size = variable_size::EIGHT_BYTES_SIZE;
+                break;
+            }
+            case 4: {
+                size = variable_size::POINTER_SIZE;
+                break;
+            }
+            default: {
+                size = variable_size::UNKNOWN;
+            }
 		}
 
 		return size;
@@ -70,7 +73,7 @@ public:
 	}
 	void add_new_function() {
 		this->variable_relative_address = 0;
-		this->memory_layouts.push_back({});
+		this->memory_layouts.emplace_back();
 
 		this->current_map = &this->memory_layouts.back().first;
 	}

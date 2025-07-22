@@ -22,17 +22,14 @@ public:
 			return;
 		}
 
-		auto found_module_function = std::find_if(
-			helper.current_module->functions_names.begin(),
-			helper.current_module->functions_names.end(),
-			[&module_function_name](const structure_builder::module_function& fnc) -> bool {
-				return fnc.name == module_function_name;
-			}
-		);
+		auto found_module_function = std::ranges::find_if(helper.current_module->functions_names,
+                                                          [&module_function_name](const structure_builder::module_function& fnc) -> bool {
+                                                              return fnc.name == module_function_name;
+                                                          });
 
 		if (found_module_function == helper.current_module->functions_names.end()) {
 			helper.current_module->functions_names
-				.push_back(structure_builder::module_function{ helper.get_id(), std::move(module_function_name) });
+				.emplace_back(helper.get_id(), std::move(module_function_name));
 		}
 	}
 };
