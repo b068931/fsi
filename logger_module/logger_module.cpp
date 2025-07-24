@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "logger_module.h"
 #include "module_interoperation.h"
+#include "../module_mediator/fsi_types.h"
 
 std::chrono::steady_clock::time_point starting_time;
 
@@ -65,7 +66,12 @@ namespace {
 	}
 	void generic_log_message_with_thread_information(message_type type, module_mediator::arguments_string_type bundle) {
 		auto [file_name, file_line, function_name, message] =
-			module_mediator::arguments_string_builder::unpack<void*, module_mediator::return_value, void*, void*>(bundle);
+			module_mediator::arguments_string_builder::unpack<
+			    module_mediator::memory,
+	            module_mediator::return_value,
+	            module_mediator::memory,
+	            module_mediator::memory
+			>(bundle);
 
 		module_mediator::return_value current_thread_id = module_mediator::fast_call(
 			get_module_part(),

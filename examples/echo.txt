@@ -1,0 +1,12 @@
+$stack-size d100;
+from prts import <io.std.out, io.std.in, memory.deallocate>
+
+function main() {
+    $main-function main;
+    $declare memory message-storage;
+    
+    message-storage: prts->io.std.in();
+    void: prts->io.std.out(variable memory message-storage)
+
+    message-storage: prts->memory.deallocate()
+}

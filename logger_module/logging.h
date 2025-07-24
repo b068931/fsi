@@ -15,6 +15,8 @@
 
 #include <string>
 #include <iostream>
+
+#include "../module_mediator/fsi_types.h"
 #include "../module_mediator/module_part.h"
 
 #define ONLY_FILE_NAME strrchr("\\" __FILE__, '\\') + 1 
@@ -56,7 +58,12 @@ namespace logger_module {
 			std::abort();
 		}
 
-		module_mediator::fast_call<void*, module_mediator::return_value, void*, void*>(
+		module_mediator::fast_call<
+			module_mediator::memory,
+	        module_mediator::return_value,
+	        module_mediator::memory,
+	        module_mediator::memory
+	    >(
 			part,
 			logger,
 			log_type,

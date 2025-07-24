@@ -13,10 +13,11 @@
 
 namespace interoperation {
     module_mediator::module_part* get_module_part();
+    module_mediator::return_value get_current_thread_id();
     module_mediator::return_value get_current_thread_group_id();
 
-    module_mediator::return_value allocate(std::uint64_t size);
-    void deallocate(module_mediator::memory pointer);
+    module_mediator::return_value allocate(module_mediator::return_value thread_group_id, module_mediator::eight_bytes size);
+    void deallocate(module_mediator::return_value thread_group_id, module_mediator::memory pointer);
 
     class index_getter {
     public:
@@ -102,6 +103,26 @@ namespace interoperation {
 
         static std::size_t resource_module_get_jump_table_size() {
             static std::size_t index = get_module_part()->find_function_index(index_getter::resource_module(), "get_jump_table_size");
+            return index;
+        }
+
+        static std::size_t logger() {
+            static std::size_t index = get_module_part()->find_module_index("logger");
+            return index;
+        }
+
+        static std::size_t logger_program_info() {
+            static std::size_t index = get_module_part()->find_function_index(index_getter::logger(), "program_info");
+            return index;
+        }
+
+        static std::size_t logger_program_warning() {
+            static std::size_t index = get_module_part()->find_function_index(index_getter::logger(), "program_warning");
+            return index;
+        }
+
+        static std::size_t logger_program_error() {
+            static std::size_t index = get_module_part()->find_function_index(index_getter::logger(), "program_error");
             return index;
         }
     };

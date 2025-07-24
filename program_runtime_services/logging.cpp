@@ -44,7 +44,7 @@ namespace {
 		if (function_name_pointer != nullptr)
 			cleanse_string(function_name_pointer, function_name_pointer_size);
 
-		module_mediator::fast_call<void*>(
+		module_mediator::fast_call<module_mediator::memory>(
 			interoperation::get_module_part(),
 			interoperation::index_getter::logger(),
 			log_endpoints[static_cast<std::uint8_t>(log)],

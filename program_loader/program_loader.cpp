@@ -13,6 +13,7 @@
 #include "program_compilation_error.h"
 
 #include "../logger_module/logging.h"
+#include "../module_mediator/fsi_types.h"
 
 namespace {
     std::mutex exposed_functions_mutex{};
@@ -31,7 +32,13 @@ namespace {
         void* jump_table, std::uint64_t jump_table_size,
         void** program_strings, std::uint64_t program_strings_count
     ) {
-        return module_mediator::fast_call<std::uint64_t, std::uint32_t, void*, std::uint32_t, void*, std::uint32_t, void*, std::uint64_t, void*, std::uint64_t>(
+        return module_mediator::fast_call<
+            module_mediator::eight_bytes, module_mediator::four_bytes,
+            module_mediator::memory, module_mediator::four_bytes,
+            module_mediator::memory, module_mediator::four_bytes,
+            module_mediator::memory, module_mediator::eight_bytes,
+            module_mediator::memory, module_mediator::eight_bytes
+        >(
             get_module_part(),
             index_getter::resm(),
             index_getter::resm_create_new_program_container(),

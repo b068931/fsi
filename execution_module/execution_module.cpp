@@ -53,7 +53,7 @@ module_mediator::return_value on_thread_creation(module_mediator::arguments_stri
 	if (result == reinterpret_cast<std::uintptr_t>(nullptr)) {
 		LOG_PROGRAM_ERROR(get_module_part(), "Thread stack initialization has failed.");
 
-		module_mediator::fast_call<module_mediator::return_value, void*>(
+		module_mediator::fast_call<module_mediator::return_value, module_mediator::memory>(
 			get_module_part(),
 			index_getter::resm(),
 			index_getter::resm_deallocate_thread_memory(),
@@ -61,7 +61,7 @@ module_mediator::return_value on_thread_creation(module_mediator::arguments_stri
 			thread_state_memory
 		);
 		
-		module_mediator::fast_call<module_mediator::return_value, void*>(
+		module_mediator::fast_call<module_mediator::return_value, module_mediator::memory>(
 			get_module_part(),
 			index_getter::resm(),
 			index_getter::resm_deallocate_thread_memory(),
@@ -119,9 +119,9 @@ module_mediator::return_value on_container_creation(module_mediator::arguments_s
 }
 module_mediator::return_value register_deferred_callback(module_mediator::arguments_string_type bundle) {
 	auto [callback_info] = 
-		module_mediator::arguments_string_builder<void*>(bundle);
+		module_mediator::arguments_string_builder::unpack<module_mediator::memory>(bundle);
 
-	module_mediator::callback_bundle* callback = static_cast<module_mediator::callback_bundle>(callback_info);
+	module_mediator::callback_bundle* callback = static_cast<module_mediator::callback_bundle*>(callback_info);
 	get_thread_local_structure()->deferred_callbacks.push_back(callback);
 
 	return module_mediator::module_success;
@@ -143,7 +143,7 @@ module_mediator::return_value get_thread_saved_variable(module_mediator::argumen
 	char* thread_state = static_cast<char*>(get_thread_local_structure()->currently_running_thread_information.thread_state) + 40;
 	module_mediator::memory thread_stack_end{};
 
-	std::memcpy(&thread_stack_end, thread_state, sizeof(module_mediator::memory));
+	std::memcpy(static_cast<void*>(&thread_stack_end), thread_state, sizeof(module_mediator::memory));
 	return reinterpret_cast<std::uintptr_t>(thread_stack_end);
 }
 module_mediator::return_value dynamic_call(module_mediator::arguments_string_type bundle) {

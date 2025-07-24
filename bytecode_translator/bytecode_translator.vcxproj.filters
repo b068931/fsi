@@ -196,6 +196,9 @@
     <CopyFileToFolders Include="..\examples\thread-groups-explosion.txt">
       <Filter>Examples</Filter>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="..\examples\echo.txt">
+      <Filter>Examples</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\examples\Cyclic1.txt">

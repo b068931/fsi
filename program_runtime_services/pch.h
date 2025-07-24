@@ -21,5 +21,8 @@
 #include <ranges>
 #include <thread>
 #include <limits>
+#include <barrier>
+#include <filesystem>
+#include <cassert>
 
 #endif //PCH_H

@@ -39,7 +39,7 @@ void inner_delete_running_thread() {
 		static_cast<char*>(thread_state) 
 	};
 
-	module_mediator::fast_call<module_mediator::return_value, void*>(
+	module_mediator::fast_call<module_mediator::return_value, module_mediator::memory>(
 		get_module_part(),
 		index_getter::resm(),
 		index_getter::resm_deallocate_thread_memory(),
@@ -47,7 +47,7 @@ void inner_delete_running_thread() {
 		reinterpret_cast<void*>(program_state_manager.get_stack_start(preferred_stack_size))
 	);
 
-	module_mediator::fast_call<module_mediator::return_value, void*>(
+	module_mediator::fast_call<module_mediator::return_value, module_mediator::memory>(
 		get_module_part(),
 		index_getter::resm(),
 		index_getter::resm_deallocate_thread_memory(),
@@ -151,7 +151,7 @@ module_mediator::return_value inner_self_duplicate(void* main_function, module_m
 		}
 	}
 
-	return module_mediator::fast_call<module_mediator::return_value, void*>(
+	return module_mediator::fast_call<module_mediator::return_value, module_mediator::memory>(
 		get_module_part(),
 		index_getter::resm(),
 		index_getter::resm_duplicate_container(),
@@ -200,7 +200,7 @@ module_mediator::return_value inner_create_thread_with_initializer(module_mediat
 
 char* inner_allocate_thread_memory(module_mediator::return_value thread_id, std::uint64_t size) {
 	return reinterpret_cast<char*>(
-		module_mediator::fast_call<module_mediator::return_value, std::uint64_t>(
+		module_mediator::fast_call<module_mediator::return_value, module_mediator::eight_bytes>(
 			::get_module_part(),
 			index_getter::resm(),
 			index_getter::resm_allocate_thread_memory(),
@@ -217,7 +217,7 @@ module_mediator::return_value inner_check_function_signature(void* function_addr
 		alleged_signature = initializer;
 	}
 
-	return module_mediator::fast_call<void*, std::uintptr_t>(
+	return module_mediator::fast_call<module_mediator::memory, std::uintptr_t>(
 		::get_module_part(),
 		index_getter::progload(),
 		index_getter::progload_check_function_arguments(),

@@ -12,7 +12,7 @@ namespace {
                     interoperation::index_getter::execution_module_get_thread_saved_variable()
                 ));
 
-        if (saved_variable[8] == module_mediator::pointer_return_value) {
+        if (saved_variable[8] == module_mediator::memory_return_value) {
             if (std::memcmp(saved_variable, static_cast<void*>(&address), sizeof(module_mediator::memory)) == 0) {
                 module_mediator::memory null_pointer{};
                 std::memcpy(saved_variable, static_cast<void*>(&null_pointer), sizeof(module_mediator::memory));
@@ -25,12 +25,12 @@ module_mediator::return_value allocate_memory(module_mediator::arguments_string_
     auto [return_address, return_type, size] =
         module_mediator::arguments_string_builder::unpack<module_mediator::memory, module_mediator::one_byte, module_mediator::eight_bytes>(bundle);
 
-    if (return_type != module_mediator::pointer_return_value) {
+    if (return_type != module_mediator::memory_return_value) {
         LOG_PROGRAM_ERROR(interoperation::get_module_part(), "Incorrect return type. (allocate_pointer)");
         return module_mediator::execution_result_terminate;
     }
 
-    module_mediator::memory allocated_memory = backend::allocate_program_memory(size);
+    module_mediator::memory allocated_memory = backend::allocate_program_memory(interoperation::get_current_thread_group_id(), size);
     if (allocated_memory == nullptr) {
         LOG_PROGRAM_ERROR(interoperation::get_module_part(), "Failed memory allocation.");
     }
@@ -43,7 +43,7 @@ module_mediator::return_value deallocate_memory(module_mediator::arguments_strin
     auto [return_address, return_type] =
         module_mediator::arguments_string_builder::unpack<module_mediator::memory, module_mediator::one_byte>(bundle);
 
-    if (return_type != module_mediator::pointer_return_value) {
+    if (return_type != module_mediator::memory_return_value) {
         LOG_PROGRAM_ERROR(interoperation::get_module_part(), "Incorrect return type. (deallocate_pointer)");
         return module_mediator::execution_result_terminate;
     }
@@ -52,7 +52,7 @@ module_mediator::return_value deallocate_memory(module_mediator::arguments_strin
     std::memcpy(static_cast<void*>(&address), return_address, sizeof(module_mediator::memory));
     if (address == nullptr) return module_mediator::execution_result_continue;
 
-    backend::deallocate_program_memory(address);
+    backend::deallocate_program_memory(interoperation::get_current_thread_group_id(), address);
     check_if_pointer_is_saved(address);
 
     module_mediator::memory null_pointer{};

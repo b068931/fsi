@@ -16,17 +16,28 @@ namespace backend {
 		return { data, size };
 	}
 
-	module_mediator::memory allocate_program_memory(module_mediator::eight_bytes size) {
+	module_mediator::memory allocate_program_memory(module_mediator::return_value thread_group_id, module_mediator::eight_bytes size) {
 		module_mediator::return_value null_pointer = reinterpret_cast<module_mediator::return_value>(nullptr);
-		module_mediator::return_value allocated_memory = interoperation::allocate(size);
+		module_mediator::return_value allocated_memory = interoperation::allocate(
+			thread_group_id, 
+			size
+		);
 
 		if (allocated_memory == null_pointer) {
 			return nullptr;
 		}
 
-		module_mediator::return_value value_pointer_data = interoperation::allocate(sizeof(std::uint64_t) * 2); //first 8 bytes - allocated size, second 8 bytes - base address
+		module_mediator::return_value value_pointer_data = interoperation::allocate(
+			thread_group_id,
+			sizeof(std::uint64_t) * 2
+		); //first 8 bytes - allocated size, second 8 bytes - base address
+
 		if (value_pointer_data == null_pointer) {
-            interoperation::deallocate(reinterpret_cast<module_mediator::memory>(allocated_memory));
+            interoperation::deallocate(
+				thread_group_id,
+				reinterpret_cast<module_mediator::memory>(allocated_memory)
+			);
+
 			return nullptr;
 		}
 
@@ -38,13 +49,13 @@ namespace backend {
 		return pointer_data;
 	}
 
-	void deallocate_program_memory(module_mediator::memory address) {
+	void deallocate_program_memory(module_mediator::return_value thread_group_id, module_mediator::memory address) {
 		module_mediator::memory base{}; //save memory's base address
 		std::memcpy(static_cast<void*>(&base), static_cast<char*>(address) + sizeof(std::uint64_t), sizeof(std::uint64_t));
 
 		if (base == nullptr) return;
 
-        interoperation::deallocate(address);
-        interoperation::deallocate(base);
+        interoperation::deallocate(thread_group_id, address);
+        interoperation::deallocate(thread_group_id, base);
 	}
 }

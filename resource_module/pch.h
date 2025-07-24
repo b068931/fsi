@@ -20,5 +20,6 @@
 #include <cassert>
 #include <utility>
 #include <format>
+#include <algorithm>
 
 #endif

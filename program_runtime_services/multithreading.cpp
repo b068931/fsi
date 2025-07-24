@@ -113,7 +113,7 @@ module_mediator::return_value dynamic_call(module_mediator::arguments_string_typ
             args_string_size.first
         };
 
-        module_mediator::return_value result = module_mediator::fast_call<void*, void*>(
+        module_mediator::return_value result = module_mediator::fast_call<module_mediator::memory, module_mediator::memory>(
             interoperation::get_module_part(),
             interoperation::index_getter::execution_module(),
             interoperation::index_getter::execution_module_dynamic_call(),
@@ -152,7 +152,12 @@ module_mediator::return_value create_thread(module_mediator::arguments_string_ty
             args_string_size.first
         };
 
-        module_mediator::return_value result = module_mediator::fast_call<module_mediator::return_value, void*, void*, std::uint64_t>(
+        module_mediator::return_value result = module_mediator::fast_call<
+            module_mediator::return_value,
+            module_mediator::memory,
+            module_mediator::memory,
+            module_mediator::eight_bytes
+        >(
             interoperation::get_module_part(),
             interoperation::index_getter::execution_module(),
             interoperation::index_getter::execution_module_create_thread(),
@@ -188,7 +193,11 @@ module_mediator::return_value create_thread_group(module_mediator::arguments_str
             args_string_size.first
         };
 
-        module_mediator::return_value result = module_mediator::fast_call<void*, void*, std::uint64_t>(
+        module_mediator::return_value result = module_mediator::fast_call<
+            module_mediator::memory,
+            module_mediator::memory,
+            module_mediator::eight_bytes
+        >(
             interoperation::get_module_part(),
             interoperation::index_getter::execution_module(),
             interoperation::index_getter::execution_module_self_duplicate(),

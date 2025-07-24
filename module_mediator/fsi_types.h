@@ -15,16 +15,16 @@ namespace module_mediator {
 	using signed_eight_bytes = std::int64_t;
 	using memory = void*;
 
-	constexpr std::uint8_t one_byte_return_value = 0;
-	constexpr std::uint8_t two_bytes_return_value = 1;
-	constexpr std::uint8_t four_bytes_return_value = 2;
-	constexpr std::uint8_t eight_bytes_return_value = 3;
-	constexpr std::uint8_t pointer_return_value = 4;
+	inline constexpr std::uint8_t one_byte_return_value = 0;
+	inline constexpr std::uint8_t two_bytes_return_value = 1;
+	inline constexpr std::uint8_t four_bytes_return_value = 2;
+	inline constexpr std::uint8_t eight_bytes_return_value = 3;
+	inline constexpr std::uint8_t memory_return_value = 4;
 
-	constexpr return_value execution_result_continue = 0;
-	constexpr return_value execution_result_switch = 1;
-	constexpr return_value execution_result_terminate = 2;
-	constexpr return_value execution_result_block = 3;
+	inline constexpr return_value execution_result_continue = 0;
+	inline constexpr return_value execution_result_switch = 1;
+	inline constexpr return_value execution_result_terminate = 2;
+	inline constexpr return_value execution_result_block = 3;
 }
 
 #endif

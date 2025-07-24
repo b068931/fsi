@@ -249,3 +249,32 @@ program_fatal=memory eight-bytes memory memory
 !info:io.log.info=memory eight-bytes memory memory
 !warning:io.log.warning=memory eight-bytes memory memory
 !error:io.log.error=memory eight-bytes memory memory
+
+-- STDIO management functions. All of them are blocking (even if input is immediately available).
+-- They block the thread until the operation is complete in order to ensure that all IO is done asynchronously.
+
+-- Attaches PRTS to the standard input/output streams.
+-- PRTS won't let you use IO functions without this.
+-- It does that to ensure that no one will interfere with streams.
+attach_to_stdio=
+
+-- Detaches PRTS from the standard input/output streams.
+-- May block indefinitely if it can't shutdown IO workers properly.
+detach_from_stdio=
+
+-- Used in conjunction with register_deferred_callback to add a thread to an output queue.
+-- Accepts a thread id, output buffer address, and a callback bundle.
+callback_register_output=eight-bytes memory memory
+
+-- Outputs a message to whatever is connected to the standard output.
+-- Accepts a message. Always outputs an entire message, as determined by the memory size.
+!out:io.std.out=memory
+
+-- Used in conjunction with register_deferred_callback to add a thread to an input queue.
+-- Accepts a thread group id, a thread id, a return address, and a callback bundle.
+callback_register_input=eight-bytes eight-bytes memory memory
+
+-- Blocks the thread and puts it into the input queue.
+-- Thread is made runnable as soon as it receives input.
+-- Accepts return address, return variable type.
+!in:io.std.in=memory one-byte

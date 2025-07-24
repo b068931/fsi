@@ -51,11 +51,23 @@ private:
 						deferred_callback->function_name
                     );
 
-					get_module_part()->call_module(
+					module_mediator::return_value result = get_module_part()->call_module(
 						module_index,
 						function_index,
 						deferred_callback->arguments_string
 					);
+
+					if (result != module_mediator::module_success) {
+						LOG_WARNING(
+							get_module_part(),
+							std::format(
+								"Deferred callback for module {} and function {} failed with error code {}.",
+								deferred_callback->module_name,
+								deferred_callback->function_name,
+								result
+							)
+						);
+                    }
 				}
 
                 get_thread_local_structure()->deferred_callbacks.clear();

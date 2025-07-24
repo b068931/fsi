@@ -18,8 +18,8 @@ namespace module_mediator {
 	using arguments_string_element = unsigned char;
 	using arguments_array_type = std::vector<std::pair<arguments_string_element, void*>>;
 
-	constexpr return_value module_success = std::numeric_limits<return_value>::max();
-	constexpr return_value module_failure = std::numeric_limits<return_value>::max() - 1;
+	inline constexpr return_value module_success = std::numeric_limits<return_value>::max();
+	inline constexpr return_value module_failure = std::numeric_limits<return_value>::max() - 1;
 
 	struct callback_bundle {
         char* module_name;
@@ -290,11 +290,11 @@ namespace module_mediator {
 	) {
 		std::unique_ptr<callback_bundle> callback_info{ new callback_bundle{} };
 		std::unique_ptr<arguments_string_element[]> arguments_string{
-			arguments_string_builder::pack<void*, args...>(arguments..., callback_info.get())
+			arguments_string_builder::pack<args..., void*>(arguments..., callback_info.get())
 		};
 
-		std::unique_ptr<char[]> module_name_copy{ new char[module_name.size()] };
-		std::unique_ptr<char[]> function_name_copy{ new char[function_name.size()] };
+		std::unique_ptr<char[]> module_name_copy{ new char[module_name.size() + 1]{} };
+		std::unique_ptr<char[]> function_name_copy{ new char[function_name.size() + 1]{} };
 
 		std::memcpy(module_name_copy.get(), module_name.data(), module_name.size());
 		std::memcpy(function_name_copy.get(), function_name.data(), function_name.size());
@@ -313,14 +313,15 @@ namespace module_mediator {
 		static void copy_tuple(auto& destination, auto& source) {
 			if constexpr (start < end) {
 				std::get<start>(destination) = std::get<start>(source);
-				copy_tuples<start + 1, end>(destination, source);
+				copy_tuple<start + 1, end>(destination, source);
 			}
         }
 
 	public:
         static std::tuple<args...> unpack(arguments_string_type arguments_string) {
             auto data = arguments_string_builder::unpack<args..., void*>(arguments_string);
-            callback_bundle* callback_info = static_cast<callback_bundle*>(std::get<0>(data));
+            callback_bundle* callback_info = 
+				static_cast<callback_bundle*>(std::get<sizeof... (args)>(data));
 
             delete[] callback_info->module_name;
             delete[] callback_info->function_name;

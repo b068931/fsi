@@ -3,11 +3,10 @@
 #endif
 
 #include <iostream>
-#include <sstream>
 #include <cstdlib>
 #include <filesystem>
-#include <format>
 
+#include "fsi_types.h"
 #include "module_mediator.h"
 
 int main(int argc, char** argv) {
@@ -30,17 +29,29 @@ int main(int argc, char** argv) {
 
 			std::size_t progload = part->find_module_index("progload");
 			std::size_t load_program_to_memory = part->find_function_index(progload, "load_program_to_memory");
-			module_mediator::fast_call<void*>(
+			module_mediator::fast_call<module_mediator::memory>(
 				part, progload, load_program_to_memory,
 				argv[3]
 			);
 
+			// Attach to stdio does not manage stderr. That is done by the logger_module.
+            std::size_t prts = part->find_module_index("prts");
+            std::size_t attach_to_stdio = part->find_function_index(prts, "attach_to_stdio");
+			module_mediator::fast_call(
+				part, prts, attach_to_stdio
+            );
+
 			std::size_t excm = part->find_module_index("excm");
 			std::size_t startup = part->find_function_index(excm, "start");
-			module_mediator::fast_call<std::uint16_t>(
+			module_mediator::fast_call<::module_mediator::two_bytes>(
 				part, excm, startup,
 				executors_count
 			);
+
+            std::size_t detach_from_stdio = part->find_function_index(prts, "detach_from_stdio");
+			module_mediator::fast_call(
+				part, prts, detach_from_stdio
+            );
 		}
 		else {
 			std::cout << "Could not correctly parse " << modules_descriptor_file.generic_string() << ": " << error_message << std::endl;

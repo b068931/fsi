@@ -6,21 +6,39 @@
 //I use global variables because they are isolated to this cpp file, they cannot be accessed elsewhere.
 //You should view PRTS as an assortment of "classes" or "objects" that are isolated in their own cpp files.
 
+//Global synchronization primitives to ensure that IO can always be cancelled or processed correctly.
+namespace {
+    //Readers: input or output operations for stdin/stdout.
+    //Writers: functions that attach or detach PRTS from stdio.
+    std::shared_mutex io_synchronizer;
+
+    //Mostly bear a cosmetic effect.
+    //3: input_worker, output_worker, whatever thread calls detach or attach.
+    std::barrier phase_coordination{ 3 };
+
+    //PRTS expects that it is the only entity that can write to stdout and stdin to work correctly.
+    bool is_stdio_attached = false;
+    bool check_stdio_attached() {
+        std::shared_lock<std::shared_mutex> lock(io_synchronizer);
+        return is_stdio_attached;
+    }
+}
+
 //WinAPI thingies for console input/output management.
 namespace {
     //Available only if attached.
-    HANDLE capturedStdOut;
-    HANDLE capturedStdIn;
+    HANDLE hCapturedStdOut;
+    HANDLE hCapturedStdIn;
 
     //The handle to the worker thread that is responsible for reading from stdin.
     //Allows to exit the thread gracefully when PRTS is detached from stdin.
-    HANDLE IOCancellationSignal;
+    HANDLE hIOCancellationSignal;
 
     //The state of the console before PRTS attached to it.
-    DWORD savedConsoleState;
+    DWORD dwSavedConsoleState;
 
-    bool InitializeConsoleInput(HANDLE hStdin, DWORD& outOriginalMode) {
-        if (!GetConsoleMode(hStdin, &outOriginalMode))
+    bool InitializeConsoleInput(HANDLE hStdin, DWORD& dwOutOriginalMode) {
+        if (!GetConsoleMode(hStdin, &dwOutOriginalMode))
             return false;
 
         //Keep only line input, echo, processed input; disable mouse/window events.
@@ -37,18 +55,18 @@ namespace {
         return FlushConsoleInputBuffer(hStdin) != FALSE;
     } 
 
-    BOOL RestoreConsoleInput(HANDLE hStdin, DWORD originalMode) {
-        return SetConsoleMode(hStdin, originalMode);
+    BOOL RestoreConsoleInput(HANDLE hStdin, DWORD dwOriginalMode) {
+        return SetConsoleMode(hStdin, dwOriginalMode);
     }
 
-    void CloseHandleReport(HANDLE& handle, const std::string& handleName) {
+    void CloseHandleReport(HANDLE& handle, const char* lpsHandleName) {
         if (handle != NULL && handle != INVALID_HANDLE_VALUE) {
             if (!CloseHandle(handle)) {
-                LOG_PROGRAM_WARNING(
+                LOG_WARNING(
                     interoperation::get_module_part(),
                     std::format(
                         "Failed to close {} handle with error code {}.",
-                        handleName,
+                        lpsHandleName,
                         GetLastError()
                     )
                 );
@@ -59,91 +77,115 @@ namespace {
         }
     }
 
-    std::pair<std::vector<char>, bool> ConsumeConsoleInput(HANDLE hStdin, HANDLE hCancelIO) {
-        HANDLE waitHandles[]{ hStdin, hCancelIO };
-
-        //Wait for input from the console.
-        //This works only for the console, it won't work for redirected input.
-        DWORD waitResult = WaitForMultipleObjects(
-            std::size(waitHandles),
-            waitHandles, 
-            FALSE, 
-            INFINITE
-        );
-
-        switch (waitResult) {
-            case WAIT_OBJECT_0: {
-                //Input is available.
-                break;
+    std::pair<std::vector<char>, bool> ConsumeConsoleInput(HANDLE hStdIn, HANDLE hCancelIO) {
+        HANDLE haWaitingHandles[]{ hStdIn, hCancelIO };
+        std::vector<char> result{};
+        while (std::ranges::find(result, '\n') == result.end()) {
+            DWORD dwConsoleWaitResult = WaitForMultipleObjects(std::size(haWaitingHandles), haWaitingHandles, FALSE, INFINITE);
+            if (dwConsoleWaitResult == WAIT_OBJECT_0 + 1) {
+                return { {}, true }; //We received shutdown signal while waiting.
             }
-            case WAIT_OBJECT_0 + 1: {
-                return { {}, true };
+
+            if (dwConsoleWaitResult == WAIT_OBJECT_0) {
+                DWORD dwAvailableInput = 0;
+                BOOL bEventsResult = GetNumberOfConsoleInputEvents(hStdIn, &dwAvailableInput);
+                if (!bEventsResult) {
+                    LOG_WARNING(
+                        interoperation::get_module_part(),
+                        std::format(
+                            "GetNumberOfConsoleInputEvents failed with error code {}. " \
+                            "Cannot read from console input.",
+                            GetLastError()
+                        )
+                    );
+
+                    return { {}, true };
+                }
+
+                constexpr DWORD dwBufferSize = 128;
+
+                INPUT_RECORD buffer[dwBufferSize];
+                DWORD dwReadEvents = 0;
+
+                DWORD dwAcquiredInput = std::min(dwAvailableInput, dwBufferSize);
+                BOOL bEventPeekedResult = PeekConsoleInputA(
+                    hStdIn,
+                    buffer,
+                    dwAcquiredInput,
+                    &dwReadEvents
+                );
+
+                if (!bEventPeekedResult) {
+                    LOG_WARNING(
+                        interoperation::get_module_part(),
+                        std::format(
+                            "ReadConsoleInput failed with error code {}. " \
+                            "Cannot read from console input.",
+                            GetLastError()
+                        )
+                    );
+
+                    return { {}, true };
+                }
+
+                WORD dwTotalTextSize = 0;
+                for (DWORD dwInputBufferIndex = 0; dwInputBufferIndex < dwReadEvents; ++dwInputBufferIndex) {
+                    if (buffer[dwInputBufferIndex].EventType == KEY_EVENT) {
+                        const KEY_EVENT_RECORD& keyEvent = buffer[dwInputBufferIndex].Event.KeyEvent;
+                        if (keyEvent.bKeyDown) {
+                            if (keyEvent.uChar.AsciiChar >= 0 && keyEvent.uChar.AsciiChar < 128) {  // NOLINT(clang-diagnostic-tautological-constant-out-of-range-compare)
+                                dwTotalTextSize += keyEvent.wRepeatCount;
+                            }
+                        }
+                        else if (keyEvent.wVirtualKeyCode == VK_RETURN) {
+                            dwTotalTextSize += 1;
+                        }
+                    }
+                }
+
+                if (dwTotalTextSize > 0) {
+                    std::unique_ptr<CHAR[]> lpTextBuffer{ new CHAR[dwTotalTextSize] };
+                    DWORD dwTextRead = 0;
+
+                    BOOL bConsoleReadResult = ReadConsoleA(
+                        hStdIn,
+                        lpTextBuffer.get(),
+                        dwTotalTextSize,
+                        &dwTextRead,
+                        NULL
+                    );
+
+                    if (!bConsoleReadResult) {
+                        LOG_WARNING(
+                            interoperation::get_module_part(),
+                            std::format(
+                                "ReadConsole failed with error code {}. " \
+                                "Cannot read from console input.",
+                                GetLastError()
+                            )
+                        );
+
+                        return { {}, true };
+                    }
+
+                    for (DWORD dwTextIndex = 0; dwTextIndex < dwTextRead; ++dwTextIndex) {
+                        if (lpTextBuffer[dwTextIndex] != '\r') {
+                            result.push_back(lpTextBuffer[dwTextIndex]);
+                        }
+                    }
+                }
             }
-            default: {
-                LOG_PROGRAM_WARNING(
+            else {
+                LOG_WARNING(
                     interoperation::get_module_part(),
                     std::format(
-                        "WaitForMultipleObjects failed with error code {}.",
+                        "Unexpected wait result {}. Received error: {}.",
+                        dwConsoleWaitResult,
                         GetLastError()
                     )
                 );
 
-                return { {}, false };
-            }
-        }
-
-        DWORD bufferedCharacters = 0;
-        if (!GetNumberOfConsoleInputEvents(hStdin, &bufferedCharacters)) {
-            constexpr DWORD defaultBufferSize = 1024;
-            bufferedCharacters = defaultBufferSize;
-
-            LOG_PROGRAM_WARNING(
-                interoperation::get_module_part(),
-                std::format(
-                    "GetNumberOfConsoleInputEvents failed with error code {}." \
-                    "Using default buffer size of {} bytes.",
-                    GetLastError(),
-                    defaultBufferSize
-                )
-            );
-        }
-
-        std::unique_ptr<CHAR[]> inputBuffer{ new CHAR[bufferedCharacters] };
-        DWORD charactersRead = 0;
-
-        std::vector<char> result{};
-        while (WaitForSingleObject(hStdin, 0) == WAIT_OBJECT_0) {
-            BOOL ok = ReadConsoleA(
-                hStdin,
-                inputBuffer.get(),
-                bufferedCharacters,
-                &charactersRead,
-                NULL 
-            );
-
-            if (!ok) {
-                LOG_PROGRAM_WARNING(
-                    interoperation::get_module_part(),
-                    std::format(
-                        "ReadFile failed with error code {}. " \
-                        "Characters read: {}",
-                        GetLastError(),
-                        charactersRead
-                    )
-                );
-
-                if (charactersRead == 0) {
-                    return { result, false };
-                }
-            }
-
-            for (DWORD index = 0; index < charactersRead; ++index) {
-                CHAR inputCharacter = inputBuffer[index];
-                char regularCharacter = (inputCharacter >= 0 && inputCharacter < 128)  // NOLINT(clang-diagnostic-tautological-constant-out-of-range-compare)
-                    ? static_cast<char>(inputCharacter)
-                    : '?';
-
-                result.push_back(regularCharacter);
+                return { {}, true };
             }
         }
 
@@ -154,9 +196,9 @@ namespace {
     //The absolute monster that handles both files and pipes. (Refactoring likely needed)
     //With all possible edge cases and fallback to synchronous IO if overlapped IO fails.
     template<auto file_type>
-    std::pair<std::vector<char>, bool> ConsumeAsynchronous(HANDLE hStdin, HANDLE hCancelIO, DWORD& offset, DWORD& offsetHigh) {
-        constexpr bool isPipe = (file_type == FILE_TYPE_PIPE);
-        HANDLE waitHandles[]{ hStdin, hCancelIO };
+    std::pair<std::vector<char>, bool> ConsumeAsynchronous(HANDLE hStdIn, HANDLE hCancelIO, DWORD& dwOffset, DWORD& dwOffsetHigh) {
+        constexpr bool is_pipe = (file_type == FILE_TYPE_PIPE);
+        HANDLE haWaitHandles[]{ hStdIn, hCancelIO };
 
         OVERLAPPED overlapped{};
         overlapped.hEvent = CreateEvent(
@@ -167,7 +209,7 @@ namespace {
         );
         
         if (overlapped.hEvent == NULL) {
-            LOG_PROGRAM_WARNING(
+            LOG_WARNING(
                 interoperation::get_module_part(),
                 std::format(
                     "CreateEvent failed with error code {}. " \
@@ -179,74 +221,75 @@ namespace {
             return { {}, true };
         }
         
-        if constexpr (isPipe) {
+        if constexpr (is_pipe) {
             overlapped.Offset = 0;
             overlapped.OffsetHigh = 0;
         }
         else {
-            overlapped.Offset = offset;
-            overlapped.OffsetHigh = offsetHigh;
+            overlapped.Offset = dwOffset;
+            overlapped.OffsetHigh = dwOffsetHigh;
         }
 
-        constexpr DWORD defaultBufferSize = 4096;
-        DWORD bufferSize = 0;
+        constexpr DWORD dwDefaultBufferSize = 4096;
+        DWORD dwBufferSize = 0;
 
-        if constexpr (isPipe) {
-            DWORD messageLeft = 0;
-            PeekNamedPipe(hStdin, NULL, 0, NULL, &bufferSize, &messageLeft);
+        if constexpr (is_pipe) {
+            DWORD dwMessageLeft = 0;
+            PeekNamedPipe(hStdIn, NULL, 0, NULL, &dwBufferSize, &dwMessageLeft);
 
-            bufferSize = std::max(bufferSize, messageLeft);
-            if (bufferSize == 0) { //If we still don't have any idea about what the buffer size should be.
-                bufferSize = defaultBufferSize;
+            dwBufferSize = std::max(dwBufferSize, dwMessageLeft);
+            if (dwBufferSize == 0) { //If we still don't have any idea about what the buffer size should be.
+                dwBufferSize = dwDefaultBufferSize;
             }
         }
         else {
-            bufferSize = defaultBufferSize;
+            dwBufferSize = dwDefaultBufferSize;
         }
 
-        std::unique_ptr<char[]> buffer{ new char[bufferSize] {} };
-        DWORD bytesRead = 0;
+        std::unique_ptr<CHAR[]> buffer{ new CHAR[dwBufferSize] {} };
+        DWORD dwBytesRead = 0;
         
-        BOOL readResult = ReadFile(
-            hStdin,
+        BOOL bReadResult = ReadFile(
+            hStdIn,
             buffer.get(),
-            bufferSize - 1,
-            &bytesRead,
+            dwBufferSize,
+            &dwBytesRead,
             &overlapped
         );
         
-        if (!readResult) { //This is just how ridiculously complicated overlapped I/O works in Windows.
+        if (!bReadResult) { //This is just how ridiculously complicated overlapped I/O is in Windows.
             if (GetLastError() == ERROR_IO_PENDING) {
                 DWORD waitResult = WaitForMultipleObjects(
-                    std::size(waitHandles),
-                    waitHandles,
+                    std::size(haWaitHandles),
+                    haWaitHandles,
                     FALSE,
                     INFINITE
                 );
 
                 if (waitResult == WAIT_OBJECT_0) {
-                    if (!GetOverlappedResult(hStdin, &overlapped, &bytesRead, FALSE)) {
+                    if (!GetOverlappedResult(hStdIn, &overlapped, &dwBytesRead, FALSE)) {
+                        CloseHandleReport(overlapped.hEvent, "overlapped.hEvent");
                         if (GetLastError() == ERROR_HANDLE_EOF) {
-                            CloseHandleReport(overlapped.hEvent, "overlapped.hEvent");
-                            return { {}, true };
+                            std::vector<char> result{ buffer.get(), buffer.get() + dwBytesRead };
+                            result.push_back('\n'); //Input worker expects that the input is newline buffered.
 
+                            return { result, false };
                         }
 
-                        if constexpr (isPipe) {
+                        if constexpr (is_pipe) {
                             if (GetLastError() == ERROR_BROKEN_PIPE) {
-                                LOG_PROGRAM_WARNING(
+                                LOG_WARNING(
                                     interoperation::get_module_part(),
                                     std::format(
                                         "Pipe closed before detaching PRTS from stdio."
                                     )
                                 );
 
-                                CloseHandleReport(overlapped.hEvent, "overlapped.hEvent");
                                 return { {}, true };
                             }
 
                             if (GetLastError() == ERROR_MORE_DATA) {
-                                LOG_PROGRAM_WARNING(
+                                LOG_WARNING(
                                     interoperation::get_module_part(),
                                     std::format(
                                         "Unexpected more data is available in a pipe. A second call will be required."
@@ -254,32 +297,31 @@ namespace {
                                 );
 
                                 auto [result, shutdown] = 
-                                    ConsumeAsynchronous<isPipe>(hStdin, offset, offsetHigh);
+                                    ConsumeAsynchronous<file_type>(hStdIn, hCancelIO, dwOffset, dwOffsetHigh);
 
                                 result.insert(result.begin(), buffer.get(),
-                                    buffer.get() + bytesRead);
+                                    buffer.get() + dwBytesRead);
 
-                                return result;
+                                return { result, shutdown };
                             }
                         }
 
-                        LOG_PROGRAM_WARNING(
+                        LOG_WARNING(
                             interoperation::get_module_part(),
                             std::format(
-                                "GetOverlappedResult failed with error code {}. "
+                                "GetOverlappedResult failed with error code {}. " \
                                 "Cannot read from file.",
                                 GetLastError()
                             )
                         );
 
-                        CloseHandleReport(overlapped.hEvent, "overlapped.hEvent");
-                        return { {}, false };
+                        return { {}, true };
                     }
                 }
                 else if (waitResult == WAIT_OBJECT_0 + 1) {
-                    BOOL IOCancelResult = CancelIo(hStdin);
-                    if (!IOCancelResult) {
-                        LOG_PROGRAM_WARNING(
+                    BOOL bIOCancelResult = CancelIo(hStdIn);
+                    if (!bIOCancelResult) {
+                        LOG_WARNING(
                             interoperation::get_module_part(),
                             std::format(
                                 "CancelIo failed with error code {}. "
@@ -293,27 +335,27 @@ namespace {
                     return { {}, true };
                 }
                 else {
-                    LOG_PROGRAM_WARNING(
+                    LOG_WARNING(
                         interoperation::get_module_part(),
                         std::format(
-                            "WaitForSingleObject failed with error code {}. " \
+                            "WaitForMultipleObjects failed with error code {}. " \
                             "Cannot read from file.",
                             GetLastError()
                         )
                     );
 
                     CloseHandleReport(overlapped.hEvent, "overlapped.HEvent");
-                    return { {}, false };
+                    return { {}, true };
                 }
             }
             else if (GetLastError() == ERROR_HANDLE_EOF) {
                 CloseHandleReport(overlapped.hEvent, "overlapped.HEvent");
-                return { {}, true };
+                return { { '\n' }, false };
             }
             else {
-                if constexpr (isPipe) {
+                if constexpr (is_pipe) {
                     if (GetLastError() == ERROR_BROKEN_PIPE) {
-                        LOG_PROGRAM_WARNING(
+                        LOG_WARNING(
                             interoperation::get_module_part(),
                             std::format(
                                 "Pipe closed before detaching PRTS from stdio."
@@ -325,7 +367,7 @@ namespace {
                     }
 
                     if (GetLastError() == ERROR_MORE_DATA) {
-                        LOG_PROGRAM_WARNING(
+                        LOG_WARNING(
                             interoperation::get_module_part(),
                             std::format(
                                 "Unexpected more data is available in a pipe. A second call will be required."
@@ -333,41 +375,41 @@ namespace {
                         );
 
                         auto [result, shutdown] = 
-                            ConsumeAsynchronous<isPipe>(hStdin, offset, offsetHigh);
+                            ConsumeAsynchronous<file_type>(hStdIn, hCancelIO, dwOffset, dwOffsetHigh);
 
                         result.insert(result.begin(), buffer.get(),
-                            buffer.get() + bytesRead);
+                            buffer.get() + dwBytesRead);
 
-                        return result;
+                        return { result, shutdown };
                     }
                 }
 
-                //Fallback to synchronous read if overlapped IO fails.
-                //Technically this is not really a documented approach, but I think this should work.
-                BOOL synchronousReadResult = ReadFile(
-                    hStdin,
+                std::shared_lock synchronous_io_lock{ io_synchronizer };
+                BOOL bSynchronousReadResult = ReadFile(
+                    hStdIn,
                     buffer.get(),
-                    bufferSize - 1,
-                    &bytesRead,
+                    dwBufferSize - 1,
+                    &dwBytesRead,
                     NULL
                 );
 
-                if (WaitForSingleObject(hCancelIO, 0) == WAIT_OBJECT_0) {
+                synchronous_io_lock.unlock();
+                if (WaitForSingleObject(hCancelIO, 0) == WAIT_OBJECT_0 || GetLastError() == ERROR_OPERATION_ABORTED) {
                     CloseHandleReport(overlapped.hEvent, "overlapped.HEvent");
                     return { {}, true };
                 }
 
-                //This also means that EOF was reached.
-                if (synchronousReadResult && bytesRead == 0) {
+                //This also means that EOF was reached. Applies to files only.
+                if (bSynchronousReadResult && dwBytesRead == 0) {
                     CloseHandleReport(overlapped.hEvent, "overlapped.HEvent");
-                    return { {}, true };
+                    return { { '\n' }, false }; //Input worker expects that the input is newline buffered.
                 }
 
-                if (!synchronousReadResult) {
+                if (!bSynchronousReadResult) {
                     CloseHandleReport(overlapped.hEvent, "overlapped.HEvent");
-                    if constexpr (isPipe) {
+                    if constexpr (is_pipe) {
                         if (GetLastError() == ERROR_BROKEN_PIPE) {
-                            LOG_PROGRAM_WARNING(
+                            LOG_WARNING(
                                 interoperation::get_module_part(),
                                 std::format(
                                     "Pipe closed before detaching PRTS from stdio."
@@ -378,7 +420,7 @@ namespace {
                         }
 
                         if (GetLastError() == ERROR_MORE_DATA) {
-                            LOG_PROGRAM_WARNING(
+                            LOG_WARNING(
                                 interoperation::get_module_part(),
                                 std::format(
                                     "Unexpected more data is available in a pipe. A second call will be required."
@@ -386,16 +428,16 @@ namespace {
                             );
 
                             auto [result, shutdown] = 
-                                ConsumeAsynchronous<isPipe>(hStdin, offset, offsetHigh);
+                                ConsumeAsynchronous<file_type>(hStdIn, hCancelIO, dwOffset, dwOffsetHigh);
 
                             result.insert(result.begin(), buffer.get(),
-                                buffer.get() + bytesRead);
+                                buffer.get() + dwBytesRead);
 
-                            return result;
+                            return { result, shutdown };
                         }
                     }
 
-                    LOG_PROGRAM_WARNING(
+                    LOG_WARNING(
                         interoperation::get_module_part(),
                         std::format(
                             "ReadFile failed with error code {}. " \
@@ -404,34 +446,31 @@ namespace {
                         )
                     );
 
-                    return { {}, false };
+                    return { {}, true };
                 }
             }
         }
 
         //Files must have their offsets updated after a successful read.
-        if constexpr (!isPipe) {
+        if constexpr (!is_pipe) {
             ULARGE_INTEGER newPosition;
-            newPosition.LowPart = offset;
-            newPosition.HighPart = offsetHigh;
-            newPosition.QuadPart += bytesRead;
+            newPosition.LowPart = dwOffset;
+            newPosition.HighPart = dwOffsetHigh;
+            newPosition.QuadPart += dwBytesRead;
 
-            offset = newPosition.LowPart;
-            offsetHigh = newPosition.HighPart;
+            dwOffset = newPosition.LowPart;
+            dwOffsetHigh = newPosition.HighPart;
         }
         
         CloseHandleReport(overlapped.hEvent, "overlapped.HEvent");
-        
-        buffer[bytesRead] = '\0';
-        return { std::vector<char>{ buffer.get(), buffer.get() + bytesRead }, false};
+        return { std::vector<char>{ buffer.get(), buffer.get() + dwBytesRead }, false};
     }
 
     //Dispatches the input reading operation based on the type of the input handle.
-    std::pair<std::vector<char>, bool> ConsumeStdIn(HANDLE hStdIn, HANDLE hCancelIO, DWORD& overlappedOffset, DWORD& overlappedOffsetHigh) {
+    std::pair<std::vector<char>, bool> ConsumeStdIn(HANDLE hStdIn, HANDLE hCancelIO, DWORD& dwOverlappedOffset, DWORD& dwOverlappedOffsetHigh) {
         switch (GetFileType(hStdIn)) {
             case FILE_TYPE_CHAR: {
-                //For console input, we must consume all input because the console is line-buffered.
-                return ConsumeConsoleInput(capturedStdIn, IOCancellationSignal);
+                return ConsumeConsoleInput(hStdIn, hCancelIO);
             }
             case FILE_TYPE_DISK: {
                 //For files and pipes, we are looking for a newline character to determine the end of input.
@@ -439,25 +478,25 @@ namespace {
                 return ConsumeAsynchronous<FILE_TYPE_DISK>(
                     hStdIn,
                     hCancelIO,
-                    overlappedOffset,
-                    overlappedOffsetHigh
+                    dwOverlappedOffset,
+                    dwOverlappedOffsetHigh
                 );
             }
             case FILE_TYPE_PIPE: {
                return ConsumeAsynchronous<FILE_TYPE_PIPE>(
                     hStdIn,
                     hCancelIO,
-                    overlappedOffset,
-                    overlappedOffsetHigh
+                    dwOverlappedOffset,
+                    dwOverlappedOffsetHigh
                 );
             }
             default: {
-                LOG_PROGRAM_WARNING(
+                LOG_WARNING(
                     interoperation::get_module_part(),
                     std::format(
                         "Unknown file type for STDIN: {}. " \
                         "Cannot read from stdin. Shutting down the worker.",
-                        GetFileType(capturedStdIn)
+                        GetFileType(hCapturedStdIn)
                     )
                 );
 
@@ -471,7 +510,7 @@ namespace {
 
         if (buffer_size == 0) return false;
         if (buffer_size > std::numeric_limits<DWORD>::max()) {
-            LOG_PROGRAM_WARNING(
+            LOG_WARNING(
                 interoperation::get_module_part(),
                 std::format(
                     "Buffer size {} exceeds maximum allowed size of {}.",
@@ -479,20 +518,28 @@ namespace {
                     std::numeric_limits<DWORD>::max()
                 )
             );
+
             return true;
         }
 
-        DWORD bytesWritten = 0;
+        DWORD dwBytesWritten = 0;
+        std::shared_lock synchronous_io_lock{ io_synchronizer };
+
         BOOL writeResult = WriteConsoleA(
             hStdOut,
             output_buffer,
             static_cast<DWORD>(buffer_size),
-            &bytesWritten,
+            &dwBytesWritten,
             NULL
         );
 
-        if (!writeResult || bytesWritten == 0) {
-            LOG_PROGRAM_WARNING(
+        synchronous_io_lock.unlock();
+        if (GetLastError() == ERROR_OPERATION_ABORTED) {
+            return true;
+        }
+
+        if (!writeResult || dwBytesWritten == 0) {
+            LOG_WARNING(
                 interoperation::get_module_part(),
                 std::format(
                     "WriteConsole failed with error code {}. " \
@@ -507,16 +554,18 @@ namespace {
         return false;
     }
 
+    //Similarly to ConsumeAsynchronous, this function handles both files and pipes.
+    //It uses overlapped IO for files and pipes, and falls back to synchronous IO if necessary.
     template<auto file_type>
-    bool PushAsynchronous(HANDLE hStdOut, HANDLE hCancelIO, module_mediator::memory buffer, DWORD& offset, DWORD& offsetHigh) {
-        constexpr bool isPipe = (file_type == FILE_TYPE_PIPE);
+    bool PushAsynchronous(HANDLE hStdOut, HANDLE hCancelIO, module_mediator::memory buffer, DWORD& dwOffset, DWORD& dwOffsetHigh) {
+        constexpr bool is_pipe = (file_type == FILE_TYPE_PIPE);
 
         HANDLE waitHandles[]{ hStdOut, hCancelIO };
         auto [output_buffer, buffer_size] = backend::decay_pointer(buffer);
 
         if (buffer_size == 0) return false;
         if (buffer_size > std::numeric_limits<DWORD>::max()) {
-            LOG_PROGRAM_WARNING(
+            LOG_WARNING(
                 interoperation::get_module_part(),
                 std::format(
                     "Buffer size {} exceeds maximum allowed size of {}.",
@@ -537,7 +586,7 @@ namespace {
         );
 
         if (overlapped.hEvent == NULL) {
-            LOG_PROGRAM_WARNING(
+            LOG_WARNING(
                 interoperation::get_module_part(),
                 std::format(
                     "CreateEvent failed with error code {}. " \
@@ -549,57 +598,59 @@ namespace {
             return true;
         }
 
-        if constexpr (isPipe) {
+        if constexpr (is_pipe) {
             overlapped.Offset = 0;
             overlapped.OffsetHigh = 0;
         }
         else {
-            overlapped.Offset = offset;
-            overlapped.OffsetHigh = offsetHigh;
+            overlapped.Offset = dwOffset;
+            overlapped.OffsetHigh = dwOffsetHigh;
         }
 
-        DWORD bytesWritten = 0;
-        BOOL writeResult = WriteFile(
+        DWORD dwBytesWritten = 0;
+        BOOL bWriteResult = WriteFile(
             hStdOut,
             output_buffer,
             static_cast<DWORD>(buffer_size),
-            &bytesWritten,
+            &dwBytesWritten,
             &overlapped
         );
 
-        if (!writeResult) {
+        if (!bWriteResult) {
             if (GetLastError() == ERROR_IO_PENDING) {
-                DWORD waitResult = WaitForMultipleObjects(
+                DWORD dwWaitResult = WaitForMultipleObjects(
                     std::size(waitHandles),
                     waitHandles,
                     FALSE,
                     INFINITE
                 );
 
-                if (waitResult == WAIT_OBJECT_0) {
-                    if (!GetOverlappedResult(hStdOut, &overlapped, &bytesWritten, FALSE)) {
-                        LOG_PROGRAM_WARNING(
+                if (dwWaitResult == WAIT_OBJECT_0) {
+                    if (!GetOverlappedResult(hStdOut, &overlapped, &dwBytesWritten, FALSE)) {
+                        LOG_WARNING(
                             interoperation::get_module_part(),
                             std::format(
                                 "GetOverlappedResult failed with error code {}. " \
-                                "Cannot write to file.",
-                                GetLastError()
+                                "Cannot write to file. Is pipe: {}.",
+                                GetLastError(),
+                                is_pipe
                             )
                         );
 
                         CloseHandle(overlapped.hEvent);
-                        return false;
+                        return true;
                     }
                 }
-                else if (waitResult == WAIT_OBJECT_0 + 1) {
-                    BOOL IOCancelResult = CancelIo(hStdOut);
-                    if (!IOCancelResult) {
-                        LOG_PROGRAM_WARNING(
+                else if (dwWaitResult == WAIT_OBJECT_0 + 1) {
+                    BOOL bIOCancelResult = CancelIo(hStdOut);
+                    if (!bIOCancelResult) {
+                        LOG_WARNING(
                             interoperation::get_module_part(),
                             std::format(
                                 "CancelIo failed with error code {}. " \
-                                "Cannot cancel I/O operation.",
-                                GetLastError()
+                                "Cannot cancel I/O operation. Is pipe: {}.",
+                                GetLastError(),
+                                is_pipe
                             )
                         );
                     }
@@ -608,66 +659,82 @@ namespace {
                     return true;
                 }
                 else {
-                    if constexpr (isPipe) {
-                        if (GetLastError() == ERROR_BROKEN_PIPE) {
-                            LOG_PROGRAM_WARNING(
-                                interoperation::get_module_part(),
-                                std::format(
-                                    "Pipe closed before detaching PRTS from stdio."
-                                )
-                            );
-
-                            CloseHandleReport(overlapped.hEvent, "overlapped.HEvent");
-                            return true;
-                        }
-                    }
-
-                    BOOL synchronousWriteResult = WriteFile(
-                        hStdOut,
-                        output_buffer,
-                        static_cast<DWORD>(buffer_size),
-                        &bytesWritten,
-                        NULL
+                    LOG_WARNING(
+                        interoperation::get_module_part(),
+                        std::format(
+                            "WaitForSingleObject failed with error code {}. " \
+                            "Cannot write to file/pipe. Is pipe: {}.",
+                            GetLastError(),
+                            is_pipe
+                        )
                     );
 
-                    if (WaitForSingleObject(hCancelIO, 0) == WAIT_OBJECT_0) {
-                        CloseHandleReport(overlapped.hEvent, "overlapped.HEvent");
-                        return true;
-                    }
-
-                    if (!synchronousWriteResult) {
-                        CloseHandleReport(overlapped.hEvent, "overlapped.HEvent");
-                        LOG_PROGRAM_WARNING(
+                    return true;
+                }
+            }
+            else {
+                if constexpr (is_pipe) {
+                    if (GetLastError() == ERROR_BROKEN_PIPE) {
+                        LOG_WARNING(
                             interoperation::get_module_part(),
                             std::format(
-                                "WriteFile failed with error code {}. " \
-                                "Cannot write to file both async and sync have failed.",
-                                GetLastError()
+                                "Pipe closed before detaching PRTS from stdio."
                             )
                         );
 
+                        CloseHandleReport(overlapped.hEvent, "overlapped.HEvent");
                         return true;
                     }
+                }
+
+                std::shared_lock synchronous_io_lock{ io_synchronizer };
+                BOOL bSynchronousWriteResult = WriteFile(
+                    hStdOut,
+                    output_buffer,
+                    static_cast<DWORD>(buffer_size),
+                    &dwBytesWritten,
+                    NULL
+                );
+
+                synchronous_io_lock.unlock();
+                if (WaitForSingleObject(hCancelIO, 0) == WAIT_OBJECT_0 || GetLastError() == ERROR_OPERATION_ABORTED) {
+                    CloseHandleReport(overlapped.hEvent, "overlapped.HEvent");
+                    return true;
+                }
+
+                if (!bSynchronousWriteResult) {
+                    CloseHandleReport(overlapped.hEvent, "overlapped.HEvent");
+                    LOG_WARNING(
+                        interoperation::get_module_part(),
+                        std::format(
+                            "WriteFile failed with error code {}. " \
+                            "Cannot write to file both async and sync have failed. Is pipe: {}.",
+                            GetLastError(),
+                            is_pipe
+                        )
+                    );
+
+                    return true;
                 }
             }
         }
 
         //Files must have their offsets updated after a successful write.
         CloseHandleReport(overlapped.hEvent, "overlapped.HEvent");
-        if constexpr (!isPipe) {
+        if constexpr (!is_pipe) {
             ULARGE_INTEGER newPosition;
-            newPosition.LowPart = offset;
-            newPosition.HighPart = offsetHigh;
-            newPosition.QuadPart += bytesWritten;
+            newPosition.LowPart = dwOffset;
+            newPosition.HighPart = dwOffsetHigh;
+            newPosition.QuadPart += dwBytesWritten;
 
-            offset = newPosition.LowPart;
-            offsetHigh = newPosition.HighPart;
+            dwOffset = newPosition.LowPart;
+            dwOffsetHigh = newPosition.HighPart;
         }
 
         return false;
     }
 
-    bool PushStdOut(HANDLE hStdOut, HANDLE hCancelIO, module_mediator::memory buffer, DWORD& overlappedOffset, DWORD& overlappedOffsetHigh) {
+    bool PushStdOut(HANDLE hStdOut, HANDLE hCancelIO, module_mediator::memory buffer, DWORD& dwOverlappedOffset, DWORD& dwOverlappedOffsetHigh) {
         switch (GetFileType(hStdOut)) {
             case FILE_TYPE_CHAR: {
                 return PushConsoleOutput(hStdOut, buffer);
@@ -677,8 +744,8 @@ namespace {
                     hStdOut,
                     hCancelIO,
                     buffer,
-                    overlappedOffset,
-                    overlappedOffsetHigh
+                    dwOverlappedOffset,
+                    dwOverlappedOffsetHigh
                 );
             }
             case FILE_TYPE_PIPE: {
@@ -686,17 +753,17 @@ namespace {
                     hStdOut,
                     hCancelIO,
                     buffer,
-                    overlappedOffset,
-                    overlappedOffsetHigh
+                    dwOverlappedOffset,
+                    dwOverlappedOffsetHigh
                 );
             }
             default: {
-                LOG_PROGRAM_WARNING(
+                LOG_WARNING(
                     interoperation::get_module_part(),
                     std::format(
                         "Unknown file type for STDOUT: {}. " \
                         "Cannot write to stdout.",
-                        GetFileType(capturedStdOut)
+                        GetFileType(hCapturedStdOut)
                     )
                 );
 
@@ -709,7 +776,9 @@ namespace {
 //Define IO queues for asynchronous input/output operations.
 namespace {
     struct thread_input_descriptor {
+        module_mediator::return_value thread_group_id;
         module_mediator::return_value thread_id;
+
         void* buffer_return_address;
     };
 
@@ -727,7 +796,7 @@ namespace {
 
     void clean_input_queue() {
         if (!input_queue::input_queue.empty()) {
-            LOG_PROGRAM_WARNING(
+            LOG_WARNING(
                 interoperation::get_module_part(),
                 "Input queue was not empty before detaching. All threads will be woken up."
             );
@@ -754,7 +823,7 @@ namespace {
 
     void clean_output_queue() {
         if (!output_queue::output_queue.empty()) {
-            LOG_PROGRAM_WARNING(
+            LOG_WARNING(
                 interoperation::get_module_part(),
                 "Output queue was not empty before detaching. All threads will be woken up."
             );
@@ -773,24 +842,16 @@ namespace {
     }
 }
 
+//IO worker threads.
 namespace {
-    //Readers: input or output operations for stdin/stdout.
-    //Writers: functions that attach or detach PRTS from stdio.
-    std::shared_mutex io_synchronizer;
-
-    //PRTS expects that it is the only entity that can write to stdout and stdin to work correctly.
-    bool is_stdin_attached = false;
-    bool check_stdio_attached() {
-        std::shared_lock<std::shared_mutex> lock(io_synchronizer);
-        return is_stdin_attached;
-    }
-
     std::thread input_worker_thread{};
     void input_worker(HANDLE hStdIn, HANDLE hCancelIO) {
         LOG_INFO(
             interoperation::get_module_part(),
             "PRTS is attached to stdio. Starting input worker."
         );
+
+        phase_coordination.arrive_and_wait();
 
         DWORD overlappedOffset = 0;
         DWORD overlappedOffsetHigh = 0;
@@ -799,12 +860,11 @@ namespace {
         while (check_stdio_attached()) {
             std::unique_lock<std::mutex> lock(input_queue::lock);
             input_queue::signaling.wait(lock, [] {
-                return !input_queue::input_queue.empty() || !check_stdio_attached();
+                return !check_stdio_attached() || !input_queue::input_queue.empty();
             });
 
             //Exit prematurely if PRTS is detached from stdio.
             if (!check_stdio_attached()) {
-                clean_input_queue();
                 break;
             }
 
@@ -832,9 +892,6 @@ namespace {
 
                     //By this point PRTS should be detached from stdio.
                     if (shutdown) {
-                        lock.lock();
-                        clean_input_queue();
-
                         break;
                     }
 
@@ -853,13 +910,13 @@ namespace {
                 }
 
                 module_mediator::memory result_data = 
-                    backend::allocate_program_memory(input_portion.size());
+                    backend::allocate_program_memory(descriptor.thread_group_id, input_portion.size());
 
                 if (result_data == nullptr) {
-                    LOG_PROGRAM_WARNING(
+                    LOG_WARNING(
                         interoperation::get_module_part(),
                         std::format(
-                            "Failed to allocate memory for input result buffer. Thread: {}",
+                            "Failed to allocate memory for input result buffer. Thread: {}.",
                             descriptor.thread_id
                         )
                     );
@@ -883,6 +940,7 @@ namespace {
             }
         }
 
+        phase_coordination.arrive_and_wait();
         LOG_INFO(
             interoperation::get_module_part(),
             "Input worker is shutting down. Detaching from stdio."
@@ -896,17 +954,18 @@ namespace {
             "PRTS is attached to stdio. Starting output worker."
         );
 
+        phase_coordination.arrive_and_wait();
+
         DWORD offset;
         DWORD offsetHigh;
 
         while (check_stdio_attached()) {
             std::unique_lock<std::mutex> lock(output_queue::lock);
             output_queue::signaling.wait(lock, [] {
-                return !output_queue::output_queue.empty() || !check_stdio_attached();
+                return  !check_stdio_attached() || !output_queue::output_queue.empty();
             });
 
             if (!check_stdio_attached()) {
-                clean_output_queue();
                 break;
             }
 
@@ -916,9 +975,6 @@ namespace {
             lock.unlock(); //It is critical that we do not hold the lock while processing output.
 
             if ([[maybe_unused]] bool shutdown = PushStdOut(hStdOut, hCancelIO, descriptor.buffer_address, offset, offsetHigh)) {
-                lock.lock();
-                clean_output_queue();
-
                 break;
             }
 
@@ -930,28 +986,23 @@ namespace {
             );
         }
 
+        phase_coordination.arrive_and_wait();
         LOG_INFO(
             interoperation::get_module_part(),
             "Output worker is shutting down. Detaching from stdio."
         );
     }
-
-    void cleanse_string(module_mediator::memory string, module_mediator::eight_bytes size) {
-        assert(string != nullptr && size != 0);
-        char* string_data = static_cast<char*>(string);
-        string_data[size - 1] = '\0';
-    }
 }
 
 module_mediator::return_value attach_to_stdio(module_mediator::arguments_string_type) {
     std::lock_guard<std::shared_mutex> lock{ io_synchronizer };
-    if (is_stdin_attached) {
+    if (is_stdio_attached) {
         return module_mediator::module_success;
     }
 
-    capturedStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    if (capturedStdOut == INVALID_HANDLE_VALUE || capturedStdOut == NULL) {
-       LOG_PROGRAM_WARNING(
+    hCapturedStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (hCapturedStdOut == INVALID_HANDLE_VALUE || hCapturedStdOut == NULL) {
+       LOG_WARNING(
            interoperation::get_module_part(),
             std::format(
                 "Failed to get STDOUT handle with error code {}. ",
@@ -962,9 +1013,9 @@ module_mediator::return_value attach_to_stdio(module_mediator::arguments_string_
        return module_mediator::module_failure;
     }
 
-    capturedStdIn = GetStdHandle(STD_INPUT_HANDLE);
-    if (capturedStdIn == INVALID_HANDLE_VALUE || capturedStdIn == NULL) {
-        LOG_PROGRAM_WARNING(
+    hCapturedStdIn = GetStdHandle(STD_INPUT_HANDLE);
+    if (hCapturedStdIn == INVALID_HANDLE_VALUE || hCapturedStdIn == NULL) {
+        LOG_WARNING(
             interoperation::get_module_part(),
             std::format(
                 "Failed to get STDIN handle with error code {}. ",
@@ -972,55 +1023,115 @@ module_mediator::return_value attach_to_stdio(module_mediator::arguments_string_
             )
         );
 
-        capturedStdOut = NULL;
+        hCapturedStdOut = NULL;
         return module_mediator::module_failure;
     }
 
-    is_stdin_attached = true;
-    IOCancellationSignal = CreateEventA(
+    if (GetFileType(hCapturedStdIn) == FILE_TYPE_CHAR && !InitializeConsoleInput(hCapturedStdIn, dwSavedConsoleState)) {
+        LOG_WARNING(
+            interoperation::get_module_part(),
+            std::format(
+                "Failed to initialize console input with error code {}." \
+                "Unexpected console handle.",
+                GetLastError()
+            )
+        );
+
+        hCapturedStdIn = NULL;
+        hCapturedStdOut = NULL;
+
+        return module_mediator::module_failure;
+    }
+
+    is_stdio_attached = true;
+    hIOCancellationSignal = CreateEventA(
         NULL, 
         TRUE,    
         FALSE,   
         NULL 
     );
 
-    if (GetFileType(capturedStdIn) == FILE_TYPE_CHAR && !InitializeConsoleInput(capturedStdIn, savedConsoleState)) {
-        LOG_PROGRAM_WARNING(
-            interoperation::get_module_part(),
-            std::format(
-                "Failed to initialize console input with error code {}. " \
-                "This error may be generated if stdio is redirected.",
-                GetLastError()
-            )
-        );
-    }
+    input_worker_thread = std::thread(input_worker, hCapturedStdIn, hIOCancellationSignal);
+    output_worker_thread = std::thread(output_worker, hCapturedStdOut, hIOCancellationSignal);
 
-    input_worker_thread = std::thread(input_worker, capturedStdIn, IOCancellationSignal);
-    output_worker_thread = std::thread(output_worker, capturedStdOut, IOCancellationSignal);
-
+    phase_coordination.arrive_and_wait();
     return module_mediator::module_success;
 }
 
 module_mediator::return_value detach_from_stdio(module_mediator::arguments_string_type) {
-    std::unique_lock<std::shared_mutex> lock(io_synchronizer);
-    if (!is_stdin_attached) {
-        return module_mediator::module_success;
+    {
+        std::unique_lock<std::shared_mutex> io_lock(io_synchronizer, std::defer_lock);
+        std::unique_lock<std::mutex> input_lock(input_queue::lock, std::defer_lock);
+        std::unique_lock<std::mutex> output_lock(output_queue::lock, std::defer_lock);
+
+        //We must ensure that workers are either already waiting on their respective condition variables or
+        //are yet to acquire their locks. This avoids a potential deadlock when they check whether we are
+        //attached to stdio, and we instantly detach from it.
+        //Notice that we must use custom backoff algorithm here to avoid another possible deadlock. Simply acquiring mutexes
+        //in some specific order won't cut it here.
+        while (true) {
+            std::this_thread::yield();
+            if (!io_lock.try_lock()) {
+                //Error not found is documented to be returned if the thread is not waiting on synchronous IO.
+                BOOL cancelSynchronousInput = CancelSynchronousIo(input_worker_thread.native_handle());
+                if (!cancelSynchronousInput && GetLastError() != ERROR_NOT_FOUND) {
+                    LOG_WARNING(
+                        interoperation::get_module_part(),
+                        std::format(
+                            "Failed to cancel synchronous I/O for input worker with error code {}. " \
+                            "This may lead to resource leaks.",
+                            GetLastError()
+                        )
+                    );
+
+                    return module_mediator::module_failure;
+                }
+
+                BOOL cancelSynchronousOutput = CancelSynchronousIo(output_worker_thread.native_handle());
+                if (!cancelSynchronousOutput && GetLastError() != ERROR_NOT_FOUND) {
+                    LOG_WARNING(
+                        interoperation::get_module_part(),
+                        std::format(
+                            "Failed to cancel synchronous I/O for output worker with error code {}. " \
+                            "This may lead to resource leaks.",
+                            GetLastError()
+                        )
+                    );
+
+                    return module_mediator::module_failure;
+                }
+            }
+
+            is_stdio_attached = false;
+            if (!input_lock.try_lock()) {
+                io_lock.unlock();
+                continue;
+            }
+
+            if (!output_lock.try_lock()) {
+                io_lock.unlock();
+                input_lock.unlock();
+                continue;
+            }
+
+            break;
+        }
+
+        if (hCapturedStdIn == NULL || hCapturedStdOut == NULL || hIOCancellationSignal == NULL) {
+            assert(hCapturedStdIn == NULL && hCapturedStdOut == NULL && hIOCancellationSignal == NULL);
+            return module_mediator::module_success;
+        }
     }
 
-    capturedStdOut = NULL;
-    capturedStdIn = NULL;
+    //We already know that both (or at least one) worker threads are either
+    //waiting on their condition variables or are yet to acquire their locks.
+    //In the last case they will read is_stdio_attached false and exit.
+    input_queue::signaling.notify_one();
+    output_queue::signaling.notify_one();
 
-    is_stdin_attached = false;
-
-    //Now perform shutdown routines for both input and output workers.
-    //It tries to cancel all asynchronous I/O operations first, then it tries to cancel synchronous ones.
-    //Then it just detaches the worker threads. If they never woke up then we have a resource leak. Otherwise, they will exit gracefully.
-    //If they wake up somewhere later after the cancellation, they will just exit without doing anything.
-    lock.unlock();
-
-    BOOL signalIOEnd = SetEvent(IOCancellationSignal);
+    BOOL signalIOEnd = SetEvent(hIOCancellationSignal);
     if (!signalIOEnd) {
-        LOG_PROGRAM_WARNING(
+        LOG_WARNING(
             interoperation::get_module_part(),
             std::format(
                 "Failed to set event for I/O cancellation with error code {}. " \
@@ -1035,32 +1146,22 @@ module_mediator::return_value detach_from_stdio(module_mediator::arguments_strin
         return module_mediator::module_failure;
     }
 
-    BOOL cancelSynchronousInput = CancelSynchronousIo(input_worker_thread.native_handle());
-    if (!cancelSynchronousInput) {
-        LOG_PROGRAM_WARNING(
-            interoperation::get_module_part(),
-            std::format(
-                "Failed to cancel synchronous I/O for input worker with error code {}. " \
-                "This may lead to resource leaks.",
-                GetLastError()
-            )
-        );
-    }
+    //This will block if the shutdown sequence fails.
+    phase_coordination.arrive_and_wait();
 
-    BOOL cancelSynchronousOutput = CancelSynchronousIo(output_worker_thread.native_handle());
-    if (!cancelSynchronousOutput) {
-       LOG_PROGRAM_WARNING(
-            interoperation::get_module_part(),
-            std::format(
-                "Failed to cancel synchronous I/O for output worker with error code {}. " \
-                "This may lead to resource leaks.",
-                GetLastError()
-            )
-       );
-    }
+    input_worker_thread.join();
+    output_worker_thread.join();
 
-    if (GetFileType(capturedStdIn) == FILE_TYPE_CHAR && !RestoreConsoleInput(capturedStdIn, savedConsoleState)) {
-        LOG_PROGRAM_WARNING(
+    clean_input_queue();
+    clean_output_queue();
+
+    hCapturedStdOut = NULL;
+    hCapturedStdIn = NULL;
+    hIOCancellationSignal = NULL;
+
+    CloseHandleReport(hIOCancellationSignal, "hIOCancellationSignal");
+    if (GetFileType(hCapturedStdIn) == FILE_TYPE_CHAR && !RestoreConsoleInput(hCapturedStdIn, dwSavedConsoleState)) {
+        LOG_WARNING(
             interoperation::get_module_part(),
             std::format(
                 "Failed to restore console input with error code {}. " \
@@ -1068,14 +1169,9 @@ module_mediator::return_value detach_from_stdio(module_mediator::arguments_strin
                 GetLastError()
             )
         );
+
+        return module_mediator::module_failure;
     }
-
-    //This will block if the shutdown sequence fails.
-    input_worker_thread.join();
-    output_worker_thread.join();
-
-    CloseHandleReport(IOCancellationSignal, "IOCancellationSignal");
-    IOCancellationSignal = NULL;
 
     return module_mediator::module_success;
 }
@@ -1085,6 +1181,26 @@ module_mediator::return_value callback_register_output(module_mediator::argument
         module_mediator::respond_callback<module_mediator::return_value, module_mediator::memory>::unpack(bundle);
 
     std::unique_lock<std::mutex> lock(output_queue::lock);
+    if (!check_stdio_attached()) { //This should not ever lead to a deadlock because we are using a shared lock.
+        LOG_WARNING(
+            interoperation::get_module_part(),
+            std::format(
+                "Concurrency error: PRTS was detached from stdio before the thread was added to the output queue." \
+                "Waking up the thread {}.",
+                thread_id
+            ) 
+        );
+
+        module_mediator::fast_call<module_mediator::return_value>(
+            interoperation::get_module_part(),
+            interoperation::index_getter::execution_module(),
+            interoperation::index_getter::execution_module_make_runnable(),
+            thread_id
+        );
+
+        return module_mediator::module_failure;
+    }
+
     output_queue::output_queue.push({
         .thread_id = thread_id,
         .buffer_address = buffer_address
@@ -1097,16 +1213,112 @@ module_mediator::return_value callback_register_output(module_mediator::argument
 }
 
 module_mediator::return_value out(module_mediator::arguments_string_type bundle) {
+    auto [output_buffer] = 
+        module_mediator::arguments_string_builder::unpack<module_mediator::memory>(bundle);
+
     std::shared_lock<std::shared_mutex> lock(io_synchronizer);
-    if (!is_stdin_attached) {
-        LOG_PROGRAM_WARNING(
+    if (!is_stdio_attached) {
+        LOG_PROGRAM_ERROR(
             interoperation::get_module_part(),
             "PRTS is not attached to stdio. Cannot write to stdout."
         );
 
-        return module_mediator::execution_result_continue;
+        return module_mediator::execution_result_terminate;
     }
 
-    module_mediator::fast_call(
+    module_mediator::callback_bundle* callback_structure =  
+        module_mediator::create_callback<module_mediator::return_value, module_mediator::memory>(
+            "prts",
+            "callback_register_output",
+            interoperation::get_current_thread_id(),
+            output_buffer
+        );
+
+    module_mediator::fast_call<module_mediator::memory>(
+        interoperation::get_module_part(),
+        interoperation::index_getter::execution_module(),
+        interoperation::index_getter::execution_module_register_deferred_callback(),
+        callback_structure
     );
+
+    return module_mediator::execution_result_block;
+}
+
+module_mediator::return_value callback_register_input(module_mediator::arguments_string_type bundle) {
+    auto [thread_group_id, thread_id, buffer_return_address] = 
+        module_mediator::respond_callback<module_mediator::return_value, module_mediator::return_value, module_mediator::memory>::unpack(bundle);
+
+    std::unique_lock<std::mutex> lock(input_queue::lock);
+    if (!check_stdio_attached()) { //This should not ever lead to a deadlock because we are using a shared lock.
+        LOG_WARNING(
+            interoperation::get_module_part(),
+            std::format(
+                "Concurrency error: PRTS was detached from stdio before the thread was added to the input queue." \
+                "Waking up the thread {}.",
+                thread_id
+            )
+        );
+
+        module_mediator::fast_call<module_mediator::return_value>(
+            interoperation::get_module_part(),
+            interoperation::index_getter::execution_module(),
+            interoperation::index_getter::execution_module_make_runnable(),
+            thread_id
+        );
+
+        return module_mediator::module_failure;
+    }
+
+    input_queue::input_queue.push({
+        .thread_group_id = thread_group_id,
+        .thread_id = thread_id,
+        .buffer_return_address = buffer_return_address
+    });
+
+    lock.unlock();
+    input_queue::signaling.notify_one();
+
+    return module_mediator::module_success;
+}
+
+module_mediator::return_value in(module_mediator::arguments_string_type bundle) {
+    auto [return_address, type] = 
+        module_mediator::arguments_string_builder::unpack<module_mediator::memory, module_mediator::one_byte>(bundle);
+
+    if (type != module_mediator::memory_return_value) {
+        LOG_PROGRAM_ERROR(
+            interoperation::get_module_part(),
+            "Invalid type for stdio input operation. Expected memory return value."
+        );
+
+        return module_mediator::execution_result_terminate;
+    }
+
+    std::shared_lock<std::shared_mutex> lock(io_synchronizer);
+    if (!is_stdio_attached) {
+        LOG_PROGRAM_ERROR(
+            interoperation::get_module_part(),
+            "PRTS is not attached to stdio. Cannot read from stdin."
+        );
+
+        return module_mediator::execution_result_terminate;
+    }
+
+    module_mediator::callback_bundle* callback_structure = 
+        module_mediator::create_callback<module_mediator::return_value, module_mediator::return_value, module_mediator::memory>(
+            "prts",
+            "callback_register_input",
+            interoperation::get_current_thread_group_id(),
+            interoperation::get_current_thread_id(),
+            return_address
+        );
+
+    module_mediator::fast_call<module_mediator::memory>(
+        interoperation::get_module_part(),
+        interoperation::index_getter::execution_module(),
+        interoperation::index_getter::execution_module_register_deferred_callback(),
+        callback_structure
+    );
+
+    return module_mediator::execution_result_block;
 }

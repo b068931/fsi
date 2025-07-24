@@ -1,12 +1,12 @@
 #include "pch.h"
 #include "resource_module.h"
 
-#include <algorithm>
 #include "program_container.h"
 #include "thread_structure.h"
 #include "id_generator.h"
 #include "module_interoperation.h"
 #include "../logger_module/logging.h"
+#include "../program_runtime_services/memory.h"
 
 //remove "#define I_HATE_MICROSOFT_AND_STUPID_ANALYZER_WARNINGS" to disable _Acquires_lock_ and _Releases_lock_
 #define I_HATE_MICROSOFT_AND_STUPID_ANALYZER_WARNINGS
@@ -231,7 +231,11 @@ namespace {
         void* main_function,
         std::uint64_t preferred_stack_size
     ) {
-        return module_mediator::fast_call<module_mediator::return_value, void*>(
+        return module_mediator::fast_call<
+            module_mediator::return_value,
+            module_mediator::memory,
+            module_mediator::eight_bytes
+        >(
             get_module_part(),
             index_getter::excm(),
             index_getter::excm_on_container_creation(),
@@ -406,7 +410,11 @@ module_mediator::return_value create_new_thread(module_mediator::arguments_strin
         }
     }
 
-    return module_mediator::fast_call<module_mediator::return_value, module_mediator::return_value>(
+    return module_mediator::fast_call<
+        module_mediator::return_value,
+        module_mediator::return_value,
+        module_mediator::eight_bytes
+    >(
         get_module_part(),
         index_getter::excm(),
         index_getter::excm_on_thread_creation(),
@@ -584,16 +592,21 @@ program_container::~program_container() noexcept {
 }
 program_context::~program_context() noexcept {
     assert(this->references_count == 0 && "destroying program context that has active references");
-    module_mediator::fast_call<void*, std::uint32_t, void*, std::uint32_t, void*, void*, std::uint64_t>(
+    module_mediator::fast_call<
+        module_mediator::memory, module_mediator::four_bytes,
+        module_mediator::memory, module_mediator::four_bytes,
+        module_mediator::memory,
+        module_mediator::memory, module_mediator::eight_bytes
+    >(
         get_module_part(),
         index_getter::progload(),
         index_getter::progload_free_program(),
-        this->code,
+        static_cast<void*>(this->code),
         this->functions_count,
-        this->exposed_functions,
+        static_cast<void*>(this->exposed_functions),
         this->exposed_functions_count,
         this->jump_table,
-        this->program_strings,
+        static_cast<void*>(this->program_strings),
         this->program_strings_size
     );
 }
