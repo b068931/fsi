@@ -5,7 +5,7 @@
 #define WIN32_LEAN_AND_MEAN
 
 #ifndef NDEBUG
-#include <vld.h>
+//#include <vld.h>
 #endif
 
 #include <windows.h>

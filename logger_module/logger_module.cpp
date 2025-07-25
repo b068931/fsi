@@ -54,7 +54,12 @@ namespace {
 
 	void generic_log_message(message_type type, module_mediator::arguments_string_type bundle) {
 		auto [file_name, file_line, function_name, message] =
-			module_mediator::arguments_string_builder::unpack<void*, module_mediator::return_value, void*, void*>(bundle);
+			module_mediator::arguments_string_builder::unpack<
+			    module_mediator::memory,
+	            module_mediator::return_value,
+	            module_mediator::memory,
+	            module_mediator::memory
+			>(bundle);
 
 		log_message(
 			type,
