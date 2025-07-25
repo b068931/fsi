@@ -16,6 +16,6 @@ function main() {
     move dereference one-byte message-storage[message-index], immediate one-byte d10;
 
     /*the program may produce an additional empty character because io.std.out prints the entire buffer, including the null terminator*/
-    void: prts->io.std.out(variable memory message-storage)
+    void: prts->io.std.out(variable memory message-storage, size-of eight-bytes message)
     message-storage: prts->memory.deallocate()
 }

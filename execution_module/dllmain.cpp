@@ -43,6 +43,8 @@ BOOL APIENTRY DllMain(HMODULE hModule,  // NOLINT(misc-use-internal-linkage)
             allocated_memory = TlsGetValue(tls_index);
             if (allocated_memory != NULL) {
                 delete[] get_thread_local_structure()->execution_thread_state;
+                get_thread_local_structure()->~thread_local_structure(); //kinda sketchy, but it has default destructor, so its behavior is predictable.
+
                 LocalFree((HLOCAL)allocated_memory);
             }
 
@@ -51,6 +53,8 @@ BOOL APIENTRY DllMain(HMODULE hModule,  // NOLINT(misc-use-internal-linkage)
             allocated_memory = TlsGetValue(tls_index);
             if (allocated_memory != NULL) {
                 delete[] get_thread_local_structure()->execution_thread_state;
+                get_thread_local_structure()->~thread_local_structure();
+
                 LocalFree((HLOCAL)allocated_memory);
             }
 

@@ -80,6 +80,7 @@ namespace {
     std::pair<std::vector<char>, bool> ConsumeConsoleInput(HANDLE hStdIn, HANDLE hCancelIO) {
         HANDLE haWaitingHandles[]{ hStdIn, hCancelIO };
         std::vector<char> result{};
+
         while (std::ranges::find(result, '\n') == result.end()) {
             DWORD dwConsoleWaitResult = WaitForMultipleObjects(std::size(haWaitingHandles), haWaitingHandles, FALSE, INFINITE);
             if (dwConsoleWaitResult == WAIT_OBJECT_0 + 1) {
@@ -144,8 +145,8 @@ namespace {
                 }
 
                 if (dwTotalTextSize > 0) {
-                    std::unique_ptr<CHAR[]> lpTextBuffer{ new CHAR[dwTotalTextSize] };
                     DWORD dwTextRead = 0;
+                    std::unique_ptr<CHAR[]> lpTextBuffer{ new CHAR[dwTotalTextSize] };
 
                     BOOL bConsoleReadResult = ReadConsoleA(
                         hStdIn,
@@ -169,6 +170,10 @@ namespace {
                     }
 
                     for (DWORD dwTextIndex = 0; dwTextIndex < dwTextRead; ++dwTextIndex) {
+                        if (lpTextBuffer[dwTextIndex] == '\x1a') {
+                            // Ctrl+Z is pressed, EOF.
+                            return { result, true };
+                        }
                         if (lpTextBuffer[dwTextIndex] != '\r') {
                             result.push_back(lpTextBuffer[dwTextIndex]);
                         }
@@ -196,7 +201,12 @@ namespace {
     //The absolute monster that handles both files and pipes. (Refactoring likely needed)
     //With all possible edge cases and fallback to synchronous IO if overlapped IO fails.
     template<auto file_type>
-    std::pair<std::vector<char>, bool> ConsumeAsynchronous(HANDLE hStdIn, HANDLE hCancelIO, DWORD& dwOffset, DWORD& dwOffsetHigh) {
+    std::pair<std::vector<char>, bool> ConsumeAsynchronous(
+        HANDLE hStdIn, 
+        HANDLE hCancelIO, 
+        DWORD& dwOffset, 
+        DWORD& dwOffsetHigh
+    ) {
         constexpr bool is_pipe = (file_type == FILE_TYPE_PIPE);
         HANDLE haWaitHandles[]{ hStdIn, hCancelIO };
 
@@ -270,10 +280,7 @@ namespace {
                     if (!GetOverlappedResult(hStdIn, &overlapped, &dwBytesRead, FALSE)) {
                         CloseHandleReport(overlapped.hEvent, "overlapped.hEvent");
                         if (GetLastError() == ERROR_HANDLE_EOF) {
-                            std::vector<char> result{ buffer.get(), buffer.get() + dwBytesRead };
-                            result.push_back('\n'); //Input worker expects that the input is newline buffered.
-
-                            return { result, false };
+                            return { { buffer.get(), buffer.get() + dwBytesRead }, false };
                         }
 
                         if constexpr (is_pipe) {
@@ -285,7 +292,7 @@ namespace {
                                     )
                                 );
 
-                                return { {}, true };
+                                return { { buffer.get(), buffer.get() + dwBytesRead }, true};
                             }
 
                             if (GetLastError() == ERROR_MORE_DATA) {
@@ -350,7 +357,7 @@ namespace {
             }
             else if (GetLastError() == ERROR_HANDLE_EOF) {
                 CloseHandleReport(overlapped.hEvent, "overlapped.HEvent");
-                return { { '\n' }, false };
+                return { {}, false };
             }
             else {
                 if constexpr (is_pipe) {
@@ -363,7 +370,7 @@ namespace {
                         );
 
                         CloseHandleReport(overlapped.hEvent, "overlapped.HEvent");
-                        return { {}, true };
+                        return { { buffer.get(), buffer.get() + dwBytesRead }, true};
                     }
 
                     if (GetLastError() == ERROR_MORE_DATA) {
@@ -402,7 +409,7 @@ namespace {
                 //This also means that EOF was reached. Applies to files only.
                 if (bSynchronousReadResult && dwBytesRead == 0) {
                     CloseHandleReport(overlapped.hEvent, "overlapped.HEvent");
-                    return { { '\n' }, false }; //Input worker expects that the input is newline buffered.
+                    return { {}, false };
                 }
 
                 if (!bSynchronousReadResult) {
@@ -416,7 +423,7 @@ namespace {
                                 )
                             );
 
-                            return { {}, true };
+                            return { { buffer.get(), buffer.get() + dwBytesRead }, true };
                         }
 
                         if (GetLastError() == ERROR_MORE_DATA) {
@@ -463,11 +470,16 @@ namespace {
         }
         
         CloseHandleReport(overlapped.hEvent, "overlapped.HEvent");
-        return { std::vector<char>{ buffer.get(), buffer.get() + dwBytesRead }, false};
+        return { { buffer.get(), buffer.get() + dwBytesRead }, false};
     }
 
     //Dispatches the input reading operation based on the type of the input handle.
-    std::pair<std::vector<char>, bool> ConsumeStdIn(HANDLE hStdIn, HANDLE hCancelIO, DWORD& dwOverlappedOffset, DWORD& dwOverlappedOffsetHigh) {
+    std::pair<std::vector<char>, bool> ConsumeStdIn(
+        HANDLE hStdIn, 
+        HANDLE hCancelIO, 
+        DWORD& dwOverlappedOffset, 
+        DWORD& dwOverlappedOffsetHigh
+    ) {
         switch (GetFileType(hStdIn)) {
             case FILE_TYPE_CHAR: {
                 return ConsumeConsoleInput(hStdIn, hCancelIO);
@@ -505,9 +517,11 @@ namespace {
         }
     }
 
-    bool PushConsoleOutput(HANDLE hStdOut, module_mediator::memory buffer) {
-        auto [output_buffer, buffer_size] = backend::decay_pointer(buffer);
-
+    bool PushConsoleOutput(
+        HANDLE hStdOut, 
+        module_mediator::memory output_buffer,
+        module_mediator::eight_bytes buffer_size
+    ) {
         if (buffer_size == 0) return false;
         if (buffer_size > std::numeric_limits<DWORD>::max()) {
             LOG_WARNING(
@@ -557,11 +571,16 @@ namespace {
     //Similarly to ConsumeAsynchronous, this function handles both files and pipes.
     //It uses overlapped IO for files and pipes, and falls back to synchronous IO if necessary.
     template<auto file_type>
-    bool PushAsynchronous(HANDLE hStdOut, HANDLE hCancelIO, module_mediator::memory buffer, DWORD& dwOffset, DWORD& dwOffsetHigh) {
+    bool PushAsynchronous(
+        HANDLE hStdOut, 
+        HANDLE hCancelIO, 
+        module_mediator::memory output_buffer,
+        module_mediator::eight_bytes buffer_size,
+        DWORD& dwOffset, 
+        DWORD& dwOffsetHigh
+    ) {
         constexpr bool is_pipe = (file_type == FILE_TYPE_PIPE);
-
         HANDLE waitHandles[]{ hStdOut, hCancelIO };
-        auto [output_buffer, buffer_size] = backend::decay_pointer(buffer);
 
         if (buffer_size == 0) return false;
         if (buffer_size > std::numeric_limits<DWORD>::max()) {
@@ -734,16 +753,24 @@ namespace {
         return false;
     }
 
-    bool PushStdOut(HANDLE hStdOut, HANDLE hCancelIO, module_mediator::memory buffer, DWORD& dwOverlappedOffset, DWORD& dwOverlappedOffsetHigh) {
+    bool PushStdOut(
+        HANDLE hStdOut, 
+        HANDLE hCancelIO, 
+        module_mediator::memory output_buffer, 
+        module_mediator::eight_bytes buffer_size, 
+        DWORD& dwOverlappedOffset, 
+        DWORD& dwOverlappedOffsetHigh
+    ) {
         switch (GetFileType(hStdOut)) {
             case FILE_TYPE_CHAR: {
-                return PushConsoleOutput(hStdOut, buffer);
+                return PushConsoleOutput(hStdOut, output_buffer, buffer_size);
             }
             case FILE_TYPE_DISK: {
                 return PushAsynchronous<FILE_TYPE_DISK>(
                     hStdOut,
                     hCancelIO,
-                    buffer,
+                    output_buffer,
+                    buffer_size,
                     dwOverlappedOffset,
                     dwOverlappedOffsetHigh
                 );
@@ -752,7 +779,8 @@ namespace {
                 return PushAsynchronous<FILE_TYPE_PIPE>(
                     hStdOut,
                     hCancelIO,
-                    buffer,
+                    output_buffer,
+                    buffer_size,
                     dwOverlappedOffset,
                     dwOverlappedOffsetHigh
                 );
@@ -776,15 +804,18 @@ namespace {
 //Define IO queues for asynchronous input/output operations.
 namespace {
     struct thread_input_descriptor {
-        module_mediator::return_value thread_group_id;
         module_mediator::return_value thread_id;
+        module_mediator::memory return_address;
 
-        void* buffer_return_address;
+        module_mediator::memory input_buffer;
+        module_mediator::eight_bytes buffer_size;
     };
 
     struct thread_output_descriptor {
         module_mediator::return_value thread_id;
+
         module_mediator::memory buffer_address;
+        module_mediator::eight_bytes buffer_size;
     };
 
     //Both are used by their respective worker threads to ensure that all IO is asynchronous.
@@ -857,8 +888,12 @@ namespace {
         DWORD overlappedOffsetHigh = 0;
 
         std::vector<char> global_input_buffer{};
+        bool input_shutdown = false;
+
         while (check_stdio_attached()) {
+            std::queue<thread_input_descriptor> local_input_queue{};
             std::unique_lock<std::mutex> lock(input_queue::lock);
+
             input_queue::signaling.wait(lock, [] {
                 return !check_stdio_attached() || !input_queue::input_queue.empty();
             });
@@ -868,7 +903,6 @@ namespace {
                 break;
             }
 
-            std::queue<thread_input_descriptor> local_input_queue{};
             while (!input_queue::input_queue.empty()) {
                 local_input_queue.push(std::move(input_queue::input_queue.front()));
                 input_queue::input_queue.pop();
@@ -877,58 +911,51 @@ namespace {
             lock.unlock(); //It is critical that we do not hold the lock while processing input.
             while (!local_input_queue.empty()) {
                 thread_input_descriptor descriptor = std::move(local_input_queue.front());
-
                 std::vector<char> input_portion{};
-                auto buffered_newline_character = 
-                    std::ranges::find(global_input_buffer, '\n');
 
-                if (buffered_newline_character != global_input_buffer.end()) {
-                    input_portion.insert(input_portion.begin(), global_input_buffer.begin(), buffered_newline_character + 1);
-                    global_input_buffer.erase(global_input_buffer.begin(), buffered_newline_character + 1);
+                if (!global_input_buffer.empty() && global_input_buffer.size() <= descriptor.buffer_size) {
+                    input_portion = std::move(global_input_buffer);
+                    global_input_buffer = {};
                 }
-                else {
-                    auto [input_data, shutdown] =
-                        ConsumeStdIn(hStdIn, hCancelIO, overlappedOffset, overlappedOffsetHigh);
-
-                    //By this point PRTS should be detached from stdio.
-                    if (shutdown) {
-                        break;
-                    }
-
-                    //Process everything up until a newline character. Everything else goes into global input buffer.
-                    auto newline_position = std::ranges::find(input_data, '\n');
-                    if (newline_position == input_data.end()) {
-                        global_input_buffer.insert(global_input_buffer.end(), input_data.begin(), input_data.end());
-                        continue;
-                    }
-
-                    input_portion.insert(input_portion.begin(), global_input_buffer.begin(), global_input_buffer.end()); 
-                    input_portion.insert(input_portion.begin(), input_data.begin(), newline_position + 1);
-
-                    global_input_buffer.clear();
-                    global_input_buffer.insert(global_input_buffer.begin(), newline_position + 1, input_data.end());
-                }
-
-                module_mediator::memory result_data = 
-                    backend::allocate_program_memory(descriptor.thread_group_id, input_portion.size());
-
-                if (result_data == nullptr) {
-                    LOG_WARNING(
-                        interoperation::get_module_part(),
-                        std::format(
-                            "Failed to allocate memory for input result buffer. Thread: {}.",
-                            descriptor.thread_id
-                        )
+                else if (descriptor.buffer_size < global_input_buffer.size()) {
+                    input_portion.insert(
+                        input_portion.end(),
+                        global_input_buffer.begin(),
+                        global_input_buffer.begin() + static_cast<std::ptrdiff_t>(descriptor.buffer_size)
                     );
 
-                    continue;
+                    global_input_buffer.erase(
+                        global_input_buffer.begin(),
+                        global_input_buffer.begin() + static_cast<std::ptrdiff_t>(descriptor.buffer_size)
+                    );
+                }
+                else if (!input_shutdown) {
+                    auto [input_data, shutdown_requested] =
+                        ConsumeStdIn(hStdIn, hCancelIO, overlappedOffset, overlappedOffsetHigh);
+
+                    input_shutdown = shutdown_requested;
+                    std::size_t additional_input = descriptor.buffer_size - input_portion.size();
+
+                    std::ptrdiff_t consume_end =
+                        static_cast<std::ptrdiff_t>(std::min(additional_input, input_data.size()));
+
+                    input_portion.insert(
+                        input_portion.end(),
+                        input_data.begin(),
+                        input_data.begin() + consume_end
+                    );
+
+                    global_input_buffer.insert(
+                        global_input_buffer.end(),
+                        input_data.begin() + consume_end,
+                        input_data.end()
+                    );
                 }
 
-                auto [input_result_buffer, buffer_size] = 
-                    backend::decay_pointer(result_data);
+                module_mediator::eight_bytes input_size{ input_portion.size() };
 
-                std::memcpy(input_result_buffer, input_portion.data(), input_portion.size());
-                std::memcpy(descriptor.buffer_return_address, static_cast<void*>(&result_data), sizeof(module_mediator::memory));
+                std::memcpy(descriptor.input_buffer, input_portion.data(), input_portion.size());
+                std::memcpy(descriptor.return_address, &input_size, sizeof(module_mediator::eight_bytes));
 
                 local_input_queue.pop();
                 module_mediator::fast_call<module_mediator::return_value>(
@@ -959,6 +986,7 @@ namespace {
         DWORD offset;
         DWORD offsetHigh;
 
+        bool output_shutdown = false;
         while (check_stdio_attached()) {
             std::unique_lock<std::mutex> lock(output_queue::lock);
             output_queue::signaling.wait(lock, [] {
@@ -974,8 +1002,15 @@ namespace {
 
             lock.unlock(); //It is critical that we do not hold the lock while processing output.
 
-            if ([[maybe_unused]] bool shutdown = PushStdOut(hStdOut, hCancelIO, descriptor.buffer_address, offset, offsetHigh)) {
-                break;
+            if (!output_shutdown) {
+                output_shutdown = PushStdOut(
+                    hStdOut,
+                    hCancelIO,
+                    descriptor.buffer_address,
+                    descriptor.buffer_size,
+                    offset,
+                    offsetHigh
+                );
             }
 
             module_mediator::fast_call<module_mediator::return_value>(
@@ -1177,8 +1212,8 @@ module_mediator::return_value detach_from_stdio(module_mediator::arguments_strin
 }
 
 module_mediator::return_value callback_register_output(module_mediator::arguments_string_type bundle) {
-    auto [thread_id, buffer_address] = 
-        module_mediator::respond_callback<module_mediator::return_value, module_mediator::memory>::unpack(bundle);
+    auto [thread_id, buffer_address, buffer_size] = 
+        module_mediator::respond_callback<module_mediator::return_value, module_mediator::memory, module_mediator::eight_bytes>::unpack(bundle);
 
     std::unique_lock<std::mutex> lock(output_queue::lock);
     if (!check_stdio_attached()) { //This should not ever lead to a deadlock because we are using a shared lock.
@@ -1203,7 +1238,8 @@ module_mediator::return_value callback_register_output(module_mediator::argument
 
     output_queue::output_queue.push({
         .thread_id = thread_id,
-        .buffer_address = buffer_address
+        .buffer_address = buffer_address,
+        .buffer_size = buffer_size
     });
 
     lock.unlock();
@@ -1213,8 +1249,28 @@ module_mediator::return_value callback_register_output(module_mediator::argument
 }
 
 module_mediator::return_value out(module_mediator::arguments_string_type bundle) {
-    auto [output_buffer] = 
-        module_mediator::arguments_string_builder::unpack<module_mediator::memory>(bundle);
+    auto [output_buffer, output_size] = 
+        module_mediator::arguments_string_builder::unpack<module_mediator::memory, module_mediator::eight_bytes>(bundle);
+
+    if (output_size == 0) {
+        return module_mediator::execution_result_continue;
+    }
+
+    auto [memory, memory_size] = 
+        backend::decay_pointer(output_buffer);
+
+    if (memory_size < output_size) {
+        LOG_PROGRAM_ERROR(
+            interoperation::get_module_part(),
+            std::format(
+                "Requested output size {} exceeds memory block size of {}.",
+                output_size,
+                memory_size
+            )
+        );
+
+        return module_mediator::execution_result_terminate;
+    }
 
     std::shared_lock<std::shared_mutex> lock(io_synchronizer);
     if (!is_stdio_attached) {
@@ -1231,7 +1287,8 @@ module_mediator::return_value out(module_mediator::arguments_string_type bundle)
             "prts",
             "callback_register_output",
             interoperation::get_current_thread_id(),
-            output_buffer
+            memory,
+            output_size
         );
 
     module_mediator::fast_call<module_mediator::memory>(
@@ -1245,8 +1302,13 @@ module_mediator::return_value out(module_mediator::arguments_string_type bundle)
 }
 
 module_mediator::return_value callback_register_input(module_mediator::arguments_string_type bundle) {
-    auto [thread_group_id, thread_id, buffer_return_address] = 
-        module_mediator::respond_callback<module_mediator::return_value, module_mediator::return_value, module_mediator::memory>::unpack(bundle);
+    auto [thread_id, return_address, input_buffer, buffer_size] = 
+        module_mediator::respond_callback<
+            module_mediator::return_value,
+            module_mediator::memory,
+            module_mediator::memory,
+            module_mediator::eight_bytes
+        >::unpack(bundle);
 
     std::unique_lock<std::mutex> lock(input_queue::lock);
     if (!check_stdio_attached()) { //This should not ever lead to a deadlock because we are using a shared lock.
@@ -1270,9 +1332,10 @@ module_mediator::return_value callback_register_input(module_mediator::arguments
     }
 
     input_queue::input_queue.push({
-        .thread_group_id = thread_group_id,
         .thread_id = thread_id,
-        .buffer_return_address = buffer_return_address
+        .return_address = return_address,
+        .input_buffer = input_buffer,
+        .buffer_size = buffer_size
     });
 
     lock.unlock();
@@ -1282,13 +1345,38 @@ module_mediator::return_value callback_register_input(module_mediator::arguments
 }
 
 module_mediator::return_value in(module_mediator::arguments_string_type bundle) {
-    auto [return_address, type] = 
-        module_mediator::arguments_string_builder::unpack<module_mediator::memory, module_mediator::one_byte>(bundle);
+    auto [return_address, type, input_buffer, buffer_size] = 
+        module_mediator::arguments_string_builder::unpack<
+            module_mediator::memory,
+            module_mediator::one_byte,
+            module_mediator::memory,
+            module_mediator::eight_bytes
+        >(bundle);
 
-    if (type != module_mediator::memory_return_value) {
+    if (buffer_size == 0) {
+        return module_mediator::execution_result_continue;
+    }
+
+    auto [memory, memory_size] = 
+        backend::decay_pointer(input_buffer);
+
+    if (memory_size < buffer_size) {
+       LOG_PROGRAM_ERROR(
+            interoperation::get_module_part(),
+            std::format(
+                "Requested input size {} exceeds memory block size of {}.",
+                buffer_size,
+                memory_size
+            )
+        );
+
+       return module_mediator::execution_result_terminate;
+    }
+
+    if (type != module_mediator::eight_bytes_return_value) {
         LOG_PROGRAM_ERROR(
             interoperation::get_module_part(),
-            "Invalid type for stdio input operation. Expected memory return value."
+            "Invalid type for stdio input operation. Expected eight bytes return value."
         );
 
         return module_mediator::execution_result_terminate;
@@ -1305,12 +1393,18 @@ module_mediator::return_value in(module_mediator::arguments_string_type bundle) 
     }
 
     module_mediator::callback_bundle* callback_structure = 
-        module_mediator::create_callback<module_mediator::return_value, module_mediator::return_value, module_mediator::memory>(
+        module_mediator::create_callback<
+            module_mediator::return_value,
+            module_mediator::memory,
+            module_mediator::memory,
+            module_mediator::eight_bytes
+        >(
             "prts",
             "callback_register_input",
-            interoperation::get_current_thread_group_id(),
             interoperation::get_current_thread_id(),
-            return_address
+            return_address,
+            memory,
+            buffer_size
         );
 
     module_mediator::fast_call<module_mediator::memory>(

@@ -263,18 +263,18 @@ attach_to_stdio=
 detach_from_stdio=
 
 -- Used in conjunction with register_deferred_callback to add a thread to an output queue.
--- Accepts a thread id, output buffer address, and a callback bundle.
-callback_register_output=eight-bytes memory memory
+-- Accepts a thread id, output buffer address, output buffer size, and a callback bundle.
+callback_register_output=eight-bytes memory eight-bytes memory
 
 -- Outputs a message to whatever is connected to the standard output.
--- Accepts a message. Always outputs an entire message, as determined by the memory size.
-!out:io.std.out=memory
+-- Accepts a message and a message size.
+!out:io.std.out=memory eight-bytes
 
 -- Used in conjunction with register_deferred_callback to add a thread to an input queue.
--- Accepts a thread group id, a thread id, a return address, and a callback bundle.
-callback_register_input=eight-bytes eight-bytes memory memory
+-- Accepts a thread id, a return address, input buffer, input buffer size, and a callback bundle.
+callback_register_input=eight-bytes memory memory eight-bytes memory
 
 -- Blocks the thread and puts it into the input queue.
 -- Thread is made runnable as soon as it receives input.
--- Accepts return address, return variable type.
-!in:io.std.in=memory one-byte
+-- Accepts return address (how may bytes written), return variable type, input buffer, input buffer size.
+!in:io.std.in=memory one-byte memory eight-bytes
