@@ -837,6 +837,10 @@ namespace {
             thread_input_descriptor descriptor = std::move(input_queue::input_queue.front());
             input_queue::input_queue.pop();
 
+            //So as not to trick the thread into reading or writing to a buffer that is not initialized.
+            module_mediator::eight_bytes input_size{ 0 };
+            std::memcpy(descriptor.input_buffer, &input_size, sizeof(module_mediator::eight_bytes));
+
             module_mediator::fast_call<module_mediator::return_value>(
                 interoperation::get_module_part(),
                 interoperation::index_getter::execution_module(),
@@ -1320,6 +1324,9 @@ module_mediator::return_value callback_register_input(module_mediator::arguments
                 thread_id
             )
         );
+
+        module_mediator::eight_bytes input_size{ 0 };
+        std::memcpy(input_buffer, &input_size, sizeof(module_mediator::eight_bytes));
 
         module_mediator::fast_call<module_mediator::return_value>(
             interoperation::get_module_part(),

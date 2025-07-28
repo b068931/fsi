@@ -10,11 +10,26 @@ public:
 		structure_builder::builder_parameters& helper,
 		structure_builder::read_map_type& read_map
 	) override {
-		output_file_structure.functions.emplace_back(
-            helper.get_id(),
-				helper.name_translations.translate_name(read_map.get_token_generator_name())
-
+		std::string function_name = read_map.get_token_generator_name();
+		auto found_another = std::ranges::find_if(
+			output_file_structure.functions,
+			[&function_name](const structure_builder::function& func) {
+				return func.name == function_name;
+			}
         );
+
+		if (found_another != output_file_structure.functions.end()) {
+			read_map.exit_with_error(
+				"Function with name '" + function_name + "' already exists."
+			);
+		}
+		else {
+			output_file_structure.functions.emplace_back(
+				helper.get_id(),
+				helper.name_translations.translate_name(std::move(function_name))
+
+			);
+		}
 	}
 };
 
@@ -76,7 +91,7 @@ public:
 			read_map.exit_with_error();
 		}
 
-		helper.active_function.set_current_function(&output_file_structure.functions.back());
+        helper.active_function.set_current_function(&output_file_structure.functions.back());
 	}
 
 };
