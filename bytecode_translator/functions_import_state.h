@@ -14,8 +14,8 @@ public:
 	) override {
 		std::string module_function_name = helper.name_translations.translate_name(read_map.get_token_generator_name());
 		if (module_function_name.empty()) {
-			if ((read_map.get_current_token() != structure_builder::source_file_token::import_end)
-				&& (read_map.get_current_token() != structure_builder::source_file_token::comment_start)) {
+			if (read_map.get_current_token() != source_file_token::import_end
+				&& read_map.get_current_token() != source_file_token::comment_start) {
 				read_map.exit_with_error("Name of the module function was expected, got empty string instead.");
 			}
 

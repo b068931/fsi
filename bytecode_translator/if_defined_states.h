@@ -13,7 +13,7 @@ public:
 		read_map
 			.get_parameters_container()
 			.assign_parameter(
-				structure_builder::parameters_enumeration::ifdef_ifndef_pop_check,
+				structure_builder::parameters_enumeration::if_defined_if_not_defined_pop_check,
 				helper.name_translations.has_remapping(read_map.get_token_generator_name())
 			);
 	}
@@ -29,7 +29,7 @@ public:
 		read_map
 			.get_parameters_container()
 			.assign_parameter(
-				structure_builder::parameters_enumeration::ifdef_ifndef_pop_check,
+				structure_builder::parameters_enumeration::if_defined_if_not_defined_pop_check,
 				!helper.name_translations.has_remapping(read_map.get_token_generator_name())
 			);
 	}
@@ -44,7 +44,7 @@ public:
 	) override {
 		read_map
 			.get_parameters_container()
-			.assign_parameter(structure_builder::parameters_enumeration::ifdef_ifndef_pop_check, false);
+			.assign_parameter(structure_builder::parameters_enumeration::if_defined_if_not_defined_pop_check, false);
 	}
 };
 

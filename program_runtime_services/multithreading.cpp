@@ -31,7 +31,7 @@ namespace {
     }
 
     bool check_function_displacement(std::uint64_t function_displacement) {
-        return (function_displacement + sizeof(void*)) <= get_current_thread_group_jump_table_size();
+        return function_displacement + sizeof(void*) <= get_current_thread_group_jump_table_size();
     }
 }
 

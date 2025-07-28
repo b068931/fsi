@@ -46,7 +46,7 @@ private:
 	}
 
 	void add_new_type_object(std::uint8_t type_bits) {
-		std::uint8_t type_group = (type_bits >> 2) & 0b11;
+		std::uint8_t type_group = type_bits >> 2 & 0b11;
 		std::uint8_t active_type = type_bits & 0b11;
 
 		if (type_group == 0b00) {
@@ -94,7 +94,7 @@ private:
 				{ 0b1111, &instruction_builder::generic_create_object<pointer> }
 			};
 
-			(this->*(object_create_map[type_bits]))();
+			(this->*object_create_map[type_bits])();
 		}
 	}
 	void create_new_type(std::uint8_t type_bits) {
@@ -144,10 +144,10 @@ protected:
 		argument_index{ 0 },
 		current_variable_type{}
 	{
-		std::uint8_t instruction_arguments_count = (instruction_prefix >> 4) & 0b1111;
+		std::uint8_t instruction_arguments_count = instruction_prefix >> 4 & 0b1111;
 		for (std::uint8_t counter = 0, type_bytes_count = instruction_arguments_count / 2; counter < type_bytes_count; ++counter) {
 			std::uint8_t type_byte = run.get_object<std::uint8_t>();
-			std::uint8_t first_type_bits = (type_byte >> 4) & 0b1111;
+			std::uint8_t first_type_bits = type_byte >> 4 & 0b1111;
 			std::uint8_t second_type_bits = type_byte & 0b1111;
 
 			this->instruction_types.push_back(first_type_bits);
@@ -242,10 +242,10 @@ protected:
 		this->translated_instruction_symbols.push_back(static_cast<char>(opcode));
 
 		if (is_dereference) {
-			this->translated_instruction_symbols.push_back(0 | ((reg << 3) & 0b00111000));
+			this->translated_instruction_symbols.push_back(0 | reg << 3 & 0b00111000);
 		}
 		else {
-			this->translated_instruction_symbols.push_back('\xc0' | ((reg << 3) & 0b00111000)); //r/m
+			this->translated_instruction_symbols.push_back('\xc0' | reg << 3 & 0b00111000); //r/m
 		}
 	}
 	void use_r8_on_reg_with_two_opcodes(std::uint8_t opcode00, std::uint8_t opcode, bool is_dereference, std::uint8_t active_type, bool is_R = false, std::uint8_t reg = 0) {
@@ -288,7 +288,7 @@ protected:
 		}
 
 		this->translated_instruction_symbols.push_back(static_cast<char>(opcode));
-		this->translated_instruction_symbols.push_back('\x85' | ((reg << 3) & 0b00111000)); //r/m
+		this->translated_instruction_symbols.push_back('\x85' | reg << 3 & 0b00111000); //r/m
 
 		this->write_variable_relative_address(variable, additional_displacement);
 	}

@@ -39,14 +39,20 @@
     <Filter Include="Source Files\Source Code Parsing\Major State Machines">
       <UniqueIdentifier>{2afa9937-88b4-47f2-bf79-97ba3901dc20}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Program Translation">
+      <UniqueIdentifier>{067434ba-9f21-4e75-8ab4-0e4e79a1ffcd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Source Code Parsing\Parser Configuration">
+      <UniqueIdentifier>{a0c24689-a6d9-49ad-9878-c1f4c9b6af23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Program Translation\Logic Errors Detection">
+      <UniqueIdentifier>{6dce9d0a-9bdb-4717-be9d-4427bd37aceb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Program Translation\Logic Errors Detection\Filters">
+      <UniqueIdentifier>{0f908980-167c-40cf-93f3-485a38477f45}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="bytecode_translator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="structure_builder.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="type_definitions.h">
       <Filter>Header Files\Source Code Parsing</Filter>
     </ClInclude>
@@ -116,9 +122,6 @@
     <ClInclude Include="import_keyword_token_state.h">
       <Filter>Header Files\Source Code Parsing\Parse Map States\Modules Import</Filter>
     </ClInclude>
-    <ClInclude Include="parser_options.h">
-      <Filter>Header Files\Source Code Parsing</Filter>
-    </ClInclude>
     <ClInclude Include="main_state.h">
       <Filter>Header Files\Source Code Parsing\Parse Map States</Filter>
     </ClInclude>
@@ -127,6 +130,93 @@
     </ClInclude>
     <ClInclude Include="include_file_state.h">
       <Filter>Header Files\Source Code Parsing\Parse Map States\Special Instructions</Filter>
+    </ClInclude>
+    <ClInclude Include="bytecode_translator.h">
+      <Filter>Header Files\Program Translation</Filter>
+    </ClInclude>
+    <ClInclude Include="structure_builder.h">
+      <Filter>Header Files\Source Code Parsing</Filter>
+    </ClInclude>
+    <ClInclude Include="parser_options.h">
+      <Filter>Header Files\Source Code Parsing\Parser Configuration</Filter>
+    </ClInclude>
+    <ClInclude Include="parser_error_type.h">
+      <Filter>Header Files\Source Code Parsing\Parser Configuration</Filter>
+    </ClInclude>
+    <ClInclude Include="source_file_token.h">
+      <Filter>Header Files\Source Code Parsing\Parser Configuration</Filter>
+    </ClInclude>
+    <ClInclude Include="instruction_checking.h">
+      <Filter>Header Files\Program Translation\Logic Errors Detection</Filter>
+    </ClInclude>
+    <ClInclude Include="translator_error_type.h">
+      <Filter>Header Files\Program Translation\Logic Errors Detection</Filter>
+    </ClInclude>
+    <ClInclude Include="create_filter.h">
+      <Filter>Header Files\Program Translation\Logic Errors Detection\Filters</Filter>
+    </ClInclude>
+    <ClInclude Include="general_instruction.h">
+      <Filter>Header Files\Program Translation\Logic Errors Detection\Filters</Filter>
+    </ClInclude>
+    <ClInclude Include="jump_instruction.h">
+      <Filter>Header Files\Program Translation\Logic Errors Detection\Filters</Filter>
+    </ClInclude>
+    <ClInclude Include="data_instruction.h">
+      <Filter>Header Files\Program Translation\Logic Errors Detection\Filters</Filter>
+    </ClInclude>
+    <ClInclude Include="variable_instruction.h">
+      <Filter>Header Files\Program Translation\Logic Errors Detection\Filters</Filter>
+    </ClInclude>
+    <ClInclude Include="apply_on_first_operand_instruction.h">
+      <Filter>Header Files\Program Translation\Logic Errors Detection\Filters</Filter>
+    </ClInclude>
+    <ClInclude Include="same_type_instruction.h">
+      <Filter>Header Files\Program Translation\Logic Errors Detection\Filters</Filter>
+    </ClInclude>
+    <ClInclude Include="binary_instruction.h">
+      <Filter>Header Files\Program Translation\Logic Errors Detection\Filters</Filter>
+    </ClInclude>
+    <ClInclude Include="multi_instruction.h">
+      <Filter>Header Files\Program Translation\Logic Errors Detection\Filters</Filter>
+    </ClInclude>
+    <ClInclude Include="different_type_instruction.h">
+      <Filter>Header Files\Program Translation\Logic Errors Detection\Filters</Filter>
+    </ClInclude>
+    <ClInclude Include="different_type_multi_instruction.h">
+      <Filter>Header Files\Program Translation\Logic Errors Detection\Filters</Filter>
+    </ClInclude>
+    <ClInclude Include="save_variable_state_instruction.h">
+      <Filter>Header Files\Program Translation\Logic Errors Detection\Filters</Filter>
+    </ClInclude>
+    <ClInclude Include="load_variable_state_instruction.h">
+      <Filter>Header Files\Program Translation\Logic Errors Detection\Filters</Filter>
+    </ClInclude>
+    <ClInclude Include="function_call_instruction.h">
+      <Filter>Header Files\Program Translation\Logic Errors Detection\Filters</Filter>
+    </ClInclude>
+    <ClInclude Include="program_function_call_instruction.h">
+      <Filter>Header Files\Program Translation\Logic Errors Detection\Filters</Filter>
+    </ClInclude>
+    <ClInclude Include="module_function_call_instruction.h">
+      <Filter>Header Files\Program Translation\Logic Errors Detection\Filters</Filter>
+    </ClInclude>
+    <ClInclude Include="pointer_move_instruction.h">
+      <Filter>Header Files\Program Translation\Logic Errors Detection\Filters</Filter>
+    </ClInclude>
+    <ClInclude Include="get_function_address_instruction.h">
+      <Filter>Header Files\Program Translation\Logic Errors Detection\Filters</Filter>
+    </ClInclude>
+    <ClInclude Include="program_verification.h">
+      <Filter>Header Files\Program Translation\Logic Errors Detection</Filter>
+    </ClInclude>
+    <ClInclude Include="string_instruction.h">
+      <Filter>Header Files\Program Translation\Logic Errors Detection\Filters</Filter>
+    </ClInclude>
+    <ClInclude Include="non_string_instruction.h">
+      <Filter>Header Files\Program Translation\Logic Errors Detection\Filters</Filter>
+    </ClInclude>
+    <ClInclude Include="instruction_encoder.h">
+      <Filter>Header Files\Program Translation</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -153,56 +243,54 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="..\examples\eight-bytes-to-string.txt">
-      <Filter>Examples</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="..\examples\hello-world.txt">
-      <Filter>Examples</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="..\examples\thread-groups-example.txt">
-      <Filter>Examples</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="..\examples\program-logic-error.txt">
-      <Filter>Examples</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="..\examples\remove-undefine.txt">
-      <Filter>Examples</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="..\examples\stackoverflow.txt">
-      <Filter>Examples</Filter>
-    </CopyFileToFolders>
     <CopyFileToFolders Include="..\examples\make.bat" />
-    <CopyFileToFolders Include="..\examples\dynamic-call.txt">
+    <CopyFileToFolders Include="..\examples\comments-everywhere.tfsi">
       <Filter>Examples</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\examples\dynamic-call-with-error.txt">
+    <CopyFileToFolders Include="..\examples\cyclic1.tfsi">
       <Filter>Examples</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\examples\incorrect-main.txt">
+    <CopyFileToFolders Include="..\examples\cyclic2.tfsi">
       <Filter>Examples</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\examples\keywords-as-names.txt">
+    <CopyFileToFolders Include="..\examples\dynamic-call.tfsi">
       <Filter>Examples</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\examples\comments-everywhere.txt">
+    <CopyFileToFolders Include="..\examples\dynamic-call-with-error.tfsi">
       <Filter>Examples</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\libraries\memory.txt">
+    <CopyFileToFolders Include="..\examples\echo.tfsi">
+      <Filter>Examples</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\examples\eight-bytes-to-string.tfsi">
+      <Filter>Examples</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\examples\hello-world.tfsi">
+      <Filter>Examples</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\examples\incorrect-main.tfsi">
+      <Filter>Examples</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\examples\keywords-as-names.tfsi">
+      <Filter>Examples</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\examples\program-logic-error.tfsi">
+      <Filter>Examples</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\examples\remove-undefine.tfsi">
+      <Filter>Examples</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\examples\stackoverflow.tfsi">
+      <Filter>Examples</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\examples\thread-groups-example.tfsi">
+      <Filter>Examples</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\examples\thread-groups-explosion.tfsi">
+      <Filter>Examples</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\libraries\memory.tfsi">
       <Filter>Libraries</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\examples\cyclic2.txt">
-      <Filter>Examples</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="..\examples\thread-groups-explosion.txt">
-      <Filter>Examples</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="..\examples\echo.txt">
-      <Filter>Examples</Filter>
-    </CopyFileToFolders>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="..\examples\Cyclic1.txt">
-      <Filter>Examples</Filter>
-    </Text>
   </ItemGroup>
 </Project>

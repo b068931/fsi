@@ -20,17 +20,17 @@ private:
     std::atomic_size_t active_threads_counter = 0;
 
     void executor_thread(module_mediator::return_value executor_id) {
-        LOG_INFO(get_module_part(), std::format("Executor {} is starting.", executor_id));
+        LOG_INFO(interoperation::get_module_part(), std::format("Executor {} is starting.", executor_id));
 
         thread_local_structure* thread_structure = get_thread_local_structure();
         scheduler::schedule_information* currently_running_thread_information = 
-            &(thread_structure->currently_running_thread_information);
+            &thread_structure->currently_running_thread_information;
 
         while (true) {
             bool choose_result = this->scheduler.choose(currently_running_thread_information);
             if (!choose_result) {
                 LOG_INFO(
-                    get_module_part(), 
+                    interoperation::get_module_part(), 
                     std::format("Executor is shutting down.", executor_id)
                 );
 
@@ -41,7 +41,7 @@ private:
             load_program(
                 thread_structure->execution_thread_state, 
                 currently_running_thread_information->thread_state,
-                (currently_running_thread_information->state == scheduler::thread_states::startup)
+                currently_running_thread_information->state == scheduler::thread_states::startup
                     ? 1 : 0
             );
 
@@ -49,13 +49,13 @@ private:
             if (currently_running_thread_information->put_back_structure) {
                 this->scheduler.put_back(currently_running_thread_information->put_back_structure);
                 for (const auto& deferred_callback : get_thread_local_structure()->deferred_callbacks) {
-                    std::size_t module_index = get_module_part()->find_module_index(deferred_callback->module_name);
-                    std::size_t function_index = get_module_part()->find_function_index(
+                    std::size_t module_index = interoperation::get_module_part()->find_module_index(deferred_callback->module_name);
+                    std::size_t function_index = interoperation::get_module_part()->find_function_index(
                         module_index,
                         deferred_callback->function_name
                     );
 
-                    module_mediator::return_value result = get_module_part()->call_module(
+                    module_mediator::return_value result = interoperation::get_module_part()->call_module(
                         module_index,
                         function_index,
                         deferred_callback->arguments_string
@@ -63,7 +63,7 @@ private:
 
                     if (result != module_mediator::module_success) {
                         LOG_WARNING(
-                            get_module_part(),
+                            interoperation::get_module_part(),
                             std::format(
                                 "Deferred callback for module {} and function {} failed with error code {}.",
                                 deferred_callback->module_name,
@@ -77,8 +77,8 @@ private:
                 get_thread_local_structure()->deferred_callbacks.clear();
             }
             else {
-                if ((previous_active_threads_count == 1) && (!this->scheduler.has_available_jobs())) {
-                    LOG_INFO(get_module_part(), "No available jobs found. Initiating shutdown."); //for this LOG_INFO the order is very important: it must be before the scheduler.initiate_shutdown() call
+                if (previous_active_threads_count == 1 && !this->scheduler.has_available_jobs()) {
+                    LOG_INFO(interoperation::get_module_part(), "No available jobs found. Initiating shutdown."); //for this LOG_INFO the order is very important: it must be before the scheduler.initiate_shutdown() call
                     this->scheduler.initiate_shutdown();
                 }
             }
@@ -115,7 +115,7 @@ public:
     }
     void startup(std::uint16_t thread_count) {
         if(!this->scheduler.has_available_jobs()) {
-            LOG_WARNING(get_module_part(), "No available jobs found. Executors won't start.");
+            LOG_WARNING(interoperation::get_module_part(), "No available jobs found. Executors won't start.");
             return;
         }
 

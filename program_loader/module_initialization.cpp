@@ -3,14 +3,18 @@
 #include "program_functions.h"
 #include "program_loader.h"
 
-module_mediator::module_part* part = nullptr;
-
-//technically, this function is used during program's lifetime, so it is not necessary to deallocate its memory VirtualFree(::default_function_address, 0, MEM_RELEASE);
-void* default_function_address = nullptr; //default address for functions that were declared but weren't initialized (terminates the program)
-
-module_mediator::module_part* get_module_part() {
-	return ::part;
+namespace {
+	//technically, this function is used during program's lifetime, so it is not necessary to deallocate its memory VirtualFree(::default_function_address, 0, MEM_RELEASE);
+	void* default_function_address = nullptr; //default address for functions that were declared but weren't initialized (terminates the program)
+	module_mediator::module_part* part = nullptr;
 }
+
+namespace interoperation {
+	module_mediator::module_part* get_module_part() {
+		return ::part;
+	}
+}
+
 void* get_default_function_address() {
 	return ::default_function_address;
 }

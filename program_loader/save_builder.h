@@ -45,7 +45,7 @@ public:
 	)
 		:instruction_builder{ std::forward<args>(instruction_builder_args)... }
 	{
-		this->assert_statement((this->get_arguments_count() == 1) && !machine_codes, "This instruction must have only one argument.");
+		this->assert_statement(this->get_arguments_count() == 1 && !machine_codes, "This instruction must have only one argument.");
 	}
 
 	virtual void visit(std::unique_ptr<variable_imm<std::uint8_t>> value) override {
@@ -92,7 +92,7 @@ public:
 
 		this->save_type_to_program_stack(this->used_variable_type);
 		this->save_value_from_r8_to_program_stack(
-			(this->used_variable_type == 4) ? 3 : this->used_variable_type
+			this->used_variable_type == 4 ? 3 : this->used_variable_type
 		);
 	}
 };

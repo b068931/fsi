@@ -38,15 +38,15 @@ public:
 		active_parsing_files.push_back(include_file);
 		
 		generic_parser::parser_facade<
-			structure_builder::source_file_token, 
+			source_file_token, 
 			structure_builder::context_key, 
 			structure_builder
 		> parser
 		{
 			parser_options::keywords,
 			parser_options::contexts,
-			structure_builder::source_file_token::name,
-			structure_builder::source_file_token::end_of_file,
+			source_file_token::name,
+			source_file_token::end_of_file,
 			structure_builder::context_key::main_context
 		};
 

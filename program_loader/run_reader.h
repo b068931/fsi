@@ -32,7 +32,7 @@ public:
 
 		char get_symbol() {
 			if (this->run_position < this->run_size) {
-				return this->reader->get_symbol(this->run_start + (this->run_position++));
+				return this->reader->get_symbol(this->run_start + this->run_position++);
 			}
 
 			return '\0';
@@ -44,7 +44,7 @@ public:
 		template<typename type>
 		type get_object(type value = type{}) {
 			char* bytes = reinterpret_cast<char*>(&value);
-			for (generic_parser::filepos count = 0; (count < sizeof(type)) && (this->run_position < this->run_size);
+			for (generic_parser::filepos count = 0; count < sizeof(type) && this->run_position < this->run_size;
 				++count, ++this->run_position) {
 				bytes[count] = this->reader->get_symbol(this->run_start + this->run_position);
 			}
@@ -62,7 +62,7 @@ public:
             }
         };
 		
-		for (generic_parser::filepos index = 0, length = reader->get_symbols_count(); (index < length);) {
+		for (generic_parser::filepos index = 0, length = reader->get_symbols_count(); index < length;) {
 			char run_type = reader->get_symbol(index++);
 
 			std::uint64_t run_size = 0;
@@ -73,11 +73,11 @@ public:
 
 			auto found_run = run_initializers.find(run_type); //check if container recognizes this type of run
 			if (found_run != run_initializers.end()) { //if not then we simply ignore this run
-				(cont->*(found_run->second))(run{ index, run_size, reader });
+				(cont->*found_run->second)(run{ index, run_size, reader });
 			}
 			else {
 				LOG_PROGRAM_WARNING(
-					get_module_part(),
+					interoperation::get_module_part(),
 					std::format(
 						"Unknown run with index {}. It will be ignored.",
 						static_cast<int>(run_type) //Otherwise it'll be printed as a character

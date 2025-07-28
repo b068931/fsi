@@ -26,7 +26,7 @@ public:
 			return;
 		}
 
-		output_file_structure.main_function = &(*found_function);
+		output_file_structure.main_function = &*found_function;
 	}
 };
 

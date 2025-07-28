@@ -15,82 +15,88 @@ module_mediator::return_value on_thread_creation(module_mediator::arguments_stri
 
 	thread_local_structure* thread_structure = get_thread_local_structure();
 
-	char* thread_state_memory = inner_allocate_thread_memory(thread_id, program_state_manager::thread_state_size);
-	char* thread_stack_memory = inner_allocate_thread_memory(thread_id, preferred_stack_size);
+	char* thread_state_memory = backend::allocate_thread_memory(thread_id, program_state_manager::thread_state_size);
+	char* thread_stack_memory = backend::allocate_thread_memory(thread_id, preferred_stack_size);
 	
 	char* thread_stack_end = thread_stack_memory + preferred_stack_size - (sizeof(module_mediator::one_byte) + sizeof(std::uint64_t));
 
 	//get program jump table from resm
 	void* program_jump_table = reinterpret_cast<void*>(
 		module_mediator::fast_call<module_mediator::return_value>(
-			get_module_part(),
-			index_getter::resm(),
-			index_getter::resm_get_jump_table(),
+            interoperation::get_module_part(),
+            interoperation::index_getter::resource_module(),
+            interoperation::index_getter::resource_module_get_jump_table(),
 			container_id
 		)
 	);
 
 	//fill in thread_state - start
-	inner_fill_in_reg_array_entry( //function address
+    backend::fill_in_reg_array_entry( //function address
 		1, 
 		thread_state_memory, 
 		reinterpret_cast<std::uintptr_t>(thread_structure->program_function_address)
 	);
 
-	inner_fill_in_reg_array_entry( //jump table
+    backend::fill_in_reg_array_entry( //jump table
 		2,
 		thread_state_memory,
 		reinterpret_cast<std::uintptr_t>(program_jump_table)
 	);
 
-	inner_fill_in_reg_array_entry( //thread state
+    backend::fill_in_reg_array_entry( //thread state
 		3,
 		thread_state_memory,
 		reinterpret_cast<std::uintptr_t>(thread_state_memory)
 	);
 
-	std::uintptr_t result = inner_initialize_thread_stack(thread_structure->program_function_address, thread_stack_memory, thread_stack_end, thread_id);
+	std::uintptr_t result = backend::initialize_thread_stack(
+		thread_structure->program_function_address, 
+		thread_stack_memory, 
+		thread_stack_end, 
+		thread_id
+	);
+
 	if (result == reinterpret_cast<std::uintptr_t>(nullptr)) {
-		LOG_PROGRAM_ERROR(get_module_part(), "Thread stack initialization has failed.");
+        LOG_PROGRAM_ERROR(interoperation::get_module_part(), "Thread stack initialization has failed.");
 
 		module_mediator::fast_call<module_mediator::return_value, module_mediator::memory>(
-			get_module_part(),
-			index_getter::resm(),
-			index_getter::resm_deallocate_thread_memory(),
+            interoperation::get_module_part(),
+            interoperation::index_getter::resource_module(),
+            interoperation::index_getter::resource_module_deallocate_thread_memory(),
 			thread_id,
 			thread_state_memory
 		);
 		
 		module_mediator::fast_call<module_mediator::return_value, module_mediator::memory>(
-			get_module_part(),
-			index_getter::resm(),
-			index_getter::resm_deallocate_thread_memory(),
+            interoperation::get_module_part(),
+            interoperation::index_getter::resource_module(),
+            interoperation::index_getter::resource_module_deallocate_thread_memory(),
 			thread_id,
 			thread_stack_memory
 		);
 
-		module_mediator::return_value result_container_id = inner_deallocate_thread(thread_id);
-		if (inner_get_container_running_threads_count(result_container_id) == 0) {
+		module_mediator::return_value result_container_id = backend::deallocate_thread(thread_id);
+		if (backend::get_container_running_threads_count(result_container_id) == 0) {
 			get_thread_manager().forget_thread_group(result_container_id);
-			inner_deallocate_program_container(result_container_id);
+            backend::deallocate_program_container(result_container_id);
 		}
 
 		return module_mediator::module_failure;
 	}
-	
-	inner_fill_in_reg_array_entry( //stack current position
+
+    backend::fill_in_reg_array_entry( //stack current position
 		4,
 		thread_state_memory,
 		result
 	);
 
-	inner_fill_in_reg_array_entry( //stack end
+    backend::fill_in_reg_array_entry( //stack end
 		5,
 		thread_state_memory,
 		reinterpret_cast<std::uintptr_t>(thread_stack_end) //account for the space that will be used to save the state of one variable between function calls
 	);
 
-	inner_fill_in_reg_array_entry( //program control functions
+    backend::fill_in_reg_array_entry( //program control functions
 		6,
 		thread_state_memory,
 		reinterpret_cast<std::uintptr_t>(get_program_control_functions_addresses())
@@ -105,18 +111,20 @@ module_mediator::return_value on_thread_creation(module_mediator::arguments_stri
 		program_jump_table
 	);
 
-	LOG_PROGRAM_INFO(get_module_part(), "New thread has been successfully created.");
+    LOG_PROGRAM_INFO(interoperation::get_module_part(), "New thread has been successfully created.");
 	return module_mediator::module_success;
 }
+
 module_mediator::return_value on_container_creation(module_mediator::arguments_string_type bundle) {
 	auto [container_id, program_main, preferred_stack_size] = 
 		module_mediator::arguments_string_builder::unpack<module_mediator::return_value, void*, std::uint64_t>(bundle);
 
 	get_thread_manager().add_thread_group(container_id, preferred_stack_size);
-	LOG_PROGRAM_INFO(get_module_part(), "New thread group has been successfully created.");
+    LOG_PROGRAM_INFO(interoperation::get_module_part(), "New thread group has been successfully created.");
 
-	return inner_create_thread(container_id, 0, program_main);
+	return backend::create_thread(container_id, 0, program_main);
 }
+
 module_mediator::return_value register_deferred_callback(module_mediator::arguments_string_type bundle) {
 	auto [callback_info] = 
 		module_mediator::arguments_string_builder::unpack<module_mediator::memory>(bundle);
@@ -134,11 +142,13 @@ module_mediator::return_value self_duplicate(module_mediator::arguments_string_t
 	module_mediator::arguments_string_type copy = new module_mediator::arguments_string_element[parameters_size]{};
 	std::memcpy(copy, main_function_parameters, parameters_size);
 
-	return inner_self_duplicate(main_function_address, copy);
+	return backend::self_duplicate(main_function_address, copy);
 }
+
 module_mediator::return_value self_priority(module_mediator::arguments_string_type) {
 	return get_thread_local_structure()->currently_running_thread_information.priority;
 }
+
 module_mediator::return_value get_thread_saved_variable(module_mediator::arguments_string_type) {
 	char* thread_state = static_cast<char*>(get_thread_local_structure()->currently_running_thread_information.thread_state) + 40;
 	module_mediator::memory thread_stack_end{};
@@ -146,6 +156,7 @@ module_mediator::return_value get_thread_saved_variable(module_mediator::argumen
 	std::memcpy(static_cast<void*>(&thread_stack_end), thread_state, sizeof(module_mediator::memory));
 	return reinterpret_cast<std::uintptr_t>(thread_stack_end);
 }
+
 module_mediator::return_value dynamic_call(module_mediator::arguments_string_type bundle) {
 	auto [function_address, function_arguments_data] =
 		module_mediator::arguments_string_builder::unpack<void*, void*>(bundle);
@@ -153,9 +164,9 @@ module_mediator::return_value dynamic_call(module_mediator::arguments_string_typ
 	module_mediator::arguments_string_type function_arguments_string =
         static_cast<module_mediator::arguments_string_type>(function_arguments_data);
 
-	if (inner_check_function_signature(function_address, function_arguments_string) != module_mediator::module_success) {
-		LOG_PROGRAM_ERROR(
-			get_module_part(), "A function signature for function '" + get_exposed_function_name(function_address) +
+	if (backend::check_function_signature(function_address, function_arguments_string) != module_mediator::module_success) {
+        LOG_PROGRAM_ERROR(
+            interoperation::get_module_part(), "A function signature for function '" + backend::get_exposed_function_name(function_address) +
 			"' does not match passed arguments. (dynamic call)"
 		);
 
@@ -176,14 +187,14 @@ module_mediator::return_value dynamic_call(module_mediator::arguments_string_typ
 		{ static_cast<module_mediator::arguments_string_element>(module_mediator::arguments_string_builder::get_type_index<std::uintptr_t>), &program_return_address }
 	);
 
-	std::uintptr_t new_current_stack_position = inner_apply_initializer_on_thread_stack(
+	std::uintptr_t new_current_stack_position = backend::apply_initializer_on_thread_stack(
 		reinterpret_cast<char*>(state_manager.get_current_stack_position()),
 		reinterpret_cast<char*>(state_manager.get_stack_end()),
 		function_arguments
 	);
 
 	if (new_current_stack_position == reinterpret_cast<std::uintptr_t>(nullptr)) {
-		LOG_PROGRAM_ERROR(get_module_part(), "The thread stack initialization has failed. (dynamic call)");
+        LOG_PROGRAM_ERROR(interoperation::get_module_part(), "The thread stack initialization has failed. (dynamic call)");
 		return module_mediator::module_failure;
 	}
 
@@ -201,19 +212,21 @@ module_mediator::return_value dynamic_call(module_mediator::arguments_string_typ
 module_mediator::return_value get_current_thread_id(module_mediator::arguments_string_type) {
 	return get_thread_local_structure()->currently_running_thread_information.thread_id;
 }
+
 module_mediator::return_value get_current_thread_group_id(module_mediator::arguments_string_type) {
 	return get_thread_local_structure()->currently_running_thread_information.thread_group_id;
 }
+
 module_mediator::return_value make_runnable(module_mediator::arguments_string_type bundle) {
 	auto [thread_id] = 
 		module_mediator::arguments_string_builder::unpack<module_mediator::return_value>(bundle);
 
 	if (get_thread_manager().make_runnable(thread_id)) {
-        LOG_PROGRAM_INFO(get_module_part(), "Made a thread with id '" + std::to_string(thread_id) + "' runnable again.");
+        LOG_PROGRAM_INFO(interoperation::get_module_part(), "Made a thread with id '" + std::to_string(thread_id) + "' runnable again.");
 	}
 	else {
-		LOG_PROGRAM_WARNING(
-			get_module_part(),
+        LOG_PROGRAM_WARNING(
+            interoperation::get_module_part(),
 			std::format(
 				"Was unable to make a thread with {} runnable again. This most likely indicates a data race.",
                 thread_id
@@ -225,18 +238,20 @@ module_mediator::return_value make_runnable(module_mediator::arguments_string_ty
 
 	return module_mediator::module_success;
 }
+
 module_mediator::return_value start(module_mediator::arguments_string_type bundle) {
 	auto [thread_count] =
 		module_mediator::arguments_string_builder::unpack<std::uint16_t>(bundle);
 
-	LOG_INFO(
-		get_module_part(), 
+    LOG_INFO(
+        interoperation::get_module_part(), 
 		"Creating execution daemons. Count: " + std::to_string(thread_count)
 	);
 
 	get_thread_manager().startup(thread_count);
 	return module_mediator::module_success;
 }
+
 module_mediator::return_value create_thread(module_mediator::arguments_string_type bundle) {
 	auto [priority, main_function_address, main_function_parameters, parameters_size] =
 		module_mediator::arguments_string_builder::unpack<module_mediator::return_value, void*, void*, std::uint64_t>(bundle);
@@ -244,5 +259,5 @@ module_mediator::return_value create_thread(module_mediator::arguments_string_ty
 	module_mediator::arguments_string_type copy = new module_mediator::arguments_string_element[parameters_size]{};
 	std::memcpy(copy, main_function_parameters, parameters_size);
 
-	return inner_create_thread_with_initializer(priority, main_function_address, copy);
+	return backend::create_thread_initializer(priority, main_function_address, copy);
 }

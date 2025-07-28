@@ -1,10 +1,10 @@
-#ifndef ADD_SADD_BUILDER_H
-#define ADD_SADD_BUILDER_H
+#ifndef ADD_SIGNED_ADD_BUILDER_H
+#define ADD_SIGNED_ADD_BUILDER_H
 
 #include "pch.h"
 #include "arithmetic_instruction_builder.h"
 
-class add_sadd_builder : public arithmetic_instruction_builder {
+class add_signed_add_builder : public arithmetic_instruction_builder {
 private:
 	void add_r8_to_rax() {
 		std::uint8_t rex = '\x44';
@@ -28,7 +28,7 @@ private:
 
 public:
 	template<typename... args>
-	add_sadd_builder(
+	add_signed_add_builder(
 		args&&... instruction_builder_args
 	)
 		:arithmetic_instruction_builder{ std::forward<args>(instruction_builder_args)... }
@@ -71,4 +71,4 @@ public:
 	}
 };
 
-#endif // !ADD_SADD_BUILDER_H
+#endif // !ADD_SIGNED_ADD_BUILDER_H

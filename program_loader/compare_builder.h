@@ -1,10 +1,10 @@
-#ifndef CMP_BUILDER_H
-#define CMP_BULIDER_H
+#ifndef COMPARE_BUILDER_H
+#define COMPARE_BUILDER_H
 
 #include "pch.h"
 #include "machine_codes_instruction_builder.h"
 
-class cmp_builder : public machine_codes_instruction_builder {
+class compare_builder : public machine_codes_instruction_builder {
 private:
 	std::uint8_t argument_index; //first argument will be placed in rax, while second one will be placed in r8
 
@@ -20,13 +20,13 @@ private:
 	}
 public:
 	template<typename... args>
-	cmp_builder(
+	compare_builder(
 		args&&... instruction_builder_args
 	)
 		:machine_codes_instruction_builder{ std::forward<args>(instruction_builder_args)... },
 		argument_index{ 0 }
 	{
-		this->assert_statement(this->check_if_active_types_match() && (this->get_arguments_count() == 2),
+		this->assert_statement(this->check_if_active_types_match() && this->get_arguments_count() == 2,
 			"Active types for this instruction must match. Arguments count must be equal to 2."); //this instruction works only with 2 arguments
 	}
 
@@ -102,4 +102,4 @@ public:
 	}
 };
 
-#endif // !CMP_BUILDER_H
+#endif // !COMPARE_BUILDER_H

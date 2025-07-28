@@ -32,7 +32,7 @@ public:
 	)
 		:instruction_builder{ std::forward<args>(instruction_builder_args)... }
 	{
-		this->assert_statement((this->get_arguments_count() == 1) && !machine_codes, "This instruction must have only one argument.");
+		this->assert_statement(this->get_arguments_count() == 1 && !machine_codes, "This instruction must have only one argument.");
 	}
 
 	virtual void visit(std::unique_ptr<regular_variable> variable) override {

@@ -9,20 +9,22 @@
 
 #include "../module_mediator/module_part.h"
 
-module_mediator::module_part* get_module_part();
 void* get_default_function_address();
+namespace interoperation {
+	module_mediator::module_part* get_module_part();
 
-class index_getter {
-public:
-	static std::size_t resm() {
-		static std::size_t index = get_module_part()->find_module_index("resm");
-		return index;
-	}
+	class index_getter {
+	public:
+		static std::size_t resource_module() {
+			static std::size_t index = get_module_part()->find_module_index("resm");
+			return index;
+		}
 
-	static std::size_t resm_create_new_program_container() {
-		static std::size_t index = get_module_part()->find_function_index(index_getter::resm(), "create_new_program_container");
-		return index;
-	}
-};
+		static std::size_t resource_module_create_new_program_container() {
+			static std::size_t index = get_module_part()->find_function_index(index_getter::resource_module(), "create_new_program_container");
+			return index;
+		}
+	};
+}
 
 #endif

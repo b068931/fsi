@@ -4,13 +4,13 @@
 #include "pch.h"
 #include "machine_codes_instruction_builder.h"
 
-class jcc_builder : public machine_codes_instruction_builder {
+class conditional_jump_builder : public machine_codes_instruction_builder {
 private:
 	const std::uint32_t jump_rel32 = 7;
 
 public:
 	template<typename... args>
-	jcc_builder(
+	conditional_jump_builder(
 		args&&... instruction_builder_args
 	)
 		:machine_codes_instruction_builder{ std::forward<args>(instruction_builder_args)... }

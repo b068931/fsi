@@ -44,8 +44,8 @@ public:
 		std::string dereference_variable_name = helper.name_translations.translate_name(read_map.get_token_generator_name());
 		if (dereference_variable_name.empty()) {
 			if (
-				(read_map.get_current_token() != structure_builder::source_file_token::dereference_end)
-				&& (read_map.get_current_token() != structure_builder::source_file_token::comment_start)) {
+				read_map.get_current_token() != source_file_token::dereference_end
+				&& read_map.get_current_token() != source_file_token::comment_start) {
 				read_map.exit_with_error("Expected the name of the dereference variable, got empty string instead.");
 			}
 

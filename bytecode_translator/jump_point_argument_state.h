@@ -32,12 +32,12 @@ public:
 			jump_point = &current_function.jump_points.back();
 		}
 		else {
-			jump_point = &(*found_jump_point);
+			jump_point = &*found_jump_point;
 		}
 
 		helper.active_function.get_last_instruction().jump_variables.emplace_back(jump_point);
 		helper.active_function.add_new_operand_to_last_instruction(
-			structure_builder::source_file_token::jump_point_argument_keyword,
+			source_file_token::jump_point_argument_keyword,
 			&helper.active_function.get_last_instruction().jump_variables.back(),
 			false
 		);

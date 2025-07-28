@@ -43,7 +43,7 @@ public:
 		this->write_bytes<std::uint8_t>(rex); //inc/dec {one_byte/two_bytes/four_bytes/eight_bytes} [r8]
 		this->write_bytes<char>(this->get_code(pointer->get_active_type()));
 
-		this->write_bytes<char>((this->get_code_back() << 3) & 0b00111000); //r/m
+		this->write_bytes<char>(this->get_code_back() << 3 & 0b00111000); //r/m
 	}
 
 	virtual void build() override {

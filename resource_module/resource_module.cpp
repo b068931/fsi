@@ -6,7 +6,6 @@
 #include "id_generator.h"
 #include "module_interoperation.h"
 #include "../logger_module/logging.h"
-#include "../program_runtime_services/memory.h"
 
 //remove "#define I_HATE_MICROSOFT_AND_STUPID_ANALYZER_WARNINGS" to disable _Acquires_lock_ and _Releases_lock_
 #define I_HATE_MICROSOFT_AND_STUPID_ANALYZER_WARNINGS
@@ -46,7 +45,7 @@ namespace {
         }
 
         LOG_WARNING(
-            get_module_part(),
+            interoperation::get_module_part(),
             std::format("Object with ID {} does not exist.", id)
         );
 
@@ -69,7 +68,7 @@ namespace {
         }
         else {
             LOG_PROGRAM_WARNING(
-                get_module_part(),
+                interoperation::get_module_part(),
                 std::format(
                     "Concurrency error: failed to add destroy callback for an object with id {}. It no longer exists.", 
                     id
@@ -95,7 +94,7 @@ namespace {
         }
 
         LOG_PROGRAM_WARNING(
-            get_module_part(), 
+            interoperation::get_module_part(), 
             std::format(
                 "Concurrency error: failed to allocate memory for an object with id {}. It no longer exists.",
                 id
@@ -124,7 +123,7 @@ namespace {
             }
             else {
                 LOG_PROGRAM_WARNING(
-                    get_module_part(), 
+                    interoperation::get_module_part(), 
                     std::format(
                         "Deallocated memory at {} does not belong to the object with id {}.",
                         address,
@@ -135,7 +134,7 @@ namespace {
         }
         else {
             LOG_PROGRAM_WARNING(
-                get_module_part(),
+                interoperation::get_module_part(),
                 std::format(
                     "Concurrency error: failed to deallocate memory for an object with id {}. It no longer exists.",
                     id
@@ -158,6 +157,19 @@ namespace {
         {
             std::unique_lock lock{ mutex };
             auto iterator_lock = get_iterator(object, mutex, id);
+            if constexpr (!thread_structure_switch) {
+                if (iterator_lock.first->second.threads_count != 0) {
+                    LOG_PROGRAM_WARNING(
+                        interoperation::get_module_part(),
+                        std::format(
+                            "Concurrency error: failed to destroy thread group with id {}. It still has running threads.",
+                            id
+                        )
+                    );
+
+                    return module_mediator::module_failure;
+                }
+            }
 
             /*
             * in theory, if several threads end simultaneously, it can lead to multiple calls to this function,
@@ -197,7 +209,7 @@ namespace {
 
         if constexpr (thread_structure_switch) {
             LOG_PROGRAM_WARNING(
-                get_module_part(), 
+                interoperation::get_module_part(), 
                 std::format(
                     "Concurrency error: failed to destroy thread with id {}.",
                     id
@@ -208,7 +220,7 @@ namespace {
         }
         else {
             LOG_PROGRAM_WARNING(
-                get_module_part(), 
+                interoperation::get_module_part(), 
                 std::format(
                     "Concurrency error: failed to destroy thread group with id {}.",
                     id
@@ -236,9 +248,9 @@ namespace {
             module_mediator::memory,
             module_mediator::eight_bytes
         >(
-            get_module_part(),
-            index_getter::excm(),
-            index_getter::excm_on_container_creation(),
+            interoperation::get_module_part(),
+            interoperation::index_getter::execution_module(),
+            interoperation::index_getter::execution_module_on_container_creation(),
             id,
             main_function,
             preferred_stack_size
@@ -290,7 +302,7 @@ module_mediator::return_value duplicate_container(module_mediator::arguments_str
         );
 
         lock.unlock(); // unlock before doing logging
-        LOG_PROGRAM_INFO(get_module_part(), "Duplicating the program context.");
+        LOG_PROGRAM_INFO(interoperation::get_module_part(), "Duplicating the program context.");
 
         return notify_execution_module_new_container(
             new_container_id,
@@ -300,7 +312,7 @@ module_mediator::return_value duplicate_container(module_mediator::arguments_str
     }
 
     LOG_PROGRAM_WARNING(
-        get_module_part(),
+        interoperation::get_module_part(),
         std::format(
             "Concurrency error: failed to duplicate container with id {}.", 
             container_id
@@ -322,7 +334,7 @@ module_mediator::return_value get_preferred_stack_size(module_mediator::argument
     }
 
     LOG_PROGRAM_WARNING(
-        get_module_part(),
+        interoperation::get_module_part(),
         std::format(
             "Thread group with id {} no longer exists. Using a fallback stack size of {}.", 
             container_id, 
@@ -399,7 +411,7 @@ module_mediator::return_value create_new_thread(module_mediator::arguments_strin
         }
         else {
             LOG_PROGRAM_WARNING(
-                get_module_part(),
+                interoperation::get_module_part(),
                 std::format(
                     "Concurrency error: failed to create thread in container with id {}. It no longer exists.",
                     container_id
@@ -415,9 +427,9 @@ module_mediator::return_value create_new_thread(module_mediator::arguments_strin
         module_mediator::return_value,
         module_mediator::eight_bytes
     >(
-        get_module_part(),
-        index_getter::excm(),
-        index_getter::excm_on_thread_creation(),
+        interoperation::get_module_part(),
+        interoperation::index_getter::execution_module(),
+        interoperation::index_getter::execution_module_on_thread_creation(),
         container_id,
         id,
         preferred_stack_size
@@ -474,7 +486,7 @@ module_mediator::return_value deallocate_thread(module_mediator::arguments_strin
         }
         else {
             LOG_PROGRAM_WARNING(
-                get_module_part(),
+                interoperation::get_module_part(),
                 std::format(
                     "Concurrency error: failed to decrease running threads count for a program container with id {}. It no longer exists.",
                     container_id
@@ -503,7 +515,7 @@ module_mediator::return_value get_running_threads_count(module_mediator::argumen
     }
 
     LOG_PROGRAM_WARNING(
-        get_module_part(),
+        interoperation::get_module_part(),
         std::format(
             "Concurrency error: failed to get running threads count for a program container with id {}. It no longer exists.",
             container_id
@@ -524,7 +536,7 @@ module_mediator::return_value get_program_container_id(module_mediator::argument
     }
 
     LOG_PROGRAM_WARNING(
-        get_module_part(),
+        interoperation::get_module_part(),
         std::format(
             "Concurrency error: failed to get program container id for a thread with id {}. It no longer exists.",
             thread_id
@@ -551,7 +563,7 @@ module_mediator::return_value get_jump_table(module_mediator::arguments_string_t
     }
 
     LOG_PROGRAM_WARNING(
-        get_module_part(),
+        interoperation::get_module_part(),
         std::format(
             "Concurrency error: failed to get jump table for a program container with id {}. It no longer exists.",
             container_id
@@ -572,7 +584,7 @@ module_mediator::return_value get_jump_table_size(module_mediator::arguments_str
     }
 
     LOG_PROGRAM_WARNING(
-        get_module_part(),
+        interoperation::get_module_part(),
         std::format(
             "Concurrency error: failed to get jump table size for a program container with id {}. It no longer exists.",
             container_id
@@ -583,7 +595,7 @@ module_mediator::return_value get_jump_table_size(module_mediator::arguments_str
 }
 
 program_container::~program_container() noexcept {
-    if (this->context && (this->context->decrease_references_count() == 0)) {
+    if (this->context && this->context->decrease_references_count() == 0) {
         delete this->context;
     }
 
@@ -598,9 +610,9 @@ program_context::~program_context() noexcept {
         module_mediator::memory,
         module_mediator::memory, module_mediator::eight_bytes
     >(
-        get_module_part(),
-        index_getter::progload(),
-        index_getter::progload_free_program(),
+        interoperation::get_module_part(),
+        interoperation::index_getter::program_loader(),
+        interoperation::index_getter::program_loader_free_program(),
         static_cast<void*>(this->code),
         this->functions_count,
         static_cast<void*>(this->exposed_functions),

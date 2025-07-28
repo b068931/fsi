@@ -207,7 +207,7 @@ namespace {
         DWORD& dwOffset, 
         DWORD& dwOffsetHigh
     ) {
-        constexpr bool is_pipe = (file_type == FILE_TYPE_PIPE);
+        constexpr bool is_pipe = file_type == FILE_TYPE_PIPE;
         HANDLE haWaitHandles[]{ hStdIn, hCancelIO };
 
         OVERLAPPED overlapped{};
@@ -579,7 +579,7 @@ namespace {
         DWORD& dwOffset, 
         DWORD& dwOffsetHigh
     ) {
-        constexpr bool is_pipe = (file_type == FILE_TYPE_PIPE);
+        constexpr bool is_pipe = file_type == FILE_TYPE_PIPE;
         HANDLE waitHandles[]{ hStdOut, hCancelIO };
 
         if (buffer_size == 0) return false;

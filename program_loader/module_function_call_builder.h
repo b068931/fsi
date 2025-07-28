@@ -131,7 +131,7 @@ public:
 			return;
 		}
 
-		this->associated_module = &(found_module->second);
+		this->associated_module = &found_module->second;
 	}
 	virtual void visit(std::unique_ptr<function> fnc) override {
 		if (this->function_to_call_index == module_mediator::module_part::function_not_found) {

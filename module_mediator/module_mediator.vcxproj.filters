@@ -69,6 +69,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="modules.txt" />
+    <CopyFileToFolders Include="engine.mods" />
   </ItemGroup>
 </Project>

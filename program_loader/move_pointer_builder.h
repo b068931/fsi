@@ -3,10 +3,10 @@
 
 #include "instruction_builder.h"
 
-class ref_builder : public instruction_builder {
+class move_pointer_builder : public instruction_builder {
 public:
 	template<typename... args>
-	ref_builder(
+	move_pointer_builder(
 		const std::vector<char>* machine_codes,
 		args&&... instruction_builder_arguments
 	) 

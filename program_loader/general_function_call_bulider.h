@@ -77,7 +77,7 @@ protected:
 			this->write_bytes('\x89');
 		}
 
-		this->write_bytes<char>('\x80' | (rm & 0b111));
+		this->write_bytes<char>('\x80' | rm & 0b111);
 		this->write_bytes(displacement);
 	}
 };

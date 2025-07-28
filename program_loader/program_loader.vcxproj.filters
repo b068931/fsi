@@ -83,7 +83,7 @@
     <ClInclude Include="instruction_builder_classes.h">
       <Filter>Header Files\Machine Code Generation\Instruction Builders</Filter>
     </ClInclude>
-    <ClInclude Include="add_sadd_builder.h">
+    <ClInclude Include="add_signed_add_builder.h">
       <Filter>Header Files\Machine Code Generation\Instruction Builders\Concrete Builders</Filter>
     </ClInclude>
     <ClInclude Include="apply_on_memory.h">
@@ -98,7 +98,7 @@
     <ClInclude Include="bits_shift_builder.h">
       <Filter>Header Files\Machine Code Generation\Instruction Builders\Concrete Builders</Filter>
     </ClInclude>
-    <ClInclude Include="cmp_builder.h">
+    <ClInclude Include="compare_builder.h">
       <Filter>Header Files\Machine Code Generation\Instruction Builders\Concrete Builders</Filter>
     </ClInclude>
     <ClInclude Include="complex_arithmetic_instruction_builder.h">
@@ -107,10 +107,10 @@
     <ClInclude Include="copy_string_builder.h">
       <Filter>Header Files\Machine Code Generation\Instruction Builders\Concrete Builders</Filter>
     </ClInclude>
-    <ClInclude Include="ctjtd_builder.h">
+    <ClInclude Include="get_function_address.h">
       <Filter>Header Files\Machine Code Generation\Instruction Builders\Concrete Builders</Filter>
     </ClInclude>
-    <ClInclude Include="div_builder.h">
+    <ClInclude Include="divide_builder.h">
       <Filter>Header Files\Machine Code Generation\Instruction Builders\Concrete Builders</Filter>
     </ClInclude>
     <ClInclude Include="function_call_builder.h">
@@ -122,10 +122,10 @@
     <ClInclude Include="instruction_builder.h">
       <Filter>Header Files\Machine Code Generation\Instruction Builders\Abstract</Filter>
     </ClInclude>
-    <ClInclude Include="jcc_builder.h">
+    <ClInclude Include="conditional_jump_builder.h">
       <Filter>Header Files\Machine Code Generation\Instruction Builders\Concrete Builders</Filter>
     </ClInclude>
-    <ClInclude Include="jmp_builder.h">
+    <ClInclude Include="jump_builder.h">
       <Filter>Header Files\Machine Code Generation\Instruction Builders\Concrete Builders</Filter>
     </ClInclude>
     <ClInclude Include="load_builder.h">
@@ -137,16 +137,16 @@
     <ClInclude Include="module_function_call_builder.h">
       <Filter>Header Files\Machine Code Generation\Instruction Builders\Concrete Builders</Filter>
     </ClInclude>
-    <ClInclude Include="mul_smul_builder.h">
+    <ClInclude Include="multiply_signed_multiply_builder.h">
       <Filter>Header Files\Machine Code Generation\Instruction Builders\Concrete Builders</Filter>
     </ClInclude>
-    <ClInclude Include="ref_builder.h">
+    <ClInclude Include="move_pointer_builder.h">
       <Filter>Header Files\Machine Code Generation\Instruction Builders\Concrete Builders</Filter>
     </ClInclude>
     <ClInclude Include="save_builder.h">
       <Filter>Header Files\Machine Code Generation\Instruction Builders\Concrete Builders</Filter>
     </ClInclude>
-    <ClInclude Include="sdiv_builder.h">
+    <ClInclude Include="signed_divide_builder.h">
       <Filter>Header Files\Machine Code Generation\Instruction Builders\Concrete Builders</Filter>
     </ClInclude>
     <ClInclude Include="jump_table_builder.h">

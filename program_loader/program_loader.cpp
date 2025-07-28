@@ -39,9 +39,9 @@ namespace {
             module_mediator::memory, module_mediator::eight_bytes,
             module_mediator::memory, module_mediator::eight_bytes
         >(
-            get_module_part(),
-            index_getter::resm(),
-            index_getter::resm_create_new_program_container(),
+            interoperation::get_module_part(),
+            interoperation::index_getter::resource_module(),
+            interoperation::index_getter::resource_module_create_new_program_container(),
             preferred_stack_size, main_function_index,
             static_cast<void*>(code), functions_count,
             static_cast<void*>(exposed_functions_addresses), exposed_functions_count,
@@ -280,7 +280,7 @@ namespace {
 
         if (compiled_function_body.empty()) {
             LOG_PROGRAM_WARNING(
-                get_module_part(),
+                interoperation::get_module_part(),
                 std::format(
                     "Function with id {} has no executable code.",
                     current_function.function_signature
@@ -414,7 +414,7 @@ module_mediator::return_value load_program_to_memory(module_mediator::arguments_
 
     try {
         LOG_PROGRAM_INFO(
-            get_module_part(),
+            interoperation::get_module_part(),
             std::format(
                 "Starting a new program: \"{}\"...",
                 program_name
@@ -449,7 +449,7 @@ module_mediator::return_value load_program_to_memory(module_mediator::arguments_
         );
 
         LOG_PROGRAM_INFO(
-            get_module_part(),
+            interoperation::get_module_part(),
             std::format(
                 "Successfully compiled \"{}\":" \
                 "\n--> Preferred stack size:      {}" \
@@ -486,7 +486,7 @@ module_mediator::return_value load_program_to_memory(module_mediator::arguments_
         auto found_entity_name = container.entities_names.find(exc.get_associated_id());
         if (found_entity_name != container.entities_names.end()) {
             LOG_ERROR(
-                get_module_part(),
+                interoperation::get_module_part(),
                 std::format(
                     "Failed to compile \"{}\": {} " \
                     "(It appears that this error is related to the following object: '{}')",
@@ -498,7 +498,7 @@ module_mediator::return_value load_program_to_memory(module_mediator::arguments_
         }
         else {
             LOG_ERROR(
-                get_module_part(),
+                interoperation::get_module_part(),
                 std::format(
                     "Failed to compile \"{}\": {}",
                     program_name,
@@ -509,7 +509,7 @@ module_mediator::return_value load_program_to_memory(module_mediator::arguments_
     }
     catch (const std::exception &exc) {
         LOG_ERROR(
-            get_module_part(),
+            interoperation::get_module_part(),
             std::format(
                 "Failed to compile \"{}\": {}",
                 program_name,
@@ -519,7 +519,7 @@ module_mediator::return_value load_program_to_memory(module_mediator::arguments_
     }
     catch (...) {
         LOG_ERROR(
-            get_module_part(),
+            interoperation::get_module_part(),
             std::format(
                 "\"{}\": Program compilation has failed with an unexpected exception.",
                 program_name
@@ -528,7 +528,7 @@ module_mediator::return_value load_program_to_memory(module_mediator::arguments_
     }
 
     LOG_ERROR(
-        get_module_part(),
+        interoperation::get_module_part(),
         std::format(
             "\"{}\": Program compilation has failed.",
             program_name

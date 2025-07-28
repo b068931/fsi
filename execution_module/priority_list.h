@@ -46,7 +46,7 @@ public:
 		}
 		T* operator-> () {
 			assert(this->associated_element && "invalid priority_list proxy used");
-			return &((*this->associated_element)->first);
+			return &(*this->associated_element)->first;
 		}
 
 		bool has_resource() const noexcept {
@@ -83,12 +83,12 @@ public:
 	}
 
 	std::size_t count() const { return this->type_priorities.size(); }
-	void remove(proxy proxy) { this->type_priorities.erase(*(proxy.associated_element)); }
+	void remove(proxy proxy) { this->type_priorities.erase(*proxy.associated_element); }
 
 	template<typename... args>
 	proxy push(priority_type priority, args&&... values) {
 		if (
-			(this->count() == 0) || (this->type_priorities.back().second < priority)
+			this->count() == 0 || this->type_priorities.back().second < priority
 		) { //special case for adding threads with the highest priority
 			this->type_priorities.push_back(
 				std::pair<T, priority_type>{ T{ std::forward<args>(values)... }, priority }

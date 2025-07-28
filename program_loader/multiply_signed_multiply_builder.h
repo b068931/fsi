@@ -4,7 +4,7 @@
 #include "pch.h"
 #include "complex_arithmetic_instruction_builder.h"
 
-class mul_smul_builder : public complex_arithmetic_instruction_builder {
+class multiply_signed_multiply_builder : public complex_arithmetic_instruction_builder {
 private:
 	void multiply_rax_using_r8() {
 		this->use_r8_on_reg_with_two_opcodes(this->get_code_front(), this->get_code(1), false, this->get_active_type(), false, this->get_code_back());
@@ -12,7 +12,7 @@ private:
 
 public:
 	template<typename... args>
-	mul_smul_builder(
+	multiply_signed_multiply_builder(
 		args&&... instruction_builder_args
 	)
 		:complex_arithmetic_instruction_builder{ std::forward<args>(instruction_builder_args)... }

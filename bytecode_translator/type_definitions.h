@@ -6,7 +6,7 @@
 
 using states_builder_type = 
 	generic_parser::states_builder<
-		structure_builder::source_file_token, 
+		source_file_token, 
 		structure_builder::context_key, 
 		structure_builder::file, 
 		structure_builder::builder_parameters, 

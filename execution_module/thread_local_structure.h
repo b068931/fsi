@@ -8,7 +8,7 @@ struct thread_local_structure {
 	module_mediator::arguments_string_type initializer{}; //contains data that will be passed to the main function in thread
 	std::vector<module_mediator::callback_bundle*> deferred_callbacks{}; //these will be called after the putback
 
-	void* program_function_address{}; //will be used to store an address of the FSI function between calls to the "inner_create_thread" and "on_thread_creation"
+	void* program_function_address{}; //will be used to store an address of the FSI function between calls to the "create_thread" and "on_thread_creation"
 	module_mediator::return_value priority; //store thread priority information between calls
 
 	char* execution_thread_state{ new char[136] {} };   //state of the execution thread before switching to the program state

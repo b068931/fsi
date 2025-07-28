@@ -19,19 +19,19 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="add_sadd_builder.h" />
+    <ClInclude Include="add_signed_add_builder.h" />
     <ClInclude Include="apply_on_memory.h" />
     <ClInclude Include="apply_right_hand_bits_on_left_hand_binary.h" />
     <ClInclude Include="arithmetic_instruction_builder.h" />
     <ClInclude Include="bits_shift_builder.h" />
-    <ClInclude Include="cmp_builder.h" />
+    <ClInclude Include="compare_builder.h" />
     <ClInclude Include="compiled_program.h" />
     <ClInclude Include="complex_arithmetic_instruction_builder.h" />
     <ClInclude Include="copy_string_builder.h" />
-    <ClInclude Include="ctjtd_builder.h" />
+    <ClInclude Include="get_function_address.h" />
     <ClInclude Include="module_interoperation.h" />
     <ClInclude Include="dereferenced_pointer.h" />
-    <ClInclude Include="div_builder.h" />
+    <ClInclude Include="divide_builder.h" />
     <ClInclude Include="function.h" />
     <ClInclude Include="program_functions.h" />
     <ClInclude Include="function_call_builder.h" />
@@ -40,25 +40,25 @@
     <ClInclude Include="instruction_arguments_classes.h" />
     <ClInclude Include="instruction_builder.h" />
     <ClInclude Include="instruction_builder_classes.h" />
-    <ClInclude Include="jcc_builder.h" />
-    <ClInclude Include="jmp_builder.h" />
+    <ClInclude Include="conditional_jump_builder.h" />
+    <ClInclude Include="jump_builder.h" />
     <ClInclude Include="jump_table_builder.h" />
     <ClInclude Include="load_builder.h" />
     <ClInclude Include="machine_codes_instruction_builder.h" />
     <ClInclude Include="memory_layouts_builder.h" />
     <ClInclude Include="module.h" />
     <ClInclude Include="module_function_call_builder.h" />
-    <ClInclude Include="mul_smul_builder.h" />
+    <ClInclude Include="multiply_signed_multiply_builder.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="pointer.h" />
     <ClInclude Include="program_compilation_error.h" />
     <ClInclude Include="program_loader.h" />
-    <ClInclude Include="ref_builder.h" />
+    <ClInclude Include="move_pointer_builder.h" />
     <ClInclude Include="regular_variable.h" />
     <ClInclude Include="run_container.h" />
     <ClInclude Include="run_reader.h" />
     <ClInclude Include="save_builder.h" />
-    <ClInclude Include="sdiv_builder.h" />
+    <ClInclude Include="signed_divide_builder.h" />
     <ClInclude Include="signed_variable.h" />
     <ClInclude Include="specialized_variable.h" />
     <ClInclude Include="variable.h" />

@@ -31,8 +31,8 @@ struct resource_container {
 		}
 
 		if (!this->allocated_memory.empty()) {
-			LOG_PROGRAM_WARNING(
-				get_module_part(), 
+            LOG_PROGRAM_WARNING(
+                interoperation::get_module_part(), 
 				std::format("Destroyed resource container had {} dangling memory block(s).", this->allocated_memory.size())
 			);
 		}

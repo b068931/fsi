@@ -178,7 +178,7 @@ public:
 
                 this->runnable_thread_notify.wait(
                     clock_list_lock, 
-                    [this] { return (this->runnable_threads_count > 0) || this->shutdown_sequence; }
+                    [this] { return this->runnable_threads_count > 0 || this->shutdown_sequence; }
                 );
             }
             else {
@@ -194,8 +194,8 @@ public:
                         [destination, current_thread_group](executable_thread& thread_obj) {
                             if (thread_obj.lock.try_lock()) { //check if thread is already taken
                                 if (
-                                    (thread_obj.state == thread_states::runnable) || 
-                                    (thread_obj.state == thread_states::startup)
+                                    thread_obj.state == thread_states::runnable || 
+                                    thread_obj.state == thread_states::startup
                                 ) { //check if thread is runnable
                                     //lock will be released in put_back
                                     destination->preferred_stack_size = current_thread_group->preferred_stack_size;

@@ -44,7 +44,7 @@ public:
 		}
 
 		this->write_bytes<std::uint8_t>(this->get_code(this->get_active_type()));
-		this->write_bytes<std::uint8_t>(0 | ((this->get_code_back() << 3) & 0b00111000));
+		this->write_bytes<std::uint8_t>(0 | this->get_code_back() << 3 & 0b00111000);
 
 		this->move_rbx_to_rcx();
 	}

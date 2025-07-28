@@ -30,7 +30,7 @@ public:
 		structure_builder::read_map_type& read_map
 	) override {
 		structure_builder::immediate_type element_size{};
-		structure_builder::source_file_token element_token = read_map.get_token_generator_additional_token();
+		source_file_token element_token = read_map.get_token_generator_additional_token();
 
 		std::string variable_name{ helper.name_translations.translate_name(read_map.get_token_generator_name()) };
 		structure_builder::function& current_function = helper.active_function.get_current_function();
@@ -47,19 +47,19 @@ public:
 		}
 
 		switch (element_token) {
-		case structure_builder::source_file_token::one_byte_type_keyword:
+		case source_file_token::one_byte_type_keyword:
 			element_size = sizeof(module_mediator::one_byte);
 			break;
 
-		case structure_builder::source_file_token::two_bytes_type_keyword:
+		case source_file_token::two_bytes_type_keyword:
 			element_size = sizeof(module_mediator::two_bytes);
 			break;
 
-		case structure_builder::source_file_token::four_bytes_type_keyword:
+		case source_file_token::four_bytes_type_keyword:
 			element_size = sizeof(module_mediator::four_bytes);
 			break;
 
-		case structure_builder::source_file_token::eight_bytes_type_keyword:
+		case source_file_token::eight_bytes_type_keyword:
 			element_size = sizeof(module_mediator::eight_bytes);
 			break;
 

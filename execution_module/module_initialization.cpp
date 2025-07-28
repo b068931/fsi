@@ -49,18 +49,21 @@ namespace {
     [[noreturn]] void inner_terminate(std::uint64_t error_code) {
         show_error(error_code);
 
-        thread_terminate();
+        backend::thread_terminate();
         load_execution_thread(get_thread_local_structure()->execution_thread_state);
     }
     [[noreturn]] void end_program() {
-        thread_terminate();
+        backend::thread_terminate();
         load_execution_thread(get_thread_local_structure()->execution_thread_state);
     }
 }
 
-module_mediator::module_part* get_module_part() {
-    return ::part;
+namespace interoperation {
+    module_mediator::module_part* get_module_part() {
+        return ::part;
+    }
 }
+
 char* get_program_control_functions_addresses() {
     return ::program_control_functions_addresses;
 }
@@ -72,25 +75,25 @@ void initialize_m(module_mediator::module_part* module_part) {
     ::part = module_part;
     ::program_control_functions_addresses = new char[4 * sizeof(std::uint64_t)] {};
 
-    inner_fill_in_reg_array_entry(
+    backend::fill_in_reg_array_entry(
         0,
         ::program_control_functions_addresses,
         reinterpret_cast<std::uintptr_t>(&special_call_module)
     );
 
-    inner_fill_in_reg_array_entry(
+    backend::fill_in_reg_array_entry(
         1,
         ::program_control_functions_addresses,
-        reinterpret_cast<std::uintptr_t>(&inner_call_module)
+        reinterpret_cast<std::uintptr_t>(&backend::call_module)
     );
 
-    inner_fill_in_reg_array_entry(
+    backend::fill_in_reg_array_entry(
         2,
         ::program_control_functions_addresses,
         reinterpret_cast<std::uintptr_t>(&inner_terminate)
     );
 
-    inner_fill_in_reg_array_entry(
+    backend::fill_in_reg_array_entry(
         3,
         ::program_control_functions_addresses,
         reinterpret_cast<std::uintptr_t>(&end_program)

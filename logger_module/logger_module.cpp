@@ -42,9 +42,9 @@ namespace {
 		std::string result_message = std::format(
 			" [TIME: {}] [FILE NAME: {}, FILE LINE: {}, FUNCTION NAME: {}] {}",
 			timestamp,
-			(file_name == nullptr) ? "UNSPECIFIED" : file_name,
-			(file_line == 0) ? "UNSPECIFIED" : std::to_string(file_line),
-			(function_name == nullptr) ? "UNSPECIFIED" : function_name,
+			file_name == nullptr ? "UNSPECIFIED" : file_name,
+			file_line == 0 ? "UNSPECIFIED" : std::to_string(file_line),
+			function_name == nullptr ? "UNSPECIFIED" : function_name,
 			message
 		);
 
@@ -91,7 +91,7 @@ namespace {
 		);
 
 		std::stringstream stream{};
-		if ((current_thread_id == 0) && (current_thread_group_id == 0)) {
+		if (current_thread_id == 0 && current_thread_group_id == 0) {
 			stream << "[ENGINE";
 		}
 		else {

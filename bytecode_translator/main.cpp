@@ -31,7 +31,7 @@ namespace {
 			return false;
 		}
 
-		if (!check_instructions_arugments(parser_value)) {
+		if (!check_instructions_arguments(parser_value)) {
 			std::cout << "SYNTAX ERROR: each instruction can have no more than " << max_instruction_arguments_count << " arguments." << std::endl;
 			return false;
 		}
@@ -59,15 +59,15 @@ int main(int argc, char** argv) {
 
 	try {
 		generic_parser::parser_facade<
-			structure_builder::source_file_token,
+			source_file_token,
 			structure_builder::context_key,
 			structure_builder
 		> parser
 		{
 			parser_options::keywords,
 			parser_options::contexts,
-			structure_builder::source_file_token::name,
-			structure_builder::source_file_token::end_of_file,
+			source_file_token::name,
+			source_file_token::end_of_file,
 			structure_builder::context_key::main_context
 		};
 
@@ -106,7 +106,7 @@ int main(int argc, char** argv) {
 			translator.start(false);
 		}
 
-		for (bytecode_translator::error_type err : translator.errors()) {
+		for (translator_error_type err : translator.errors()) {
 			std::cout << "PROGRAM LOGIC ERROR: ";
 			translate_error(err, std::cout);
 

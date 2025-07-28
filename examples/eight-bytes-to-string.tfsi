@@ -1,7 +1,7 @@
 $stack-size d1024;
 from prts import <io.log.info, memory.allocate, memory.deallocate>
 
-$include libraries/memory.txt;
+$include libraries/memory.tfsi;
 $redefine symbol-base d48;
 
 function ebyte-to-string(eight-bytes value) {

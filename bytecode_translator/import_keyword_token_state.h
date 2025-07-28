@@ -10,7 +10,7 @@ public:
 		structure_builder::builder_parameters& helper,
 		structure_builder::read_map_type& read_map
 	) override {
-		if (read_map.get_token_generator_additional_token() != structure_builder::source_file_token::import_keyword) {
+		if (read_map.get_token_generator_additional_token() != source_file_token::import_keyword) {
 			read_map.exit_with_error();
 		}
 	}

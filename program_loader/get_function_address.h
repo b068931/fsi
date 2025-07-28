@@ -3,13 +3,13 @@
 
 #include "instruction_builder.h"
 
-class ctjtd_builder : public instruction_builder {
+class get_function_address : public instruction_builder {
 private:
 	std::uint32_t function_displacement;
 
 public:
 	template<typename... args>
-	ctjtd_builder(
+	get_function_address(
 		const std::vector<char>* machine_codes,
 		args&&... instruction_builder_args
 	)

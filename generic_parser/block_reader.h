@@ -24,7 +24,7 @@ namespace generic_parser {
 			filepos read_size = block_size;
 			filepos expected_size = block_index * block_size + block_size;
 			if (expected_size > this->file_size) {
-				read_size = this->file_size - (block_index * block_size);
+				read_size = this->file_size - block_index * block_size;
 			}
 
 			this->file_stream->seekg(block_index * block_size, std::ios::beg); //seek to the start of the block and read it
@@ -69,7 +69,7 @@ namespace generic_parser {
 		filepos get_symbols_count() const { return this->file_size; }
 		char get_symbol(filepos index) {
 			if (index < this->file_size) {
-				filepos block_index = (index / block_size);
+				filepos block_index = index / block_size;
 				if (block_index != this->current_loaded_block) {
 					this->load_block_to_memory(block_index);
 				}

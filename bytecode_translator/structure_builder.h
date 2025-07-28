@@ -11,140 +11,20 @@
 #include <format>
 #include <cerrno>
 
+#include "parser_error_type.h"
+#include "source_file_token.h"
+
 #include "../generic_parser/token_generator.h"
 #include "../generic_parser/read_map.h"
 
-/*
-* generally speaking, this entire file is FUCKED UP.
-* tons of code depend on pointers, most of the time this means nothing (this is c++ after all).
-* but here it makes heavy use of pointers to elements in STL structures.
-* and these structures tend to invalidate these pointers, invoking UB (before i used vectors,
-* and it didn't end well, as you might have guessed).
-* so std::list, std::deque, etc. are the only options.
-*/
-
-//this class is used to convert FSI file contents to objects. (FSI file is a source file, FSI are random letters and mean nothing)
 class structure_builder {
 public:
     using entity_id = std::uint64_t;
     using line_type = std::uint64_t;
     using immediate_type = std::uint64_t;
 
-    enum class error_type {
-        no_error,
-        outside_function,
-        inside_module_import,
-        import_was_expected,
-        import_start_was_expected,
-        coma_or_import_end_were_expected,
-        special_symbol,
-        define_name_expected,
-        redefine_name_expected,
-        if_defined_name_expected,
-        if_not_defined_name_expected,
-        stack_size_name_expected,
-        invalid_number,
-        unexpected_type,
-        can_not_declare_variable,
-        declare_name,
-        function_name,
-        arguments_start_expected,
-        arguments_end_or_coma,
-        function_arguments_unexpected_type,
-        function_arguments_unexpected_token,
-        function_arguments_empty_name,
-        function_body_start_was_expected,
-        function_body_token,
-        instruction_token,
-        name_does_not_exist
-    };
-    enum class source_file_token {
-        end_of_file,
-        name,
-        coma, //,
-        comment_start, //tokens inside comments will be simply ignored
-        comment_end,
-        import_start,  //from ... import <> (<)
-        import_end,	   //(>)
-        from_keyword,
-        import_keyword,
-        special_instruction, //.redefine and other
-        redefine_keyword,
-        define_keyword,
-        undefine_keyword,
-        if_defined_keyword,
-        if_not_defined_keyword,
-        endif_keyword,
-        stack_size_keyword,
-        declare_keyword,
-        main_function_keyword,
-        include_keyword,
-        function_declaration_keyword, //function
-        function_args_start, //(
-        function_args_end, //)
-        sizeof_argument_keyword,
-        one_byte_type_keyword,
-        two_bytes_type_keyword,
-        four_bytes_type_keyword,
-        eight_bytes_type_keyword,
-        memory_type_keyword,
-        function_body_start, //{
-        expression_end, //;
-        move_instruction_keyword,
-        add_instruction_keyword,
-        signed_add_instruction_keyword,
-        subtract_instruction_keyword,
-        signed_subtract_instruction_keyword,
-        multiply_instruction_keyword,
-        signed_multiply_instruction_keyword,
-        divide_instruction_keyword,
-        signed_divide_instruction_keyword,
-        compare_instruction_keyword,
-        increment_instruction_keyword,
-        decrement_instruction_keyword,
-        jump_instruction_keyword,
-        jump_equal_instruction_keyword,
-        jump_not_equal_instruction_keyword,
-        jump_greater_instruction_keyword,
-        jump_greater_equal_instruction_keyword,
-        jump_less_instruction_keyword,
-        jump_less_equal_instruction_keyword,
-        jump_above_instruction_keyword,
-        jump_above_equal_instruction_keyword,
-        jump_below_instruction_keyword,
-        jump_below_equal_instruction_keyword,
-        dereference_start, //[
-        dereference_end, //]
-        module_call, //->
-        module_return_value, //:
-        jump_point, //@
-        function_body_end, //}
-        immediate_argument_keyword,
-        new_line,
-        function_address_argument_keyword,
-        signed_argument_keyword,
-        variable_argument_keyword,
-        pointer_dereference_argument_keyword,
-        no_return_module_call_keyword,
-        function_call,
-        jump_point_argument_keyword,
-        bit_and_instruction_keyword,
-        bit_or_instruction_keyword,
-        bit_xor_instruction_keyword,
-        bit_not_instruction_keyword,
-        save_value_instruction_keyword,
-        load_value_instruction_keyword,
-        move_pointer_instruction_keyword,
-        bit_shift_left_instruction_keyword,
-        bit_shift_right_instruction_keyword,
-        get_function_address_instruction_keyword,
-        define_string_keyword,
-        string_separator,
-        string_argument_keyword,
-        copy_string_instruction_keyword
-    };
     enum class parameters_enumeration {
-        ifdef_ifndef_pop_check,
+        if_defined_if_not_defined_pop_check,
         inside_comment,
         names_stack
     };
@@ -428,13 +308,13 @@ public:
             ) {
                 auto found_argument = this->find_argument_variable_by_name(name);
                 if (found_argument != this->get_current_function().arguments.end()) {
-                    *out = &(*found_argument);
+                    *out = &*found_argument;
                     return;
                 }
 
                 auto found_local = this->find_local_variable_by_name(name);
                 if (found_local != this->get_current_function().locals.end()) {
-                    *out = &(*found_local);
+                    *out = &*found_local;
                     return;
                 }
 
@@ -507,7 +387,7 @@ public:
                     char* last_symbol = nullptr;
                     unsigned long long result = std::strtoull(value.c_str() + 1, &last_symbol, base);
                     if (static_cast<std::size_t>(last_symbol - value.c_str()) == value.size()) {
-                        if ((errno == ERANGE) || (result != static_cast<T>(result))) {
+                        if (errno == ERANGE || result != static_cast<T>(result)) {
                             throw std::invalid_argument{ "Value is too big to be converted." };
                         }
                         
@@ -520,7 +400,7 @@ public:
             std::string translate_name(std::string name) const { //translate redefined name to a normal name
                 std::string generated_name = std::move(name);
                 auto found_name = this->find_remapped_name(generated_name);
-                if ((found_name != this->remappings.end()) && (!found_name->second.empty())) {
+                if (found_name != this->remappings.end() && !found_name->second.empty()) {
                     generated_name = found_name->second;
                 }
 
@@ -559,7 +439,7 @@ public:
                 return;
             }
 
-            function* function = &(*found_function);
+            function* function = &*found_function;
             func->func = function; //bind function address argument with specific function
 
             auto found_exposed_function =
@@ -576,7 +456,7 @@ public:
 
 private:
     line_type error_line;
-    generic_parser::token_generator<structure_builder::source_file_token, context_key>* generator;
+    generic_parser::token_generator<source_file_token, context_key>* generator;
 
     read_map_type parse_map;
     void configure_parse_map();
@@ -585,8 +465,8 @@ private:
     file output_file_structure;
 public:
     structure_builder(
-        std::vector<std::pair<std::string, structure_builder::source_file_token>>* names_stack, 
-        generic_parser::token_generator<structure_builder::source_file_token, context_key>* token_generator
+        std::vector<std::pair<std::string, source_file_token>>* names_stack, 
+        generic_parser::token_generator<source_file_token, context_key>* token_generator
     )
         :generator{ token_generator },
         error_line{ 1 },
@@ -594,7 +474,7 @@ public:
     {
         this->parse_map
             .get_parameters_container()
-            .assign_parameter(parameters_enumeration::ifdef_ifndef_pop_check, false)
+            .assign_parameter(parameters_enumeration::if_defined_if_not_defined_pop_check, false)
             .assign_parameter(parameters_enumeration::inside_comment, std::pair<bool, std::string>{ false, "" })
             .assign_parameter(parameters_enumeration::names_stack, names_stack);
 
@@ -603,7 +483,7 @@ public:
 
     std::pair<line_type, std::string> error() const { return { this->error_line, this->parse_map.error() }; }
     bool is_working() { return this->parse_map.is_working(); }
-    void handle_token(structure_builder::source_file_token token) {
+    void handle_token(source_file_token token) {
         auto& [just_left_comment, saved_name] = this->parse_map
             .get_parameters_container()
             .retrieve_parameter<std::pair<bool, std::string>>(parameters_enumeration::inside_comment);

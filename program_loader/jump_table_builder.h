@@ -36,7 +36,7 @@ public:
 	void remap_jump_address(std::uint32_t function_index, std::uint32_t instruction_index, std::uint64_t new_address) {
 		auto found_jump_point = std::ranges::find_if(this->jump_addresses,
                                                      [function_index, instruction_index](const std::tuple<entity_id, std::uint32_t, std::uint32_t, std::uint64_t>& value) {
-                                                         return (std::get<1>(value) == function_index) && (std::get<2>(value) == instruction_index);
+                                                         return std::get<1>(value) == function_index && std::get<2>(value) == instruction_index;
                                                      });
 
 		if (found_jump_point != this->jump_addresses.end()) {
@@ -70,7 +70,7 @@ public:
                                                      });
 
 		if (found_jump_point != this->jump_addresses.end()) {
-			return sizeof(std::uint64_t) + (this->function_addresses.size() * sizeof(std::uint64_t)) + (sizeof(std::uint64_t) * (found_jump_point - this->jump_addresses.begin()));
+			return sizeof(std::uint64_t) + this->function_addresses.size() * sizeof(std::uint64_t) + sizeof(std::uint64_t) * (found_jump_point - this->jump_addresses.begin());
 		}
 
 		return 0;
@@ -79,8 +79,8 @@ public:
 	std::pair<void*, std::uint64_t> create_raw_table(std::uint64_t default_fallback_address) {
 		std::uint64_t jump_table_size =
 			sizeof(std::uint64_t) +
-			(this->function_addresses.size() * sizeof(std::uint64_t)) +
-			(this->jump_addresses.size() * sizeof(std::uint64_t));
+			this->function_addresses.size() * sizeof(std::uint64_t) +
+			this->jump_addresses.size() * sizeof(std::uint64_t);
 		char* jump_table = new char[jump_table_size] {0};
 
 		std::size_t index = sizeof(std::uint64_t);

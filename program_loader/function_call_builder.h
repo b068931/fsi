@@ -24,8 +24,8 @@ private:
 		);
 
 		this->assert_statement(
-			(this->fnc_signature->argument_types[this->get_argument_index() - 1].second == translated_type) &&
-			((this->get_current_variable_type() & 0b1100) != 0),
+			this->fnc_signature->argument_types[this->get_argument_index() - 1].second == translated_type &&
+			(this->get_current_variable_type() & 0b1100) != 0,
 			"Function call with incorrect arguments."
 		);
 
@@ -65,7 +65,7 @@ public:
 				return;
 			}
 
-			this->fnc_signature = &(found_signature->second);
+			this->fnc_signature = &found_signature->second;
 		}
 		else {
 			variable_imm<std::uint64_t> immediate_function_displacement{

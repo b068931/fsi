@@ -122,7 +122,7 @@ namespace generic_parser {
 	public:
 		bool is_handle_token(token_type token) {
 			auto found_token = std::find(this->handle_tokens.cbegin(), this->handle_tokens.cend(), token);
-			return (found_token != this->handle_tokens.cend()) || this->all_tokens_handler;
+			return found_token != this->handle_tokens.cend() || this->all_tokens_handler;
 		}
 
 		redirection_information_type get_redirection_for_token(
@@ -241,9 +241,9 @@ namespace generic_parser {
 			}
 		}
 		void check_state_behaviour(state_type* state) {
-			if ((!this->working) && state->is_detached_name()) {
+			if (!this->working && state->is_detached_name()) {
 				//detached name can not be used for the last token
-				if ((this->get_current_token() == this->name_token) || this->generator->is_token_from_names_stack()) {
+				if (this->get_current_token() == this->name_token || this->generator->is_token_from_names_stack()) {
 					this->working = true;
 					this->detached_name.reset(new std::string{ this->generator->get_name() });
 
@@ -253,7 +253,7 @@ namespace generic_parser {
 					this->set_state_error_message(state);
 				}
 			}
-			else if ((!this->working) && state->is_whitelist()) {
+			else if (!this->working && state->is_whitelist()) {
 				this->set_state_error_message(state);
 			}
 			else {
@@ -264,14 +264,14 @@ namespace generic_parser {
 				}
 			}
 
-			this->working = this->is_working() && (this->get_current_token() != this->end_token);
+			this->working = this->is_working() && this->get_current_token() != this->end_token;
 		}
 		bool initialize_handle(token_type token, state_type* current_state) {
 			this->current_token = token;
 			this->working = false;
 
 			assert(this->states_stack.size() != 0 && "Empty states stack.");
-			if ((this->detached_name.get()) != nullptr && (!this->generator->is_name_empty())) {
+			if (this->detached_name.get() != nullptr && !this->generator->is_name_empty()) {
 				this->set_state_error_message(current_state);
 				return false;
 			}
@@ -388,7 +388,7 @@ namespace generic_parser {
 		}
 
 		bool is_working() {
-			return this->working && (this->states_stack.size() != 0);
+			return this->working && this->states_stack.size() != 0;
 		}
 		friend class states_builder<token_type, context_key_type, objects, parameters_object, parameters_enumeration_type>;
 	};

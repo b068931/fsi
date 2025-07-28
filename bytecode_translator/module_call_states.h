@@ -20,9 +20,9 @@ public:
                                                  });
 
 		if (found_module != output_file_structure.modules.end()) {
-			helper.active_function.get_last_instruction().modules.emplace_back(&(*found_module));
+			helper.active_function.get_last_instruction().modules.emplace_back(&*found_module);
 			helper.active_function.add_new_operand_to_last_instruction(
-				structure_builder::source_file_token::module_call,
+				source_file_token::module_call,
 				&helper.active_function.get_last_instruction().modules.back(),
 				false
 			);
@@ -53,7 +53,7 @@ public:
 		if (found_module_function != referenced_module->functions_names.end()) {
 			helper.active_function.get_last_instruction().module_functions.emplace_back(&*found_module_function);
 			helper.active_function.add_new_operand_to_last_instruction(
-				structure_builder::source_file_token::module_call,
+				source_file_token::module_call,
 				&helper.active_function.get_last_instruction().module_functions.back(),
 				false
 			);

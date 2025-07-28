@@ -25,7 +25,7 @@ public:
 		structure_builder::builder_parameters& helper,
 		structure_builder::read_map_type& read_map
 	) override {
-		if (read_map.get_current_token() == structure_builder::source_file_token::function_args_end) {
+		if (read_map.get_current_token() == source_file_token::function_args_end) {
 			if (!read_map.is_token_generator_name_empty()) {
 				read_map.exit_with_error("Specify a name/type for your function argument.");
 				return;

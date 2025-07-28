@@ -13,8 +13,8 @@ public:
 		structure_builder::builder_parameters& helper,
 		structure_builder::read_map_type& read_map
 	) override {
-		structure_builder::source_file_token token = read_map.get_current_token();
-		if (token == structure_builder::source_file_token::function_body_start) {
+		source_file_token token = read_map.get_current_token();
+		if (token == source_file_token::function_body_start) {
 			std::string name = helper.name_translations.translate_name(read_map.get_token_generator_name());
 			auto found_function = std::ranges::find_if(output_file_structure.functions,
                                                        [&name](const structure_builder::function& function) -> bool {
@@ -23,13 +23,13 @@ public:
             );
 
 			if (found_function != output_file_structure.functions.end()) {
-				helper.active_function.set_current_function(&(*found_function));
+				helper.active_function.set_current_function(&*found_function);
 			}
 			else {
 				read_map.exit_with_error("Function '" + name + "' was not declared. Declare a function before defining its body.");
 			}
 		}
-		else if ((token == structure_builder::source_file_token::expression_end) && (!read_map.is_token_generator_name_empty())) {
+		else if (token == source_file_token::expression_end && !read_map.is_token_generator_name_empty()) {
 			read_map.exit_with_error();
 		}
 	}

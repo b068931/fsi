@@ -2,21 +2,21 @@
 #define INSTRUCTION_BUILDER_CLASSES_H
 
 #include "apply_on_memory.h"
-#include "cmp_builder.h"
-#include "jmp_builder.h"
+#include "compare_builder.h"
+#include "jump_builder.h"
 #include "apply_right_hand_bits_on_left_hand_binary.h"
-#include "jcc_builder.h"
-#include "add_sadd_builder.h"
-#include "mul_smul_builder.h"
-#include "sdiv_builder.h"
-#include "div_builder.h"
+#include "conditional_jump_builder.h"
+#include "add_signed_add_builder.h"
+#include "multiply_signed_multiply_builder.h"
+#include "signed_divide_builder.h"
+#include "divide_builder.h"
 #include "function_call_builder.h"
 #include "module_function_call_builder.h"
 #include "save_builder.h"
 #include "load_builder.h"
-#include "ref_builder.h"
+#include "move_pointer_builder.h"
 #include "bits_shift_builder.h"
-#include "ctjtd_builder.h"
+#include "get_function_address.h"
 #include "copy_string_builder.h"
 
 template<typename T>
@@ -52,38 +52,38 @@ inline std::map<std::uint8_t,
 		{ 10, & construct_builder_generic<apply_on_memory> }, //inc, dec, not
 		{ 11, &construct_builder_generic<apply_on_memory> },
 		{ 28, &construct_builder_generic<apply_on_memory> },
-		{ 4, &construct_builder_generic<cmp_builder> },
-		{ 15, &construct_builder_generic<jmp_builder> },
+		{ 4, &construct_builder_generic<compare_builder> },
+		{ 15, &construct_builder_generic<jump_builder> },
 		{ 5, &construct_builder_generic<apply_right_hand_bits_on_left_hand_binary> }, //mov, sub, ssub(no difference from the previous one), and, or, xor
 		{ 0, &construct_builder_generic<apply_right_hand_bits_on_left_hand_binary> },
 		{ 1, &construct_builder_generic<apply_right_hand_bits_on_left_hand_binary> },
 		{ 12, &construct_builder_generic<apply_right_hand_bits_on_left_hand_binary> },
 		{ 13, &construct_builder_generic<apply_right_hand_bits_on_left_hand_binary> },
 		{ 14, &construct_builder_generic<apply_right_hand_bits_on_left_hand_binary> },
-		{ 8, &construct_builder_generic<mul_smul_builder> },
-		{ 9, &construct_builder_generic<mul_smul_builder> },
-		{ 6, &construct_builder_generic<add_sadd_builder> },
-		{ 7, &construct_builder_generic<add_sadd_builder> },
-		{ 16, &construct_builder_generic<jcc_builder> },
-		{ 17, &construct_builder_generic<jcc_builder> },
-		{ 18, &construct_builder_generic<jcc_builder> },
-		{ 19, &construct_builder_generic<jcc_builder> },
-		{ 20, &construct_builder_generic<jcc_builder> },
-		{ 21, &construct_builder_generic<jcc_builder> },
-		{ 22, &construct_builder_generic<jcc_builder> },
-		{ 23, &construct_builder_generic<jcc_builder> },
-		{ 24, &construct_builder_generic<jcc_builder> },
-		{ 27, &construct_builder_generic<jcc_builder> },
-		{ 2, &construct_builder_generic<div_builder> },
-		{ 3, &construct_builder_generic<sdiv_builder> },
+		{ 8, &construct_builder_generic<multiply_signed_multiply_builder> },
+		{ 9, &construct_builder_generic<multiply_signed_multiply_builder> },
+		{ 6, &construct_builder_generic<add_signed_add_builder> },
+		{ 7, &construct_builder_generic<add_signed_add_builder> },
+		{ 16, &construct_builder_generic<conditional_jump_builder> },
+		{ 17, &construct_builder_generic<conditional_jump_builder> },
+		{ 18, &construct_builder_generic<conditional_jump_builder> },
+		{ 19, &construct_builder_generic<conditional_jump_builder> },
+		{ 20, &construct_builder_generic<conditional_jump_builder> },
+		{ 21, &construct_builder_generic<conditional_jump_builder> },
+		{ 22, &construct_builder_generic<conditional_jump_builder> },
+		{ 23, &construct_builder_generic<conditional_jump_builder> },
+		{ 24, &construct_builder_generic<conditional_jump_builder> },
+		{ 27, &construct_builder_generic<conditional_jump_builder> },
+		{ 2, &construct_builder_generic<divide_builder> },
+		{ 3, &construct_builder_generic<signed_divide_builder> },
 		{ 25, &construct_builder_generic<function_call_builder> },
 		{ 26, &construct_builder_generic<module_function_call_builder> },
 		{ 29, &construct_builder_generic<save_builder> },
 		{ 30, &construct_builder_generic<load_builder> },
-		{ 31, &construct_builder_generic<ref_builder> },
+		{ 31, &construct_builder_generic<move_pointer_builder> },
 		{ 32, &construct_builder_generic<bits_shift_builder> },
 		{ 33, &construct_builder_generic<bits_shift_builder> },
-		{ 34, &construct_builder_generic<ctjtd_builder> },
+		{ 34, &construct_builder_generic<get_function_address> },
 		{ 35, &construct_builder_generic<copy_string_builder> }
 	};
 }
@@ -143,7 +143,7 @@ inline instruction_builder* generate_builder(
 		auto found_machine_codes = machine_codes.find(instruction_operation_code);
 		if (found_machine_codes != machine_codes.end()) {
 			return found_factory->second(
-				&(found_machine_codes->second),
+				&found_machine_codes->second,
 				instruction_prefix,
 				run,
 				function_memory_layout,
