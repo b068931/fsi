@@ -48,7 +48,6 @@ private:
         this->logic_errors.push_back(translator_error_type::unknown_instruction);
     }
 
-
     static constexpr std::uint8_t modules_run = 0;
     static constexpr std::uint8_t jump_points_run = 1;
     static constexpr std::uint8_t function_signatures_run = 2;
@@ -325,6 +324,10 @@ private:
         std::uint32_t function_index = 0;
         for (structure_builder::function& fnc : this->file_structure->functions) {
             for (const structure_builder::jump_point& jmp_point : fnc.jump_points) {
+                if (jmp_point.index == std::numeric_limits<std::uint32_t>::max()) {
+                    this->logic_errors.push_back(translator_error_type::unknown_jump_point);
+                }
+
                 this->write_4_bytes(function_index);
                 this->write_4_bytes(jmp_point.index);
                 this->write_8_bytes(static_cast<std::uint64_t>(jmp_point.id));

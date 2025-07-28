@@ -26,6 +26,7 @@ enum class translator_error_type {
     get_function_address_instruction,
     non_string_instruction,
     string_instruction,
+    unknown_jump_point,
     unknown_instruction
 };
 
@@ -96,7 +97,7 @@ inline void translate_error(translator_error_type error, std::ostream& stream) {
             break;
         }
         case translator_error_type::load_variable_state_instruction: {
-            stream << "load instruction takes only one argument, excluding immediates, signed variables, jump points, etc.";
+            stream << "load instruction takes only one argument, excluding immediates, signed variables, jump points, etc";
             break;
         }
         case translator_error_type::pointer_ref_instruction: {
@@ -108,11 +109,15 @@ inline void translate_error(translator_error_type error, std::ostream& stream) {
             break;
         }
         case translator_error_type::non_string_instruction: {
-            stream << "Only copy_string instruction can use string as the second argument.";
+            stream << "Only copy_string instruction can use string as the second argument";
             break;
         }
         case translator_error_type::string_instruction: {
-            stream << "copy_string instruction uses 'str' as its second argument.";
+            stream << "copy_string instruction uses 'str' as its second argument";
+            break;
+        }
+        case translator_error_type::unknown_jump_point: {
+            stream << "Jump point has been used, yet it has not been defined anywhere";
             break;
         }
         case translator_error_type::unknown_instruction: {

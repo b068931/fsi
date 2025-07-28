@@ -21,6 +21,13 @@ public:
 	void add_new_jump_address(entity_id id, std::uint32_t function_index, std::uint32_t instruction_index, std::uint64_t address = {}) {
 		this->jump_addresses.emplace_back(id, function_index, instruction_index, address);
 	}
+	bool verify_function_jump_addresses(std::uint32_t function_index, std::uint32_t total_instructions) const {
+		return std::ranges::all_of(this->jump_addresses, [function_index, total_instructions](const auto& jump_address) {
+                return std::get<1>(jump_address) != function_index || 
+                    std::get<2>(jump_address) <= total_instructions;
+            }
+		);
+	}
 
 	void remap_function_address(entity_id id, std::uint64_t new_address) {
 		auto found_function = std::ranges::find_if(this->function_addresses,
@@ -84,8 +91,8 @@ public:
 		char* jump_table = new char[jump_table_size] {0};
 
 		std::size_t index = sizeof(std::uint64_t);
-		for (const auto& function_address : this->function_addresses) {
-			copy_uint64_t(jump_table + index, function_address.second);
+		for (const auto& function_address : this->function_addresses | std::views::values) {
+			copy_uint64_t(jump_table + index, function_address);
 			index += sizeof(std::uint64_t);
 		}
 

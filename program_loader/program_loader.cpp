@@ -211,6 +211,10 @@ namespace {
         }
 
         jump_table.remap_jump_address(function_index, instruction_index, translated_address); //jump-point after last instruction
+        if (!jump_table.verify_function_jump_addresses(function_index, instruction_index)) {
+            throw program_compilation_error{ "Jump point outside of function body" };
+        }
+
         return function_body_symbols;
     }
 

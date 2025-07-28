@@ -2,6 +2,7 @@
 #define JUMP_POINT_ARGUMENT_STATE_H
 
 #include <algorithm>
+#include <limits>
 
 #include "type_definitions.h"
 
@@ -28,7 +29,7 @@ public:
         //simply create new jump point if it wasn't already created
 		structure_builder::jump_point* jump_point;
 		if (found_jump_point == current_function.jump_points.end()) {
-			current_function.jump_points.emplace_back(helper.get_id(), static_cast<std::uint32_t>(helper.instruction_index - 1), name);
+			current_function.jump_points.emplace_back(helper.get_id(), std::numeric_limits<std::uint32_t>::max(), name);
 			jump_point = &current_function.jump_points.back();
 		}
 		else {
