@@ -410,11 +410,9 @@ module_mediator::return_value load_program_to_memory(module_mediator::arguments_
 
     runs_container container; //load file information to memory
     std::string program_name = std::filesystem::canonical(
-        static_cast<char *>(
-            std::get<0>(
-                module_mediator::arguments_string_builder::unpack<void *>(bundle))
-            )
-    ).generic_string();
+        static_cast<const char*>(
+            std::get<0>(module_mediator::arguments_string_builder::unpack<void*>(bundle)))
+        ).generic_string();
 
     try {
         LOG_PROGRAM_INFO(
@@ -504,9 +502,10 @@ module_mediator::return_value load_program_to_memory(module_mediator::arguments_
             LOG_ERROR(
                 interoperation::get_module_part(),
                 std::format(
-                    "Failed to compile \"{}\": {}",
+                    "Failed to compile \"{}\": {} (The error is associated with the following id: '{}')",
                     program_name,
-                    exc.what()
+                    exc.what(),
+                    exc.get_associated_id()
                 )
             );
         }

@@ -44,6 +44,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentat
 		documentation\engine-multithreading.txt = documentation\engine-multithreading.txt
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "compression_algorithms", "compression_algorithms\compression_algorithms.vcxproj", "{DD719431-ECE7-4C3F-8F0E-73E8A88E7783}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug Sanitaizer|x64 = Debug Sanitaizer|x64
@@ -120,6 +122,14 @@ Global
 		{DB1E244F-2629-402B-A7EA-E6772D475175}.Debug|x64.ActiveCfg = Debug|x64
 		{DB1E244F-2629-402B-A7EA-E6772D475175}.Release (Installer)|x64.ActiveCfg = Release|x64
 		{DB1E244F-2629-402B-A7EA-E6772D475175}.Release|x64.ActiveCfg = Release|x64
+		{DD719431-ECE7-4C3F-8F0E-73E8A88E7783}.Debug Sanitaizer|x64.ActiveCfg = Debug|x64
+		{DD719431-ECE7-4C3F-8F0E-73E8A88E7783}.Debug Sanitaizer|x64.Build.0 = Debug|x64
+		{DD719431-ECE7-4C3F-8F0E-73E8A88E7783}.Debug|x64.ActiveCfg = Debug|x64
+		{DD719431-ECE7-4C3F-8F0E-73E8A88E7783}.Debug|x64.Build.0 = Debug|x64
+		{DD719431-ECE7-4C3F-8F0E-73E8A88E7783}.Release (Installer)|x64.ActiveCfg = Release|x64
+		{DD719431-ECE7-4C3F-8F0E-73E8A88E7783}.Release (Installer)|x64.Build.0 = Release|x64
+		{DD719431-ECE7-4C3F-8F0E-73E8A88E7783}.Release|x64.ActiveCfg = Release|x64
+		{DD719431-ECE7-4C3F-8F0E-73E8A88E7783}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -135,6 +145,7 @@ Global
 		{EFFA46AB-91B0-4C85-9B61-998018F77CBC} = {7DFDF923-97C5-48D9-B6F5-ABC6CA5523B2}
 		{DB1E244F-2629-402B-A7EA-E6772D475175} = {F9BEAC84-0B37-4963-9819-2F4B59FBC48F}
 		{02EA681E-C7D8-13C7-8484-4AC65E1B71E8} = {EDAA1009-AF0E-4FD1-AAFE-EF360DF81916}
+		{DD719431-ECE7-4C3F-8F0E-73E8A88E7783} = {F9BEAC84-0B37-4963-9819-2F4B59FBC48F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0389860B-44F1-4F73-9967-3737FD94893C}

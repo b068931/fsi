@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <vector>
 #include <cstdint>
+#include <iostream>
 
 #include "apply_on_first_operand_instruction.h"
 #include "binary_instruction.h"
@@ -57,18 +58,18 @@ private:
     static constexpr std::uint8_t program_debug_run = 6;
 
     structure_builder::file* file_structure;
-    std::ofstream* file_stream;
+    std::ostream* out_stream;
 
     std::vector<translator_error_type> logic_errors;
     void add_new_logic_error(translator_error_type err) { this->logic_errors.push_back(err); }
 
     template<typename type>
     void write_bytes(type value) {
-        this->file_stream->write(reinterpret_cast<char*>(&value), sizeof(value));
+        this->out_stream->write(reinterpret_cast<char*>(&value), sizeof(value));
     }
 
     void write_n_bytes(const char* bytes, std::size_t size) {
-        this->file_stream->write(bytes, static_cast<std::streamsize>(size));
+        this->out_stream->write(bytes, static_cast<std::streamsize>(size));
     }
     void write_8_bytes(std::uint64_t value) {
         this->write_bytes<std::uint64_t>(value);
@@ -85,7 +86,7 @@ private:
 
     static std::uint8_t convert_type_to_uint8(source_file_token token_type) {
         std::uint8_t type = 0;
-        switch (token_type) {
+        switch (token_type) {  // NOLINT(clang-diagnostic-switch-enum)
             case source_file_token::two_bytes_type_keyword: {
                 type = 1;
                 break;
@@ -102,6 +103,7 @@ private:
                 type = 4;
                 break;
             }
+            default: break;
         }
 
         return type;
@@ -271,16 +273,16 @@ private:
 
     auto write_run_header(std::uint8_t run_type) {
         this->write_1_byte(run_type);
-        auto saved_position = this->file_stream->tellp(); //we will return here later after we calculate this run's size
+        auto saved_position = this->out_stream->tellp(); //we will return here later after we calculate this run's size
         
         this->write_8_bytes(0);
         return saved_position;
     }
-    void write_run_footer(std::streampos saved_position, std::uint64_t run_size) {
-        this->file_stream->seekp(saved_position); //go back and write this run's size
+    void write_run_footer(const std::streampos& saved_position, std::uint64_t run_size) {
+        this->out_stream->seekp(saved_position); //go back and write this run's size
         this->write_8_bytes(run_size);
 
-        this->file_stream->seekp(0, std::ios::end); //go back to the end of this file
+        this->out_stream->seekp(0, std::ios::end); //go back to the end of this file
     }
 
     void create_modules_run() { //8 bytes: modules count, 8 bytes: module's entity_id, 8 bytes: number of functions in this module, 1 byte: module name length, module name, 8 bytes: entity_id, 1 byte module function name length, module function name;
@@ -310,7 +312,7 @@ private:
                     this->add_new_logic_error(translator_error_type::name_too_long);
                 }
 
-                this->file_stream->write(mod_fnc.name.c_str(), static_cast<std::streamsize>(module_function_name_size));
+                this->out_stream->write(mod_fnc.name.c_str(), static_cast<std::streamsize>(module_function_name_size));
                 run_size += 9 + module_function_name_size;
             }
         }
@@ -365,7 +367,7 @@ private:
 
         this->write_run_footer(saved_position, run_size);
     }
-    void create_function_body_run(structure_builder::function& func) { //8 bytes: signature's entity_id, 4 bytes: number of local variables, 1 byte: local variable_type, 8 bytes: local variable entity_id
+    void create_function_body_run(const structure_builder::function& func) { //8 bytes: signature's entity_id, 4 bytes: number of local variables, 1 byte: local variable_type, 8 bytes: local variable entity_id
         std::uint64_t run_size = 12; //8 bytes: signature's entity_id, 4 bytes: number of local variables
         auto saved_position = this->write_run_header(function_body_run);
 
@@ -519,16 +521,16 @@ private:
     }
 
 public:
-    bytecode_translator(structure_builder::file* file, std::ofstream* file_stream)
+    bytecode_translator(structure_builder::file* file, std::ostream* file_stream)
         :file_structure{file},
-        file_stream{file_stream}
+        out_stream{file_stream}
     {}
 
     void reset_file_structure(structure_builder::file* file) {
         this->file_structure = file;
     }
-    void reset_file_stream(std::ofstream* stream) {
-        this->file_stream = stream;
+    void reset_out_stream(std::ostream* stream) {
+        this->out_stream = stream;
     }
 
     void start(bool include_debug) {

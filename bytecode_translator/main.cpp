@@ -7,125 +7,221 @@
 #include <cstdlib>
 #include <filesystem>
 #include <utility>
+#include <sstream>
+#include <iterator>
+#include <vector>
+#include <limits>
 
 #include "parser_options.h"
 #include "structure_builder.h"
 #include "bytecode_translator.h"
 #include "include_file_state.h"
+
 #include "../generic_parser/parser_facade.h"
+#include "../compression_algorithms/static_huffman.h"
+#include "../compression_algorithms/sequence_reduction.h"
 
 namespace {
-	bool verify_program(const structure_builder::file& parser_value) {
-		std::vector<std::string> empty_functions{ check_functions_bodies(parser_value) };
-		for (const std::string& name : empty_functions) {
-			std::cout << "PROGRAM LOGIC WARNING: function with name '" + name + "' has empty body." << std::endl;
-		}
+    bool verify_program(const structure_builder::file& parser_value) {
+        std::vector<std::string> empty_functions{ check_functions_bodies(parser_value) };
+        for (const std::string& name : empty_functions) {
+            std::cout << "PROGRAM LOGIC WARNING: function with name '" + name + "' has empty body." << std::endl;
+        }
 
-		std::cout << "Chosen stack size: " << parser_value.stack_size << " bytes." << std::endl;
-		if (parser_value.stack_size == 0) {
-			std::cout << "PROGRAM LOGIC ERROR: You must explicitly specify the stack size that your program will use." << std::endl;
-		}
+        std::cout << "Chosen stack size: " << parser_value.stack_size << " bytes." << std::endl;
+        if (parser_value.stack_size == 0) {
+            std::cout << "PROGRAM LOGIC ERROR: You must explicitly specify the stack size that your program will use." << std::endl;
+        }
 
-		if (parser_value.main_function == nullptr) {
-			std::cout << "SYNTAX ERROR: You must specify the starting function for your program." << std::endl;
-			return false;
-		}
+        if (parser_value.main_function == nullptr) {
+            std::cout << "SYNTAX ERROR: You must specify the starting function for your program." << std::endl;
+            return false;
+        }
 
-		if (!check_instructions_arguments(parser_value)) {
-			std::cout << "SYNTAX ERROR: each instruction can have no more than " << max_instruction_arguments_count << " arguments." << std::endl;
-			return false;
-		}
+        if (!check_instructions_arguments(parser_value)) {
+            std::cout << "SYNTAX ERROR: each instruction can have no more than " << max_instruction_arguments_count << " arguments." << std::endl;
+            return false;
+        }
 
-	    if (!check_functions_count(parser_value)) {
-			std::cout << "SYNTAX ERROR: you can have no more than " << max_functions_count << " functions in one file." << std::endl;
-			return false;
-		}
+        if (!check_functions_count(parser_value)) {
+            std::cout << "SYNTAX ERROR: you can have no more than " << max_functions_count << " functions in one file." << std::endl;
+            return false;
+        }
 
-	    if (!check_functions_size(parser_value)) {
-			std::cout << "SYNTAX ERROR: you can have no more than " << max_instructions_count << " instructions in each function." << std::endl;
-			return false;
-		}
+        if (!check_functions_size(parser_value)) {
+            std::cout << "SYNTAX ERROR: you can have no more than " << max_instructions_count << " instructions in each function." << std::endl;
+            return false;
+        }
 
-		return true;
-	}
+        return true;
+    }
+
+    std::stringstream produce_bytecode(structure_builder::file* parser_value, std::string debug_parameter) {
+        std::stringstream result{ std::ios::in | std::ios::out | std::ios::binary };
+        bytecode_translator translator{ parser_value, &result };
+
+        if (debug_parameter == std::string{ "include-debug" }) {
+            translator.start(true);
+        }
+        else if (debug_parameter == std::string{ "no-debug" }) {
+            translator.start(false);
+        }
+        else {
+            std::cout << "Unknown debug flag '" << debug_parameter << "' debug run won't be added.\n";
+            translator.start(false);
+        }
+
+        for (translator_error_type err : translator.errors()) {
+            std::cout << "PROGRAM LOGIC ERROR: ";
+            translate_error(err, std::cout);
+
+            std::cout << std::endl;
+        }
+
+        return result;
+    }
+
+    std::vector<unsigned char> compress_bytecode(std::stringstream bytecode_stream) {
+        constexpr unsigned short sequence_buffer_size = 256;
+
+        std::vector<unsigned char> intermediate{};
+        std::vector<unsigned char> result{ 'F', 'S', 'I' };
+
+        std::copy_n(
+            reinterpret_cast<const unsigned char*>(&sequence_buffer_size),
+            sizeof(sequence_buffer_size),
+            std::back_inserter(result)
+        );
+
+        compression_algorithms::static_huffman<std::size_t, unsigned char> huffman_compressor{};
+        compression_algorithms::sequence_reduction sequence_reducer{ sequence_buffer_size };
+
+        sequence_reducer.encode(
+            std::istreambuf_iterator(bytecode_stream),
+            std::istreambuf_iterator<char>{},
+            std::back_inserter(intermediate)
+        );
+
+        huffman_compressor.create_encode_table(
+            intermediate.begin(),
+            intermediate.end()
+        );
+
+        std::size_t size_signature = intermediate.size();
+        std::copy_n(
+            reinterpret_cast<char*>(&size_signature),
+            sizeof(size_signature),
+            std::back_inserter(result)
+        );
+
+        for (std::size_t index = 0; index < huffman_compressor.get_encode_table_size(); ++index) {
+            result.push_back(
+                huffman_compressor.get_encode_object_symbol(index)
+            );
+
+            std::size_t symbol_count = huffman_compressor.get_encode_object_count(index);
+
+            unsigned char bytes_needed = 0;
+            std::size_t temp = symbol_count;
+            do {
+                bytes_needed++;
+                temp >>= std::numeric_limits<unsigned char>::digits;
+            } while (temp > 0);
+            
+            result.push_back(bytes_needed);
+            std::copy_n(
+                reinterpret_cast<char*>(&symbol_count),
+                bytes_needed,
+                std::back_inserter(result)
+            );
+        }
+
+        huffman_compressor.encode(
+            intermediate.begin(),
+            intermediate.end(),
+            std::back_inserter(result)
+        );
+
+        return result;
+    }
 }
 
 int main(int argc, char** argv) {
-	auto start_time = std::chrono::high_resolution_clock::now();
-	if (argc != 4) {
-		std::cout << "Provide the name of the file to compile and its output destination. And add 'include-debug' or 'no-debug' at the end. It is only three arguments." << std::endl;
-		return EXIT_FAILURE;
-	}
+    auto start_time = std::chrono::high_resolution_clock::now();
+    if (argc != 4) {
+        std::cout << "Provide the name of the file to compile and its output destination. And add 'include-debug' or 'no-debug' at the end. It is only three arguments." << std::endl;
+        return EXIT_FAILURE;
+    }
 
-	try {
-		generic_parser::parser_facade<
-			source_file_token,
-			structure_builder::context_key,
-			structure_builder
-		> parser
-		{
-			parser_options::keywords,
-			parser_options::contexts,
-			source_file_token::name,
-			source_file_token::end_of_file,
-			structure_builder::context_key::main_context
-		};
+    try {
+        generic_parser::parser_facade<
+            source_file_token,
+            structure_builder::context_key,
+            structure_builder
+        > parser
+        {
+            parser_options::keywords,
+            parser_options::contexts,
+            source_file_token::name,
+            source_file_token::end_of_file,
+            structure_builder::context_key::main_context
+        };
 
-		std::filesystem::path main_program_file{ std::filesystem::canonical(argv[1]) };
-		std::cout << "Now parsing: " << main_program_file.generic_string() << std::endl;
+        std::filesystem::path main_program_file{ std::filesystem::canonical(argv[1]) };
+        std::cout << "Now parsing: " << main_program_file.generic_string() << std::endl;
 
-		include_file_state::active_parsing_files.push_back(main_program_file);
-		parser.start(main_program_file);
+        include_file_state::active_parsing_files.push_back(main_program_file);
+        parser.start(main_program_file);
 
-		std::pair<structure_builder::line_type, std::string> error{ parser.error() };
-		structure_builder::file parser_value{ parser.get_builder_value() };
-		if (!error.second.empty()) {
-			std::cout << "SYNTAX ERROR:	"
-				<< error.second.c_str()
-				<< " NEAR LINE " << error.first << std::endl;
+        std::pair<structure_builder::line_type, std::string> error{ parser.error() };
+        structure_builder::file parser_value{ parser.get_builder_value() };
+        if (!error.second.empty()) {
+            std::cout << "SYNTAX ERROR:	"
+                << error.second.c_str()
+                << " NEAR LINE " << error.first << std::endl;
 
-			return EXIT_FAILURE;
-		}
+            return EXIT_FAILURE;
+        }
 
-		include_file_state::active_parsing_files.pop_back();
-		if (!verify_program(parser_value)) {
-			return EXIT_FAILURE;
-		}
+        include_file_state::active_parsing_files.pop_back();
+        if (!verify_program(parser_value)) {
+            return EXIT_FAILURE;
+        }
 
-		std::ofstream file_stream{ argv[2], std::ios::binary | std::ios::out };
-		bytecode_translator translator{ &parser_value, &file_stream };
+        std::cout << "Now translating the program to bytecode..." << std::endl;
+        std::stringstream translated_program = produce_bytecode(&parser_value, argv[3]);
 
-		if (argv[3] == std::string{ "include-debug" }) {
-			translator.start(true);
-		}
-		else if (argv[3] == std::string{ "no-debug" }) {
-			translator.start(false);
-		}
-		else {
-			std::cout << "Unknown debug flag '" << argv[3] << "' debug run won't be added.\n";
-			translator.start(false);
-		}
+        translated_program.seekg(0, std::ios::end);
+        std::size_t bytecode_size = translated_program.tellg();
 
-		for (translator_error_type err : translator.errors()) {
-			std::cout << "PROGRAM LOGIC ERROR: ";
-			translate_error(err, std::cout);
+        std::cout << "Now compressing the bytecode..." << std::endl;
+        translated_program.seekg(0, std::ios::beg);
+        std::vector<unsigned char> compressed_bytecode = compress_bytecode(
+            std::move(translated_program)
+        );
 
-			std::cout << std::endl;
-		}
+        std::cout << "Compression ratio: "
+            << static_cast<double>(compressed_bytecode.size()) / static_cast<double>(bytecode_size)
+            << '.'
+            << std::endl;
 
-		auto end_time = std::chrono::high_resolution_clock::now();
-		std::cout << "Estimated time: "
-			<< std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count()
-			<< " microseconds or "
-			<< std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count()
-			<< " seconds."
-			<< std::endl;
+        std::ofstream file_stream{ argv[2], std::ios::binary | std::ios::out };
+        file_stream.write(
+            reinterpret_cast<const char*>(compressed_bytecode.data()),
+            static_cast<std::streamsize>(compressed_bytecode.size())
+        );
 
-		return EXIT_SUCCESS;
-	}
-	catch (const std::exception& exc) {
-		std::cout << "Unable to process the file: " << exc.what() << std::endl;
-	}
+        auto end_time = std::chrono::high_resolution_clock::now();
+        std::cout << "Estimated time: "
+            << std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count()
+            << " microseconds."
+            << std::endl;
 
-	return EXIT_FAILURE;
+        return EXIT_SUCCESS;
+    }
+    catch (const std::exception& exc) {
+        std::cout << "Unable to process the file: " << exc.what() << std::endl;
+    }
+
+    return EXIT_FAILURE;
 }
