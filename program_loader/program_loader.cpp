@@ -520,7 +520,7 @@ module_mediator::return_value load_program_to_memory(module_mediator::arguments_
             );
         }
     }
-    catch (const std::exception &exc) {
+    catch ([[maybe_unused]] const std::exception& exc) {
         LOG_ERROR(
             interoperation::get_module_part(),
             std::format(

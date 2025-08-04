@@ -5,7 +5,9 @@
 #include "thread_structure.h"
 #include "id_generator.h"
 #include "module_interoperation.h"
+
 #include "../logger_module/logging.h"
+#include "../module_mediator/fsi_types.h"
 
 //remove "#define I_HATE_MICROSOFT_AND_STUPID_ANALYZER_WARNINGS" to disable _Acquires_lock_ and _Releases_lock_
 #define I_HATE_MICROSOFT_AND_STUPID_ANALYZER_WARNINGS

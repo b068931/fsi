@@ -66,7 +66,7 @@ namespace module_mediator {
 				try {
 					return this->mediator->call_module(module_index, function_index, arguments_string);
 				}
-				catch (const std::exception& exc) {
+				catch ([[maybe_unused]] const std::exception& exc) {
 					LOG_ERROR(this, exc.what());
 					LOG_FATAL(this, "call_module has failed. The process will be terminated with 'abort'.");
 
