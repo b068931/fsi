@@ -15,31 +15,49 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_08768D2150A24FE1945030084E9E92D7"
+        "MsmKey" = "8:_010EAFF294534E979463125263797960"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_217AD84B1336426A937247F224F26DA0"
+        "MsmKey" = "8:_08E117B468814A0BB33ABF237A523283"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_690980C24BD4427FA8F88DAFA4E14D3D"
+        "MsmKey" = "8:_1C88D0EDC7F44F278CBD3664CE34CA7C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_6985E22EEE564C6ABE455E0D603010AA"
+        "MsmKey" = "8:_34AFB3DFC5B643CF8F813C13086D496A"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_7489F69E7E0B443C9D60317B7D1C39AD"
+        "MsmKey" = "8:_4AAEE389399D41D6B44DEC385F861445"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_53460A53E4414CE8A7A0A3BE5FA72A3D"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_6ADF85C0DF824846A843896DC1234C82"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_7157626C5A7F45DB8F1F8D15A176A555"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -51,7 +69,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_8243D2AD0B3D41589006ADD985CDAC4A"
+        "MsmKey" = "8:_86551E1B9E81425D94714204CFBD18C5"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -63,13 +81,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_94836E512C984B55A69E4360CA3DDF19"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_98A9358C350549D3B26D65A92FF904D8"
+        "MsmKey" = "8:_9C5EA95C8C2E4CB0B6568778B4216355"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -81,49 +93,43 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_A7326FAC0E3742D2A338EA3BAE0D77FE"
+        "MsmKey" = "8:_BBDDC4873615480F8D84DE9990C0715D"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_B0378D67191541D3B620430D6C7C54F4"
+        "MsmKey" = "8:_CEDF369384314DA2A2166754D091C310"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_B3BA8C3CB7A642C7BD53C2E86BF81B7E"
+        "MsmKey" = "8:_DB402A71E64246E4B023A740D53B3DE7"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_BF24C137486F4B1185E22FBC0EFF87A4"
+        "MsmKey" = "8:_E1E8A4EE6D56428B8226B63823029809"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_CBB159AC10504526AA5EF1320403EBB7"
+        "MsmKey" = "8:_E36D6A4D40EE4A0FA43B03A0602826F7"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_DB6733F0FAF1470587E6B6E0082B6437"
+        "MsmKey" = "8:_EBA7A9C5175A4600AB43FDCF706DD9EE"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_E406AA17B137400082859A1E4E23783A"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_FB43E2D0C43942AF8CE130A32943ACB3"
+        "MsmKey" = "8:_FF76ECE591824BDFAD8828BAD615B128"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -278,10 +284,30 @@
         }
         "File"
         {
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_08768D2150A24FE1945030084E9E92D7"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_010EAFF294534E979463125263797960"
             {
-            "SourcePath" = "8:..\\module_mediator\\modules.txt"
-            "TargetName" = "8:modules.txt"
+            "SourcePath" = "8:..\\examples\\hello-world.tfsi"
+            "TargetName" = "8:hello-world.tfsi"
+            "Tag" = "8:"
+            "Folder" = "8:_6B51D42DF1364945B951059526EBC2B8"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_08E117B468814A0BB33ABF237A523283"
+            {
+            "SourcePath" = "8:..\\module_mediator\\engine.mods"
+            "TargetName" = "8:engine.mods"
             "Tag" = "8:"
             "Folder" = "8:_193912ADD08549EA802630E58105B84D"
             "Condition" = "8:"
@@ -298,10 +324,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_217AD84B1336426A937247F224F26DA0"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1C88D0EDC7F44F278CBD3664CE34CA7C"
             {
-            "SourcePath" = "8:..\\examples\\make.bat"
-            "TargetName" = "8:make.bat"
+            "SourcePath" = "8:..\\examples\\program-logic-error.tfsi"
+            "TargetName" = "8:program-logic-error.tfsi"
             "Tag" = "8:"
             "Folder" = "8:_6B51D42DF1364945B951059526EBC2B8"
             "Condition" = "8:"
@@ -318,10 +344,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_690980C24BD4427FA8F88DAFA4E14D3D"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_34AFB3DFC5B643CF8F813C13086D496A"
             {
-            "SourcePath" = "8:..\\examples\\incorrect-main.txt"
-            "TargetName" = "8:incorrect-main.txt"
+            "SourcePath" = "8:..\\examples\\dynamic-call-with-error.tfsi"
+            "TargetName" = "8:dynamic-call-with-error.tfsi"
             "Tag" = "8:"
             "Folder" = "8:_6B51D42DF1364945B951059526EBC2B8"
             "Condition" = "8:"
@@ -338,10 +364,30 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6985E22EEE564C6ABE455E0D603010AA"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4AAEE389399D41D6B44DEC385F861445"
             {
-            "SourcePath" = "8:..\\examples\\program-logic-error.txt"
-            "TargetName" = "8:program-logic-error.txt"
+            "SourcePath" = "8:..\\libraries\\memory.tfsi"
+            "TargetName" = "8:memory.tfsi"
+            "Tag" = "8:"
+            "Folder" = "8:_1C8A4017A8964E6883778C807117A277"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_53460A53E4414CE8A7A0A3BE5FA72A3D"
+            {
+            "SourcePath" = "8:..\\examples\\cyclic2.tfsi"
+            "TargetName" = "8:cyclic2.tfsi"
             "Tag" = "8:"
             "Folder" = "8:_6B51D42DF1364945B951059526EBC2B8"
             "Condition" = "8:"
@@ -358,10 +404,30 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7489F69E7E0B443C9D60317B7D1C39AD"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6ADF85C0DF824846A843896DC1234C82"
             {
-            "SourcePath" = "8:..\\examples\\stackoverflow.txt"
-            "TargetName" = "8:stackoverflow.txt"
+            "SourcePath" = "8:..\\examples\\thread-groups-example.tfsi"
+            "TargetName" = "8:thread-groups-example.tfsi"
+            "Tag" = "8:"
+            "Folder" = "8:_6B51D42DF1364945B951059526EBC2B8"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7157626C5A7F45DB8F1F8D15A176A555"
+            {
+            "SourcePath" = "8:..\\examples\\remove-undefine.tfsi"
+            "TargetName" = "8:remove-undefine.tfsi"
             "Tag" = "8:"
             "Folder" = "8:_6B51D42DF1364945B951059526EBC2B8"
             "Condition" = "8:"
@@ -398,10 +464,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_8243D2AD0B3D41589006ADD985CDAC4A"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_86551E1B9E81425D94714204CFBD18C5"
             {
-            "SourcePath" = "8:..\\examples\\cyclic1.txt"
-            "TargetName" = "8:cyclic1.txt"
+            "SourcePath" = "8:..\\examples\\eight-bytes-to-string.tfsi"
+            "TargetName" = "8:eight-bytes-to-string.tfsi"
             "Tag" = "8:"
             "Folder" = "8:_6B51D42DF1364945B951059526EBC2B8"
             "Condition" = "8:"
@@ -438,30 +504,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_94836E512C984B55A69E4360CA3DDF19"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9C5EA95C8C2E4CB0B6568778B4216355"
             {
-            "SourcePath" = "8:..\\examples\\eight-bytes-to-string.txt"
-            "TargetName" = "8:eight-bytes-to-string.txt"
-            "Tag" = "8:"
-            "Folder" = "8:_6B51D42DF1364945B951059526EBC2B8"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_98A9358C350549D3B26D65A92FF904D8"
-            {
-            "SourcePath" = "8:..\\examples\\comments-everywhere.txt"
-            "TargetName" = "8:comments-everywhere.txt"
+            "SourcePath" = "8:..\\examples\\echo.tfsi"
+            "TargetName" = "8:echo.tfsi"
             "Tag" = "8:"
             "Folder" = "8:_6B51D42DF1364945B951059526EBC2B8"
             "Condition" = "8:"
@@ -498,10 +544,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A7326FAC0E3742D2A338EA3BAE0D77FE"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_BBDDC4873615480F8D84DE9990C0715D"
             {
-            "SourcePath" = "8:..\\examples\\thread-groups-example.txt"
-            "TargetName" = "8:thread-groups-example.txt"
+            "SourcePath" = "8:..\\examples\\incorrect-main.tfsi"
+            "TargetName" = "8:incorrect-main.tfsi"
             "Tag" = "8:"
             "Folder" = "8:_6B51D42DF1364945B951059526EBC2B8"
             "Condition" = "8:"
@@ -518,10 +564,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B0378D67191541D3B620430D6C7C54F4"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_CEDF369384314DA2A2166754D091C310"
             {
-            "SourcePath" = "8:..\\examples\\remove-undefine.txt"
-            "TargetName" = "8:remove-undefine.txt"
+            "SourcePath" = "8:..\\examples\\thread-groups-explosion.tfsi"
+            "TargetName" = "8:thread-groups-explosion.tfsi"
             "Tag" = "8:"
             "Folder" = "8:_6B51D42DF1364945B951059526EBC2B8"
             "Condition" = "8:"
@@ -538,10 +584,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B3BA8C3CB7A642C7BD53C2E86BF81B7E"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_DB402A71E64246E4B023A740D53B3DE7"
             {
-            "SourcePath" = "8:..\\examples\\keywords-as-names.txt"
-            "TargetName" = "8:keywords-as-names.txt"
+            "SourcePath" = "8:..\\examples\\comments-everywhere.tfsi"
+            "TargetName" = "8:comments-everywhere.tfsi"
             "Tag" = "8:"
             "Folder" = "8:_6B51D42DF1364945B951059526EBC2B8"
             "Condition" = "8:"
@@ -558,10 +604,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_BF24C137486F4B1185E22FBC0EFF87A4"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E1E8A4EE6D56428B8226B63823029809"
             {
-            "SourcePath" = "8:..\\examples\\dynamic-call-with-error.txt"
-            "TargetName" = "8:dynamic-call-with-error.txt"
+            "SourcePath" = "8:..\\examples\\keywords-as-names.tfsi"
+            "TargetName" = "8:keywords-as-names.tfsi"
             "Tag" = "8:"
             "Folder" = "8:_6B51D42DF1364945B951059526EBC2B8"
             "Condition" = "8:"
@@ -578,10 +624,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_CBB159AC10504526AA5EF1320403EBB7"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E36D6A4D40EE4A0FA43B03A0602826F7"
             {
-            "SourcePath" = "8:..\\examples\\dynamic-call.txt"
-            "TargetName" = "8:dynamic-call.txt"
+            "SourcePath" = "8:..\\examples\\cyclic1.tfsi"
+            "TargetName" = "8:cyclic1.tfsi"
             "Tag" = "8:"
             "Folder" = "8:_6B51D42DF1364945B951059526EBC2B8"
             "Condition" = "8:"
@@ -598,30 +644,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_DB6733F0FAF1470587E6B6E0082B6437"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_EBA7A9C5175A4600AB43FDCF706DD9EE"
             {
-            "SourcePath" = "8:..\\libraries\\memory.txt"
-            "TargetName" = "8:memory.txt"
-            "Tag" = "8:"
-            "Folder" = "8:_1C8A4017A8964E6883778C807117A277"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E406AA17B137400082859A1E4E23783A"
-            {
-            "SourcePath" = "8:..\\examples\\hello-world.txt"
-            "TargetName" = "8:hello-world.txt"
+            "SourcePath" = "8:..\\examples\\stackoverflow.tfsi"
+            "TargetName" = "8:stackoverflow.tfsi"
             "Tag" = "8:"
             "Folder" = "8:_6B51D42DF1364945B951059526EBC2B8"
             "Condition" = "8:"
@@ -638,10 +664,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_FB43E2D0C43942AF8CE130A32943ACB3"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_FF76ECE591824BDFAD8828BAD615B128"
             {
-            "SourcePath" = "8:..\\examples\\cyclic2.txt"
-            "TargetName" = "8:cyclic2.txt"
+            "SourcePath" = "8:..\\examples\\dynamic-call.tfsi"
+            "TargetName" = "8:dynamic-call.tfsi"
             "Tag" = "8:"
             "Folder" = "8:_6B51D42DF1364945B951059526EBC2B8"
             "Condition" = "8:"
@@ -780,15 +806,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:FSI"
-        "ProductCode" = "8:{E503F26E-E953-469C-B124-E8ECE9AE5C1F}"
-        "PackageCode" = "8:{E13876C7-21C5-44E4-B878-38C03DB49FFA}"
+        "ProductCode" = "8:{F4B64410-A36C-4CA1-AC5C-1D42A9745DD9}"
+        "PackageCode" = "8:{907148A9-D5EC-49AC-A9C4-5886CE87B3AB}"
         "UpgradeCode" = "8:{95F50751-258F-4D59-AC9D-6B28888B41F6}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:0.1.1"
+        "ProductVersion" = "8:1.0.0"
         "Manufacturer" = "8:b068931"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -797,7 +823,7 @@
         "ARPCONTACT" = "8:b068931"
         "Keywords" = "8:"
         "ARPCOMMENTS" = "8:A useless piece of software."
-        "ARPURLINFOABOUT" = "8:"
+        "ARPURLINFOABOUT" = "8:https://github.com/b068931/fsi"
         "ARPPRODUCTICON" = "8:"
         "ARPIconIndex" = "3:0"
         "SearchPath" = "8:"
@@ -1302,7 +1328,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_25A3000B7ED141D0BE62E1F3ED32C49C"
             {
-            "SourcePath" = "8:"
+            "SourcePath" = "8:..\\x64\\Release (Installer)\\engine\\dynamic-libraries\\core\\program-loader.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_1FBE022B092241B49274ABC6DDA79674"
@@ -1330,7 +1356,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_2EBBB73C188B4F529E9181B83E50A0B3"
             {
-            "SourcePath" = "8:"
+            "SourcePath" = "8:..\\x64\\Release (Installer)\\engine\\dynamic-libraries\\core\\execution-module.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_1FBE022B092241B49274ABC6DDA79674"
@@ -1358,7 +1384,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_57AD020CE33C4B6B898A4A4109D8871F"
             {
-            "SourcePath" = "8:"
+            "SourcePath" = "8:..\\x64\\Release (Installer)\\engine\\mediator.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_193912ADD08549EA802630E58105B84D"
@@ -1386,7 +1412,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_68525B02373C48B1A8FDC65077AFDCFC"
             {
-            "SourcePath" = "8:"
+            "SourcePath" = "8:..\\x64\\Release (Installer)\\engine\\dynamic-libraries\\core\\logger-module.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_1FBE022B092241B49274ABC6DDA79674"
@@ -1414,7 +1440,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_A5D99CABCD7947FFBCF1CF08D5AA78B3"
             {
-            "SourcePath" = "8:"
+            "SourcePath" = "8:..\\x64\\Release (Installer)\\translator\\translator.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_266D926C8E3A4787808280F14CA29CEC"
@@ -1442,7 +1468,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_D63A059F65C1406B8F770A154AD9BD17"
             {
-            "SourcePath" = "8:"
+            "SourcePath" = "8:..\\x64\\Release (Installer)\\engine\\dynamic-libraries\\core\\program-runtime-services.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_1FBE022B092241B49274ABC6DDA79674"
@@ -1470,7 +1496,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_DEAF2DC1FFFE43169F28A0503B96E03A"
             {
-            "SourcePath" = "8:"
+            "SourcePath" = "8:..\\x64\\Release (Installer)\\engine\\dynamic-libraries\\core\\resource-module.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_1FBE022B092241B49274ABC6DDA79674"
