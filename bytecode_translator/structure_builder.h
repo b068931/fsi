@@ -442,13 +442,6 @@ public:
             function* function = &*found_function;
             func->func = function; //bind function address argument with specific function
 
-            auto found_exposed_function =
-                std::ranges::find(file_structure.exposed_functions, function);
-
-            if (found_exposed_function == file_structure.exposed_functions.end()) { //insert exposed function if it hasn't been already added to the list
-                file_structure.exposed_functions.push_back(function);
-            }
-
             helper_parameters.active_function.add_new_operand_to_last_instruction(source_file_token::function_address_argument_keyword, func, false);
         }
     };

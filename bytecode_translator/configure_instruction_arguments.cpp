@@ -12,7 +12,7 @@ namespace {
 		argument_last_state
 			.set_redirection_for_tokens(
 				{
-					source_file_token::function_args_end, source_file_token::expression_end
+					source_file_token::function_arguments_end, source_file_token::expression_end
 				},
 				generic_parser::state_action::pop_top,
 				nullptr
@@ -143,7 +143,7 @@ extern state_settings& configure_instruction_arguments(states_builder_type& buil
 		.set_error_message("Unexpected token inside instruction. You were expected to introduce a keyword for another arugment.")
 		.set_redirection_for_tokens(
 			{
-				source_file_token::expression_end, source_file_token::function_args_end
+				source_file_token::expression_end, source_file_token::function_arguments_end
 			},
 			generic_parser::state_action::pop_top,
 			nullptr

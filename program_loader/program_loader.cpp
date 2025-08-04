@@ -341,8 +341,18 @@ namespace {
             throw program_compilation_error{ "Loaded program has no executable code." };
         }
 
-        void** exposed_functions_addresses = new void* [container.exposed_functions.size()] { nullptr };
-        void** loaded_functions_addresses = new void* [functions_count] { nullptr };
+        if (container.function_signatures.size() != container.function_bodies.size()) {
+            throw program_compilation_error{
+                std::format(
+                    "Loaded program has {} function signatures, but {} functions.",
+                    container.function_signatures.size(),
+                    container.function_bodies.size()
+                )
+            };
+        }
+
+        void** exposed_functions_addresses = new void* [container.exposed_functions.size()] {};
+        void** loaded_functions_addresses = new void* [functions_count] {};
 
         std::uint32_t main_function_index = functions_count;
         try {
@@ -574,7 +584,7 @@ module_mediator::return_value free_program(module_mediator::arguments_string_typ
     delete[] static_cast<void**>(exposed_functions_addresses);
     delete[] static_cast<char**>(program_strings);
 
-    return 0;
+    return module_mediator::module_success;
 }
 
 module_mediator::return_value check_function_arguments(module_mediator::arguments_string_type bundle) {

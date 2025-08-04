@@ -27,6 +27,7 @@ enum class translator_error_type {
     non_string_instruction,
     string_instruction,
     unknown_jump_point,
+    main_not_exposed,
     unknown_instruction
 };
 
@@ -118,6 +119,10 @@ inline void translate_error(translator_error_type error, std::ostream& stream) {
         }
         case translator_error_type::unknown_jump_point: {
             stream << "Jump point has been used, yet it has not been defined anywhere";
+            break;
+        }
+        case translator_error_type::main_not_exposed: {
+            stream << "You did not expose the main function. Execution engine won't be able to check its signature";
             break;
         }
         case translator_error_type::unknown_instruction: {

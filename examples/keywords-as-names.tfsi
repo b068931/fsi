@@ -8,6 +8,7 @@ $redefine strcpy copy-string;
 
 fun function() {
     $main-function function;
+    $expose-function function;
     $decl memory memory;
     $declare memory copy-string 
     ;

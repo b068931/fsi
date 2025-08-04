@@ -28,12 +28,12 @@ extern state_settings& configure_function_declaration(states_builder_type& build
 		.set_handle_tokens(
 			{
 				source_file_token::coma,
-				source_file_token::function_args_end,
+				source_file_token::function_arguments_end,
 				source_file_token::comment_start
 			}
 		)
 		.set_redirection_for_token(
-			source_file_token::function_args_end,
+			source_file_token::function_arguments_end,
 			generic_parser::state_action::change_top,
 			declaration_or_definition
 		);
@@ -41,23 +41,23 @@ extern state_settings& configure_function_declaration(states_builder_type& build
 	state_settings& function_argument_type = builder.create_state<function_argument_type_state>()
 		.set_error_message("Unexpected type for a function argument.")
 		.set_handle_tokens(std::vector<source_file_token>{ parser_options::all_types })
-		.add_handle_token(source_file_token::function_args_end)
+		.add_handle_token(source_file_token::function_arguments_end)
 		.set_redirection_for_tokens(
 			std::vector<source_file_token>{ parser_options::all_types },
 			generic_parser::state_action::change_top,
 			function_argument_name
 		)
 		.set_redirection_for_token(
-			source_file_token::function_args_end,
+			source_file_token::function_arguments_end,
 			generic_parser::state_action::change_top,
 			declaration_or_definition
 		);
 
 	state_settings& function_name = builder.create_state<function_name_state>()
 		.set_error_message("Invalid function name.")
-		.set_handle_tokens({ source_file_token::function_args_start })
+		.set_handle_tokens({ source_file_token::function_arguments_start })
 		.set_redirection_for_token(
-			source_file_token::function_args_start,
+			source_file_token::function_arguments_start,
 			generic_parser::state_action::change_top,
 			function_argument_type
 		);
@@ -85,9 +85,9 @@ extern state_settings& configure_inside_function(states_builder_type& builder, s
 
 	state_settings& module_call_function_name = builder.create_state<module_call_function_name_state>()
 		.set_error_message("A name of one of the module functions was expected.")
-		.set_handle_tokens({ source_file_token::function_args_start })
+		.set_handle_tokens({ source_file_token::function_arguments_start })
 		.set_redirection_for_token(
-			source_file_token::function_args_start,
+			source_file_token::function_arguments_start,
 			generic_parser::state_action::change_top,
 			instruction_arguments
 		);
@@ -105,7 +105,7 @@ extern state_settings& configure_inside_function(states_builder_type& builder, s
 		.set_error_message("Unexpected token inside function. You were expected to introduce a jump point, instruction, function or module call, etc.")
 		.set_handle_tokens( //jump_point and function_body_end are useless? -- i have zero idea what this thing means after several months (or years?) of it being here
 				{ //it is actually kind of funny that I did not manage to come up with something better than this
-				source_file_token::function_args_start, source_file_token::expression_end,
+				source_file_token::function_arguments_start, source_file_token::expression_end,
 				source_file_token::module_return_value, source_file_token::jump_point,
 				source_file_token::function_body_end, source_file_token::add_instruction_keyword,
 				source_file_token::signed_add_instruction_keyword, source_file_token::multiply_instruction_keyword,
@@ -128,7 +128,7 @@ extern state_settings& configure_inside_function(states_builder_type& builder, s
 			}
 		)
 		.set_redirection_for_token(
-			source_file_token::function_args_start,
+			source_file_token::function_arguments_start,
 			generic_parser::state_action::push_state,
 			instruction_arguments
 		)

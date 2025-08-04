@@ -218,6 +218,9 @@
     <ClInclude Include="instruction_encoder.h">
       <Filter>Header Files\Program Translation</Filter>
     </ClInclude>
+    <ClInclude Include="expose_function_state.h">
+      <Filter>Header Files\Source Code Parsing\Parse Map States\Special Instructions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

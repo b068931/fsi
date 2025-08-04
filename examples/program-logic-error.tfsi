@@ -3,6 +3,7 @@ from prts import <io.log.info, memory.allocate, memory.deallocate>
 
 function main() {
     $main-function main;
+    $expose-function main;
     $define-string message ''''Hello World!''''
     $declare memory message-storage;
     

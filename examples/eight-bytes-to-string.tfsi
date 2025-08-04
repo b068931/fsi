@@ -50,6 +50,8 @@ function ebyte-to-string(eight-bytes value) {
 
 function main() {
     $main-function main;
+    $expose-function main;
+
     $declare memory message;
     $declare memory null;
 

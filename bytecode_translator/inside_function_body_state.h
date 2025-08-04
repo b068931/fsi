@@ -11,7 +11,7 @@ public:
 		structure_builder::read_map_type& read_map
 	) override {
 		source_file_token token = read_map.get_current_token();
-		if (token == source_file_token::function_args_start) { //special case for function call
+		if (token == source_file_token::function_arguments_start) { //special case for function call
 			helper.active_function.add_new_instruction(source_file_token::function_call);
 			helper.add_function_address_argument(output_file_structure, helper, read_map);
 

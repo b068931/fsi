@@ -27,7 +27,7 @@ public:
     virtual bool is_match(source_file_token instr) override {
         return std::ranges::find(this->instruction_list, instr) != this->instruction_list.end();
     }
-    virtual void check_errors(const structure_builder::instruction& instr, std::vector<translator_error_type>& err_list) {
+    virtual void check_errors(const structure_builder::instruction& instr, std::vector<translator_error_type>& err_list) override {
         if (!this->filter.check(instr)) {
             err_list.push_back(this->filter.error_message);
         }

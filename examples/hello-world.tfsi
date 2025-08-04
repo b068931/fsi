@@ -5,6 +5,8 @@ $define-string message ''''Hello World!0''''
 
 function main() {
     $main-function main;
+    $expose-function main;
+
     $declare memory message-storage;
     $declare eight-bytes message-index;
     

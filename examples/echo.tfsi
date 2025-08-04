@@ -3,6 +3,7 @@ from prts import <io.std.out, io.std.in, memory.deallocate, memory.allocate>
 
 function main() {
     $main-function main;
+    $expose-function main;
 
     $declare memory message-storage;
     $declare eight-bytes storage-size;

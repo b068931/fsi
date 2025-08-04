@@ -164,6 +164,7 @@
     <ClInclude Include="define_state.h" />
     <ClInclude Include="different_type_instruction.h" />
     <ClInclude Include="different_type_multi_instruction.h" />
+    <ClInclude Include="expose_function_state.h" />
     <ClInclude Include="function_call_instruction.h" />
     <ClInclude Include="general_instruction.h" />
     <ClInclude Include="get_function_address_instruction.h" />

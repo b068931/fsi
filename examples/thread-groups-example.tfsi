@@ -34,6 +34,7 @@ function choose-string(one-byte is-ping)
 
 function show-passed-message-and-switch(eight-bytes counter, one-byte is-ping)
 {
+    $expose-function show-passed-message-and-switch;
     $declare memory message;
     $declare memory null;
 
@@ -83,3 +84,4 @@ get-ping-string {
     save-value variable memory ping-storage;
 }
 $main-function main;
+$expose-function main;

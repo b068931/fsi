@@ -1,6 +1,6 @@
 function 
 
 
-main( );main	{main
+main( );$expose-function main;main	{main
 ()$stack-size d1000000000;}
 $main-function main;

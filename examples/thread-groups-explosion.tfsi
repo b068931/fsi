@@ -4,6 +4,8 @@ $redefine binary-tree-depth d10;
 from prts import <threading.create-group>
 
 function self-duplicate(eight-bytes counter) {
+    $expose-function self-duplicate;
+
     compare variable eight-bytes counter, immediate eight-bytes d0;
     jump-equal point end;
 
@@ -17,5 +19,7 @@ function self-duplicate(eight-bytes counter) {
 
 function main() {
     $main-function main;
+    $expose-function main;
+
     void: prts->threading.create-group(function-name self-duplicate, immediate eight-bytes binary-tree-depth);
 }

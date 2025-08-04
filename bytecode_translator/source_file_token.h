@@ -23,9 +23,10 @@ enum class source_file_token {
     declare_keyword,
     main_function_keyword,
     include_keyword,
+    expose_function_keyword,
     function_declaration_keyword, //function
-    function_args_start, //(
-    function_args_end, //)
+    function_arguments_start, //(
+    function_arguments_end, //)
     sizeof_argument_keyword,
     one_byte_type_keyword,
     two_bytes_type_keyword,

@@ -8,6 +8,7 @@ from prts import<
 
 function hello-world(memory the-message)
  {
+    $expose-function hello-world;
     $declare memory null;
     void: prts->io.log.info(variable memory null, immediate eight-bytes d0, variable memory null, variable memory the-message);
     the-message: prts->memory.deallocate();
@@ -17,6 +18,7 @@ $define-string message ''''Hello World! With extra steps.''''
 
 function main(){
     $main-function main;
+    $expose-function main;
     $declare memory message-storage;
     $declare eight-bytes function-address;
     

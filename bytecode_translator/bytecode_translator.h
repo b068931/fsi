@@ -409,7 +409,7 @@ private:
         );
 
         if (found_main == this->file_structure->exposed_functions.end()) {
-            this->file_structure->exposed_functions.push_back(this->file_structure->main_function);
+            this->logic_errors.push_back(translator_error_type::main_not_exposed);
         }
 
         this->write_8_bytes(static_cast<std::uint64_t>(this->file_structure->stack_size));
