@@ -1,4 +1,0 @@
-$stack-size b1000000;
-function main(eight-bytes wrong);
-$main-function main;
-main {;;;};;

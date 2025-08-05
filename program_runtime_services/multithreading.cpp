@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "multithreading.h"
 
+#include "../logger_module/logging.h"
+
 namespace {
     module_mediator::return_value get_current_thread_group_jump_table_size() {
         return module_mediator::fast_call<module_mediator::return_value>(

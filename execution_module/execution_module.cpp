@@ -185,7 +185,12 @@ module_mediator::return_value dynamic_call(module_mediator::arguments_string_typ
 
     function_arguments.insert(
         function_arguments.cbegin(),
-        { static_cast<module_mediator::arguments_string_element>(module_mediator::arguments_string_builder::get_type_index<std::uintptr_t>), &program_return_address }
+        {
+            static_cast<module_mediator::arguments_string_element>(
+                module_mediator::arguments_string_builder::get_type_index<std::uintptr_t>
+            ),
+            &program_return_address
+        }
     );
 
     std::uintptr_t new_current_stack_position = backend::apply_initializer_on_thread_stack(
@@ -200,7 +205,9 @@ module_mediator::return_value dynamic_call(module_mediator::arguments_string_typ
     }
 
     state_manager.set_current_stack_position(
-        new_current_stack_position - module_mediator::arguments_string_builder::get_type_size_by_index(module_mediator::arguments_string_builder::get_type_index<std::uintptr_t>)
+        new_current_stack_position - module_mediator::arguments_string_builder::get_type_size_by_index(
+            module_mediator::arguments_string_builder::get_type_index<std::uintptr_t>
+        )
     );
     
     state_manager.set_return_address(

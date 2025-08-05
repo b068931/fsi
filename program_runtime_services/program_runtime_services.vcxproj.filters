@@ -74,7 +74,7 @@
       <Filter>Source Files\Module Mediator\IO</Filter>
     </ClCompile>
     <ClCompile Include="backend_functions.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Maintenance</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

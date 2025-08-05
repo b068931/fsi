@@ -8,6 +8,10 @@
 //#include <vld.h>
 #endif
 
+#ifndef _MSC_VER
+#error "Currently only MSVC is supported for the program runtime services module."
+#endif
+
 #include <windows.h>
 #include <memory>
 #include <vector>
@@ -24,5 +28,6 @@
 #include <barrier>
 #include <filesystem>
 #include <cassert>
+#include <atomic>
 
 #endif //PCH_H

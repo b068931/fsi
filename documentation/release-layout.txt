@@ -1,0 +1,14 @@
+After installing the FSI you'll have several directories and files in the installation folder:
+- 'bin'          : Contains the FSI executables and all the necessary DLLs. Check "installation.txt" for more details.
+- 'documentation': Contains the documentation files, including this one.
+- 'examples'     : Contains example scripts. Refer to "use-fsi-translator.txt" and "use-fsi-mediator" for more details.
+- 'libraries'    : Contains the libraries that you might use in your scripts. Notice that right now there is only one.
+- 'LICENSE.txt'  : Licensing information about the FSI. Read that if you want to modify the FSI or use its parts in your own projects.
+- 'README.md'   : A short introduction.
+- 'vc_redist.x64.exe' : The VC++ Redistributable installer. This is only needed if you used the ".msi" installer, 
+                        and you don't have VC++ Redist installed. REFER TO "LICENSE.txt" FOR MORE DETAILS.
+
+The 'bin' folder contains all of the compiled executables and DLLs that are needed to run the FSI. Depending on the installation
+type it might also contain the VC++ Redist files. REFER TO "LICENSE.txt" FOR MORE DETAILS. The high-level description of each of
+the EE's (Execution Engine) modules is provided in the "README.md". All executables are prefixed with "fsi-", so that they do not
+clash with other executables in you PATH, should you choose to add the 'bin' folder to your PATH.

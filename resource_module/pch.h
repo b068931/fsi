@@ -8,6 +8,10 @@
 //#include <vld.h>
 #endif
 
+#ifndef _MSC_VER
+#error "Currently only MSVC is supported for the resource module."
+#endif
+
 #include <windows.h>
 #include <cstdint>
 #include <mutex>
@@ -21,5 +25,7 @@
 #include <utility>
 #include <format>
 #include <algorithm>
+#include <atomic>
+#include <set>
 
 #endif

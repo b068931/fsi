@@ -8,6 +8,10 @@
 //#include <vld.h>
 #endif
 
+#ifndef _MSC_VER
+#error "Currently only MSVC is supported for the program loader module."
+#endif
+
 #include <windows.h>
 #include <map>
 #include <memory>

@@ -1,0 +1,22 @@
+Refer to "release-layout.txt" for the layout of the release package.
+There are two ways to install the From Scratch Interpreter (FSI):
+1. Using the installer, which is packaged as two files:
+   - 'fsi-installer.msi' installs ONLY the software itself.
+   - 'setup.exe' checks whether you have VC++ Redistributable installed 
+   and installs it if necessary, then installs the software.
+
+2. Using the portable version, which is packaged as a ZIP file.
+The only difference between the two is that the portable version includes
+all the necessary VC++ Redist files in the 'bin' folder. However, they can't be
+updated automatically, so Microsoft discourages this approach - I do not care.
+So if you are using a portable version, you don't have to do anything except
+extract the ZIP file to a folder of your choice.
+
+If you get error message boxes with scary text about missing DLLs, you are probably missing
+VC++ Redist. Most likely, this is because you used the ".msi" installer. For this reason,
+I also added "vc_redist.x64.exe" in the root folder, it'll install the VC++ Redist.
+
+If the messages persist, but you have VC++ Redist installed, and these messages appear inside
+the CMD window, then it is quite likely that the execution engine's modules got borked. Another
+possibility is that the '.mods' file got corrupted. Either way, try reinstalling. Or use
+the portable version.

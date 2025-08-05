@@ -1,23 +1,17 @@
 $stack-size d100;
 from prts import <io.std.out, memory.allocate, memory.deallocate>
 
-$define-string message ''''Hello World!0''''
+$define-string message ''''Hello World!''''
 
 function main() {
     $main-function main;
     $expose-function main;
 
     $declare memory message-storage;
-    $declare eight-bytes message-index;
-    
+
     message-storage: prts->memory.allocate(size-of eight-bytes message)
     copy-string variable memory message-storage, string message;
 
-    /*manually add a new line symbols because translator does not support escaped sequences*/
-    move variable eight-bytes message-index, immediate eight-bytes d12;
-    move dereference one-byte message-storage[message-index], immediate one-byte d10;
-
-    /*the program may produce an additional empty character because io.std.out prints the entire buffer, including the null terminator*/
-    void: prts->io.std.out(variable memory message-storage, size-of eight-bytes message)
+    void: prts->io.std.out(variable memory message-storage, immediate eight-bytes d12)
     message-storage: prts->memory.deallocate()
 }

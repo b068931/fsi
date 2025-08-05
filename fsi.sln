@@ -42,6 +42,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 	ProjectSection(SolutionItems) = preProject
 		documentation\engine-multithreading.txt = documentation\engine-multithreading.txt
+		documentation\installation.txt = documentation\installation.txt
+		documentation\release-layout.txt = documentation\release-layout.txt
+		documentation\use-fsi-mediator.txt = documentation\use-fsi-mediator.txt
+		documentation\use-fsi-translator.txt = documentation\use-fsi-translator.txt
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "compression_algorithms", "compression_algorithms\compression_algorithms.vcxproj", "{DD719431-ECE7-4C3F-8F0E-73E8A88E7783}"

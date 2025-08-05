@@ -365,3 +365,5 @@ FodyWeavers.xsd
 /application_setup/appico.ico
 /application_setup/Release (Installer)
 *.binary
+*.msi
+*.exe

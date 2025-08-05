@@ -2,6 +2,8 @@
 #include "standard_input_output.h"
 #include "backend_functions.h"
 
+#include "../logger_module/logging.h"
+
 //This file describes IO logic for the FSI programs through PRTS (Program RunTime Services) module.
 //I use global variables because they are isolated to this cpp file, they cannot be accessed elsewhere.
 //You should view PRTS as an assortment of "classes" or "objects" that are isolated in their own cpp files.
@@ -888,8 +890,8 @@ namespace {
 
         phase_coordination.arrive_and_wait();
 
-        DWORD overlappedOffset = 0;
-        DWORD overlappedOffsetHigh = 0;
+        DWORD dwOverlappedOffset = 0;
+        DWORD dwOverlappedOffsetHigh = 0;
 
         std::vector<char> global_input_buffer{};
         bool input_shutdown = false;
@@ -935,7 +937,7 @@ namespace {
                 }
                 else if (!input_shutdown) {
                     auto [input_data, shutdown_requested] =
-                        ConsumeStdIn(hStdIn, hCancelIO, overlappedOffset, overlappedOffsetHigh);
+                        ConsumeStdIn(hStdIn, hCancelIO, dwOverlappedOffset, dwOverlappedOffsetHigh);
 
                     input_shutdown = shutdown_requested;
                     std::size_t additional_input = descriptor.buffer_size - input_portion.size();
@@ -987,8 +989,8 @@ namespace {
 
         phase_coordination.arrive_and_wait();
 
-        DWORD offset;
-        DWORD offsetHigh;
+        DWORD dwOverlappedOffset = 0;
+        DWORD dwOverlappedOffsetHigh = 0;
 
         bool output_shutdown = false;
         while (check_stdio_attached()) {
@@ -1012,8 +1014,8 @@ namespace {
                     hCancelIO,
                     descriptor.buffer_address,
                     descriptor.buffer_size,
-                    offset,
-                    offsetHigh
+                    dwOverlappedOffset,
+                    dwOverlappedOffsetHigh
                 );
             }
 

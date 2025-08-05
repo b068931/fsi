@@ -1,0 +1,27 @@
+The 'fsi-translator' executable is used to convert the textual representation of a FSI program to a
+binary format that can be executed by the FSI's interpreter. The textual representation is suffixed with
+'.tfsi', while the binary format is suffixed with '.bfsi'. 'b' and 't' stand for binary and text, respectively.
+
+The command to run the translator is as follows:
+- fsi-translator <input-file> <output-file> <include-debug|no-debug>
+- "input-file" and "output-file" are the paths to the input and output files, respectively.
+- "include-debug|no-debug" is a flag that indicates whether to include the debug information in the output file.
+  By debug information, I mean the information about the names of parts of your program, such as the names of
+  variables, functions, and so on. This information maybe used by the interpreter to provide more meaningful 
+  error messages, it does NOT allow step-by-step debugging of the program.
+
+In order to better understand the syntax of the textual representation, you may want to look at the provided 
+examples in the 'examples' directory. If you are into that, you may also want to look at the source code of the
+translator itself. Be warned, though, that the source code is rather messy and may seem incoherent at first glance.
+Seriously though, examples should contain enough information to get you started.
+
+You can look into bytecode_translator\parser_options.cpp to see all available keywords, punctuations, etc.
+Some instructions (except, obviously, function calls and module calls) can accept more than two arguments, exact
+behavior depends on the instruction itself. For example, 'add' sums all other arguments into the first one.
+
+The result of the translation is a compressed binary file that contains all the information about your program.
+It is not meant to be human-readable, but you can use some hex editor to peek inside if you are curious. All binary
+files start with 'FSI' signature, followed by some of the information that is required for decompression: the size of
+the binary file before compression, buffer size for the sequence-reduction algorithm, frequency table for huffman coding,
+etc. The rest of the file is the compressed data itself. Program loader consumes only the uncompressed data, which is
+structured in blocks (internally called 'runs') that contain function bodies, function signatures, and other data.

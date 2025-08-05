@@ -1,3 +1,19 @@
+Portable or installer releases of this software may contain the following files:
+- concrt140.dll
+- msvcp140.dll
+- msvcp140_1.dll
+- msvcp140_2.dll
+- msvcp140_atomic_wait.dll
+- msvcp140_codecvt_ids.dll
+- vccorlib140.dll
+- vcruntime140.dll
+- vcruntime140_1.dll
+- vcruntime140_threads.dll
+- vc_redist.x64.exe
+These are provided as per https://learn.microsoft.com/en-us/visualstudio/releases/2022/redistribution.
+They are provided in accordance with the Microsoft Visual Studio Community 2022 license terms, 
+in an unmodified form. They are not covered by the MIT License below.
+
 MIT License
 
 Copyright (c) 2023 https://github.com/b068931

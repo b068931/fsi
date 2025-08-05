@@ -3,7 +3,6 @@
 
 #include "../module_mediator/module_part.h"
 #include "../module_mediator/fsi_types.h"
-#include "../logger_module/logging.h"
 
 #ifdef PROGRAMRUNTIMESERVICES_EXPORTS
 #define PROGRAMRUNTIMESERVICES_API extern "C" __declspec(dllexport)
@@ -13,11 +12,33 @@
 
 namespace interoperation {
     module_mediator::module_part* get_module_part();
+    module_mediator::return_value verify_thread_memory(
+        module_mediator::return_value thread_id,
+        module_mediator::memory pointer
+    );
+
     module_mediator::return_value get_current_thread_id();
     module_mediator::return_value get_current_thread_group_id();
 
-    module_mediator::return_value allocate(module_mediator::return_value thread_group_id, module_mediator::eight_bytes size);
-    void deallocate(module_mediator::return_value thread_group_id, module_mediator::memory pointer);
+    module_mediator::return_value thread_allocate(
+        module_mediator::return_value thread_id, 
+        module_mediator::eight_bytes size
+    );
+
+    void thread_deallocate(
+        module_mediator::return_value thread_id, 
+        module_mediator::memory pointer
+    );
+
+    module_mediator::return_value thread_group_allocate(
+        module_mediator::return_value thread_group_id, 
+        module_mediator::eight_bytes size
+    );
+
+    void thread_group_deallocate(
+        module_mediator::return_value thread_group_id, 
+        module_mediator::memory pointer
+    );
 
     class index_getter {
     public:
@@ -83,6 +104,21 @@ namespace interoperation {
 
         static std::size_t resource_module() {
             static std::size_t index = get_module_part()->find_module_index("resm");
+            return index;
+        }
+
+        static std::size_t resource_module_allocate_thread_memory() {
+            static std::size_t index = get_module_part()->find_function_index(index_getter::resource_module(), "allocate_thread_memory");
+            return index;
+        }
+
+        static std::size_t resource_module_deallocate_thread_memory() {
+            static std::size_t index = get_module_part()->find_function_index(index_getter::resource_module(), "deallocate_thread_memory");
+            return index;
+        }
+
+        static std::size_t resource_module_verify_thread_memory() {
+            static std::size_t index = get_module_part()->find_function_index(index_getter::resource_module(), "verify_thread_memory");
             return index;
         }
 

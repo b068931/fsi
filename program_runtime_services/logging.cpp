@@ -1,7 +1,8 @@
 #include "pch.h"
 #include "logging.h"
-
 #include "backend_functions.h"
+
+#include "../logger_module/logging.h"
 
 namespace {
 	enum class log_type : std::uint8_t {

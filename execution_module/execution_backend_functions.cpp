@@ -138,7 +138,8 @@ namespace backend {
 		assert(get_thread_local_structure()->initializer == nullptr && "possible memory leak");
 		get_thread_local_structure()->initializer = initializer;
 		if (initializer != nullptr) { //you can not initialize a thread_group with memory because this can lead to data race
-			constexpr auto pointer_type_index = module_mediator::arguments_string_builder::get_type_index<module_mediator::memory>;
+			constexpr auto pointer_type_index = 
+				module_mediator::arguments_string_builder::get_type_index<module_mediator::memory>;
 
 			module_mediator::arguments_string_element arguments_count = initializer[0];
 			module_mediator::arguments_string_type arguments_types = initializer + 1;
@@ -179,7 +180,11 @@ namespace backend {
 		std::memcpy(memory + sizeof(std::uint64_t) * entry_index, &value, sizeof(std::uint64_t));
 	}
 
-	module_mediator::return_value create_thread(module_mediator::return_value thread_group_id, module_mediator::return_value priority, void* function_address) {
+	module_mediator::return_value create_thread(
+		module_mediator::return_value thread_group_id, 
+		module_mediator::return_value priority, 
+		void* function_address
+	) {
 		thread_local_structure* thread_structure = get_thread_local_structure();
 		LOG_PROGRAM_INFO(interoperation::get_module_part(), "Creating a new thread.");
 
@@ -194,7 +199,11 @@ namespace backend {
 		);
 	}
 
-	module_mediator::return_value create_thread_initializer(module_mediator::return_value priority, void* function_address, module_mediator::arguments_string_type initializer) {
+	module_mediator::return_value create_thread_initializer(
+		module_mediator::return_value priority, 
+		void* function_address, 
+		module_mediator::arguments_string_type initializer
+	) {
 		assert(get_thread_local_structure()->initializer == nullptr && "possible memory leak");
 		get_thread_local_structure()->initializer = initializer;
 		return create_thread(
@@ -248,9 +257,13 @@ namespace backend {
 		return function_name;
 	}
 
-	std::uintptr_t apply_initializer_on_thread_stack(char* thread_stack_memory, char* thread_stack_end, const module_mediator::arguments_array_type& arguments) {
-		for (auto argument : std::ranges::reverse_view(arguments)) {
-			std::size_t type_size = module_mediator::arguments_string_builder::get_type_size_by_index(argument.first);
+	std::uintptr_t apply_initializer_on_thread_stack(
+		char* thread_stack_memory, 
+		const char* thread_stack_end, 
+		const module_mediator::arguments_array_type& arguments
+	) {
+		for (auto [argument_type, argument_address] : std::ranges::reverse_view(arguments)) {
+			std::size_t type_size = module_mediator::arguments_string_builder::get_type_size_by_index(argument_type);
 			if (thread_stack_memory + type_size >= thread_stack_end) {
 				LOG_PROGRAM_ERROR(interoperation::get_module_part(), "Not enough stack space to initialize thread stack.");
 				return reinterpret_cast<std::uintptr_t>(nullptr);
@@ -258,7 +271,7 @@ namespace backend {
 
 			std::memcpy(
 				thread_stack_memory,
-				argument.second,
+				argument_address,
 				type_size
 			);
 
@@ -268,7 +281,12 @@ namespace backend {
 		return reinterpret_cast<std::uintptr_t>(thread_stack_memory);
 	}
 
-	std::uintptr_t initialize_thread_stack(void* function_address, char* thread_stack_memory, char* thread_stack_end, module_mediator::return_value thread_id) {
+	std::uintptr_t initialize_thread_stack(
+		void* function_address, 
+		char* thread_stack_memory, 
+		char* thread_stack_end, 
+		module_mediator::return_value thread_id
+	) {
 		if (check_function_signature(function_address, get_thread_local_structure()->initializer) != module_mediator::module_success) {
 			delete[] get_thread_local_structure()->initializer;
 			get_thread_local_structure()->initializer = nullptr;

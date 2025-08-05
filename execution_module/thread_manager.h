@@ -4,6 +4,7 @@
 #include "scheduler.h"
 #include "module_interoperation.h"
 #include "assembly_functions.h"
+
 #include "../logger_module/logging.h"
 
 class thread_manager {
@@ -50,10 +51,34 @@ private:
                 this->scheduler.put_back(currently_running_thread_information->put_back_structure);
                 for (const auto& deferred_callback : get_thread_local_structure()->deferred_callbacks) {
                     std::size_t module_index = interoperation::get_module_part()->find_module_index(deferred_callback->module_name);
+                    if (module_index == module_mediator::module_part::module_not_found) {
+                        LOG_WARNING(
+                            interoperation::get_module_part(),
+                            std::format(
+                                "Module {} not found.", 
+                                deferred_callback->module_name
+                            )
+                        );
+
+                        continue;
+                    }
+
                     std::size_t function_index = interoperation::get_module_part()->find_function_index(
                         module_index,
                         deferred_callback->function_name
                     );
+                    if (function_index == module_mediator::module_part::function_not_found) {
+                        LOG_WARNING(
+                            interoperation::get_module_part(),
+                            std::format(
+                                "Function {} not found in module {}.", 
+                                deferred_callback->function_name, 
+                                deferred_callback->module_name
+                            )
+                        );
+
+                        continue;
+                    }
 
                     module_mediator::return_value result = interoperation::get_module_part()->call_module(
                         module_index,

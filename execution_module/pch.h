@@ -8,6 +8,10 @@
 //#include <vld.h>
 #endif
 
+#ifndef _MSC_VER
+#error "Currently only MSVC is supported for the execution module."
+#endif
+
 #include <windows.h>
 #include <cassert>
 #include <new>

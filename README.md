@@ -2,6 +2,8 @@
 
 > A toy programming language built from scratch to explore how software works at a lower level.
 
+> Refer to "documentation\installation.txt" for installation instructions.
+
 ## 📋 Table of Contents
 - [Introduction](#-introduction)
 - [What is FSI?](#-what-is-fsi)

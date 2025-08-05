@@ -246,7 +246,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="..\examples\make.bat" />
     <CopyFileToFolders Include="..\examples\comments-everywhere.tfsi">
       <Filter>Examples</Filter>
     </CopyFileToFolders>

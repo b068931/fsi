@@ -2,6 +2,10 @@
 //#include <vld.h>
 #endif
 
+#ifndef _MSC_VER
+#error "Currently only MSVC is supported for the module mediator."
+#endif
+
 #include <iostream>
 #include <cstdlib>
 #include <filesystem>

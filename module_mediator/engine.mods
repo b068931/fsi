@@ -1,6 +1,6 @@
 -- Contains scheduler, executor threads management, thread creation and initialization.
 -- You should also look at resource module. This module manages data that is only execution related.
-[excm:dynamic-libraries/core/execution-module.dll]
+[excm:execution-module.dll]
 
 -- Called by resource module as a response to container (thread group) creation.
 -- Accepts container id, main function address, preferred stack size.
@@ -62,20 +62,20 @@ dynamic_call=memory memory
 -- the execution module. I believe this enables a more clear separation of concerns: managing data is complicated enough on its own,
 -- trying to combine it with execution management would make it even more convoluted.
 -- Another thing that resource module is concerned with is notifying other modules about destroying threads and containers.
-[resm:dynamic-libraries/core/resource-module.dll]
+[resm:resource-module.dll]
 
 -- Adds a function that will be called when a thread group (container) is destroyed.
 -- The function gets called BEFORE resource module starts deallocating the memory.
 -- This allows you to remove all your data structures related to the thread group.
 -- Otherwise resource module will just deallocate the memory (without any destructors). This may lead to memory leaks.
--- It will also generate a warning in the log if there are undeallocated memory blocks.
+-- It will also generate a warning in the log if there are any undeallocated memory blocks.
 -- Does nothing if object does not exist.
--- Accepts a thread group id, function address, additional data that will be passed to the function.
-add_container_on_destroy=eight-bytes memory memory
+-- Accepts a thread group id, callback bundle.
+add_container_on_destroy=eight-bytes memory
 
 -- Analogous to add_container_on_destroy, but for threads.
--- Accepts a thread id, function address, additional data that will be passed to the function.
-add_thread_on_destroy=eight-bytes memory memory
+-- Accepts a thread id, callback bundle.
+add_thread_on_destroy=eight-bytes memory
 
 -- From the point of view of the execution module, each new thread group is a new program.
 -- Resource module, however, does not actually duplicate the program data (compiled functions, string, etc.).
@@ -150,11 +150,20 @@ deallocate_program_memory=eight-bytes memory
 -- Accepts a thread id, memory address.
 deallocate_thread_memory=eight-bytes memory
 
+-- Checks whether the specified memory address belongs to the specified program container.
+-- Returns module_success if it does, module_failure otherwise.
+-- Accepts a thread id, memory address.
+verify_thread_memory=eight-bytes memory
+
+-- Analogous to verify_thread_memory but for program containers.
+-- Accepts a container id, memory address.
+verify_program_memory=eight-bytes memory
+
 -- Contains logic required to read binary representation of a program, compile it, and load it into memory.
 -- Also manages some information about compiled functions, such as exposed functions. Also it must be used to
 -- deallocate program context, because this module is the one that creates it (otherwise process would crash,
 -- because each DLL has its own copy of Visual C++ runtime).
-[progload:dynamic-libraries/core/program-loader.dll]
+[progload:program-loader.dll]
 
 -- Loads a program from the specified binary file. Ensures that the program is correct.
 -- Accepts the name of the binary file.
@@ -178,7 +187,7 @@ get_function_name=eight-bytes
 -- All other modules rely on this module to produce log messages.
 -- Outputs all log messages to std::cerr, which can be redirected, if needed.
 -- Functions provided by this module imbue log messages with additional information, such as file name, line number, etc.
-[logger:dynamic-libraries/core/logger-module.dll]
+[logger:logger-module.dll]
 
 -- All functions accept file name, line number, function name, and message.
 -- These functions provide log messages without additional information about thread and thread group.
@@ -195,7 +204,7 @@ program_fatal=memory eight-bytes memory memory
 
 -- Provides a running program with access to the runtime environment functions.
 -- Memory management, thread management, logging, etc.
-[prts:dynamic-libraries/core/program-runtime-services.dll]
+[prts:program-runtime-services.dll]
 
 -- Provides a set of functions to manage memory.
 

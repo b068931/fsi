@@ -11,24 +11,30 @@ struct program_container : public resource_container {
 
 	program_container() = default;
 
+    program_container(const program_container& container) = delete;
+    program_container& operator=(const program_container& container) = delete;
+
 	program_container(program_container&& container) noexcept
-		:resource_container{ std::move(container) },
-		context{ container.context },
-		threads_count{ container.threads_count }
+		:resource_container{ std::move(static_cast<resource_container&&>(container)) },
+		threads_count{ container.threads_count },
+		context{ container.context }
 	{
 		container.threads_count = 0;
 		container.context = nullptr;
 	}
-	void operator=(program_container&& container) noexcept {
-		this->move_resource_container_to_this(std::move(container));
+
+	program_container& operator=(program_container&& container) noexcept {
+		this->move_resource_container_to_this(std::move(static_cast<resource_container&&>(container)));
 		this->threads_count = container.threads_count;
 		this->context = container.context;
 
 		container.threads_count = 0;
 		container.context = nullptr;
+
+		return *this;
 	}
 
-	~program_container() noexcept;
+	~program_container() noexcept override;
 };
 
 #endif // !PROGRAM_CONTAINER_H

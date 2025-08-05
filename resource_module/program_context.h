@@ -1,8 +1,7 @@
-#ifndef PRGORAM_CONTEXT_H
+#ifndef PROGRAM_CONTEXT_H
 #define PROGRAM_CONTEXT_H
 
 #include "pch.h"
-
 
 struct program_context {
 private:
@@ -57,6 +56,13 @@ public:
 			program_strings, program_strings_size
 		};
 	}
+
+    program_context(program_context&&) = delete;
+    program_context& operator=(program_context&&) = delete;
+
+    program_context(const program_context&) = delete;
+    program_context& operator=(const program_context&) = delete;
+
 	static program_context* duplicate(program_context* object) {
 		std::lock_guard lock{ object->references_mutex };
 		assert(object->references_count != 0);
@@ -64,6 +70,7 @@ public:
 		++object->references_count;
 		return object;
 	}
+
 	std::size_t decrease_references_count() {
 		std::lock_guard lock{ this->references_mutex };
 		return --this->references_count;
@@ -72,4 +79,4 @@ public:
 	~program_context() noexcept;
 };
 
-#endif // !PRGORAM_CONTEXT_H
+#endif // !PROGRAM_CONTEXT_H

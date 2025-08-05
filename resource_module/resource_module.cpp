@@ -9,9 +9,7 @@
 #include "../logger_module/logging.h"
 #include "../module_mediator/fsi_types.h"
 
-//remove "#define I_HATE_MICROSOFT_AND_STUPID_ANALYZER_WARNINGS" to disable _Acquires_lock_ and _Releases_lock_
-#define I_HATE_MICROSOFT_AND_STUPID_ANALYZER_WARNINGS
-#ifndef I_HATE_MICROSOFT_AND_STUPID_ANALYZER_WARNINGS
+#ifndef _MSC_VER
     #define _Acquires_lock_(a)
     #define _Releases_lock_(a)
 #endif
@@ -63,10 +61,15 @@ namespace {
     }
 
     template<typename T>
-    void add_destroy_callback_generic(std::recursive_mutex& mutex, T& object, id_generator::id_type id, void(*callback)(void*), void* paired_information) {
+    void add_destroy_callback_generic(
+        std::recursive_mutex& mutex, 
+        T& object, 
+        id_generator::id_type id, 
+        module_mediator::callback_bundle* bundle
+    ) {
         auto iterator_lock = get_iterator(object, mutex, id);
         if (iterator_lock.second) {
-            iterator_lock.first->second.destroy_callbacks.push_back(std::pair{ callback, paired_information });
+            iterator_lock.first->second.destroy_callbacks.push_back(bundle);
         }
         else {
             LOG_PROGRAM_WARNING(
@@ -91,8 +94,12 @@ namespace {
         */
 
         if (iterator_lock.second) { //check if we acquired mutex for an object
-            iterator_lock.first->second.allocated_memory.push_back(new(std::nothrow) char[size] {});
-            return reinterpret_cast<std::uintptr_t>(iterator_lock.first->second.allocated_memory.back());
+            [[maybe_unused]] auto [result, is_new] = iterator_lock.first->second.allocated_memory.insert(
+                static_cast<void*>(new(std::nothrow) char[size] {})
+            );
+
+            assert(is_new && "allocated memory already exists for this object");
+            return reinterpret_cast<std::uintptr_t>(*result);
         }
 
         LOG_PROGRAM_WARNING(
@@ -112,11 +119,8 @@ namespace {
         //see allocate_memory_generic
         auto iterator_lock = get_iterator(object, mutex, id);
         if (iterator_lock.second) {
-            std::vector<void*>& allocated_memory = iterator_lock.first->second.allocated_memory;
-            auto found_address = std::ranges::find(
-                allocated_memory,
-                address
-            );
+            auto& allocated_memory = iterator_lock.first->second.allocated_memory;
+            auto found_address = allocated_memory.find(address);
 
             //if address does not belong to this structure we do nothing
             if (found_address != allocated_memory.end()) {
@@ -233,6 +237,39 @@ namespace {
         }
     }
 
+    template<typename T>
+    module_mediator::return_value verify_memory_generic(
+        std::recursive_mutex& mutex,
+        T& object,
+        id_generator::id_type object_id, 
+        module_mediator::memory address
+    ) {
+        if (address == nullptr) {
+            return module_mediator::module_failure;
+        }
+
+        auto [iterator, lock] =
+            get_iterator(object, mutex, object_id);
+
+        if (lock) {
+            if (iterator->second.allocated_memory.contains(address)) {
+                return module_mediator::module_success;
+            }
+
+            return module_mediator::module_failure;
+        }
+
+        LOG_PROGRAM_WARNING(
+            interoperation::get_module_part(),
+            std::format("Object with id {} does not exist, cannot verify memory at {}.", 
+                object_id, 
+                reinterpret_cast<std::uintptr_t>(address)
+            )
+        );
+
+        return module_mediator::module_failure;
+    }
+
     void insert_new_container(id_generator::id_type id, program_context* context) {
         program_container new_container{};
         new_container.context = context;
@@ -261,29 +298,27 @@ namespace {
 }
 
 module_mediator::return_value add_container_on_destroy(module_mediator::arguments_string_type bundle) {
-    auto [container_id, destroy_callback, user_data] = 
-        module_mediator::arguments_string_builder::unpack<module_mediator::return_value, void*, void*>(bundle);
+    auto [container_id, callback_bundle] = 
+        module_mediator::arguments_string_builder::unpack<module_mediator::return_value, module_mediator::memory>(bundle);
 
     add_destroy_callback_generic(
         containers_mutex,
         containers,
         container_id,
-        static_cast<void(*)(void*)>(destroy_callback), //not really that portable, either way this only works on windows under x86_64
-        user_data
+        static_cast<module_mediator::callback_bundle*>(callback_bundle)
     );
 
     return module_mediator::module_success;
 }
 module_mediator::return_value add_thread_on_destroy(module_mediator::arguments_string_type bundle) {
-    auto [thread_id, destroy_callback, user_data] = 
-        module_mediator::arguments_string_builder::unpack<module_mediator::return_value, void*, void*>(bundle);
+    auto [thread_id, callback_bundle] = 
+        module_mediator::arguments_string_builder::unpack<module_mediator::return_value, module_mediator::memory>(bundle);
 
     add_destroy_callback_generic(
         thread_structures_mutex,
         thread_structures,
         thread_id,
-        static_cast<void(*)(void*)>(destroy_callback),
-        user_data
+        static_cast<module_mediator::callback_bundle*>(callback_bundle)
     );
 
     return module_mediator::module_success;
@@ -291,7 +326,7 @@ module_mediator::return_value add_thread_on_destroy(module_mediator::arguments_s
 
 module_mediator::return_value duplicate_container(module_mediator::arguments_string_type bundle) {
     auto [container_id, main_function] = 
-        module_mediator::arguments_string_builder::unpack<id_generator::id_type, void*>(bundle);
+        module_mediator::arguments_string_builder::unpack<id_generator::id_type, module_mediator::memory>(bundle);
 
     auto [iterator, lock] =
         get_iterator(containers, containers_mutex, container_id);
@@ -355,10 +390,10 @@ module_mediator::return_value create_new_program_container(module_mediator::argu
           jump_table, jump_table_size,
           program_strings, program_strings_count] = module_mediator::arguments_string_builder::unpack<
         std::uint64_t, std::uint32_t, 
-        void*, std::uint32_t, 
-        void*, std::uint32_t, 
-        void*, std::uint64_t, 
-        void*, std::uint64_t
+        module_mediator::memory, std::uint32_t, 
+        module_mediator::memory, std::uint32_t, 
+        module_mediator::memory, std::uint64_t, 
+        module_mediator::memory, std::uint64_t
     >(bundle);
     
     /*
@@ -453,14 +488,14 @@ module_mediator::return_value allocate_thread_memory(module_mediator::arguments_
 
 module_mediator::return_value deallocate_program_memory(module_mediator::arguments_string_type bundle) {
     auto [container_id, memory_address] = 
-        module_mediator::arguments_string_builder::unpack<id_generator::id_type, void*>(bundle);
+        module_mediator::arguments_string_builder::unpack<id_generator::id_type, module_mediator::memory>(bundle);
 
     deallocate_memory_generic(containers_mutex, containers, container_id, memory_address);
     return module_mediator::module_success;
 }
 module_mediator::return_value deallocate_thread_memory(module_mediator::arguments_string_type bundle) {
     auto [thread_id, memory_address] = 
-        module_mediator::arguments_string_builder::unpack<id_generator::id_type, void*>(bundle);
+        module_mediator::arguments_string_builder::unpack<id_generator::id_type, module_mediator::memory>(bundle);
 
     deallocate_memory_generic(thread_structures_mutex, thread_structures, thread_id, memory_address);
     return module_mediator::module_success;
@@ -594,6 +629,29 @@ module_mediator::return_value get_jump_table_size(module_mediator::arguments_str
     );
 
     return module_mediator::module_failure;
+}
+
+module_mediator::return_value verify_thread_memory(module_mediator::arguments_string_type bundle) {
+    auto [thread_id, memory_address] =
+        module_mediator::arguments_string_builder::unpack<id_generator::id_type, module_mediator::memory>(bundle);
+
+    return verify_memory_generic(
+        thread_structures_mutex,
+        thread_structures,
+        thread_id,
+        memory_address
+    );
+}
+module_mediator::return_value verify_program_memory(module_mediator::arguments_string_type bundle) {
+    auto [container_id, memory_address] =
+        module_mediator::arguments_string_builder::unpack<id_generator::id_type, module_mediator::memory>(bundle);
+
+    return verify_memory_generic(
+        containers_mutex,
+        containers,
+        container_id,
+        memory_address
+    );
 }
 
 program_container::~program_container() noexcept {

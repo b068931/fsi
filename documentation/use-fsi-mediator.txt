@@ -1,0 +1,64 @@
+I'll start by defining some of the terms I use:
+- 'FSI'        : From Scratch Interpreter. This is the name of the whole project.
+- 'translator' : A program that converts the textual representation of a FSI program to a binary format.
+- 'mediator'   : A name for the executable that loads and configures EE's modules. You may also add your own modules.
+- 'Execution Engine' or 'EE' : A list of modules that combine their logic to facilitate the execution of FSI programs.
+- 'module'                   : Every DLL file that is loaded by the mediator is called a module. Modules are the parts
+                               of the execution engine.
+- 'interpreter' or 'FSI interpreter' : A combination of the 'mediator', 'core' modules, and all other modules that you add
+                                       to the execution engine. Worth noting that I use the term 'interpreter' specifically
+                                       to point out the fact that native executable is never generated, even though the
+                                       program loader compiles the entire program into machine code before executing it.
+
+In general, there are several types of errors:
+- 'syntax error' : An error that occurs when the program is not syntactically correct. This is detected by the translator.
+- 'logic error'  : An error that occurs when the program is syntactically correct, but does not make any sense.
+- 'compilation error' : An error that occurs when the program is syntactically correct, but cannot be compiled to machine code.
+                        Most likely, this is due to a logic error in the program.
+- 'runtime error' : An error that occurs when the program is syntactically correct, compiled to machine code, but fails at runtime.
+                    This is usually due to a logic error that can be detected only at runtime, such as division by zero.
+- 'runtime warning' : Covers a wide range of possible issues that can occur at runtime, but do not prevent the program from running,
+                      and do not crash the engine. These are mostly concurrency errors, from which the interpreter can recover.
+                      Worth noting that normally you should not see any warnings at all, you can use them as an indicator that
+                      the execution engine is unstable.
+- 'fatal error' : An error in the interpreter itself, such as a bug in the EE code. It can also happen if your program manages to
+                  go around the interpreter's checks. For example, you can accidentally guess some memory address that technically
+                  does belong to your program, but is not meant to be accessed by it. This can be your stack address, for example.
+                  Not all fatal errors can produce a diagnostic message.
+
+The command line to run the mediator is as follows:
+- fsi-mediator <modules-descriptor-file> <executors-count> <binary-file>
+- "modules-descriptor-file" is the path to the file that contains the list of modules to be loaded.
+- "executors-count" is the number of executors to be created. Executors are the system threads that will run your program.
+- "binary-file" is the path to the compressed binary file produced by the translator.
+
+First, mediator reads a module descriptor file, which is a simple text file that contains the list of modules to be loaded.
+This file is called 'engine.mods'. It is also located in the 'bin' directory, where the mediator executable is located.
+You can check it out to see which functionality each module provides, I added quite a lot of comments in that file.
+
+Next, mediator receives the compressed binary file produced by the translator, uncompresses it, producing an actual binary
+representation of your program. That program is saved as a temporary file, which is then passed to the program loader.
+By default, all modules have logging enabled, so you can see the flow of the program execution in the console.
+
+Your program can take advantage of the multithreading model implemented in the interpreter. In its full form, it should consist of
+thread groups -> threads -> fibers + delegates. Only the first two levels are implemented at the moment, though. Thread groups are
+considered to be like a boundary between different programs. That is, threads from different thread groups cannot interact. Each 
+thread group essentially runs in its own "context". By "context" I mean all strings, referenced modules, compiled functions, etc.
+Your program can create a new thread group by duplicating its context. Threads from thread groups are chosen with a round-robin
+algorithm. Threads are different units of execution that can run in parallel, depending on the amount of executors. Threads are
+organized inside their groups in a priority queue, scheduler always chooses the thread with the highest priority. If the highest
+priority thread can't run, the scheduler picks the next thread with the highest priority. Threads in the same priority group are
+served in FIFO order. Each thread can be in one of the following states: startup, running, runnable, blocked. Fibers are intended
+to be somewhat similar to stackful coroutines, only one fiber can run at a time. Delegates are intended to be one-off functions that
+need to run in the context of a specific thread. The entire model is cooperative, meaning the interpreter can NOT preempt your threads
+willy-nilly. Your threads must either end their execution or yield control to the interpreter.
+
+When called from your program, the module's function must return what is called an 'execution result'. Which can be one of the following:
+continue, switch, terminate, block. Continue means that the interpreter should continue executing the current thread. Switch gives
+control to the scheduler. Terminate instantly kills the current thread. Block means that your thread can't be chosen for execution,
+it also switches control to the scheduler. Each module defines its condition for unblocking the thread, PRTS module, for example,
+uses that to implement IO operations. Returning an unknown execution result is one of the 'fatal errors' that you can encounter.
+
+EE terminates as soon as it detects that there are no runnable threads left. It also will refuse to start if you don't add some starting
+job for it.
+

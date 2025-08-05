@@ -1,8 +1,37 @@
 $stack-size d1024;
 from prts import <io.log.info, memory.allocate, memory.deallocate>
 
-$include libraries/memory.tfsi;
 $redefine symbol-base d48;
+/* you may also use $include */
+
+function memory-copy(memory destination, memory source, eight-bytes size) {
+    @repeat;
+    compare variable eight-bytes size, immediate eight-bytes d0;
+    jump-equal point end;
+
+    decrement variable eight-bytes size;
+    move dereference one-byte destination[size], dereference one-byte source[size];
+
+    jump point repeat;
+    @end;
+}
+
+function memory-copy-reversed(memory destination, memory source, eight-bytes size) {
+    $declare eight-bytes destination-index;
+    move variable eight-bytes destination-index, immediate eight-bytes d0;
+
+    @repeat;
+    compare variable eight-bytes size, immediate eight-bytes d0;
+    jump-equal point end;
+
+    decrement variable eight-bytes size;
+
+    move dereference one-byte destination[destination-index], dereference one-byte source[size];
+    increment variable eight-bytes destination-index;
+
+    jump point repeat;
+    @end;
+}
 
 function ebyte-to-string(eight-bytes value) {
     $declare memory result;
