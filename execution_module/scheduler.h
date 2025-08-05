@@ -56,12 +56,14 @@ private:
             jump_table{ thread.jump_table },
             id{ thread.id }
         {}
-        void operator= (executable_thread&& thread) noexcept {
+        executable_thread& operator= (executable_thread&& thread) noexcept {
             this->id = thread.id;
             this->state = thread.state;
 
             this->thread_state = thread.thread_state;
             this->jump_table = thread.jump_table;
+
+            return *this;
         }
     };
 
@@ -82,10 +84,12 @@ private:
             threads{ std::move(thread_group.threads) },
             preferred_stack_size{ thread_group.preferred_stack_size }
         {}
-        void operator= (thread_group&& thread_group) noexcept {
+        thread_group& operator= (thread_group&& thread_group) noexcept {
             this->id = thread_group.id;
             this->threads = std::move(thread_group.threads);
             this->preferred_stack_size = thread_group.preferred_stack_size;
+
+            return *this;
         }
     };
 
@@ -254,7 +258,7 @@ public:
     * 6. release mutex
     */
     void add_thread_group(module_mediator::return_value id, std::uint64_t preferred_stack_size) {
-        thread_group_proxy proxy{};
+        thread_group_proxy proxy;
         
         {
             std::lock_guard<std::mutex> clock_list_lock{ this->clock_list_mutex };
@@ -288,18 +292,17 @@ public:
                     void* thread_state,
                     const void* jump_table
     ) {
-        thread_group_proxy& thread_group_proxy = this->get_thread_group_using_hash_table(thread_group_id);
-        thread_proxy thread_proxy{};
-
         {
+            // Adding a thread to a thread group and adding it to the hash table must be done while we are holding a thread group lock.
+            // This is to because it is possible that a new thread will start and complete before we finish adding it to the hash table.
+            thread_group_proxy& thread_group_proxy = this->get_thread_group_using_hash_table(thread_group_id);
+
             std::lock_guard<std::mutex> thread_group_lock{ thread_group_proxy->lock };
-            thread_proxy = thread_group_proxy->threads.push(
-                priority, 
+            thread_proxy thread_proxy = thread_group_proxy->threads.push(
+                priority,
                 thread_id, thread_states::startup, thread_state, jump_table
             );
-        }
-
-        {
+        
             std::lock_guard<std::recursive_mutex> thread_hash_table_lock{ this->threads_hash_table_mutex };
             this->threads_hash_table[thread_id] = std::move(thread_proxy);
         }
@@ -444,7 +447,7 @@ public:
 
         // This is even worse than terrible, because this means that we are trying to make a non-existent thread runnable.
         if (!thread_proxy.has_resource()) {
-            std::size_t result = this->threads_hash_table.erase(thread_id);
+            [[maybe_unused]] std::size_t result = this->threads_hash_table.erase(thread_id);
             assert(result == 1 && "invalid thread id: something went really wrong");
 
             return false;
@@ -510,6 +513,11 @@ public:
     void initiate_shutdown() { 
         //locking on this mutex is required in order to ensure that all executors are either already waiting on a condition variable or are yet to enter the "choose" function.
         std::lock_guard<std::mutex> clock_list_lock{ this->clock_list_mutex };
+        if (!this->threads_hash_table.empty() || !this->thread_groups_hash_table.empty()) {
+            // Make a panic shutdown if hash tables got out of sync
+            std::abort();
+        }
+
         this->shutdown_sequence = true;
         this->runnable_thread_notify.notify_all();
     }

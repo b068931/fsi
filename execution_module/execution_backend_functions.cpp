@@ -5,6 +5,7 @@
 #include "assembly_functions.h"
 #include "program_state_manager.h"
 #include "executions_backend_functions.h"
+
 #include "../logger_module/logging.h"
 #include "../module_mediator/module_part.h"
 #include "../module_mediator/fsi_types.h"

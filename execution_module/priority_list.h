@@ -33,11 +33,13 @@ public:
 		{
 			pr.associated_element = nullptr;
 		}
-		void operator=(proxy&& pr) noexcept {
+		proxy& operator=(proxy&& pr) noexcept {
 			this->free_resource();
 
 			this->associated_element = pr.associated_element;
 			pr.associated_element = nullptr;
+
+			return *this;
 		}
 
 		T& operator* () {
@@ -53,7 +55,7 @@ public:
 			return this->associated_element != nullptr;
         }
 
-		~proxy() {
+		~proxy() noexcept {
 			this->free_resource();
 		}
 
