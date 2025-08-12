@@ -24,7 +24,8 @@ In general, there are several types of errors:
 - 'fatal error' : An error in the interpreter itself, such as a bug in the EE code. It can also happen if your program manages to
                   go around the interpreter's checks. For example, you can accidentally guess some memory address that technically
                   does belong to your program, but is not meant to be accessed by it. This can be your stack address, for example.
-                  Not all fatal errors can produce a diagnostic message.
+                  Not all fatal errors can produce a diagnostic message. But most of them do, you can check
+                  module_mediator\crash_handle_setup.cpp to see how the interpreter handles fatal errors.
 
 The command line to run the mediator is as follows:
 - fsi-mediator <modules-descriptor-file> <executors-count> <binary-file>

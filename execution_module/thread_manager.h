@@ -6,6 +6,7 @@
 #include "assembly_functions.h"
 
 #include "../logger_module/logging.h"
+#include "../module_mediator/local_crash_handle_setup.h"
 
 class thread_manager {
 private:
@@ -21,7 +22,30 @@ private:
     std::atomic_size_t active_threads_counter = 0;
 
     void executor_thread(module_mediator::return_value executor_id) {
-        LOG_INFO(interoperation::get_module_part(), std::format("Executor {} is starting.", executor_id));
+        // These must be installed on a per-thread basis.
+        module_mediator::crash_handling::install_crash_handlers();
+
+        LOG_INFO(
+            interoperation::get_module_part(), 
+            std::format(
+                "Executor {} is starting. System thread is {}.", 
+                executor_id,
+                GetCurrentThreadId()
+            )
+        );
+
+        ULONG ulDesiredStackSize = 8192;
+        BOOL bResult = SetThreadStackGuarantee(&ulDesiredStackSize);
+        if (!bResult) {
+            LOG_WARNING(
+                interoperation::get_module_part(),
+                std::format(
+                    "Failed to set thread stack guarantee for executor {}. " \
+                    "This may impede fatal error reporting.", 
+                    executor_id
+                )
+            );
+        }
 
         thread_local_structure* thread_structure = get_thread_local_structure();
         scheduler::schedule_information* currently_running_thread_information = 

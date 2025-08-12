@@ -1,7 +1,7 @@
 #include "pch.h"
-#include "module_interoperation.h"
-#include "program_functions.h"
 #include "program_loader.h"
+#include "program_functions.h"
+#include "module_interoperation.h"
 
 namespace {
 	//technically, this function is used during program's lifetime, so it is not necessary to deallocate its memory VirtualFree(::default_function_address, 0, MEM_RELEASE);

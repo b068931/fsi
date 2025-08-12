@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "resource_module.h"
 #include "module_interoperation.h"
+
 #include "../module_mediator/module_part.h"
 
 namespace {

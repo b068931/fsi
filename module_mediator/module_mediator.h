@@ -3,19 +3,18 @@
 
 #define NOMINMAX 
 #include <Windows.h>
-#include <sstream>
 #include <cassert>
 #include <tuple>
 #include <string_view>
-#include <algorithm>
 #include <stdexcept>
 #include <filesystem>
 
 #include "file_builder.h"
 #include "parser_options.h"
 #include "file_components.h"
-#include "../generic_parser/parser_facade.h"
+
 #include "../logger_module/logging.h"
+#include "../generic_parser/parser_facade.h"
 
 /*
 * "When an evaluation of an expression writes to a memory location and another evaluation reads or modifies
@@ -68,13 +67,14 @@ namespace module_mediator {
 				}
 				catch ([[maybe_unused]] const std::exception& exc) {
 					LOG_ERROR(this, exc.what());
-					LOG_FATAL(this, "call_module has failed. The process will be terminated with 'abort'.");
+					LOG_FATAL(this, "call_module has failed. The process will be terminated.");
 
-					std::abort();
+					std::terminate();
 				}
 			}
 		virtual return_value call_module_visible_only(std::size_t module_index, std::size_t function_index, arguments_string_type arguments_string, void(*error_callback)(call_error)) override {
-			call_error error{ call_error::no_error };
+            // ReSharper disable once CppInitializedValueIsAlwaysRewritten
+            call_error error{ call_error::no_error };
 
 			try {
 				return this->mediator->call_module_visible_only(module_index, function_index, arguments_string);

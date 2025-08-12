@@ -108,10 +108,10 @@ namespace module_mediator::parser::components {
 		void load_module(const std::string& module_path) {
 			this->loaded_module = LoadLibraryA(module_path.c_str());
 			if (this->loaded_module == NULL) {
-				std::cerr << "Unable to load one of the modules. Process will be terminated with std::abort."
+				std::cerr << "Unable to load one of the modules. Process will be aborted."
 					<< " (Path: " << module_path << ')' << std::endl;
 
-				std::abort();
+				std::terminate();
 			}
 		}
 		void free_module() {
@@ -123,20 +123,20 @@ namespace module_mediator::parser::components {
 
 				BOOL freed_library = FreeLibrary(this->loaded_module);
 				if (!freed_library) {
-					std::cerr << "Unable to correctly dispose one of the modules. Process will be terminated with std::abort."
+					std::cerr << "Unable to correctly dispose one of the modules. Process will be aborted."
 						<< " (Name: " << this->name << ')' << std::endl;
 
-					std::abort();
+					std::terminate();
 				}
 			}
 		}
 		void initialize_module(module_mediator::module_part* mediator) {
 			FARPROC initialize = GetProcAddress(this->loaded_module, "initialize_m");
 			if (initialize == NULL) {
-				std::cerr << "One of the modules does not define the initialize_m function. Process will be terminated with std::abort."
+				std::cerr << "One of the modules does not define the initialize_m function. Process will be aborted."
 					<< "(Name: " << this->name << ')' << std::endl;
 
-				std::abort();
+				std::terminate();
 			}
 
 			((void(*)(module_mediator::module_part*))initialize)(mediator); //convert and call initialize_m

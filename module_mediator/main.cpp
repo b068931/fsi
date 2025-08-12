@@ -13,6 +13,8 @@
 
 #include "fsi_types.h"
 #include "module_mediator.h"
+#include "local_crash_handle_setup.h"
+#include "global_crash_handle_setup.h"
 
 #include "../logger_module/logging.h"
 #include "../compression_algorithms/static_huffman.h"
@@ -149,6 +151,14 @@ int main(int argc, char** argv) {
     }
 
     try {
+        // Funnily enough, CRT maintains std::set_terminate function on a per-thread basis
+        // So we need to call this in each thread that the program uses
+        module_mediator::crash_handling::install_crash_handlers();
+        if (!InstallGlobalCrashHandler()) {
+           std::cerr << "Failed to install global crash handler." \
+            " This may slightly impede reporting some types of fatal errors." << std::endl;
+        }
+
         std::filesystem::path modules_descriptor_file{ std::filesystem::canonical(argv[1]) };
         std::cerr << "Parsing modules descriptor file: " << modules_descriptor_file.generic_string() << '\n';
 
@@ -157,9 +167,12 @@ int main(int argc, char** argv) {
 
         module_mediator::module_part* part = module_mediator.get_module_part();
         if (error_message.empty()) {
-            std::cerr << "All modules were loaded successfully." << '\n';
-            std::uint16_t executors_count = static_cast<std::uint16_t>(std::stoi(argv[2])); //no point in starting an app if unable to parse the executors count
+            LOG_PROGRAM_INFO(
+                part,
+                "All modules were loaded successfully."
+            );
 
+            std::uint16_t executors_count = static_cast<std::uint16_t>(std::stoi(argv[2])); //no point in starting an app if unable to parse the executors count
             std::filesystem::path decompressed_bytecode = decompress_bytecode(
                 consume_compressed_bytecode(argv[3])
             );

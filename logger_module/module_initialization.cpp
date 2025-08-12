@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "logger_module.h"
 #include "module_interoperation.h"
+
 #include "../module_mediator/module_part.h"
 
 namespace {

@@ -129,8 +129,8 @@ namespace backend {
 			load_execution_thread(get_thread_local_structure()->execution_thread_state);
 
 		default:
-			LOG_PROGRAM_FATAL(interoperation::get_module_part(), "Incorrect return code. Process will be killed with abort.");
-			std::abort();
+			LOG_PROGRAM_FATAL(interoperation::get_module_part(), "Incorrect return code. Process will be aborted.");
+			std::terminate();
 		}
 	}
 

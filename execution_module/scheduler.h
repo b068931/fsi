@@ -515,7 +515,7 @@ public:
         std::lock_guard<std::mutex> clock_list_lock{ this->clock_list_mutex };
         if (!this->threads_hash_table.empty() || !this->thread_groups_hash_table.empty()) {
             // Make a panic shutdown if hash tables got out of sync
-            std::abort();
+            std::terminate();
         }
 
         this->shutdown_sequence = true;

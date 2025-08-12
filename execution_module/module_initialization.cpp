@@ -40,18 +40,20 @@ namespace {
             break;
 
         default:  // NOLINT(clang-diagnostic-covered-switch-default)
-            LOG_PROGRAM_FATAL(::part, "Unknown termination code. The process will be terminated with 'abort'.");
-            std::abort();
+            LOG_PROGRAM_FATAL(::part, "Unknown termination code. The process will be terminated.");
+            std::terminate();
         }
 
         LOG_PROGRAM_ERROR(::part, "Program execution error. Thread terminated.");
     }
+
     [[noreturn]] void inner_terminate(std::uint64_t error_code) {
         show_error(error_code);
 
         backend::thread_terminate();
         load_execution_thread(get_thread_local_structure()->execution_thread_state);
     }
+
     [[noreturn]] void end_program() {
         backend::thread_terminate();
         load_execution_thread(get_thread_local_structure()->execution_thread_state);

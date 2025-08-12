@@ -151,7 +151,7 @@ namespace {
 
     template<typename T>
     std::conditional_t<
-        std::is_same_v<T, std::map<id_generator::id_type, thread_structure>>, //for thread_structure this function also returns id of the asscociated program_container
+        std::is_same_v<T, std::map<id_generator::id_type, thread_structure>>, //for thread_structure this function also returns id of the associated program_container
         std::pair<module_mediator::return_value, id_generator::id_type>,
         module_mediator::return_value
     >

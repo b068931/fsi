@@ -3,6 +3,7 @@
 #include "backend_functions.h"
 
 #include "../logger_module/logging.h"
+#include "../module_mediator/local_crash_handle_setup.h"
 
 //This file describes IO logic for the FSI programs through PRTS (Program RunTime Services) module.
 //I use global variables because they are isolated to this cpp file, they cannot be accessed elsewhere.
@@ -740,6 +741,23 @@ namespace {
             }
         }
 
+        if constexpr (!is_pipe) {
+            BOOL bResult = FlushFileBuffers(hStdOut);
+            if (!bResult) {
+                LOG_WARNING(
+                    interoperation::get_module_part(),
+                    std::format(
+                        "FlushFileBuffers failed with error code {}. " \
+                        "Cannot flush file buffers.",
+                        GetLastError()
+                    )
+                );
+
+                CloseHandleReport(overlapped.hEvent, "overlapped.HEvent");
+                return true;
+            }
+        }
+
         //Files must have their offsets updated after a successful write.
         CloseHandleReport(overlapped.hEvent, "overlapped.HEvent");
         if constexpr (!is_pipe) {
@@ -883,10 +901,26 @@ namespace {
 namespace {
     std::thread input_worker_thread{};
     void input_worker(HANDLE hStdIn, HANDLE hCancelIO) {
+        // We can't call this after LOG_* function, because it might fail.
+        module_mediator::crash_handling::install_crash_handlers();
+
         LOG_INFO(
             interoperation::get_module_part(),
-            "PRTS is attached to stdio. Starting input worker."
+            std::format(
+                "PRTS is attached to stdio. Starting input worker. System thread is: {}.",
+                GetCurrentThreadId()
+            )
         );
+
+        ULONG ulDesiredStackSize = 8192;
+        BOOL bResult = SetThreadStackGuarantee(&ulDesiredStackSize);
+        if (!bResult) {
+            LOG_WARNING(
+                interoperation::get_module_part(),
+                "Failed to set thread stack guarantee for input worker. " \
+                "This may impede fatal error reporting."
+            );
+        }
 
         phase_coordination.arrive_and_wait();
 
@@ -982,10 +1016,26 @@ namespace {
 
     std::thread output_worker_thread{};
     void output_worker(HANDLE hStdOut, HANDLE hCancelIO) {
+        // We can't call this after LOG_* function, because it might fail.
+        module_mediator::crash_handling::install_crash_handlers();
+
         LOG_INFO(
             interoperation::get_module_part(),
-            "PRTS is attached to stdio. Starting output worker."
+            std::format(
+                "PRTS is attached to stdio. Starting output worker. System thread is: {}.",
+                GetCurrentThreadId()
+            )
         );
+
+        ULONG ulDesiredStackSize = 8192;
+        BOOL bResult = SetThreadStackGuarantee(&ulDesiredStackSize);
+        if (!bResult) {
+            LOG_WARNING(
+                interoperation::get_module_part(),
+                "Failed to set thread stack guarantee for output worker. " \
+                "This may impede fatal error reporting."
+            );
+        }
 
         phase_coordination.arrive_and_wait();
 

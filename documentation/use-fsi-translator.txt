@@ -18,6 +18,8 @@ Seriously though, examples should contain enough information to get you started.
 You can look into bytecode_translator\parser_options.cpp to see all available keywords, punctuations, etc.
 Some instructions (except, obviously, function calls and module calls) can accept more than two arguments, exact
 behavior depends on the instruction itself. For example, 'add' sums all other arguments into the first one.
+Note that instructions that start with '$' are called special instructions. They do not get compiled to the
+machine code, so they are not counted when program loader produces error messages.
 
 The result of the translation is a compressed binary file that contains all the information about your program.
 It is not meant to be human-readable, but you can use some hex editor to peek inside if you are curious. All binary
