@@ -116,12 +116,12 @@ public:
 		args&&... instruction_builder_args
 	)
 		:general_function_call_builder{ std::forward<args>(instruction_builder_args)... },
+		stack_allocation_size{ 0 },
 		associated_module{ nullptr },
 		function_to_call_index{ module_mediator::module_part::function_not_found },
-		current_rbx_displacement{ 0 },
 		variable_index{ 0 },
 		is_second_time{ false },
-		stack_allocation_size{ 0 }
+		current_rbx_displacement{ 0 }
 	{}
 
 	virtual void visit(std::unique_ptr<engine_module> engine_module) override {

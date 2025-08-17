@@ -40,9 +40,11 @@ namespace {
 module_mediator::return_value yield(module_mediator::arguments_string_type) {
     return module_mediator::execution_result_switch;
 }
+
 module_mediator::return_value self_terminate(module_mediator::arguments_string_type) {
     return module_mediator::execution_result_terminate;
 }
+
 module_mediator::return_value self_priority(module_mediator::arguments_string_type bundle) {
     auto [return_address, type] =
         module_mediator::arguments_string_builder::unpack<module_mediator::memory, module_mediator::one_byte>(bundle);
@@ -65,6 +67,7 @@ module_mediator::return_value self_priority(module_mediator::arguments_string_ty
     std::memcpy(return_address, &priority, sizeof(module_mediator::eight_bytes));
     return module_mediator::execution_result_continue;
 }
+
 module_mediator::return_value thread_id(module_mediator::arguments_string_type bundle) {
     auto [return_address, type] =
         module_mediator::arguments_string_builder::unpack<module_mediator::memory, module_mediator::one_byte>(bundle);
@@ -83,6 +86,7 @@ module_mediator::return_value thread_id(module_mediator::arguments_string_type b
     std::memcpy(return_address, &thread_id, sizeof(module_mediator::eight_bytes));
     return module_mediator::execution_result_continue;
 }
+
 module_mediator::return_value thread_group_id(module_mediator::arguments_string_type bundle) {
     auto [return_address, type] =
         module_mediator::arguments_string_builder::unpack<module_mediator::memory, module_mediator::one_byte>(bundle);
@@ -97,6 +101,7 @@ module_mediator::return_value thread_group_id(module_mediator::arguments_string_
 
     return module_mediator::execution_result_continue;
 }
+
 module_mediator::return_value dynamic_call(module_mediator::arguments_string_type bundle) {
     module_mediator::arguments_array_type arguments =
         module_mediator::arguments_string_builder::convert_to_arguments_array(bundle);
@@ -128,6 +133,18 @@ module_mediator::return_value dynamic_call(module_mediator::arguments_string_typ
             return module_mediator::execution_result_terminate;
         }
     }
+    else {
+        LOG_PROGRAM_ERROR(
+            interoperation::get_module_part(),
+            std::format(
+                "Function displacement '{}' is out of bounds for the current thread group jump table size '{}'.",
+                function_displacement,
+                get_current_thread_group_jump_table_size()
+            )
+        );
+
+        return module_mediator::execution_result_terminate;
+    }
 
     return module_mediator::execution_result_continue;
 }
@@ -138,20 +155,28 @@ module_mediator::return_value create_thread(module_mediator::arguments_string_ty
 
     module_mediator::eight_bytes priority{};
     module_mediator::eight_bytes function_displacement{};
+
     if (
-        !module_mediator::arguments_string_builder::extract_value_from_arguments_array<module_mediator::eight_bytes>(&priority, 0, arguments) ||
-            !module_mediator::arguments_string_builder::extract_value_from_arguments_array<module_mediator::eight_bytes>(&function_displacement, 1, arguments)
+        !module_mediator::arguments_string_builder::extract_value_from_arguments_array<module_mediator::eight_bytes>(
+            &priority, 0, arguments
+        ) || !module_mediator::arguments_string_builder::extract_value_from_arguments_array<module_mediator::eight_bytes>(
+            &function_displacement, 1, arguments
+        )
     ) {
         LOG_PROGRAM_ERROR(interoperation::get_module_part(), "Incorrect create_thread call structure.");
         return module_mediator::execution_result_terminate;
     }
 
     if (check_function_displacement(function_displacement)) {
-        std::pair<module_mediator::arguments_string_type, std::size_t> args_string_size = 
-            module_mediator::arguments_string_builder::convert_from_arguments_array(arguments.begin() + 2, arguments.end());
+        constexpr std::size_t arguments_start_index = 2;
+        auto [arguments_string, arguments_length] = 
+            module_mediator::arguments_string_builder::convert_from_arguments_array(
+                arguments.begin() + arguments_start_index, 
+                arguments.end()
+            );
 
         std::unique_ptr<module_mediator::arguments_string_element[]> thread_main_parameters{
-            args_string_size.first
+            arguments_string
         };
 
         module_mediator::return_value result = module_mediator::fast_call<
@@ -166,7 +191,7 @@ module_mediator::return_value create_thread(module_mediator::arguments_string_ty
             priority,
             get_function_address(function_displacement),
             thread_main_parameters.get(),
-            args_string_size.second
+            arguments_length
         );
 
         if (result != module_mediator::module_success) {
@@ -174,25 +199,58 @@ module_mediator::return_value create_thread(module_mediator::arguments_string_ty
             return module_mediator::execution_result_terminate;
         }
     }
+    else {
+        LOG_PROGRAM_ERROR(
+             interoperation::get_module_part(),
+             std::format(
+                 "Function displacement '{}' is out of bounds for the current thread group jump table size '{}'.",
+                 function_displacement,
+                 get_current_thread_group_jump_table_size()
+             )
+         );
+
+        return module_mediator::execution_result_terminate;
+    }
+
+    module_mediator::return_value current_priority = module_mediator::fast_call(
+        interoperation::get_module_part(),
+        interoperation::index_getter::execution_module(),
+        interoperation::index_getter::execution_module_self_priority()
+    );
+
+    // Allow the thread with higher priority to execute first.
+    if (priority > current_priority) {
+        return module_mediator::execution_result_switch;
+    }
 
     return module_mediator::execution_result_continue;
 }
+
 module_mediator::return_value create_thread_group(module_mediator::arguments_string_type bundle) {
     module_mediator::arguments_array_type arguments =
         module_mediator::arguments_string_builder::convert_to_arguments_array(bundle);
 
     module_mediator::eight_bytes function_displacement{};
-    if (!module_mediator::arguments_string_builder::extract_value_from_arguments_array<module_mediator::eight_bytes>(&function_displacement, 0, arguments)) {
+
+    if (
+        !module_mediator::arguments_string_builder::extract_value_from_arguments_array<module_mediator::eight_bytes>(
+            &function_displacement, 0, arguments
+        )
+    ) {
         LOG_PROGRAM_ERROR(interoperation::get_module_part(), "Incorrect create_thread_group call structure.");
         return module_mediator::execution_result_terminate;
     }
 
     if (check_function_displacement(function_displacement)) {
-        std::pair<module_mediator::arguments_string_type, std::size_t> args_string_size =
-            module_mediator::arguments_string_builder::convert_from_arguments_array(arguments.begin() + 1, arguments.end());
+        constexpr std::size_t arguments_start_index = 1;
+        auto [arguments_string, arguments_length] =
+            module_mediator::arguments_string_builder::convert_from_arguments_array(
+                arguments.begin() + arguments_start_index, 
+                arguments.end()
+            );
 
         std::unique_ptr<module_mediator::arguments_string_element[]> thread_main_parameters{
-            args_string_size.first
+            arguments_string
         };
 
         module_mediator::return_value result = module_mediator::fast_call<
@@ -205,13 +263,25 @@ module_mediator::return_value create_thread_group(module_mediator::arguments_str
             interoperation::index_getter::execution_module_self_duplicate(),
             get_function_address(function_displacement),
             thread_main_parameters.get(),
-            args_string_size.second
+            arguments_length
         );
 
         if (result != module_mediator::module_success) {
             LOG_PROGRAM_ERROR(interoperation::get_module_part(), "Can not create a new thread group.");
             return module_mediator::execution_result_terminate;
         }
+    }
+    else {
+        LOG_PROGRAM_ERROR(
+            interoperation::get_module_part(),
+            std::format(
+                "Function displacement '{}' is out of bounds for the current thread group jump table size '{}'.",
+                function_displacement,
+                get_current_thread_group_jump_table_size()
+            )
+        );
+
+        return module_mediator::execution_result_terminate;
     }
 
     return module_mediator::execution_result_continue;

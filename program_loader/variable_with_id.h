@@ -12,8 +12,8 @@ private:
 
 public:
 	variable_with_id(entity_id id)
-		:id{ id },
-		variable{}
+		:variable{},
+		id{ id }
 	{}
 
 	entity_id get_id() const { return this->id; }

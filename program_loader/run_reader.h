@@ -11,17 +11,17 @@ class run_reader {
 public:
 	class run { //used to access bytes ONLY from specific run
 	private:
-		generic_parser::filepos run_start;
-		generic_parser::filepos run_position;
-		generic_parser::filepos run_size;
+		generic_parser::file_position_type run_start;
+		generic_parser::file_position_type run_position;
+		generic_parser::file_position_type run_size;
 
 		std::shared_ptr<generic_parser::block_reader<1024>> reader; //we will use only one block_reader for all runs
 	public:
-		run(generic_parser::filepos start, generic_parser::filepos size, std::shared_ptr<generic_parser::block_reader<1024>> reader)
+		run(generic_parser::file_position_type start, generic_parser::file_position_type size, std::shared_ptr<generic_parser::block_reader<1024>> reader)
 			:run_start{ start },
+			run_position{ 0 },
 			run_size{ size },
-			reader{ reader },
-			run_position{ 0 }
+			reader{ reader }
 		{}
 
 		run(const run&) = delete;
@@ -38,13 +38,13 @@ public:
 			return '\0';
 		}
 
-		generic_parser::filepos get_run_size() const { return this->run_size; }
-		generic_parser::filepos get_run_position() const { return this->run_position; }
+		generic_parser::file_position_type get_run_size() const { return this->run_size; }
+		generic_parser::file_position_type get_run_position() const { return this->run_position; }
 
 		template<typename type>
 		type get_object(type value = type{}) {
 			char* bytes = reinterpret_cast<char*>(&value);
-			for (generic_parser::filepos count = 0; count < sizeof(type) && this->run_position < this->run_size;
+			for (generic_parser::file_position_type count = 0; count < sizeof(type) && this->run_position < this->run_size;
 				++count, ++this->run_position) {
 				bytes[count] = this->reader->get_symbol(this->run_start + this->run_position);
 			}
@@ -62,7 +62,7 @@ public:
             }
         };
 		
-		for (generic_parser::filepos index = 0, length = reader->get_symbols_count(); index < length;) {
+		for (generic_parser::file_position_type index = 0, length = reader->get_symbols_count(); index < length;) {
 			char run_type = reader->get_symbol(index++);
 
 			std::uint64_t run_size = 0;

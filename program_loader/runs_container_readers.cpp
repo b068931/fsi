@@ -31,7 +31,7 @@ void runs_container::modules_reader(run_reader<runs_container>::run run) { //eve
 	}
 }
 void runs_container::jump_points_reader(run_reader <runs_container>::run run) {
-	for (generic_parser::filepos counter = 0, jump_points_count = run.get_run_size() / (sizeof(std::uint32_t) + sizeof(std::uint32_t) + sizeof(std::uint64_t)); counter < jump_points_count; ++counter) {
+	for (generic_parser::file_position_type counter = 0, jump_points_count = run.get_run_size() / (sizeof(std::uint32_t) + sizeof(std::uint32_t) + sizeof(std::uint64_t)); counter < jump_points_count; ++counter) {
 		std::uint32_t function_index = run.get_object<std::uint32_t>();
 		std::uint32_t instruction_index = run.get_object<std::uint32_t>();
 		entity_id id = run.get_object<entity_id>();

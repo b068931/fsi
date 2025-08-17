@@ -10,8 +10,8 @@ private:
 
 public:
 	variable_imm(T value)
-		:value{ value },
-		variable{}
+		:variable{},
+		value{ value }
 	{}
 
 	T get_value() const { return this->value; }

@@ -137,12 +137,12 @@ protected:
 		jump_table_builder& jump_table,
 		runs_container& general_file_information
 	)
-		:run{ run },
+		:current_variable_type{},
+		argument_index{ 0 },
+		run{ run },
 		function_memory_layout{ function_memory_layout },
 		jump_table{ jump_table },
-		general_file_information{ general_file_information },
-		argument_index{ 0 },
-		current_variable_type{}
+		general_file_information{ general_file_information }
 	{
 		std::uint8_t instruction_arguments_count = instruction_prefix >> 4 & 0b1111;
 		for (std::uint8_t counter = 0, type_bytes_count = instruction_arguments_count / 2; counter < type_bytes_count; ++counter) {

@@ -319,14 +319,14 @@ namespace generic_parser {
 
 	public:
 		read_map_base(token_type end_token, token_type name_token, token_generator<token_type, context_key_type>* token_generator)
-			:end_token{ end_token },
-			name_token{ name_token },
-			current_token{ end_token },
-			handle_error_exit{ false },
-			working{ true },
+			:name_token{ name_token },
 			generator{ token_generator },
 			detached_name{ nullptr },
-			is_additional_token{ false }
+			is_additional_token{ false },
+			current_token{ end_token },
+			end_token{ end_token },
+			working{ true },
+			handle_error_exit{ false }
 		{
 		}
 

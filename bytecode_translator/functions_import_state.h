@@ -1,9 +1,8 @@
 #ifndef FUNCTION_IMPORT_STATE_H
 #define FUNCTION_IMPORT_STATE_H
 
-#include "type_definitions.h"
 #include <algorithm>
-#include <format>
+#include "type_definitions.h"
 
 class functions_import_state : public state_type {
 public:

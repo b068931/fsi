@@ -18,44 +18,64 @@ public:
     };
 
     struct schedule_information {
+        // A fully unique identifier for a thread.
         module_mediator::return_value thread_id{};
+
+        // A fully unique identifier for a thread group.
+        // Notice that identifiers can't be the same for threads and thread groups.
         module_mediator::return_value thread_group_id{};
 
-        module_mediator::return_value priority{};
+        // The priority of the program thread.
+        module_mediator::return_value priority{
+            std::numeric_limits<decltype(priority)>::min()
+        };
+
+        // Whether thread is running, runnable, etc. Look into an appropriate enum for more information.
         thread_states state{};
         
+        // Values of processor registers that will be used to restore the program state.
         void* thread_state{};
+
+        // Jump table address that is used to call functions in the program.
         const void* jump_table{};
+
+        // Preferred stack size for the thread.
         std::uint64_t preferred_stack_size{};
 
-        put_back_structure_type put_back_structure{}; //must be used with scheduler::put_back
+        // Must be used with scheduler::put_back to allow a thread to be scheduled again.
+        put_back_structure_type put_back_structure{}; 
     };
 
 private:
     struct executable_thread {
         module_mediator::return_value id;
 
-        //if locked, this means that the thread is already taken
-        std::mutex lock;
+        // If locked, this means that the thread is already taken
+        // to be honest, this feels kind of like a misuse of mutex, because
+        // it is used to as data, not as a synchronization primitive.
+        mutable std::mutex lock;
         thread_states state;
         
         void* thread_state;
         const void* jump_table;
 
         executable_thread(module_mediator::return_value id, thread_states state, void* thread_state, const void* jump_table)
-            :state{ state },
+            :id{ id },
+            state{ state },
             thread_state{ thread_state },
-            jump_table{ jump_table },
-            id{ id }
+            jump_table{ jump_table }
         {}
 
+        executable_thread(const executable_thread&) = delete;
+        executable_thread& operator= (const executable_thread&) = delete;
+
         executable_thread(executable_thread&& thread) noexcept
-            :lock{},
+            :id{ thread.id },
             state{ thread.state },
             thread_state{ thread.thread_state },
-            jump_table{ thread.jump_table },
-            id{ thread.id }
+            jump_table{ thread.jump_table }
         {}
+
         executable_thread& operator= (executable_thread&& thread) noexcept {
             this->id = thread.id;
             this->state = thread.state;
@@ -65,13 +85,15 @@ private:
 
             return *this;
         }
+
+        ~executable_thread() noexcept = default;
     };
 
     struct thread_group {
         module_mediator::return_value id;
         std::uint64_t preferred_stack_size;
 
-        std::mutex lock;
+        mutable std::mutex lock;
         priority_list<executable_thread, module_mediator::return_value> threads;
 
         thread_group(module_mediator::return_value id, std::uint64_t preferred_stack_size)
@@ -79,11 +101,15 @@ private:
             preferred_stack_size{ preferred_stack_size }
         {}
 
+        thread_group(const thread_group&) = delete;
+        thread_group& operator= (const thread_group&) = delete;
+
         thread_group(thread_group&& thread_group) noexcept
             :id{ thread_group.id },
-            threads{ std::move(thread_group.threads) },
-            preferred_stack_size{ thread_group.preferred_stack_size }
+            preferred_stack_size{ thread_group.preferred_stack_size },
+            threads{ std::move(thread_group.threads) }
         {}
+
         thread_group& operator= (thread_group&& thread_group) noexcept {
             this->id = thread_group.id;
             this->threads = std::move(thread_group.threads);
@@ -91,6 +117,8 @@ private:
 
             return *this;
         }
+
+        ~thread_group() noexcept = default;
     };
 
     /*
@@ -195,18 +223,18 @@ public:
                     clock_list_lock.unlock();
 
                     std::pair<executable_thread*, module_mediator::return_value> thread = current_thread_group->threads.find(
-                        [destination, current_thread_group](executable_thread& thread_obj) {
-                            if (thread_obj.lock.try_lock()) { //check if thread is already taken
+                        [destination, current_thread_group](const executable_thread& thread_object) {
+                            if (thread_object.lock.try_lock()) { //check if thread is already taken
                                 if (
-                                    thread_obj.state == thread_states::runnable || 
-                                    thread_obj.state == thread_states::startup
+                                    thread_object.state == thread_states::runnable || 
+                                    thread_object.state == thread_states::startup
                                 ) { //check if thread is runnable
                                     //lock will be released in put_back
                                     destination->preferred_stack_size = current_thread_group->preferred_stack_size;
                                     return true;
                                 }
                                 else {
-                                    thread_obj.lock.unlock();
+                                    thread_object.lock.unlock();
                                 }
                             }
 

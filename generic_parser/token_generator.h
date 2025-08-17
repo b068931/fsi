@@ -5,7 +5,6 @@
 #include <string>
 #include <vector>
 #include <fstream>
-#include <cctype>
 #include <cassert>
 #include <filesystem>
 #include <algorithm>
@@ -32,8 +31,8 @@ namespace generic_parser {
 		token_type end_token; //this token will be returned whenever end of file is encountered
 		token_type additional_token; //additional token is created when hard symbol is encountered and it generated name from names_stack
 
-		filepos name_start;
-		filepos name_end;
+		file_position_type name_start;
+		file_position_type name_end;
 
 		std::map<context_key_type, symbols_pair> symbols_list;
 		typename std::map<context_key_type, symbols_pair>::iterator current_context;
@@ -55,26 +54,26 @@ namespace generic_parser {
 				valid_hard_symbols.push_back(begin);
 			}
 
-			filepos saved_name_end = this->name_end; //we will restore this value after execution
-			filepos multiindex = 0; //index in multiple strings
+			file_position_type saved_name_end = this->name_end; //we will restore this value after execution
+			file_position_type multi_index = 0; //index in multiple strings
 
 			iterator best_find = container.end();
 			while (!valid_hard_symbols.empty()) {
 				for (std::size_t current_string_index = 0; current_string_index < valid_hard_symbols.size(); ++current_string_index) {
-					if (multiindex == get_string(valid_hard_symbols[current_string_index]).size()) { //if we reached the end of the string this means that this string is currently our best find. the longest string will be returned
+					if (multi_index == get_string(valid_hard_symbols[current_string_index]).size()) { //if we reached the end of the string this means that this string is currently our best find. the longest string will be returned
 						best_find = valid_hard_symbols[current_string_index];
 
 						valid_hard_symbols.erase(valid_hard_symbols.begin() + current_string_index); //delete element and go 1 index back if needed
 						--current_string_index;
 					}
-					else if (this->reader.get_symbol(this->name_end) != get_string(valid_hard_symbols[current_string_index])[multiindex]) { //if string in a file has different symbol
+					else if (this->reader.get_symbol(this->name_end) != get_string(valid_hard_symbols[current_string_index])[multi_index]) { //if string in a file has different symbol
 						valid_hard_symbols.erase(valid_hard_symbols.begin() + current_string_index);
 						--current_string_index;
 					}
 				}
 
 				++this->name_end;
-				++multiindex;
+				++multi_index;
 			}
 
 			this->name_end = saved_name_end;
@@ -124,15 +123,15 @@ namespace generic_parser {
 			token_type end_token,
 			context_key_type starting_context
 		)
-			:symbols_list{ contexts },
-			is_names_stack_token{ false },
-			names_stack{ names_stack },
-			reader{},
+			:reader{},
 			name_token{ name_token },
 			end_token{ end_token },
 			additional_token{ end_token },
 			name_start{ 0 },
-			name_end{ 0 }
+			name_end{ 0 },
+			symbols_list{ contexts },
+			is_names_stack_token{ false },
+			names_stack{ names_stack }
 		{
 			this->set_current_context(starting_context);
 		}

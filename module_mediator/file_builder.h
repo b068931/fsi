@@ -88,10 +88,10 @@ namespace module_mediator::parser::components {
 			generic_parser::token_generator<engine_module_builder::file_tokens, context_keys>* token_generator,
 			engine_module_mediator* mediator
 		) //"mediator" will be used to initialize engine_module objects
-			:parse_map{ file_tokens::end_of_file, file_tokens::name, token_generator },
-			generator{ token_generator },
+			:generator{ token_generator },
 			names_stack{ names_stack },
-			mediator{ mediator }
+			mediator{ mediator },
+			parse_map{ file_tokens::end_of_file, file_tokens::name, token_generator }
 		{
 			this->configure_parse_map();
 		}

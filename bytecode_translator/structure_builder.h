@@ -11,7 +11,6 @@
 #include <format>
 #include <cerrno>
 
-#include "parser_error_type.h"
 #include "source_file_token.h"
 
 #include "../generic_parser/token_generator.h"
@@ -200,14 +199,14 @@ public:
 
         jump_point(entity_id object_id, std::uint32_t index, std::string&& name)
             :entity{ object_id },
-            name {std::move(name)},
-            index{index}
+            index{index},
+            name {std::move(name)}
         {}
 
         jump_point(entity_id object_id, std::uint32_t index, const std::string& name)
             :entity{ object_id },
-            name{ name },
-            index{ index }
+            index{ index },
+            name{ name }
         {}
     };
     struct function : public entity {
@@ -461,8 +460,8 @@ public:
         std::vector<std::pair<std::string, source_file_token>>* names_stack, 
         generic_parser::token_generator<source_file_token, context_key>* token_generator
     )
-        :generator{ token_generator },
-        error_line{ 1 },
+        :error_line{ 1 },
+        generator{ token_generator },
         parse_map{ source_file_token::end_of_file, source_file_token::name, token_generator }
     {
         this->parse_map

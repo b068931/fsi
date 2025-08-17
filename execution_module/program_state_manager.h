@@ -2,17 +2,16 @@
 #define PROGRAM_STATE_MANAGER_H
 
 #include <cstdint>
-#include <cstring>
 #include "../module_mediator/fsi_types.h"
 
 class program_state_manager {
 public:
-	static const std::size_t thread_state_size = 144;
+	static constexpr std::size_t thread_state_size = 144;
 
 private:
 	char* program_state;
 	
-	static constexpr std::size_t comparsion_state_displacement = 0;
+	static constexpr std::size_t comparison_state_displacement = 0;
 	static constexpr std::size_t return_address_displacement = 8;
 	static constexpr std::size_t jump_table_displacement = 16;
 	static constexpr std::size_t my_state_address_displacement = 24;
@@ -38,11 +37,11 @@ public:
 		:program_state{ program_state }
 	{}
 
-	std::uint64_t get_comparstion_state() {
-		return this->generic_read_state_entry<std::uint64_t>(comparsion_state_displacement);
+	std::uint64_t get_comparison_state() {
+		return this->generic_read_state_entry<std::uint64_t>(comparison_state_displacement);
 	}
-	void set_comparstion_state(std::uint64_t value) {
-		this->generic_write_state_entry<std::uint64_t>(comparsion_state_displacement, value);
+	void set_comparison_state(std::uint64_t value) {
+		this->generic_write_state_entry<std::uint64_t>(comparison_state_displacement, value);
 	}
 
 	std::uintptr_t get_return_address() {

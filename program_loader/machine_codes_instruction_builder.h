@@ -14,8 +14,8 @@ protected:
 		const std::vector<char>* machine_codes,
 		args&&... instruction_builder_args
 	)
-		:machine_codes{ machine_codes },
-		instruction_builder{ std::forward<args>(instruction_builder_args)... }
+		:instruction_builder{ std::forward<args>(instruction_builder_args)... },
+		machine_codes{ machine_codes }
 	{
 		this->assert_statement(machine_codes, "This instruction must have machine codes."); //check whether machine codes for this instruction were passed
 	}

@@ -8,6 +8,8 @@
 * creating a structure that can be used to iterate through all elements over and over
 */
 
+/// <summary>
+/// A clock list is a data structure that allows for circular iteration over its elements.
 template<typename T>
 class clock_list {
 private:
@@ -53,14 +55,15 @@ public:
 	};
 
 public:
-	T* get_current() const {
+	T* get_current() const noexcept {
 		if (this->hand) {
 			return &this->hand->object;
 		}
 
 		return nullptr;
 	}
-	void remove(proxy proxy) {
+
+	void remove(proxy proxy) noexcept {
 		assert(this->elements_count != 0);
 
 		list_element* to_delete = proxy.associated_element;
@@ -85,7 +88,12 @@ public:
 
 	template<typename... args>
 	proxy push_after(args&&... values) {
-		list_element* new_element = new list_element{ T{ std::forward<args>(values)... }, nullptr, nullptr };
+		list_element* new_element = new list_element{
+		    .object = T{ std::forward<args>(values)... },
+		    .next = nullptr,
+		    .previous = nullptr
+		};
+
 		if (this->elements_count == 0) {
 			this->hand = new_element;
 			
@@ -103,11 +111,13 @@ public:
 		++this->elements_count;
 		return proxy{ new_element };
 	}
-	void make_step() {
+
+	void make_step() noexcept {
 		assert(this->elements_count != 0);
 		this->hand = this->hand->next;
 	}
-	std::size_t get_elements_count() { return this->elements_count; }
+
+	std::size_t get_elements_count() const noexcept { return this->elements_count; }
 };
 
 #endif // !CLOCK_LIST_H

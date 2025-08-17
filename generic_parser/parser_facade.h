@@ -30,16 +30,17 @@ namespace generic_parser {
 			builder_args&&... args
 		)
 			:names_stack{ names_stack },
+			end_of_file{ end_token },
 			generator{ contexts, &this->names_stack, name_token, end_token, starting_context },
-			builder{ &this->names_stack, &this->generator, std::forward<builder_args>(args)... },
-			end_of_file{ end_token }
+			builder{ &this->names_stack, &this->generator, std::forward<builder_args>(args)... }
 		{
 		}
 
 		parser_facade(const parser_facade&) = delete;
+		parser_facade& operator= (const parser_facade&) = delete;
+
 		parser_facade(parser_facade&&) = delete;
-		void operator= (const parser_facade&) = delete;
-		void operator=(parser_facade&&) = delete;
+		parser_facade& operator=(parser_facade&&) = delete;
 
 		decltype(auto) error() { return this->builder.error(); }
 		void start(const std::filesystem::path& file_name) {
@@ -52,8 +53,11 @@ namespace generic_parser {
 				this->builder.handle_token(token);
 			} while (this->builder.is_working());
 		}
+
 		decltype(auto) get_builder_value() { return this->builder.get_value(); } //auto will ignore const qualifier, references, etc. so this function returns decltype(auto)
 		builder_type& get_builder() { return this->builder; }
+
+		~parser_facade() noexcept = default;
 	};
 }
 

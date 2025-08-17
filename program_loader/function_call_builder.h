@@ -49,10 +49,10 @@ public:
 		args&&... instruction_builder_args
 	)
 		:general_function_call_builder{ std::forward<args>(instruction_builder_args)... },
+		stack_allocation_size{ 0 },
 		function_jump_table_index{},
 		fnc_signature{ nullptr },
-		stack_address{ 0 },
-		stack_allocation_size{ 0 }
+		stack_address{ 0 }
 	{}
 
 	virtual void visit(std::unique_ptr<function> fnc) override {
