@@ -105,6 +105,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_5D8ECBE150394C769E9BDDE0BCD01BAA"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_6A1DD3E9FA944F89A2A67712D8F2B5B4"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -614,6 +620,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5D8ECBE150394C769E9BDDE0BCD01BAA"
+            {
+            "SourcePath" = "8:..\\examples\\unsynchronized-shared-memory.tfsi"
+            "TargetName" = "8:unsynchronized-shared-memory.tfsi"
+            "Tag" = "8:"
+            "Folder" = "8:_7869B5D4D9794125B9553DF6C120B641"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6A1DD3E9FA944F89A2A67712D8F2B5B4"
             {
             "SourcePath" = "8:..\\examples\\remove-undefine.tfsi"
@@ -914,15 +940,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:FSI"
-        "ProductCode" = "8:{921C78F9-4B41-4919-BB13-B2543B1C7CCC}"
-        "PackageCode" = "8:{1589BF9C-E908-4FAA-8925-553187E84ECC}"
+        "ProductCode" = "8:{E74BAF49-200F-464A-91A5-87B896E1B784}"
+        "PackageCode" = "8:{9CEDF702-1075-435B-A7FC-53BF177C65DC}"
         "UpgradeCode" = "8:{95F50751-258F-4D59-AC9D-6B28888B41F6}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.2"
+        "ProductVersion" = "8:1.1.0"
         "Manufacturer" = "8:b068931"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
