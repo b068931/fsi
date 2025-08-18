@@ -9,6 +9,8 @@ The command to run the translator is as follows:
   By debug information, I mean the information about the names of parts of your program, such as the names of
   variables, functions, and so on. This information maybe used by the interpreter to provide more meaningful 
   error messages, it does NOT allow step-by-step debugging of the program.
+- Example: Run ./fsi-translator "..\examples\unsynchronized-shared-memory.tfsi" "..\out.bfsi" include-debug from
+  the bin directory to translate the example program.
 
 In order to better understand the syntax of the textual representation, you may want to look at the provided 
 examples in the 'examples' directory. If you are into that, you may also want to look at the source code of the

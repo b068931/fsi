@@ -32,6 +32,8 @@ The command line to run the mediator is as follows:
 - "modules-descriptor-file" is the path to the file that contains the list of modules to be loaded.
 - "executors-count" is the number of executors to be created. Executors are the system threads that will run your program.
 - "binary-file" is the path to the compressed binary file produced by the translator.
+- Example: Run ./fsi-mediator engine.mods 4 "..\out.bfsi" from the bin directory to run the translated program.
+  Notice that you first need to run the translator to produce the binary file.
 
 First, mediator reads a module descriptor file, which is a simple text file that contains the list of modules to be loaded.
 This file is called 'engine.mods'. It is also located in the 'bin' directory, where the mediator executable is located.
