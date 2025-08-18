@@ -77,25 +77,25 @@ void initialize_m(module_mediator::module_part* module_part) {
     ::part = module_part;
     ::program_control_functions_addresses = new char[4 * sizeof(std::uint64_t)] {};
 
-    backend::fill_in_reg_array_entry(
+    backend::fill_in_register_array_entry(
         0,
         ::program_control_functions_addresses,
         reinterpret_cast<std::uintptr_t>(&special_call_module)
     );
 
-    backend::fill_in_reg_array_entry(
+    backend::fill_in_register_array_entry(
         1,
         ::program_control_functions_addresses,
         reinterpret_cast<std::uintptr_t>(&backend::call_module)
     );
 
-    backend::fill_in_reg_array_entry(
+    backend::fill_in_register_array_entry(
         2,
         ::program_control_functions_addresses,
         reinterpret_cast<std::uintptr_t>(&inner_terminate)
     );
 
-    backend::fill_in_reg_array_entry(
+    backend::fill_in_register_array_entry(
         3,
         ::program_control_functions_addresses,
         reinterpret_cast<std::uintptr_t>(&end_program)

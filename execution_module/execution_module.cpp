@@ -32,19 +32,19 @@ module_mediator::return_value on_thread_creation(module_mediator::arguments_stri
     );
 
     //fill in thread_state - start
-    backend::fill_in_reg_array_entry( //function address
+    backend::fill_in_register_array_entry( //function address
         1, 
         thread_state_memory, 
         reinterpret_cast<std::uintptr_t>(thread_structure->program_function_address)
     );
 
-    backend::fill_in_reg_array_entry( //jump table
+    backend::fill_in_register_array_entry( //jump table
         2,
         thread_state_memory,
         reinterpret_cast<std::uintptr_t>(program_jump_table)
     );
 
-    backend::fill_in_reg_array_entry( //thread state
+    backend::fill_in_register_array_entry( //thread state
         3,
         thread_state_memory,
         reinterpret_cast<std::uintptr_t>(thread_state_memory)
@@ -85,19 +85,19 @@ module_mediator::return_value on_thread_creation(module_mediator::arguments_stri
         return module_mediator::module_failure;
     }
 
-    backend::fill_in_reg_array_entry( //stack current position
+    backend::fill_in_register_array_entry( //stack current position
         4,
         thread_state_memory,
         result
     );
 
-    backend::fill_in_reg_array_entry( //stack end
+    backend::fill_in_register_array_entry( //stack end
         5,
         thread_state_memory,
         reinterpret_cast<std::uintptr_t>(thread_stack_end) //account for the space that will be used to save the state of one variable between function calls
     );
 
-    backend::fill_in_reg_array_entry( //program control functions
+    backend::fill_in_register_array_entry( //program control functions
         6,
         thread_state_memory,
         reinterpret_cast<std::uintptr_t>(get_program_control_functions_addresses())
@@ -196,7 +196,8 @@ module_mediator::return_value dynamic_call(module_mediator::arguments_string_typ
     std::uintptr_t new_current_stack_position = backend::apply_initializer_on_thread_stack(
         reinterpret_cast<char*>(state_manager.get_current_stack_position()),
         reinterpret_cast<char*>(state_manager.get_stack_end()),
-        function_arguments
+        function_arguments,
+        get_thread_local_structure()->currently_running_thread_information.thread_id
     );
 
     if (new_current_stack_position == reinterpret_cast<std::uintptr_t>(nullptr)) {
@@ -264,7 +265,7 @@ module_mediator::return_value create_thread(module_mediator::arguments_string_ty
     auto [priority, main_function_address, main_function_parameters, parameters_size] =
         module_mediator::arguments_string_builder::unpack<module_mediator::return_value, void*, void*, std::uint64_t>(bundle);
 
-    module_mediator::arguments_string_type copy = new module_mediator::arguments_string_element[parameters_size]{};
+    module_mediator::arguments_string_type copy = new module_mediator::arguments_string_element[parameters_size] {};
     std::memcpy(copy, main_function_parameters, parameters_size);
 
     return backend::create_thread_initializer(priority, main_function_address, copy);

@@ -12,7 +12,9 @@ namespace interoperation {
 	module_mediator::module_part* get_module_part();
 
 	class index_getter {
-		//i guess this class is thread safe https://stackoverflow.com/questions/8102125/is-local-static-variable-initialization-thread-safe-in-c11
+		// I guess this class is thread safe:
+		// https://stackoverflow.com/questions/8102125/is-local-static-variable-initialization-thread-safe-in-c11
+
 	public:
 		static std::size_t program_loader() {
 			static std::size_t index = get_module_part()->find_module_index("progload");
@@ -103,6 +105,11 @@ namespace interoperation {
 			static std::size_t index = get_module_part()->find_function_index(index_getter::resource_module(), "deallocate_program_memory");
 			return index;
 		}
+
+		static std::size_t resource_module_verify_thread_memory() {
+			static std::size_t index = get_module_part()->find_function_index(index_getter::resource_module(), "verify_thread_memory");
+			return index;
+        }
 	};
 }
 

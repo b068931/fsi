@@ -1,0 +1,254 @@
+$stack-size d1024;
+from prts import <
+    io.std.out, 
+    memory.allocate, 
+    memory.deallocate, 
+    memory.allocated-size,
+    threading.create
+>
+
+$redefine symbol-base d48;
+
+function memory-copy(memory destination, memory source, eight-bytes size) {
+    @repeat;
+        compare variable  eight-bytes size, 
+                immediate eight-bytes d0;
+
+        jump-equal point end;
+        decrement variable eight-bytes size;
+
+        move dereference one-byte destination[size], 
+             dereference one-byte source     [size];
+
+        jump point repeat;
+    @end;
+}
+
+function memory-copy-reversed(memory destination, memory source, eight-bytes size) {
+    $declare eight-bytes destination-index;
+
+    move variable  eight-bytes destination-index, 
+         immediate eight-bytes d0;
+
+    @repeat;
+        compare variable  eight-bytes size, 
+                immediate eight-bytes d0;
+
+        jump-equal point end;
+        decrement variable eight-bytes size;
+
+        move dereference one-byte destination[destination-index], 
+             dereference one-byte source     [size];
+
+        increment variable eight-bytes destination-index;
+        jump point repeat;
+
+    @end;
+}
+
+function eight-bytes-to-string(eight-bytes value) {
+    $declare memory result;
+    $declare memory result-copy;
+
+    $declare eight-bytes result-size;
+    $declare eight-bytes result-copy-size;
+
+    $declare eight-bytes symbol;
+
+    move variable  eight-bytes result-size, 
+         immediate eight-bytes d0;
+
+    move variable  eight-bytes result-copy-size, 
+         immediate eight-bytes d0;
+
+    @repeat;
+        divide variable  eight-bytes value, 
+               immediate eight-bytes d10;
+
+        increment variable eight-bytes result-copy-size;
+
+        result-copy: prts->memory.allocate(
+            variable eight-bytes result-copy-size
+        )
+
+        memory-copy(
+            variable memory      result-copy, 
+            variable memory      result, 
+            variable eight-bytes result-size
+        )
+
+        result: prts->memory.deallocate()
+
+        /* Divide instruction stores the remainder */
+        load-value variable eight-bytes symbol;
+
+        add variable  eight-bytes symbol, 
+            immediate eight-bytes symbol-base;
+
+        move dereference one-byte result-copy[result-size], 
+             variable    one-byte symbol;
+
+        move-pointer variable memory result, 
+                     variable memory result-copy;
+
+        move variable eight-bytes result-size, 
+             variable eight-bytes result-copy-size;
+
+        compare variable  eight-bytes value, 
+                immediate eight-bytes d0;
+
+        jump-equal point end;
+        jump point repeat;
+
+    @end;
+
+    increment variable eight-bytes result-copy-size;
+    result-copy: prts->memory.allocate(
+        variable eight-bytes result-copy-size
+    )
+   
+    memory-copy-reversed(
+        variable memory      result-copy, 
+        variable memory      result, 
+        variable eight-bytes result-size
+    )
+
+    result: prts->memory.deallocate()
+    save-value variable memory result-copy;
+}
+
+/* 
+ *Lower increment counts may execute too fast.
+ * That is, the first thread will finish before
+ * the first one starts.
+*/
+$redefine do-increments d10000000;
+$define-string i-counted ''''I counted: ''''
+
+function increment-shared-memory(memory shared-memory) {
+    $declare eight-bytes counter;
+    $declare one-byte    first-byte;
+
+    $declare eight-bytes my-result;
+    $declare memory      my-result-string;
+    $declare eight-bytes my-result-index;
+
+    $declare memory      message-result;
+    $declare eight-bytes message-result-size;
+
+    move variable  eight-bytes counter,
+         immediate eight-bytes d0;
+
+    move variable  one-byte    first-byte, 
+         immediate one-byte    d0;
+
+    move variable  eight-bytes my-result, 
+         immediate eight-bytes d0;
+
+    move variable  eight-bytes my-result-index, 
+         immediate eight-bytes d0;
+
+    @repeat1;
+        /*
+         * Due to the fact that this memory access is not synchronized,
+         * we will get value that is not equal to do-increment * the number of threads
+        */
+        add dereference eight-bytes shared-memory[first-byte], 
+            immediate   eight-bytes d1;
+
+        increment variable eight-bytes counter;
+
+        compare variable  eight-bytes counter, 
+                immediate eight-bytes do-increments;
+
+        jump-not-equal point repeat1;
+
+    move variable    eight-bytes my-result, 
+         dereference eight-bytes shared-memory[first-byte];
+
+    eight-bytes-to-string(variable eight-bytes my-result)
+
+    load-value variable memory my-result-string;
+    message-result-size: prts->memory.allocated-size(
+        variable memory my-result-string
+    )
+
+    add variable eight-bytes message-result-size, 
+        size-of  eight-bytes i-counted;
+
+    /* For the new line character */
+    increment variable eight-bytes message-result-size; 
+
+    message-result: prts->memory.allocate(
+        variable eight-bytes message-result-size
+    )
+
+    copy-string variable memory message-result, 
+                string          i-counted;
+
+    move variable eight-bytes counter, 
+         size-of  eight-bytes i-counted;
+    
+    decrement variable eight-bytes message-result-size;
+    @repeat2;
+        move dereference one-byte message-result  [counter], 
+             dereference one-byte my-result-string[my-result-index];
+
+        increment variable eight-bytes counter,
+                  variable eight-bytes my-result-index;
+
+        compare variable eight-bytes counter,
+                variable eight-bytes message-result-size;
+
+        jump-not-equal point repeat2;
+
+    move dereference one-byte message-result[message-result-size],
+         /* h0A is an ASCII code for '\n' or new line character */
+         immediate   one-byte h0A; 
+
+    increment variable eight-bytes message-result-size;
+    void: prts->io.std.out(
+        variable memory      message-result,
+        variable eight-bytes message-result-size
+    )
+
+    message-result: prts->memory.deallocate()
+    my-result-string: prts->memory.deallocate()
+
+    /* Shared memory must be deallocated in each thread that had it */
+    /* Internally, this deallocated the thread local memory descriptor */
+    /* After all descriptors are gone, the memory gets deallocated */
+    shared-memory: prts->memory.deallocate()
+}
+
+function main() {
+    $main-function main;
+
+    $expose-function main;
+    $expose-function increment-shared-memory;
+
+    $declare memory      shared-memory;
+    $declare eight-bytes function-address;
+
+    shared-memory: prts->memory.allocate(
+        immediate eight-bytes d8
+    )
+
+    get-function-address variable      eight-bytes function-address,
+                         function-name             increment-shared-memory;
+
+    void: prts->threading.create(
+        /* The first argument is the priority */
+    immediate eight-bytes d0,
+        variable  eight-bytes function-address,
+        variable  memory      shared-memory
+    )
+
+    void: prts->threading.create(
+        immediate eight-bytes d0,
+        variable  eight-bytes function-address,
+        variable  memory      shared-memory
+    )
+
+    shared-memory: prts->memory.deallocate()
+}

@@ -44,7 +44,7 @@ namespace backend {
         module_mediator::return_value container_id
     );
 
-    void fill_in_reg_array_entry(
+    void fill_in_register_array_entry(
         std::uint64_t entry_index, 
         char* memory, 
         std::uint64_t value
@@ -75,13 +75,14 @@ namespace backend {
     std::uintptr_t apply_initializer_on_thread_stack(
         char* thread_stack_memory, 
         const char* thread_stack_end, 
-        const module_mediator::arguments_array_type& arguments
+        const module_mediator::arguments_array_type& arguments,
+        module_mediator::return_value thread_id
     );
 
     std::uintptr_t initialize_thread_stack(
         void* function_address, 
         char* thread_stack_memory, 
-        char* thread_stack_end, 
+        const char* thread_stack_end, 
         module_mediator::return_value thread_id
     );
 }

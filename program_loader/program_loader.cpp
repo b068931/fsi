@@ -206,7 +206,12 @@ namespace {
                 ++instruction_index;
             }
             else {
-                throw program_compilation_error{ "Unknown instruction/can not create a new builder." };
+                throw program_compilation_error{
+                    std::format(
+                        "Unknown instruction/can not create a new builder. Instruction index: {}",
+                        instruction_index
+                    )
+                };
             }
         }
 
@@ -508,7 +513,7 @@ module_mediator::return_value load_program_to_memory(module_mediator::arguments_
                 )
             );
         }
-        else {
+        else if (exc.get_associated_id() != 0) { // Id 0 means that the error is not associated with any entity
             LOG_ERROR(
                 interoperation::get_module_part(),
                 std::format(
@@ -518,6 +523,16 @@ module_mediator::return_value load_program_to_memory(module_mediator::arguments_
                     exc.get_associated_id()
                 )
             );
+        }
+        else {
+           LOG_ERROR(
+                interoperation::get_module_part(),
+                std::format(
+                    "Failed to compile \"{}\": {}",
+                    program_name,
+                    exc.what()
+                )
+           );
         }
     }
     catch ([[maybe_unused]] const std::exception& exc) {

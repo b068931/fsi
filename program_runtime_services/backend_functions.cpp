@@ -146,11 +146,14 @@ namespace backend {
             *static_cast<std::uint64_t*>(cross_thread_sharing)
         );
 
-        assert(cross_thread_sharing_synchronous.load() > 0 && "Cross-thread sharing counter cannot be zero");
+        assert(cross_thread_sharing_synchronous.load(std::memory_order_seq_cst) > 0 && "Cross-thread sharing counter cannot be zero");
         if (cross_thread_sharing_synchronous.fetch_sub(1, std::memory_order_relaxed) == 1) {
+            // Deallocate shared data and the memory itself.
             interoperation::thread_group_deallocate(thread_group_id, cross_thread_sharing);
-            interoperation::thread_deallocate(thread_id, address);
             interoperation::thread_group_deallocate(thread_group_id, base);
         }
+
+        // Deallocate the memory descriptor for the thread.
+        interoperation::thread_deallocate(thread_id, address);
     }
 }

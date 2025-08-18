@@ -294,5 +294,8 @@
     <CopyFileToFolders Include="..\libraries\memory.tfsi">
       <Filter>Libraries</Filter>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="..\examples\unsynchronized-shared-memory.tfsi">
+      <Filter>Examples</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
 </Project>

@@ -167,11 +167,20 @@ namespace {
             OutputDebugStringA(sExceptionInfoBuffer);
         }
 
+        // Fail instantly on Release builds. On Debug builds notify the debugger.
+#ifdef NDEBUG
+        if (g_pPreviousFilter != NULL) {
+            return g_pPreviousFilter(pExceptionInfo);
+        }
+
+        return EXCEPTION_EXECUTE_HANDLER;
+#else
         if (g_pPreviousFilter != NULL) {
             return g_pPreviousFilter(pExceptionInfo);
         }
 
         return EXCEPTION_CONTINUE_SEARCH;
+#endif
     }
 }
 
