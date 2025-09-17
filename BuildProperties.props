@@ -3,8 +3,14 @@
   <PropertyGroup Label="UserMacros">
     <!--By default debug builds include VLD-->
     <VisualLeakDetectorDir Condition="'$(VisualLeakDetectorDir)' == ''">D:\Visual Leak Detector</VisualLeakDetectorDir>
+
+    <!--Because Visual Studio's Intelisense does not see it for some reason-->
+    <QtIncludeDirectory Condition="'$(QtIncludeDirectory)' == ''">C:\Qt\6.9.0\msvc2022_64\include</QtIncludeDirectory>
   </PropertyGroup>
   <Target Name="EnsureVLDDir" BeforeTargets="PrepareForBuild" Condition="'$(VisualLeakDetectorDir)' == ''">
     <Error Text="ERROR: VisualLeakDetectorDir is not defined!" />
+  </Target> 
+  <Target Name="EnsureQtIncludeDir" BeforeTargets="PrepareForBuild" Condition="'$(QtIncludeDirectory)' == ''">
+    <Error Text="ERROR: QtIncludeDirectory is not defined!" />
   </Target> 
 </Project>
