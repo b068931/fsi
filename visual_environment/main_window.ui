@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindowClass</class>
+ <widget class="QMainWindow" name="MainWindowClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1872</width>
+    <height>1001</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Visual Environment</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QVBoxLayout" name="verticalLayout"/>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1872</width>
+     <height>33</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="fileMenu">
+    <property name="title">
+     <string>Файл</string>
+    </property>
+    <addaction name="openFileMenuAction"/>
+    <addaction name="saveFileMenuAction"/>
+    <addaction name="saveFileAsMenuAction"/>
+    <addaction name="closeFileMenuAction"/>
+   </widget>
+   <widget class="QMenu" name="folderMenu">
+    <property name="title">
+     <string>Папка</string>
+    </property>
+    <addaction name="openFolderMenuAction"/>
+    <addaction name="closeFolderMenuAction"/>
+   </widget>
+   <widget class="QMenu" name="programMenu">
+    <property name="title">
+     <string>Програма</string>
+    </property>
+    <addaction name="translateAndRunMenuAction"/>
+    <addaction name="executionEnvironmentMenuAction"/>
+   </widget>
+   <widget class="QMenu" name="programAboutMenu">
+    <property name="title">
+     <string>Про Програму</string>
+    </property>
+    <widget class="QMenu" name="documentationFSIMenu">
+     <property name="title">
+      <string>Документація FSI</string>
+     </property>
+     <addaction name="documentationFSIInstallationMenuAction"/>
+     <addaction name="documentationFSIReleaseLayoutMenuAction"/>
+     <addaction name="documentationFSIUseTranslatorMenuAction"/>
+     <addaction name="documentationFSIUseExecutionEnvironmentMenuAction"/>
+     <addaction name="documentationFSIEngineMultithreadingMenuAction"/>
+    </widget>
+    <addaction name="visualEnvironmentDocumentationMenuAction"/>
+    <addaction name="documentationFSIMenu"/>
+    <addaction name="separator"/>
+    <addaction name="shortDescriptionMenuAction"/>
+   </widget>
+   <addaction name="fileMenu"/>
+   <addaction name="folderMenu"/>
+   <addaction name="programMenu"/>
+   <addaction name="programAboutMenu"/>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="saveFileMenuAction">
+   <property name="text">
+    <string>Зберегти</string>
+   </property>
+  </action>
+  <action name="saveFileAsMenuAction">
+   <property name="text">
+    <string>Зберегти Як...</string>
+   </property>
+  </action>
+  <action name="closeFileMenuAction">
+   <property name="text">
+    <string>Закрити</string>
+   </property>
+  </action>
+  <action name="openFileMenuAction">
+   <property name="text">
+    <string>Відкрити</string>
+   </property>
+  </action>
+  <action name="openFolderMenuAction">
+   <property name="text">
+    <string>Відкрити</string>
+   </property>
+  </action>
+  <action name="closeFolderMenuAction">
+   <property name="text">
+    <string>Закрити</string>
+   </property>
+  </action>
+  <action name="translateAndRunMenuAction">
+   <property name="text">
+    <string>Транслювати і Запустити</string>
+   </property>
+  </action>
+  <action name="executionEnvironmentMenuAction">
+   <property name="text">
+    <string>Середовище Виконання</string>
+   </property>
+  </action>
+  <action name="visualEnvironmentDocumentationMenuAction">
+   <property name="text">
+    <string>Документація Візуального Середовища</string>
+   </property>
+  </action>
+  <action name="shortDescriptionMenuAction">
+   <property name="text">
+    <string>Короткий Опис</string>
+   </property>
+  </action>
+  <action name="documentationFSIInstallationMenuAction">
+   <property name="text">
+    <string>Встановлення</string>
+   </property>
+  </action>
+  <action name="documentationFSIReleaseLayoutMenuAction">
+   <property name="text">
+    <string>Розміщення Файлів</string>
+   </property>
+  </action>
+  <action name="documentationFSIUseTranslatorMenuAction">
+   <property name="text">
+    <string>Використання Транслятора</string>
+   </property>
+  </action>
+  <action name="documentationFSIUseExecutionEnvironmentMenuAction">
+   <property name="text">
+    <string>Використання Середовища</string>
+   </property>
+  </action>
+  <action name="documentationFSIEngineMultithreadingMenuAction">
+   <property name="text">
+    <string>Паралельність Середовища</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="main_window.qrc"/>
+ </resources>
+ <connections/>
+</ui>
