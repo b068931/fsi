@@ -109,6 +109,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main_window_slots.cpp" />
+    <ClCompile Include="text_editor.cpp" />
+    <ClCompile Include="text_editor_slots.cpp" />
     <QtUic Include="main_window.ui" />
     <QtMoc Include="main_window.h" />
     <ClCompile Include="main_window.cpp" />
@@ -116,6 +118,9 @@
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="main_window.qrc" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="text_editor.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

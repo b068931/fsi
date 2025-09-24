@@ -1,24 +1,23 @@
 #ifndef QT_VISUAL_ENVIRONMENT_MAIN_WINDOW_H
 #define QT_VISUAL_ENVIRONMENT_MAIN_WINDOW_H
 
-#include <QTreeView>
-#include <QTabWidget>
 #include <QtWidgets/QMainWindow>
-#include <QString>
 
+#include "text_editor.h"
 #include "ui_main_window.h"
 
 /// <summary>
-/// MainWindow is a text editor. You are supposed to use
-/// it in order to quickly edit programs and launch them
-/// in the execution environment.
+/// MainWindow provides the main access point
+/// to the capabilities of the application. It manages
+/// a simple text editor widget (for more information see text_editor.h)
+/// and a runtime environment.
 /// </summary>
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(QWidget *parent = nullptr);
 
     MainWindow(const MainWindow&) = delete;
     MainWindow& operator= (const MainWindow&) = delete;
@@ -28,18 +27,11 @@ public:
 
     ~MainWindow() noexcept override;
 
-private slots:
-    void onWorkingDirectoryItemDoubleClicked(const QModelIndex& index);
-
 private:
     Ui::MainWindowClass ui{};
+    TextEditor* editor{};
 
-    QTabWidget* textEditor{};
-    QTreeView* workingDirectory{};
-
-    void connectSignalsManually();
-    void setupEditorComponents();
-    void openWorkingDirectory(const QString& directoryPath);
+    void setupTextEditor();
 };
 
 #endif
