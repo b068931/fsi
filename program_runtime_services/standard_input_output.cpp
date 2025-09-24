@@ -1246,11 +1246,9 @@ module_mediator::return_value detach_from_stdio(module_mediator::arguments_strin
     clean_input_queue();
     clean_output_queue();
 
-    hCapturedStdOut = NULL;
-    hCapturedStdIn = NULL;
+    CloseHandleReport(hIOCancellationSignal, "hIOCancellationSignal");
     hIOCancellationSignal = NULL;
 
-    CloseHandleReport(hIOCancellationSignal, "hIOCancellationSignal");
     if (GetFileType(hCapturedStdIn) == FILE_TYPE_CHAR && !RestoreConsoleInput(hCapturedStdIn, dwSavedConsoleState)) {
         LOG_WARNING(
             interoperation::get_module_part(),
@@ -1261,8 +1259,14 @@ module_mediator::return_value detach_from_stdio(module_mediator::arguments_strin
             )
         );
 
+        hCapturedStdOut = NULL;
+        hCapturedStdIn = NULL;
+
         return module_mediator::module_failure;
     }
+
+    hCapturedStdOut = NULL;
+    hCapturedStdIn = NULL;
 
     return module_mediator::module_success;
 }
