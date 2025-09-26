@@ -12,6 +12,8 @@ void TextEditor::showEvent(QShowEvent* event) {
 }
 
 void TextEditor::onWorkingDirectoryItemDoubleClicked(const QModelIndex &index) {
+    Q_ASSERT(this->workingDirectory != nullptr && "The working directory has not been set up.");
+
     QFileSystemModel* fileModel = qobject_cast<QFileSystemModel*>(this->workingDirectory->model());
     if (!fileModel)
         return;

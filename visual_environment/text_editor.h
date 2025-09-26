@@ -8,8 +8,13 @@
 #include <QVector>
 #include <QWidget>
 #include <QSplitter>
+#include <QtGlobal>
 
-class TextEditor : public QWidget
+/// <summary>
+/// A final QWidget-based class that provides a text editor interface
+/// with basic file browsing capabilities and ability to edit several files.
+/// </summary>
+class TextEditor final : public QWidget
 {
     Q_OBJECT
 
@@ -24,7 +29,7 @@ public:
 
     ~TextEditor() noexcept override;
 
-    void showEvent(QShowEvent* event) override;
+    virtual void showEvent(QShowEvent* event) override;
 
 public:
     /// <summary>
