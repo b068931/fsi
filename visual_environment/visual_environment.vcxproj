@@ -108,6 +108,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <QtMoc Include="enriched_status_bar.h" />
+    <ClCompile Include="enriched_status_bar.cpp" />
     <ClCompile Include="main_window_slots.cpp" />
     <ClCompile Include="text_editor.cpp" />
     <ClCompile Include="text_editor_slots.cpp" />
@@ -117,10 +119,16 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <QtRcc Include="main_window.qrc" />
+    <QtRcc Include="visual_environment.qrc" />
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="text_editor.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtTranslation Include="translation_visual_environment_uk_UA.ts">
+      <QmOutputDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)</QmOutputDir>
+      <QmOutputDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)</QmOutputDir>
+    </QtTranslation>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

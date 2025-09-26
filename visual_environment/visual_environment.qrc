@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/"/>
+    <qresource prefix="/i18n">
+        <file>translation_visual_environment_uk_UA.qm</file>
+    </qresource>
+</RCC>

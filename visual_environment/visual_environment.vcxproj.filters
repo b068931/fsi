@@ -24,6 +24,18 @@
     <Filter Include="Source Files\Main Window">
       <UniqueIdentifier>{8af7c87e-ade8-4f18-b3bd-cc13409dbb91}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Custom Widgets">
+      <UniqueIdentifier>{e1342918-40e8-4111-b2d9-7baacf1035b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Custom Widgets">
+      <UniqueIdentifier>{06fe67bd-5c29-4f88-9edd-d0f5370dda20}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Custom Widgets\Text Editor">
+      <UniqueIdentifier>{33ab35cc-d274-4bb3-9b0b-b9bc26cae92e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Custom Widgets\Enriched Status Bar">
+      <UniqueIdentifier>{a8866440-d9fc-4f9a-b78c-6f88faeb3517}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="main_window.ui">
@@ -43,10 +55,32 @@
     <ClCompile Include="main_window_slots.cpp">
       <Filter>Source Files\Main Window</Filter>
     </ClCompile>
+    <ClCompile Include="text_editor.cpp">
+      <Filter>Source Files\Custom Widgets\Text Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="text_editor_slots.cpp">
+      <Filter>Source Files\Custom Widgets\Text Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="enriched_status_bar.cpp">
+      <Filter>Source Files\Custom Widgets\Enriched Status Bar</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <QtRcc Include="main_window.qrc">
+    <QtRcc Include="visual_environment.qrc">
       <Filter>Resource Files</Filter>
     </QtRcc>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="text_editor.h">
+      <Filter>Header Files\Custom Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="enriched_status_bar.h">
+      <Filter>Header Files\Custom Widgets</Filter>
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <QtTranslation Include="translation_visual_environment_uk_UA.ts">
+      <Filter>Translation Files</Filter>
+    </QtTranslation>
   </ItemGroup>
 </Project>
