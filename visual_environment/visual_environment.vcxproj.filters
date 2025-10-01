@@ -36,6 +36,18 @@
     <Filter Include="Source Files\Custom Widgets\Enriched Status Bar">
       <UniqueIdentifier>{a8866440-d9fc-4f9a-b78c-6f88faeb3517}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Components">
+      <UniqueIdentifier>{41471b6f-3760-4f34-a336-55f14f99049c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Components\Internationalization">
+      <UniqueIdentifier>{4c7cae54-7dc3-4a05-9902-8d61bba3a98d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Components">
+      <UniqueIdentifier>{c39eaf9a-49bb-4dad-bce1-b15ca9a3cb99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Components\Internationalization">
+      <UniqueIdentifier>{2cfc59df-ab50-40e7-8002-a0e84d667bd3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="main_window.ui">
@@ -64,6 +76,12 @@
     <ClCompile Include="enriched_status_bar.cpp">
       <Filter>Source Files\Custom Widgets\Enriched Status Bar</Filter>
     </ClCompile>
+    <ClCompile Include="interface_translator.cpp">
+      <Filter>Source Files\Components\Internationalization</Filter>
+    </ClCompile>
+    <ClCompile Include="translatable_qstring_adapter.cpp">
+      <Filter>Source Files\Components\Internationalization</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="visual_environment.qrc">
@@ -77,10 +95,21 @@
     <QtMoc Include="enriched_status_bar.h">
       <Filter>Header Files\Custom Widgets</Filter>
     </QtMoc>
+    <QtMoc Include="interface_translator.h">
+      <Filter>Header Files\Components\Internationalization</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtTranslation Include="translation_visual_environment_uk_UA.ts">
       <Filter>Translation Files</Filter>
     </QtTranslation>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="translatable_string_interface.h">
+      <Filter>Header Files\Components\Internationalization</Filter>
+    </ClInclude>
+    <ClInclude Include="translatable_qstring_adapter.h">
+      <Filter>Header Files\Components\Internationalization</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

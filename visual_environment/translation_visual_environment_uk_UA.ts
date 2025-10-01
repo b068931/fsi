@@ -2,48 +2,91 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="uk_UA">
 <context>
-    <name>EnrichedStatusBar</name>
+    <name>CustomWidgets::EnrichedStatusBar</name>
     <message>
-        <location filename="enriched_status_bar.cpp" line="58"/>
+        <location filename="enriched_status_bar.cpp" line="59"/>
         <source>Tooltips</source>
         <extracomment>Label in the status bar showing tooltips.</extracomment>
-        <translation>Підказки</translation>
+        <translation type="unfinished">Підказки</translation>
     </message>
     <message>
-        <location filename="enriched_status_bar.cpp" line="63"/>
+        <location filename="enriched_status_bar.cpp" line="64"/>
         <source>Working Directory</source>
         <extracomment>Label in the status bar showing the working directory of the application.</extracomment>
-        <translation>Робочий каталог</translation>
+        <translation type="unfinished">Робочий каталог</translation>
     </message>
     <message>
-        <location filename="enriched_status_bar.cpp" line="68"/>
+        <location filename="enriched_status_bar.cpp" line="69"/>
         <source>Translator Result</source>
         <extracomment>Label in the status bar showing the result of translator execution.</extracomment>
-        <translation>Результат виконання транслятора</translation>
+        <translation type="unfinished">Результат виконання транслятора</translation>
     </message>
     <message>
-        <location filename="enriched_status_bar.cpp" line="73"/>
+        <location filename="enriched_status_bar.cpp" line="74"/>
         <source>Execution Environment State</source>
         <extracomment>Label in the status bar showing the state of the execution environment.</extracomment>
-        <translation>Стан середовища виконання</translation>
+        <translation type="unfinished">Стан середовища виконання</translation>
+    </message>
+</context>
+<context>
+    <name>CustomWidgets::TextEditor</name>
+    <message>
+        <location filename="text_editor.cpp" line="79"/>
+        <source>Working directory view. Use double-click or context menu.</source>
+        <extracomment>Status tip for the working directory view in the text editor.</extracomment>
+        <translation type="unfinished">Огляд робочого каталогу. Подвійний клік або контекстне меню.</translation>
+    </message>
+    <message>
+        <location filename="text_editor.cpp" line="116"/>
+        <source>Error</source>
+        <extracomment>Status tip for the error message box when a file cannot be opened.</extracomment>
+        <translation type="unfinished">Помилка</translation>
+    </message>
+    <message>
+        <location filename="text_editor.cpp" line="117"/>
+        <source>Could not open file &quot;%1&quot; for reading.</source>
+        <translation type="unfinished">Неможливо відкрити файл &quot;%1&quot; для читання.</translation>
+    </message>
+</context>
+<context>
+    <name>EnrichedStatusBar</name>
+    <message>
+        <source>Tooltips</source>
+        <extracomment>Label in the status bar showing tooltips.</extracomment>
+        <translation type="vanished">Підказки</translation>
+    </message>
+    <message>
+        <source>Working Directory</source>
+        <extracomment>Label in the status bar showing the working directory of the application.</extracomment>
+        <translation type="vanished">Робочий каталог</translation>
+    </message>
+    <message>
+        <source>Translator Result</source>
+        <extracomment>Label in the status bar showing the result of translator execution.</extracomment>
+        <translation type="vanished">Результат виконання транслятора</translation>
+    </message>
+    <message>
+        <source>Execution Environment State</source>
+        <extracomment>Label in the status bar showing the state of the execution environment.</extracomment>
+        <translation type="vanished">Стан середовища виконання</translation>
     </message>
 </context>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="main_window.cpp" line="56"/>
+        <location filename="main_window.cpp" line="91"/>
         <source>Working directory not set</source>
         <extracomment>Value for the status bar when no working directory is set.</extracomment>
         <translation>Робочий каталог не встановлено</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="61"/>
-        <location filename="main_window.cpp" line="67"/>
+        <location filename="main_window.cpp" line="96"/>
+        <location filename="main_window.cpp" line="102"/>
         <source>Not started</source>
         <extracomment>Value for the status bar when execution environment has not been started once yet.
 ----------
 Value for the status bar when translator has not been run once yet.</extracomment>
-        <translation>Середовище не запускалось</translation>
+        <translation type="unfinished">Жодного запуску</translation>
     </message>
 </context>
 <context>
@@ -168,21 +211,18 @@ Value for the status bar when translator has not been run once yet.</extracommen
 <context>
     <name>TextEditor</name>
     <message>
-        <location filename="text_editor.cpp" line="78"/>
         <source>Working directory view. Use double-click or context menu.</source>
         <extracomment>Status tip for the working directory view in the text editor.</extracomment>
-        <translation>Огляд робочого каталогу. Подвійний клік або контекстне меню.</translation>
+        <translation type="vanished">Огляд робочого каталогу. Подвійний клік або контекстне меню.</translation>
     </message>
     <message>
-        <location filename="text_editor.cpp" line="115"/>
         <source>Error</source>
         <extracomment>Status tip for the error message box when a file cannot be opened.</extracomment>
-        <translation>Помилка</translation>
+        <translation type="vanished">Помилка</translation>
     </message>
     <message>
-        <location filename="text_editor.cpp" line="116"/>
         <source>Could not open file &quot;%1&quot; for reading.</source>
-        <translation>Неможливо відкрити файл &quot;%1&quot; для читання.</translation>
+        <translation type="vanished">Неможливо відкрити файл &quot;%1&quot; для читання.</translation>
     </message>
 </context>
 </TS>
