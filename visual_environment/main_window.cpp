@@ -19,6 +19,7 @@ namespace Windows {
     MainWindow::~MainWindow() noexcept = default;
 
     void MainWindow::connectSignalsManually() {
+        // Connect the retranslateUI signal to the appropriate slots.
         connect(this->i18n.data(), &Components::Internationalization::InterfaceTranslator::retranslateUI,
             this, &MainWindow::onRetranslateUI);
 
@@ -28,11 +29,21 @@ namespace Windows {
         connect(this->i18n.data(), &Components::Internationalization::InterfaceTranslator::retranslateUI,
             this->enrichedStatusBar, &CustomWidgets::EnrichedStatusBar::onRetranslateUI);
 
+        // Connect menu actions to their respective slots.
         connect(this->ui.actionUkrainian, &QAction::triggered,
             this, &MainWindow::onMenuLanguageUkrainian);
 
         connect(this->ui.actionEnglish, &QAction::triggered,
             this, &MainWindow::onMenuLanguageEnglish);
+
+        connect(this->ui.openFolderMenuAction, &QAction::triggered,
+            this, &MainWindow::onMenuWorkingDirectoryOpen);
+
+        connect(this->ui.closeFolderMenuAction, &QAction::triggered,
+            this, &MainWindow::onMenuWorkingDirectoryClose);
+
+        connect(this->ui.openFileMenuAction, &QAction::triggered,
+            this, &MainWindow::onMenuFileOpen);
     }
 
     void MainWindow::setupTextEditor() {

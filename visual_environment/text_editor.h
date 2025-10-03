@@ -30,20 +30,24 @@ namespace CustomWidgets {
 
         ~TextEditor() noexcept override;
 
-        virtual void showEvent(QShowEvent* event) override;
-
         /// <summary>
-        /// Opens the specified working directory.
+        /// Opens the specified working directory. Closes currently open directory if received an empty string.
         /// </summary>
         /// <param name="directoryPath">The path to the directory to open.</param>
         void openWorkingDirectory(const QString& directoryPath);
 
         /// <summary>
-        /// Retrieves the currently selected file and its selection status.
+        /// Retrieves the current working directory path.
         /// </summary>
-        /// <returns>A QPair containing the name of the currently selected file (QString) 
-        /// and a boolean indicating whether the file has been saved on disk.</returns>
-        QPair<QString, bool> getCurrentlySelectedFile() const;
+        /// <returns>A constant reference to a QString containing the path of the current working directory.</returns>
+        const QString& getWorkingDirectoryPath() const noexcept;
+
+        /// <summary>
+        /// Opens a new file at the specified file path. If the file is already open, it switches to that tab instead.
+        /// Otherwise, it opens the file in a new tab.
+        /// </summary>
+        /// <param name="filePath">The path to the file to be opened.</param>
+        void openNewFile(const QString& filePath);
 
         /// <summary>
         /// Sets the splitter ratio to its default value.
@@ -51,6 +55,9 @@ namespace CustomWidgets {
         /// The default ratio is approximately 1:6.
         /// </summary>
         void setDefaultSplitterRatio();
+
+    protected:
+        virtual void showEvent(QShowEvent* event) override;
 
     private slots:
         void onWorkingDirectoryItemDoubleClicked(const QModelIndex& index);
@@ -61,9 +68,6 @@ namespace CustomWidgets {
         void onRetranslateUI();
 
     private:
-        void openNewFile(const QString& filePath);
-        void closeFileAtIndex(int index);
-
         // So that you can't accidentally change the layout of this widget
         // from outside this class.
         using QWidget::setLayout;
@@ -73,12 +77,14 @@ namespace CustomWidgets {
             bool isTemporary;
         };
 
+        QString workingDirectoryPath;
         QVector<OpenedFile> openFiles;
 
         QSplitter* splitter{};
         QTabWidget* fileTabs{};
         QTreeView* workingDirectory{};
 
+        void closeFileAtIndex(int index);
         void connectSignalsManually();
         void setupEditorComponents();
     };
