@@ -4,48 +4,53 @@
 <context>
     <name>CustomWidgets::EnrichedStatusBar</name>
     <message>
-        <location filename="enriched_status_bar.cpp" line="59"/>
+        <location filename="enriched_status_bar_messages.h" line="9"/>
         <source>Tooltips</source>
         <extracomment>Label in the status bar showing tooltips.</extracomment>
-        <translation type="unfinished">Підказки</translation>
+        <translation>Підказки</translation>
     </message>
     <message>
-        <location filename="enriched_status_bar.cpp" line="64"/>
+        <location filename="enriched_status_bar_messages.h" line="12"/>
         <source>Working Directory</source>
         <extracomment>Label in the status bar showing the working directory of the application.</extracomment>
-        <translation type="unfinished">Робочий каталог</translation>
+        <translation>Робочий каталог</translation>
     </message>
     <message>
-        <location filename="enriched_status_bar.cpp" line="69"/>
+        <location filename="enriched_status_bar_messages.h" line="18"/>
         <source>Translator Result</source>
-        <extracomment>Label in the status bar showing the result of translator execution.</extracomment>
-        <translation type="unfinished">Результат виконання транслятора</translation>
+        <extracomment>Label in the status bar showing the state of the execution environment.</extracomment>
+        <translation>Результат виконання транслятора</translation>
     </message>
     <message>
-        <location filename="enriched_status_bar.cpp" line="74"/>
+        <location filename="enriched_status_bar_messages.h" line="15"/>
         <source>Execution Environment State</source>
-        <extracomment>Label in the status bar showing the state of the execution environment.</extracomment>
-        <translation type="unfinished">Стан середовища виконання</translation>
+        <extracomment>Label in the status bar showing the result of translator execution.</extracomment>
+        <translation>Стан середовища виконання</translation>
     </message>
 </context>
 <context>
     <name>CustomWidgets::TextEditor</name>
     <message>
-        <location filename="text_editor.cpp" line="79"/>
+        <location filename="text_editor_messages.h" line="9"/>
         <source>Working directory view. Use double-click or context menu.</source>
-        <extracomment>Status tip for the working directory view in the text editor.</extracomment>
-        <translation type="unfinished">Огляд робочого каталогу. Подвійний клік або контекстне меню.</translation>
+        <extracomment>Tooltip message for the working directory view.</extracomment>
+        <translation>Огляд робочого каталогу. Подвійний клік або контекстне меню.</translation>
     </message>
     <message>
-        <location filename="text_editor.cpp" line="116"/>
+        <location filename="text_editor_messages.h" line="12"/>
         <source>Error</source>
-        <extracomment>Status tip for the error message box when a file cannot be opened.</extracomment>
-        <translation type="unfinished">Помилка</translation>
+        <extracomment>Title for the message box which pops up when text editor can&apos;t open a file.</extracomment>
+        <translation>Помилка</translation>
     </message>
     <message>
-        <location filename="text_editor.cpp" line="117"/>
+        <location filename="text_editor_messages.h" line="15"/>
+        <source>Couldn&apos;t open file &quot;%1&quot; for reading.</source>
+        <extracomment>Text for the message box which pops up when text editor can&apos;t open a file.</extracomment>
+        <translation>Неможливо відкрити файл &quot;%1&quot; для читання.</translation>
+    </message>
+    <message>
         <source>Could not open file &quot;%1&quot; for reading.</source>
-        <translation type="unfinished">Неможливо відкрити файл &quot;%1&quot; для читання.</translation>
+        <translation type="obsolete">Неможливо відкрити файл &quot;%1&quot; для читання.</translation>
     </message>
 </context>
 <context>
@@ -74,19 +79,16 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="main_window.cpp" line="91"/>
         <source>Working directory not set</source>
         <extracomment>Value for the status bar when no working directory is set.</extracomment>
-        <translation>Робочий каталог не встановлено</translation>
+        <translation type="vanished">Робочий каталог не встановлено</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="96"/>
-        <location filename="main_window.cpp" line="102"/>
         <source>Not started</source>
         <extracomment>Value for the status bar when execution environment has not been started once yet.
 ----------
 Value for the status bar when translator has not been run once yet.</extracomment>
-        <translation type="unfinished">Жодного запуску</translation>
+        <translation type="obsolete">Жодного запуску</translation>
     </message>
 </context>
 <context>
@@ -223,6 +225,34 @@ Value for the status bar when translator has not been run once yet.</extracommen
     <message>
         <source>Could not open file &quot;%1&quot; for reading.</source>
         <translation type="vanished">Неможливо відкрити файл &quot;%1&quot; для читання.</translation>
+    </message>
+</context>
+<context>
+    <name>Window::MainWindow</name>
+    <message>
+        <source>Not started</source>
+        <extracomment>Default message displayed in the status bar for the environment
+----------
+Default message displayed in the status bar for the translator</extracomment>
+        <translation type="obsolete">Жодного запуску</translation>
+    </message>
+</context>
+<context>
+    <name>Windows::MainWindow</name>
+    <message>
+        <location filename="main_window_messages.h" line="9"/>
+        <source>Working directory not set.</source>
+        <extracomment>Default message in working directory label.</extracomment>
+        <translation>Робоча папка не встановлена.</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="12"/>
+        <location filename="main_window_messages.h" line="15"/>
+        <source>Not started</source>
+        <extracomment>Default message displayed in the status bar for the environment
+----------
+Default message displayed in the status bar for the translator</extracomment>
+        <translation>Жодного запуску</translation>
     </message>
 </context>
 </TS>

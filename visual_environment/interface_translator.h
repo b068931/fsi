@@ -3,16 +3,27 @@
 
 #include <QLocale>
 #include <QTranslator>
-#include <qobject.h>
-#include <memory>
+#include <QObject>
+#include <QScopedPointer>
 
 namespace Components::Internationalization {
+    /// <summary>
+    /// Component which manages application translation.
+    /// Automatically emits the retranslateUI() signal when the language is changed.
+    /// </summary>
     class InterfaceTranslator : public QObject {
         Q_OBJECT
 
     public:
+        static const QList<QLocale> supportedLocales;
+        enum class Language : int {
+            Default = -1,
+            English = 0,
+            Ukrainian = 1,
+        };
+
         InterfaceTranslator();
-        ~InterfaceTranslator() noexcept;
+        ~InterfaceTranslator() noexcept override;
 
         InterfaceTranslator(const InterfaceTranslator&) = delete;
         InterfaceTranslator& operator= (const InterfaceTranslator&) = delete;
@@ -20,13 +31,11 @@ namespace Components::Internationalization {
         InterfaceTranslator(InterfaceTranslator&&) = delete;
         InterfaceTranslator& operator= (InterfaceTranslator&&) = delete;
 
-    public:
         /// <summary>
-        /// Loads a translator resource by its name.
-        /// Note that you must manually emit the retranslateUI() signal.
+        /// Sets the application's language.
         /// </summary>
-        /// <param name="locale">The name of the translator resource to load. Nullptr for default language (English).</param>
-        void loadTranslator(const QLocale* locale);
+        /// <param name="language">The language to set for the application.</param>
+        void setLanguage(Language language);
 
     signals:
         /// <summary>
@@ -36,9 +45,13 @@ namespace Components::Internationalization {
         void retranslateUI();
 
     private:
-        static const QList<QLocale> supportedLocales;
+        QScopedPointer<QTranslator> activeTranslator;
 
-        std::unique_ptr<QTranslator> activeTranslator;
+        /// <summary>
+        /// Loads a translator resource by its name.
+        /// </summary>
+        /// <param name="locale">The name of the translator resource to load. Nullptr for default language (English).</param>
+        void loadTranslator(const QLocale* locale);
         void startupProbeLocales();
     };
 }

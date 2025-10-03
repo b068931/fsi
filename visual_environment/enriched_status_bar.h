@@ -5,6 +5,9 @@
 #include <QLabel>
 #include <QWidget>
 #include <QString>
+#include <memory>
+
+#include "translatable_string_interface.h"
 
 namespace CustomWidgets {
     /// <summary>
@@ -17,6 +20,12 @@ namespace CustomWidgets {
         Q_OBJECT
 
     public:
+        enum class ColorHint {
+            success,
+            neutral,
+            failure
+        };
+
         explicit EnrichedStatusBar(QWidget* parent = nullptr);
 
         EnrichedStatusBar(const EnrichedStatusBar&) = delete;
@@ -27,40 +36,48 @@ namespace CustomWidgets {
 
         ~EnrichedStatusBar() noexcept override;
 
-    public:
-        enum class ColorHint {
-            success,
-            neutral,
-            failure
-        };
-
         /// <summary>
         /// Displays a tooltip with the specified message.
         /// </summary>
         /// <param name="message">The text to be shown in the tooltip.</param>
-        void toolTip(const QString& message);
+        void toolTip(
+            std::unique_ptr<Components::Internationalization::ITranslatableString> message
+        );
 
         /// <summary>
         /// Displays the working directory of the application.
         /// </summary>
         /// <param name="path">The path to the directory to set as the working directory.</param>
-        void workingDirectory(const QString& path);
+        void workingDirectory(
+            std::unique_ptr<Components::Internationalization::ITranslatableString> path
+        );
 
         /// <summary>
         /// Updates the state of the execution environment with a message and a color queue.
         /// </summary>
         /// <param name="message">A QString containing the message describing the environment state. For example, "running", "stopped", "crashed".</param>
         /// <param name="hint">A ColorQue object representing the color queue associated with the environment state.</param>
-        void environmentState(const QString& message, ColorHint hint);
+        void environmentState(
+            std::unique_ptr<Components::Internationalization::ITranslatableString> message, 
+            ColorHint hint
+        );
 
         /// <summary>
         /// Displays the result of translator execution with an associated color hint.
         /// </summary>
         /// <param name="message">The message string to display, the translation result. For example, "crashed", "failed", "success".</param>
         /// <param name="hint">A color hint indicating the status or type of the message.</param>
-        void translatorResult(const QString& message, ColorHint hint);
+        void translatorResult(
+            std::unique_ptr<Components::Internationalization::ITranslatableString> message, 
+            ColorHint hint
+        );
+
+    public slots:
+        void onRetranslateUI();
 
     private:
+        using ITranslatableString = Components::Internationalization::ITranslatableString;
+
         // So as not to accidentally change status bar from
         // outside of this class.
         using QStatusBar::addPermanentWidget;
@@ -69,14 +86,18 @@ namespace CustomWidgets {
         using QStatusBar::insertWidget;
         using QStatusBar::removeWidget;
 
-    private:
         QLabel* statusToolTipLabel;
         QLabel* workingDirectoryLabel;
         QLabel* environmentStateLabel;
         QLabel* translatorResultLabel;
 
+        std::unique_ptr<ITranslatableString> savedToolTipMessage;
+        std::unique_ptr<ITranslatableString> savedWorkingDirectoryMessage;
+        std::unique_ptr<ITranslatableString> savedEnvironmentStateMessage;
+        std::unique_ptr<ITranslatableString> savedTranslatorResultMessage;
+
         void setupUIComponents();
-        void setVisualHintForLabel(QLabel* label, ColorHint hint);
+        void setToolTips();
     };
 }
 

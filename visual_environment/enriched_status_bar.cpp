@@ -1,4 +1,39 @@
-﻿#include "enriched_status_bar.h"
+﻿#include <QVector>
+#include <QString>
+#include <QTGlobal>
+
+#include "enriched_status_bar.h"
+#include "enriched_status_bar_messages.h"
+
+namespace {
+    void setVisualHintForLabel(QLabel* label, CustomWidgets::EnrichedStatusBar::ColorHint hint) {
+        Q_ASSERT(label && "Label is expected to be non-null.");
+        QString styleSheetTemplate = QString(
+            "QLabel {" \
+            "   color: %1;" \
+            "}"
+        );
+
+        switch (hint) {
+        case CustomWidgets::EnrichedStatusBar::ColorHint::success: {
+            styleSheetTemplate = styleSheetTemplate.arg("green");
+            break;
+        }
+        case CustomWidgets::EnrichedStatusBar::ColorHint::neutral: {
+            styleSheetTemplate = styleSheetTemplate.arg("white");
+            break;
+        }
+        case CustomWidgets::EnrichedStatusBar::ColorHint::failure: {
+            styleSheetTemplate = styleSheetTemplate.arg("red");
+            break;
+        }
+        default:
+            Q_ASSERT(false && "Unknown visual hint provided.");
+        }
+
+        label->setStyleSheet(styleSheetTemplate);
+    }
+}
 
 namespace CustomWidgets {
     EnrichedStatusBar::EnrichedStatusBar(QWidget* parent)
@@ -9,30 +44,62 @@ namespace CustomWidgets {
 
     EnrichedStatusBar::~EnrichedStatusBar() noexcept = default;
 
-    void EnrichedStatusBar::toolTip(const QString& message) {
+    void EnrichedStatusBar::toolTip(
+        std::unique_ptr<ITranslatableString> message
+    ) {
+        Q_ASSERT(message && "The message pointer must not be null.");
         Q_ASSERT(this->statusToolTipLabel && "The status tooltip label has not been set up.");
-        this->statusToolTipLabel->setText(message);
+
+        this->savedToolTipMessage = std::move(message);
+        this->statusToolTipLabel->setText(
+            this->savedToolTipMessage->freeze()
+        );
     }
 
     // ReSharper disable once CppMemberFunctionMayBeConst
-    void EnrichedStatusBar::workingDirectory(const QString& path) {
+    void EnrichedStatusBar::workingDirectory(
+        std::unique_ptr<ITranslatableString> path
+    ) {
+        Q_ASSERT(path && "The path pointer must not be null.");
         Q_ASSERT(this->workingDirectoryLabel && "The working directory label has not been set up.");
-        this->workingDirectoryLabel->setText(path);
+
+        this->savedWorkingDirectoryMessage = std::move(path);
+        this->workingDirectoryLabel->setText(
+            this->savedWorkingDirectoryMessage->freeze()
+        );
     }
 
-    void EnrichedStatusBar::environmentState(const QString& message, ColorHint hint) {
+    void EnrichedStatusBar::environmentState(
+        std::unique_ptr<ITranslatableString> message, 
+        ColorHint hint
+    ) {
+        Q_ASSERT(message && "The message pointer must not be null.");
         Q_ASSERT(this->environmentStateLabel && "The environment state label has not been set up.");
-        this->environmentStateLabel->setText(message);
-        this->setVisualHintForLabel(
+
+        this->savedEnvironmentStateMessage = std::move(message);
+        this->environmentStateLabel->setText(
+            this->savedEnvironmentStateMessage->freeze()
+        );
+
+        setVisualHintForLabel(
             this->environmentStateLabel,
             hint
         );
     }
 
-    void EnrichedStatusBar::translatorResult(const QString& message, ColorHint hint) {
+    void EnrichedStatusBar::translatorResult(
+        std::unique_ptr<ITranslatableString> message, 
+        ColorHint hint
+    ) {
+        Q_ASSERT(message && "The message pointer must not be null.");
         Q_ASSERT(this->translatorResultLabel && "The translator result label has not been set up.");
-        this->translatorResultLabel->setText(message);
-        this->setVisualHintForLabel(
+
+        this->savedTranslatorResultMessage = std::move(message);
+        this->translatorResultLabel->setText(
+            this->savedTranslatorResultMessage->freeze()
+        );
+
+        setVisualHintForLabel(
             this->translatorResultLabel,
             hint
         );
@@ -58,56 +125,33 @@ namespace CustomWidgets {
         this->environmentStateLabel->setAlignment(Qt::AlignCenter);
         this->translatorResultLabel->setAlignment(Qt::AlignCenter);
 
-        //: Label in the status bar showing tooltips.
-        this->statusToolTipLabel->setToolTip(
-            tr("Tooltips")
-        );
-
-        //: Label in the status bar showing the working directory of the application.
-        this->workingDirectoryLabel->setToolTip(
-            tr("Working Directory")
-        );
-
-        //: Label in the status bar showing the result of translator execution.
-        this->translatorResultLabel->setToolTip(
-            tr("Translator Result")
-        );
-
-        //: Label in the status bar showing the state of the execution environment.
-        this->environmentStateLabel->setToolTip(
-            tr("Execution Environment State")
-        );
+        this->setToolTips();
 
         // Margins so that text on the edges is not close to the window border.
         this->workingDirectoryLabel->setContentsMargins(0, 0, 5, 0);
         this->statusToolTipLabel->setContentsMargins(5, 0, 5, 0);
     }
 
-    void EnrichedStatusBar::setVisualHintForLabel(QLabel* label, ColorHint hint) {
-        Q_ASSERT(label && "Label is expected to be non-null.");
-        QString styleSheetTemplate = QString(
-            "QLabel {" \
-            "   color: %1;" \
-            "}"
+    void EnrichedStatusBar::setToolTips() {
+        Q_ASSERT(this->statusToolTipLabel && "The status tooltip label has not been set up.");
+        Q_ASSERT(this->workingDirectoryLabel && "The working directory label has not been set up.");
+        Q_ASSERT(this->environmentStateLabel && "The environment state label has not been set up.");
+        Q_ASSERT(this->translatorResultLabel && "The translator result label has not been set up.");
+
+        this->statusToolTipLabel->setToolTip(
+            tr(g_Messages[MessageKeys::g_TooltipTooltips])
         );
 
-        switch (hint) {
-        case ColorHint::success: {
-            styleSheetTemplate = styleSheetTemplate.arg("green");
-            break;
-        }
-        case ColorHint::neutral: {
-            styleSheetTemplate = styleSheetTemplate.arg("white");
-            break;
-        }
-        case ColorHint::failure: {
-            styleSheetTemplate = styleSheetTemplate.arg("red");
-            break;
-        }
-        default:
-            Q_ASSERT(false && "Unknown visual hint provided.");
-        }
+        this->workingDirectoryLabel->setToolTip(
+            tr(g_Messages[MessageKeys::g_TooltipWorkingDirectory])
+        );
 
-        label->setStyleSheet(styleSheetTemplate);
+        this->translatorResultLabel->setToolTip(
+            tr(g_Messages[MessageKeys::g_TooltipTranslatorResult])
+        );
+
+        this->environmentStateLabel->setToolTip(
+            tr(g_Messages[MessageKeys::g_TooltipExecutionEnvironmentState])
+        );
     }
 }

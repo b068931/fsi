@@ -32,7 +32,6 @@ namespace CustomWidgets {
 
         virtual void showEvent(QShowEvent* event) override;
 
-    public:
         /// <summary>
         /// Opens the specified working directory.
         /// </summary>
@@ -58,11 +57,13 @@ namespace CustomWidgets {
         void onTabCloseRequested(int index);
         void onTabMoved(int from, int to);
 
+    public slots:
+        void onRetranslateUI();
+
     private:
         void openNewFile(const QString& filePath);
         void closeFileAtIndex(int index);
 
-    private:
         // So that you can't accidentally change the layout of this widget
         // from outside this class.
         using QWidget::setLayout;
