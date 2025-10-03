@@ -3,6 +3,7 @@
 #include <QShowEvent>
 
 #include "text_editor.h"
+#include "text_editor_messages.h"
 
 namespace CustomWidgets {
     void TextEditor::showEvent(QShowEvent* event) {
@@ -37,5 +38,11 @@ namespace CustomWidgets {
         Q_ASSERT(to < this->openFiles.size() && "The 'to' index is out of range.");
 
         this->openFiles.move(from, to);
+    }
+
+    void TextEditor::onRetranslateUI() {
+        this->workingDirectory->setStatusTip(
+            tr(g_Messages[MessageKeys::g_TooltipWorkingDirectoryView])
+        );
     }
 }

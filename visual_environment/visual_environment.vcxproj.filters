@@ -48,14 +48,23 @@
     <Filter Include="Source Files\Components\Internationalization">
       <UniqueIdentifier>{2cfc59df-ab50-40e7-8002-a0e84d667bd3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Custom Widgets\Enriched Status Bar">
+      <UniqueIdentifier>{e7df96e8-3501-45a5-bdaa-6abd731cfafd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Windows">
+      <UniqueIdentifier>{c08472af-6371-4e23-83d6-e33da1d10bf9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Windows\Main Window">
+      <UniqueIdentifier>{de709df3-86cf-436e-a41d-7125f928dd9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Custom Widgets\Text Editor">
+      <UniqueIdentifier>{9b0a59f0-4775-4e69-9066-62f19fd812dd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="main_window.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtMoc Include="main_window.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -79,7 +88,13 @@
     <ClCompile Include="interface_translator.cpp">
       <Filter>Source Files\Components\Internationalization</Filter>
     </ClCompile>
-    <ClCompile Include="translatable_qstring_adapter.cpp">
+    <ClCompile Include="static_translatable_string.cpp">
+      <Filter>Source Files\Components\Internationalization</Filter>
+    </ClCompile>
+    <ClCompile Include="enriched_status_bar_slots.cpp">
+      <Filter>Source Files\Custom Widgets\Enriched Status Bar</Filter>
+    </ClCompile>
+    <ClCompile Include="qstring_wrapper.cpp">
       <Filter>Source Files\Components\Internationalization</Filter>
     </ClCompile>
   </ItemGroup>
@@ -89,18 +104,24 @@
     </QtRcc>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="text_editor.h">
-      <Filter>Header Files\Custom Widgets</Filter>
-    </QtMoc>
-    <QtMoc Include="enriched_status_bar.h">
-      <Filter>Header Files\Custom Widgets</Filter>
-    </QtMoc>
     <QtMoc Include="interface_translator.h">
       <Filter>Header Files\Components\Internationalization</Filter>
+    </QtMoc>
+    <QtMoc Include="enriched_status_bar.h">
+      <Filter>Header Files\Custom Widgets\Enriched Status Bar</Filter>
+    </QtMoc>
+    <QtMoc Include="main_window.h">
+      <Filter>Header Files\Windows\Main Window</Filter>
+    </QtMoc>
+    <QtMoc Include="text_editor.h">
+      <Filter>Header Files\Custom Widgets\Text Editor</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtTranslation Include="translation_visual_environment_uk_UA.ts">
+      <Filter>Translation Files</Filter>
+    </QtTranslation>
+    <QtTranslation Include="translation_visual_environment_en_GB.ts">
       <Filter>Translation Files</Filter>
     </QtTranslation>
   </ItemGroup>
@@ -108,8 +129,20 @@
     <ClInclude Include="translatable_string_interface.h">
       <Filter>Header Files\Components\Internationalization</Filter>
     </ClInclude>
-    <ClInclude Include="translatable_qstring_adapter.h">
+    <ClInclude Include="static_translatable_string.h">
       <Filter>Header Files\Components\Internationalization</Filter>
+    </ClInclude>
+    <ClInclude Include="enriched_status_bar_messages.h">
+      <Filter>Header Files\Custom Widgets\Enriched Status Bar</Filter>
+    </ClInclude>
+    <ClInclude Include="qstring_wrapper.h">
+      <Filter>Header Files\Components\Internationalization</Filter>
+    </ClInclude>
+    <ClInclude Include="main_window_messages.h">
+      <Filter>Header Files\Windows\Main Window</Filter>
+    </ClInclude>
+    <ClInclude Include="text_editor_messages.h">
+      <Filter>Header Files\Custom Widgets\Text Editor</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -2,8 +2,9 @@
 #include "interface_translator.h"
 
 namespace Components::Internationalization {
-    // English is not listed here, as it is the default language.
     const QList<QLocale> InterfaceTranslator::supportedLocales = {
+        // Default locale (English). Does not differ from the strings in the source code.
+        QLocale(QLocale::English, QLocale::UnitedKingdom),
         QLocale(QLocale::Ukrainian, QLocale::Ukraine)
     };
 
@@ -14,6 +15,19 @@ namespace Components::Internationalization {
     InterfaceTranslator::~InterfaceTranslator() noexcept {
         if (QTranslator* currentTranslator = this->activeTranslator.get()) {
             qApp->removeTranslator(currentTranslator);
+        }
+    }
+
+    void InterfaceTranslator::setLanguage(Language language) {
+        int index = static_cast<int>(language);
+        if (index == -1) {
+            this->loadTranslator(nullptr);
+        }
+        else if (index >= 0 && index < InterfaceTranslator::supportedLocales.size()) {
+            this->loadTranslator(&InterfaceTranslator::supportedLocales.at(index));
+        }
+        else {
+            qWarning() << "Unsupported language index:" << index;
         }
     }
 
@@ -52,10 +66,12 @@ namespace Components::Internationalization {
         // If not supported, the application will run in English (default).
         QLocale systemLocale = QLocale::system();
         for (const QLocale& supportedLocale : InterfaceTranslator::supportedLocales) {
-            if (supportedLocale.territory() == systemLocale.territory() && supportedLocale.language() == systemLocale.language()) {
-                loadTranslator(&supportedLocale);
+            if (supportedLocale.language() == systemLocale.language()) {
+                this->loadTranslator(&supportedLocale);
                 return;
             }
         }
+
+        this->loadTranslator(nullptr);
     }
 }

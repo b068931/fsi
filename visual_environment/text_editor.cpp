@@ -18,6 +18,7 @@
 #include <array>
 
 #include "text_editor.h"
+#include "text_editor_messages.h"
 
 namespace CustomWidgets {
     TextEditor::TextEditor(QWidget* parent)
@@ -74,9 +75,8 @@ namespace CustomWidgets {
         this->workingDirectory->setAnimated(true);
         this->workingDirectory->setContextMenuPolicy(Qt::CustomContextMenu);
 
-        //: Status tip for the working directory view in the text editor.
         this->workingDirectory->setStatusTip(
-            tr("Working directory view. Use double-click or context menu.")
+            tr(g_Messages[MessageKeys::g_TooltipWorkingDirectoryView])
         );
     }
 
@@ -113,8 +113,12 @@ namespace CustomWidgets {
         QFile file(filePath);
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
             //: Status tip for the error message box when a file cannot be opened.
-            QMessageBox::warning(this, tr("Error"),
-                tr("Could not open file \"%1\" for reading.").arg(filePath));
+            QMessageBox::warning(
+                this, 
+                tr(g_Messages[MessageKeys::g_MessageBoxFileOpenErrorTitle]),
+                tr(g_Messages[MessageKeys::g_MessageBoxFileOpenErrorMessage]).arg(filePath)
+            );
+
             return;
         }
 

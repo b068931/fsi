@@ -108,11 +108,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="translatable_qstring_adapter.cpp" />
     <QtMoc Include="enriched_status_bar.h" />
     <ClCompile Include="enriched_status_bar.cpp" />
+    <ClCompile Include="enriched_status_bar_slots.cpp" />
     <ClCompile Include="interface_translator.cpp" />
     <ClCompile Include="main_window_slots.cpp" />
+    <ClCompile Include="qstring_wrapper.cpp" />
+    <ClCompile Include="static_translatable_string.cpp" />
     <ClCompile Include="text_editor.cpp" />
     <ClCompile Include="text_editor_slots.cpp" />
     <QtUic Include="main_window.ui" />
@@ -127,15 +129,31 @@
     <QtMoc Include="text_editor.h" />
   </ItemGroup>
   <ItemGroup>
+    <QtTranslation Include="translation_visual_environment_en_GB.ts">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+      <QmOutputDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)</QmOutputDir>
+      <QmOutputDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)</QmOutputDir>
+    </QtTranslation>
     <QtTranslation Include="translation_visual_environment_uk_UA.ts">
       <QmOutputDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)</QmOutputDir>
       <QmOutputDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)</QmOutputDir>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
     </QtTranslation>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="interface_translator.h" />
+    <ClInclude Include="enriched_status_bar_messages.h" />
+    <ClInclude Include="main_window_messages.h" />
+    <ClInclude Include="qstring_wrapper.h" />
+    <ClInclude Include="text_editor_messages.h" />
     <ClInclude Include="translatable_string_interface.h" />
-    <ClInclude Include="translatable_qstring_adapter.h" />
+    <ClInclude Include="static_translatable_string.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

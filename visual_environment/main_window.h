@@ -5,47 +5,59 @@
 #include <QtGlobal>
 #include <QtWidgets/QMainWindow>
 #include <QString>
-
-#include <memory>
+#include <QScopedPointerDeleteLater>
+#include <QScopedPointer>
 
 #include "ui_main_window.h"
 #include "text_editor.h"
 #include "enriched_status_bar.h"
 #include "interface_translator.h"
 
-/// <summary>
-/// MainWindow provides the main access point
-/// to the capabilities of the application. It manages
-/// a simple text editor widget (for more information see text_editor.h)
-/// and several child processes started on demand.
-/// Essentially, this class implements the mediator pattern.
-/// </summary>
-class MainWindow final : public QMainWindow
-{
-    Q_OBJECT
+namespace Windows {
+    /// <summary>
+    /// MainWindow provides the main access point
+    /// to the capabilities of the application. It manages
+    /// a simple text editor widget (for more information see text_editor.h)
+    /// and several child processes started on demand.
+    /// Essentially, this class is a mediator between all others.
+    /// </summary>
+    class MainWindow final : public QMainWindow
+    {
+        Q_OBJECT
 
-public:
-    explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow() noexcept override;
+    public:
+        explicit MainWindow(QWidget* parent = nullptr);
+        ~MainWindow() noexcept override;
 
-    MainWindow(const MainWindow&) = delete;
-    MainWindow& operator= (const MainWindow&) = delete;
+        MainWindow(const MainWindow&) = delete;
+        MainWindow& operator= (const MainWindow&) = delete;
 
-    MainWindow(MainWindow&&) = delete;
-    MainWindow& operator= (MainWindow&&) = delete;
+        MainWindow(MainWindow&&) = delete;
+        MainWindow& operator= (MainWindow&&) = delete;
 
-protected:
-    virtual bool event(QEvent* event) override;
+    public slots:
+        void onRetranslateUI();
 
-private:
-    Ui::MainWindowClass ui{};
-    std::unique_ptr<Components::Internationalization::InterfaceTranslator> i18n{};
+        void onMenuLanguageUkrainian();
+        void onMenuLanguageEnglish();
 
-    CustomWidgets::TextEditor* editor{};
-    CustomWidgets::EnrichedStatusBar* enrichedStatusBar{};
+    protected:
+        virtual bool event(QEvent* event) override;
 
-    void setupTextEditor();
-    void setupStatusBar();
-};
+    private:
+        Ui::MainWindowClass ui{};
+        QScopedPointer<
+            Components::Internationalization::InterfaceTranslator,
+            QScopedPointerDeleteLater
+        > i18n{};
+
+        CustomWidgets::TextEditor* editor{};
+        CustomWidgets::EnrichedStatusBar* enrichedStatusBar{};
+
+        void connectSignalsManually();
+        void setupTextEditor();
+        void setupStatusBar();
+    };
+}
 
 #endif
