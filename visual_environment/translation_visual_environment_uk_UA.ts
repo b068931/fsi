@@ -254,5 +254,23 @@ Default message displayed in the status bar for the translator</extracomment>
 Default message displayed in the status bar for the translator</extracomment>
         <translation>Жодного запуску</translation>
     </message>
+    <message>
+        <location filename="main_window_messages.h" line="18"/>
+        <source>Select Working Directory</source>
+        <extracomment>Title for the &quot;Open Working Directory&quot; dialog.</extracomment>
+        <translation>Оберіть робочий каталог</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="21"/>
+        <source>Select File</source>
+        <extracomment>Title for the &quot;Open File&quot; dialog.</extracomment>
+        <translation>Оберіть файл</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="24"/>
+        <source>Source Files (*.tfsi *.fsi);;All Files (*.*)</source>
+        <extracomment>File filter for source code files.</extracomment>
+        <translation>Файли вихідного коду (*.tfsi *.fsi);;Будь-які файли (*.*)</translation>
+    </message>
 </context>
 </TS>

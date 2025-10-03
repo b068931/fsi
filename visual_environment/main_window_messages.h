@@ -13,12 +13,24 @@ constexpr const char* g_Messages[] = {
 
     //: Default message displayed in the status bar for the translator
     QT_TRANSLATE_NOOP("Windows::MainWindow", "Not started"),
+
+    //: Title for the "Open Working Directory" dialog.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "Select Working Directory"),
+
+    //: Title for the "Open File" dialog.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "Select File"),
+
+    //: File filter for source code files.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "Source Files (*.tfsi *.fsi);;All Files (*.*)"),
 };
 
 enum MessageKeys {
     g_StatusBarDefaultWorkingDirectory = 0,
     g_StatusBarDefaultEnvironmentState = 1,
-    g_StatusBarDefaultTranslatorState = 2
+    g_StatusBarDefaultTranslatorState = 2,
+    g_DialogTitleOpenWorkingDirectory = 3,
+    g_DialogTitleOpenFile = 4,
+    g_DialogFilterSourceFiles = 5,
 };
 
 #endif

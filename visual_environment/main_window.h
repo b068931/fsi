@@ -38,6 +38,11 @@ namespace Windows {
     public slots:
         void onRetranslateUI();
 
+        void onMenuFileOpen();
+
+        void onMenuWorkingDirectoryOpen();
+        void onMenuWorkingDirectoryClose();
+
         void onMenuLanguageUkrainian();
         void onMenuLanguageEnglish();
 

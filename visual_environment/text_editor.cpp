@@ -101,6 +101,7 @@ namespace CustomWidgets {
     }
 
     void TextEditor::openNewFile(const QString& filePath) {
+        Q_ASSERT(!filePath.isEmpty() && "The provided file path is empty.");
         Q_ASSERT(this->fileTabs != nullptr && "The file tabs have not been set up.");
 
         for (int index = 0; index < this->openFiles.size(); ++index) {
@@ -155,18 +156,28 @@ namespace CustomWidgets {
             oldModel->deleteLater();
         }
 
-        QFileSystemModel* newModel = new QFileSystemModel{};
-        QModelIndex rootDirectory = newModel->setRootPath(directoryPath);
-        newModel->setFilter(QDir::AllEntries | QDir::NoDotAndDotDot);
+        this->workingDirectoryPath = directoryPath;
+        if (!directoryPath.isEmpty()) {
+            QFileSystemModel* newModel = new QFileSystemModel{};
+            QModelIndex rootDirectory = newModel->setRootPath(directoryPath);
+            newModel->setFilter(QDir::AllEntries | QDir::NoDotAndDotDot);
 
-        // Set new model and hide all columns except "Name".
-        // "Name" column has zero index.
+            // Set new model and hide all columns except "Name".
+            // "Name" column has zero index.
 
-        this->workingDirectory->header()->hide();
-        this->workingDirectory->setModel(newModel);
-        this->workingDirectory->setRootIndex(rootDirectory);
-        for (int index = 1; index < newModel->columnCount(); ++index) {
-            this->workingDirectory->hideColumn(index);
+            this->workingDirectory->header()->hide();
+            this->workingDirectory->setModel(newModel);
+            this->workingDirectory->setRootIndex(rootDirectory);
+            for (int index = 1; index < newModel->columnCount(); ++index) {
+                this->workingDirectory->hideColumn(index);
+            }
         }
+        else {
+            this->workingDirectory->setModel(nullptr);
+        }
+    }
+
+    const QString& TextEditor::getWorkingDirectoryPath() const noexcept {
+        return this->workingDirectoryPath;
     }
 }
