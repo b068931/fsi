@@ -12,6 +12,7 @@
 #include <QFileInfo>
 #include <QTabBar>
 #include <QMessageBox>
+#include <QFileDialog>
 
 #include <cstdlib>
 #include <numeric>
@@ -22,7 +23,7 @@
 
 namespace CustomWidgets {
     TextEditor::TextEditor(QWidget* parent)
-        :QWidget{ parent }
+        : QWidget{ parent }, fileWatcher{ new QFileSystemWatcher(this) }
     {
         this->setupEditorComponents();
         this->connectSignalsManually();
@@ -33,6 +34,7 @@ namespace CustomWidgets {
     void TextEditor::connectSignalsManually() {
         Q_ASSERT(this->workingDirectory != nullptr && "The working directory view has not been set up.");
         Q_ASSERT(this->fileTabs != nullptr && "The file tabs have not been set up.");
+        Q_ASSERT(this->fileWatcher && "The file watcher has not been set up.");
 
         // Connect signals for objects which were created manually
         // at application startup.
@@ -44,6 +46,9 @@ namespace CustomWidgets {
 
         connect(this->fileTabs->tabBar(), &QTabBar::tabMoved,
             this, &TextEditor::onTabMoved);
+
+        connect(this->fileWatcher, &QFileSystemWatcher::fileChanged,
+            this, &TextEditor::onFileChangedOutside);
     }
 
     void TextEditor::setupEditorComponents() {
@@ -100,44 +105,65 @@ namespace CustomWidgets {
         this->splitter->setSizes(newSizes);
     }
 
+    void TextEditor::closeAllFiles() {
+        for (int index = 0; index < this->openFiles.size(); ++index) {
+            this->closeFileAtIndex(index);
+        }
+    }
+
     void TextEditor::openNewFile(const QString& filePath) {
         Q_ASSERT(!filePath.isEmpty() && "The provided file path is empty.");
         Q_ASSERT(this->fileTabs != nullptr && "The file tabs have not been set up.");
 
-        for (int index = 0; index < this->openFiles.size(); ++index) {
-            if (this->openFiles[index].filePath == filePath) {
-                this->fileTabs->setCurrentIndex(index);
-                return;
+        try {
+            QFileInfo fileInfo(filePath);
+            if (!fileInfo.isFile()) {
+                throw tr(g_Messages[MessageKeys::g_MessageBoxFileOpenErrorMessage]).arg(filePath);
             }
-        }
 
-        QFile file(filePath);
-        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            //: Status tip for the error message box when a file cannot be opened.
-            QMessageBox::warning(
-                this, 
-                tr(g_Messages[MessageKeys::g_MessageBoxFileOpenErrorTitle]),
-                tr(g_Messages[MessageKeys::g_MessageBoxFileOpenErrorMessage]).arg(filePath)
+            QString absoluteFilePath = fileInfo.absoluteFilePath();
+            for (int index = 0; index < this->openFiles.size(); ++index) {
+                if (this->openFiles[index].filePath == absoluteFilePath) {
+                    this->fileTabs->setCurrentIndex(index);
+                    return;
+                }
+            }
+
+            QFile file(filePath);
+            if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                throw tr(g_Messages[MessageKeys::g_MessageBoxFileOpenErrorMessage]).arg(filePath);
+            }
+
+            if (!this->fileWatcher->addPath(absoluteFilePath)) {
+                throw tr(g_Messages[MessageKeys::g_MessageBoxFileOpenErrorMessage]).arg(filePath);
+            }
+
+            QPlainTextEdit* fileEditor = new QPlainTextEdit;
+            fileEditor->setPlainText(file.readAll());
+
+            this->openFiles.append(
+                {
+                    .filePath = absoluteFilePath,
+                    .isTemporary = false
+                }
             );
 
-            return;
+            const int newTabIndex = this->fileTabs->addTab(fileEditor, fileInfo.fileName());
+            this->fileTabs->setCurrentIndex(newTabIndex);
+            this->fileTabs->setTabToolTip(newTabIndex, absoluteFilePath);
+            this->fileTabs->widget(newTabIndex)->setStatusTip(absoluteFilePath);
         }
-
-        QPlainTextEdit* fileEditor = new QPlainTextEdit;
-        fileEditor->setPlainText(file.readAll());
-
-        QFileInfo fileInfo(filePath);
-        this->openFiles.append(
-            {
-                .filePath = filePath,
-                .isTemporary = false
-            }
-        );
-
-        const int newTabIndex = this->fileTabs->addTab(fileEditor, fileInfo.fileName());
-        this->fileTabs->setCurrentIndex(newTabIndex);
-        this->fileTabs->setTabToolTip(newTabIndex, filePath);
-        this->fileTabs->widget(newTabIndex)->setStatusTip(filePath);
+        catch (const QString& message) {
+            // This is not a critical error, so we can just show a message box.
+            // It is not really a good practice to throw exceptions which are not derived
+            // from std::exception, but creating a custom class for this isolated case is
+            // not worth the effort.
+            QMessageBox::warning(
+                this,
+                tr(g_Messages[MessageKeys::g_MessageBoxFileOpenErrorTitle]),
+                message
+            );
+        }
     }
 
     void TextEditor::closeFileAtIndex(int index) {
@@ -145,8 +171,90 @@ namespace CustomWidgets {
         Q_ASSERT(this->fileTabs->count() == this->openFiles.count() && "The file tabs and open files count do not match.");
         Q_ASSERT(index < this->fileTabs->count() && index >= 0 && "The specified index is out of range.");
 
+        // TODO: Prompt the user with the "Are you sure you want to close without saving?" dialog before calling saveFileAtIndex or closing it without saving.
+
+        OpenedFile& openFile = this->openFiles[index];
+        QPlainTextEdit* fileEditor = qobject_cast<QPlainTextEdit*>(this->fileTabs->widget(index));
+
+        this->saveFileAtIndex(index);
         this->fileTabs->removeTab(index);
         this->openFiles.remove(index);
+
+        if (!this->fileWatcher->removePath(openFile.filePath)) {
+            qWarning() << "Failed to remove file from the file watcher at path :" << openFile.filePath;
+        }
+    }
+
+    void TextEditor::saveFileAtIndex(int index) {
+        Q_ASSERT(this->fileTabs && "The file tabs have not been set up.");
+        Q_ASSERT(index < this->fileTabs->count() && index >= 0 && "The specified index is out of range.");
+
+        OpenedFile& openFile = this->openFiles[index];
+        QPlainTextEdit* fileEditor = qobject_cast<QPlainTextEdit*>(this->fileTabs->widget(index));
+        if (fileEditor == nullptr) {
+            this->closeAllFiles();
+            qFatal() << "Failed to cast the file editor widget to QPlainTextEdit." << __LINE__ << __FILE__;
+        }
+
+        if (fileEditor->document()->isModified() && !openFile.isTemporary) {
+            QFile oldFile(openFile.filePath);
+            if (oldFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+                fileEditor->document()->setModified(false);
+                oldFile.write(fileEditor->toPlainText().toUtf8());
+                oldFile.close();
+            }
+            else {
+                openFile.isTemporary = true;
+                QMessageBox::warning(
+                    this,
+                    tr(g_Messages[MessageKeys::g_MessageBoxFileSaveErrorTitle]),
+                    tr(g_Messages[MessageKeys::g_MessageBoxFileSaveErrorMessage]).arg(openFile.filePath)
+                );
+            }
+        }
+        else if (openFile.isTemporary) {
+            // TODO: Check if a file already has filePath set. This can happen when file was removed from the outside of the text editor, for example.
+
+            QString filePath = QFileDialog::getSaveFileName(
+                this,
+                tr(g_Messages[MessageKeys::g_SaveFileDialogTitle]),
+                openFile.filePath.isEmpty() ? this->getWorkingDirectoryPath() : openFile.filePath,
+                tr(g_Messages[MessageKeys::g_SaveFileDialogFilter])
+            );
+
+            if (!filePath.isEmpty()) {
+                QFile newFile(filePath);
+                if (newFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+                    QFileInfo fileInfo(filePath);
+
+                    openFile.filePath = fileInfo.absoluteFilePath();
+                    fileEditor->document()->setModified(false);
+                    openFile.isTemporary = false;
+
+                    this->fileTabs->setTabText(index, fileInfo.fileName());
+                    this->fileTabs->setTabToolTip(index, fileInfo.absoluteFilePath());
+                    this->fileTabs->widget(index)->setStatusTip(fileInfo.absoluteFilePath());
+
+                    // TODO: Implement additional to check to ensure that the file was fully written.
+                    // TODO: Handle the case when the file was not fully written.
+                    // TODO: Check whether readAll function can fail and handle that case.
+
+                    newFile.write(fileEditor->toPlainText().toUtf8());
+                    newFile.close();
+
+                    if (!this->fileWatcher->addPath(fileInfo.absoluteFilePath())) {
+                        qWarning() << "Failed to add newly saved file to the file watcher at path :" << fileInfo.absoluteFilePath();
+                    }
+                }
+                else {
+                    QMessageBox::warning(
+                        this,
+                        tr(g_Messages[MessageKeys::g_MessageBoxFileSaveErrorTitle]),
+                        tr(g_Messages[MessageKeys::g_MessageBoxFileSaveErrorMessage]).arg(openFile.filePath)
+                    );
+                }
+            }
+        }
     }
 
     void TextEditor::openWorkingDirectory(const QString& directoryPath) {

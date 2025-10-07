@@ -2,13 +2,13 @@
 #define VISUAL_ENVIRONMENT_TEXT_EDITOR_H
 
 #include <QTreeView>
-#include <QPair>
 #include <QTabWidget>
 #include <QString>
 #include <QVector>
 #include <QWidget>
 #include <QSplitter>
 #include <QtGlobal>
+#include <QFileSystemWatcher>
 
 namespace CustomWidgets {
     /// <summary>
@@ -47,6 +47,7 @@ namespace CustomWidgets {
         /// Otherwise, it opens the file in a new tab.
         /// </summary>
         /// <param name="filePath">The path to the file to be opened.</param>
+        /// <returns>A boolean value which indicates whether the operation was successful.</returns>
         void openNewFile(const QString& filePath);
 
         /// <summary>
@@ -56,11 +57,18 @@ namespace CustomWidgets {
         /// </summary>
         void setDefaultSplitterRatio();
 
+        /// <summary>
+        /// Closes all open files in the editor.
+        /// Prompts the user to save any unsaved changes before closing.
+        /// </summary>
+        void closeAllFiles();
+
     protected:
         virtual void showEvent(QShowEvent* event) override;
 
     private slots:
         void onWorkingDirectoryItemDoubleClicked(const QModelIndex& index);
+        void onFileChangedOutside(const QString& path);
         void onTabCloseRequested(int index);
         void onTabMoved(int from, int to);
 
@@ -83,8 +91,11 @@ namespace CustomWidgets {
         QSplitter* splitter{};
         QTabWidget* fileTabs{};
         QTreeView* workingDirectory{};
+        QFileSystemWatcher* fileWatcher{};
 
         void closeFileAtIndex(int index);
+        void saveFileAtIndex(int index);
+
         void connectSignalsManually();
         void setupEditorComponents();
     };

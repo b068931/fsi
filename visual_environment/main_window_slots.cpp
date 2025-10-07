@@ -26,6 +26,11 @@ namespace Windows {
         return QMainWindow::event(event);
     }
 
+    void MainWindow::closeEvent(QCloseEvent* event) {
+        this->editor->closeAllFiles();
+        QMainWindow::closeEvent(event);
+    }
+
     void MainWindow::onMenuFileOpen() {
         QString filePath = QFileDialog::getOpenFileName(
             this,
