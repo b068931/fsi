@@ -9,6 +9,7 @@
 #include <QSplitter>
 #include <QtGlobal>
 #include <QFileSystemWatcher>
+#include <QPlainTextEdit>
 
 namespace CustomWidgets {
     /// <summary>
@@ -47,8 +48,29 @@ namespace CustomWidgets {
         /// Otherwise, it opens the file in a new tab.
         /// </summary>
         /// <param name="filePath">The path to the file to be opened.</param>
-        /// <returns>A boolean value which indicates whether the operation was successful.</returns>
         void openNewFile(const QString& filePath);
+
+        /// <summary>
+        /// Creates a temporary file tab. Temporary files are not associated with any file path on disk.
+        /// In addition, they are not monitored for external changes. Trying to save a temporary file
+        /// works like "Save As" operation.
+        /// </summary>
+        void createTemporaryFile();
+
+        /// <summary>
+        /// Saves the file which is currently selected in the tab widget.
+        /// </summary>
+        void saveCurrentFile();
+
+        /// <summary>
+        /// A convenience function which saves the currently opened file under a new name.
+        /// </summary>
+        void saveCurrentFileAs();
+
+        /// <summary>
+        /// Closes the file which is currently selected in the tab widget.
+        /// </summary>
+        void closeCurrentFile();
 
         /// <summary>
         /// Sets the splitter ratio to its default value.
@@ -80,9 +102,17 @@ namespace CustomWidgets {
         // from outside this class.
         using QWidget::setLayout;
 
+        // TODO: Start using QtConcurrent to offload file writes to background threads.
+        //       This will also make autosaving feasible. Right now, I don't have the time to implement it.
+
+        // TODO: Implement messages for different error codes from the QFile operations.
+        //       Right now, I just have a generic error message for all file operation errors.
+
         struct OpenedFile {
             QString filePath;
             bool isTemporary;
+
+            QString getNormalizedName() const;
         };
 
         QString workingDirectoryPath;
@@ -95,6 +125,8 @@ namespace CustomWidgets {
 
         void closeFileAtIndex(int index);
         void saveFileAtIndex(int index);
+        QPlainTextEdit* getEditorAtIndex(int index);
+        void onFileChangedOutsideRecursive(const QString& path, int depth);
 
         void connectSignalsManually();
         void setupEditorComponents();

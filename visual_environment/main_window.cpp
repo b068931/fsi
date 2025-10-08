@@ -42,8 +42,20 @@ namespace Windows {
         connect(this->ui.closeFolderMenuAction, &QAction::triggered,
             this, &MainWindow::onMenuWorkingDirectoryClose);
 
+        connect(this->ui.newFileMenuAction, &QAction::triggered,
+            this, &MainWindow::onMenuFileNew);
+
         connect(this->ui.openFileMenuAction, &QAction::triggered,
             this, &MainWindow::onMenuFileOpen);
+
+        connect(this->ui.saveFileMenuAction, &QAction::triggered,
+            this, &MainWindow::onMenuFileSave);
+
+        connect(this->ui.saveFileAsMenuAction, &QAction::triggered,
+            this, &MainWindow::onMenuFileSaveAs);
+
+        connect(this->ui.closeFileMenuAction, &QAction::triggered,
+            this, &MainWindow::onMenuFileClose);
     }
 
     void MainWindow::setupTextEditor() {

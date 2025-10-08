@@ -27,11 +27,20 @@ namespace Windows {
     }
 
     void MainWindow::closeEvent(QCloseEvent* event) {
+        Q_ASSERT(this->editor && "The text editor has not been set up.");
+
         this->editor->closeAllFiles();
         QMainWindow::closeEvent(event);
     }
 
+    void MainWindow::onMenuFileNew() {
+        Q_ASSERT(this->editor && "The text editor has not been set up.");
+        this->editor->createTemporaryFile();
+    }
+
     void MainWindow::onMenuFileOpen() {
+        Q_ASSERT(this->editor && "The text editor has not been set up.");
+
         QString filePath = QFileDialog::getOpenFileName(
             this,
             tr(g_Messages[g_DialogTitleOpenFile]),
@@ -45,23 +54,43 @@ namespace Windows {
         }
     }
 
+    void MainWindow::onMenuFileSave() {
+        Q_ASSERT(this->editor && "The text editor has not been set up.");
+        this->editor->saveCurrentFile();
+    }
+
+    void MainWindow::onMenuFileSaveAs() {
+        Q_ASSERT(this->editor && "The text editor has not been set up.");
+        this->editor->saveCurrentFileAs();
+    }
+
+    void MainWindow::onMenuFileClose() {
+        Q_ASSERT(this->editor && "The text editor has not been set up.");
+        this->editor->closeCurrentFile();
+    }
+
     void MainWindow::onRetranslateUI() {
         this->ui.retranslateUi(this);
     }
 
     void MainWindow::onMenuLanguageUkrainian() {
+        Q_ASSERT(this->i18n && "The internationalization component has not been set up.");
         this->i18n->setLanguage(
             Components::Internationalization::InterfaceTranslator::Language::Ukrainian
         );
     }
 
     void MainWindow::onMenuLanguageEnglish() {
+        Q_ASSERT(this->i18n && "The internationalization component has not been set up.");
         this->i18n->setLanguage(
             Components::Internationalization::InterfaceTranslator::Language::English
         );
     }
 
     void MainWindow::onMenuWorkingDirectoryOpen() {
+        Q_ASSERT(this->editor && "The text editor has not been set up.");
+        Q_ASSERT(this->enrichedStatusBar && "The status bar has not been set up.");
+
         QString newWorkingDirectory = QFileDialog::getExistingDirectory(
             this,
             tr(g_Messages[g_DialogTitleOpenWorkingDirectory]),
@@ -78,6 +107,9 @@ namespace Windows {
     }
 
     void MainWindow::onMenuWorkingDirectoryClose() {
+        Q_ASSERT(this->editor && "The text editor has not been set up.");
+        Q_ASSERT(this->enrichedStatusBar && "The status bar has not been set up.");
+
         this->editor->openWorkingDirectory(QString());
         this->enrichedStatusBar->workingDirectory(
             std::make_unique<Components::Internationalization::StaticTranslatableString>(

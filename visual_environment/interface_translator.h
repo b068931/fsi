@@ -45,7 +45,8 @@ namespace Components::Internationalization {
         void retranslateUI();
 
     private:
-        QScopedPointer<QTranslator> activeTranslator;
+        QScopedPointer<QTranslator> applicationTranslator;
+        QScopedPointer<QTranslator> qtTranslator;
 
         /// <summary>
         /// Loads a translator resource by its name.

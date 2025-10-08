@@ -38,9 +38,123 @@
     </message>
     <message>
         <location filename="text_editor_messages.h" line="12"/>
+        <source>Error: Opening New File</source>
+        <extracomment>Title for the message box which pops up when text editor can&apos;t open a file.</extracomment>
+        <translation>Error: Opening New File</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="18"/>
+        <source>File Changed</source>
+        <extracomment>Title for the message box which pops up when a file has been modified outside the text editor.</extracomment>
+        <translation>File Changed</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="21"/>
+        <source>File &quot;%1&quot; has been modified outside the editor. Reload?</source>
+        <oldsource>File &quot;%1&quot; has been modified outside the editor. Reload? You can choose to check whether the file exists again.</oldsource>
+        <extracomment>Text for the message box which pops up when a file has been modified outside the text editor.</extracomment>
+        <translation>File &quot;%1&quot; has been modified outside the editor. Reload?</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="24"/>
+        <source>File Changed Error</source>
+        <extracomment>Title for the message box which pops up when a file has been modified outside the text editor. But the file can&apos;t be opened.</extracomment>
+        <translation>File Changed Error</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="27"/>
+        <source>File &quot;%1&quot; has been modified outside the editor. However, it can&apos;t be reloaded.</source>
+        <extracomment>Text for the message box which pops up when a file has been modified outside the text editor. But the file can&apos;t be opened.</extracomment>
+        <translation>File &quot;%1&quot; has been modified outside the eidotr. However, it can&apos;t be reloaded.</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="30"/>
+        <source>File Removed</source>
+        <extracomment>Title for the message box which pops up when a file has been removed outside the text editor.</extracomment>
+        <translation>File Removed</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="33"/>
+        <source>File &quot;%1&quot; has been removed outside the editor. Remove it?</source>
+        <extracomment>Text for the message box which pops up when a file has been removed outside the text editor.</extracomment>
+        <translation>File &quot;%1&quot; has been removed outside the editor. Remove it?</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="36"/>
+        <source>File Save Error</source>
+        <extracomment>Title for the message box which pops up when a file can&apos;t be opened for writing during save operation.</extracomment>
+        <translation>File Save Error</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="39"/>
+        <source>Couldn&apos;t open file &quot;%1&quot; for writing. You might want to save the file in a different place.</source>
+        <extracomment>Text for the message box which pops up when a file can&apos;t be opened for writing during save operation.</extracomment>
+        <translation>Couldn&apos;t open file &quot;%1&quot; for writing. You might want to save the file in a different place.</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="42"/>
+        <source>Save File</source>
+        <extracomment>Save file dialog title.</extracomment>
+        <translation>Save File</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="45"/>
+        <source>FSI Source File (*.tfsi *.fsi);;All Files (*)</source>
+        <extracomment>Save file dialog file type filter options.</extracomment>
+        <translation>FSI Source File (*.tfsi *.fsi);;All Files (*)</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="48"/>
+        <source>File Write Error</source>
+        <extracomment>Title for the message box which pops up when the editor can&apos;t write the whole file content to the disk.</extracomment>
+        <translation>File Write Error</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="51"/>
+        <source>Couldn&apos;t write the whole file &quot;%1&quot; to disk. Try to save it to a different location.</source>
+        <extracomment>Text for the message box which pops up when the editor can&apos;t write the whole file content to the disk.</extracomment>
+        <translation>Couldn&apos;t write the whole file &quot;%1&quot; to disk. Try to save it to a different location.</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="54"/>
+        <source>File Read Error</source>
+        <extracomment>Title for the message box which pops up when text editor can open a file, but can&apos;t read its content.</extracomment>
+        <translation>File Read Error</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="57"/>
+        <source>Couldn&apos;t read file &quot;%1&quot;. You may see its contents partially or none at all.</source>
+        <extracomment>Text for the message box which pops up when text editor can open a file, but can&apos;t read its content.</extracomment>
+        <translation>Couldn&apos;t read file &quot;%1&quot;. You may see its contents partially or none at all.</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="60"/>
+        <source>Unsaved Changes</source>
+        <extracomment>Title for the message box which pops up when the user tries to close a file tab for the file which has not been saved.</extracomment>
+        <translation>Unsaved Changes</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="63"/>
+        <source>You have unsaved changes in &quot;%1&quot;. Do you want to save them before closing?</source>
+        <extracomment>Text for the message box which pops up when the user tries to close a file tab for the file which has not been saved.</extracomment>
+        <translation>You have unsaved changes in &quot;%1&quot;. Do youo want to save them before closing?</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="66"/>
+        <source>*Untitled*</source>
+        <extracomment>A name for the temporary files created in the text editor.</extracomment>
+        <translation>*Untitled*</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="69"/>
+        <source>Check Again</source>
+        <extracomment>Text for the additional button in &quot;File Removed&quot; dialog. Asks the user whether they want the app to check if file exists again.</extracomment>
+        <translation>Check Again</translation>
+    </message>
+    <message>
         <source>Error</source>
         <extracomment>Title for the message box which pops up when text editor can&apos;t open a file.</extracomment>
-        <translation>Error</translation>
+        <translation type="vanished">Error</translation>
     </message>
     <message>
         <location filename="text_editor_messages.h" line="15"/>
@@ -62,106 +176,111 @@
         <translation>File</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="42"/>
+        <location filename="main_window.ui" line="43"/>
         <source>Working Folder</source>
         <translation>Working Folder</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="49"/>
+        <location filename="main_window.ui" line="50"/>
         <source>Program</source>
         <translation>Program</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="56"/>
+        <location filename="main_window.ui" line="57"/>
         <source>About</source>
         <translation>About</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="60"/>
+        <location filename="main_window.ui" line="61"/>
         <source>FSI Documentation</source>
         <translation>FSI Documentation</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="75"/>
+        <location filename="main_window.ui" line="76"/>
         <source>Languages</source>
         <translation>Languages</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="99"/>
+        <location filename="main_window.ui" line="100"/>
         <source>Save</source>
         <translation>Save</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="104"/>
+        <location filename="main_window.ui" line="105"/>
         <source>Save as...</source>
         <translation>Save as...</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="109"/>
-        <location filename="main_window.ui" line="124"/>
+        <location filename="main_window.ui" line="110"/>
+        <location filename="main_window.ui" line="125"/>
         <source>Close</source>
         <translation>Close</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="114"/>
-        <location filename="main_window.ui" line="119"/>
+        <location filename="main_window.ui" line="115"/>
+        <location filename="main_window.ui" line="120"/>
         <source>Open...</source>
         <translation>Open...</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="129"/>
+        <location filename="main_window.ui" line="130"/>
         <source>Translate and Run</source>
         <translation>Translate and Run</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="134"/>
+        <location filename="main_window.ui" line="135"/>
         <source>Runtime Environment</source>
         <translation>Runtime Environment</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="139"/>
+        <location filename="main_window.ui" line="140"/>
         <source>Visual Environment Documentation</source>
         <translation>Visual Environment Documentation</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="144"/>
+        <location filename="main_window.ui" line="145"/>
         <source>Short Overview...</source>
         <translation>Short Overview...</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="149"/>
+        <location filename="main_window.ui" line="150"/>
         <source>Installation</source>
         <translation>Installation</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="154"/>
+        <location filename="main_window.ui" line="155"/>
         <source>Release Layout</source>
         <translation>Release Layout</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="159"/>
+        <location filename="main_window.ui" line="160"/>
         <source>Using Translator</source>
         <translation>Using Translator</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="164"/>
+        <location filename="main_window.ui" line="165"/>
         <source>Using Execution Engine</source>
         <translation>Using Execution Engine</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="169"/>
+        <location filename="main_window.ui" line="170"/>
         <source>Engine Multithreading</source>
         <translation>Engine Multithreading</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="174"/>
+        <location filename="main_window.ui" line="175"/>
         <source>Ukrainian</source>
         <translation>Ukrainian</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="179"/>
+        <location filename="main_window.ui" line="180"/>
         <source>English</source>
         <translation>English</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="185"/>
+        <source>New</source>
+        <translation>New</translation>
     </message>
 </context>
 <context>
