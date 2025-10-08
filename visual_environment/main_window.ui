@@ -32,6 +32,7 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="newFileMenuAction"/>
     <addaction name="openFileMenuAction"/>
     <addaction name="saveFileMenuAction"/>
     <addaction name="saveFileAsMenuAction"/>
@@ -177,6 +178,11 @@
   <action name="actionEnglish">
    <property name="text">
     <string>English</string>
+   </property>
+  </action>
+  <action name="newFileMenuAction">
+   <property name="text">
+    <string>New</string>
    </property>
   </action>
  </widget>

@@ -3,6 +3,7 @@
 #include <QShowEvent>
 #include <QMessageBox>
 #include <QPlainTextEdit>
+#include <QPushButton>
 
 #include "text_editor.h"
 #include "text_editor_messages.h"
@@ -32,7 +33,12 @@ namespace CustomWidgets {
     }
 
     void TextEditor::onFileChangedOutside(const QString& path) {
+        this->onFileChangedOutsideRecursive(path, 0);
+    }
+
+    void TextEditor::onFileChangedOutsideRecursive(const QString& path, int depth) {
         Q_ASSERT(this->fileWatcher && "The file watcher has not been set up.");
+        constexpr int maximumFileExistenceRetries = 4;
 
         // Start tracking the file again if it was removed from the watcher for some reason.
         if (!this->fileWatcher->files().contains(path)) {
@@ -43,23 +49,55 @@ namespace CustomWidgets {
         for (int index = 0; index < this->openFiles.size(); ++index) {
             OpenedFile& openFile = this->openFiles[index];
             if (openFile.filePath == path) {
-                if (!fileInfo.exists()) {
-                    QMessageBox::StandardButton result = QMessageBox::question(
-                        this,
-                        tr(g_Messages[MessageKeys::g_MessageBoxFileRemovedTitle]),
-                        tr(g_Messages[MessageKeys::g_MessageBoxFileRemovedMessage]).arg(path),
-                        QMessageBox::Yes | QMessageBox::No,
-                        QMessageBox::No
-                    );
+                // Silently disregard this message if the file is temporary.
+                // This may indicate that some piece of logic is broken. That is,
+                // it decided to mark a file as temporary, but forgot to remove it from the watcher.
+                if (openFile.isTemporary) {
+                    if (!this->fileWatcher->removePath(path)) {
+                        qWarning() << "Failed to remove path from file watcher:" << path;
+                    }
 
-                    if (result == QMessageBox::Yes) {
-                        // Remove the tab and stop tracking the file.
-                        // Do not prompt to save changes, as the file is gone.
-                        this->fileTabs->removeTab(index);
-                        this->openFiles.removeAt(index);
-                        this->fileWatcher->removePath(path);
+                    qWarning() << "Received file changed notification for a temporary file. This indicates a logic error. File path:" << path;
+                    return;
+                }
+
+                QPlainTextEdit* fileEditor = this->getEditorAtIndex(index);
+                if (!fileInfo.exists()) {
+                    QMessageBox msgBox(this);
+                    msgBox.setWindowTitle(tr(g_Messages[MessageKeys::g_MessageBoxFileRemovedTitle]));
+                    msgBox.setText(tr(g_Messages[MessageKeys::g_MessageBoxFileRemovedMessage]).arg(path));
+                    msgBox.setIcon(QMessageBox::Question);
+                    
+                    QPushButton* yesButton = msgBox.addButton(QMessageBox::Yes);
+                    QPushButton* noButton = msgBox.addButton(QMessageBox::No);
+                    
+                    QPushButton* tryAgainButton = nullptr;
+                    if (depth < maximumFileExistenceRetries) {
+                        tryAgainButton = msgBox.addButton(
+                            tr(g_Messages[MessageKeys::g_CheckAgainFileRemovedButton]),
+                            QMessageBox::ActionRole
+                        );
+
+                        msgBox.setDefaultButton(tryAgainButton);
                     }
                     else {
+                        msgBox.setDefaultButton(noButton);
+                    }
+                    
+                    msgBox.exec();
+                    QAbstractButton* clickedButton = msgBox.clickedButton();
+
+                    if (clickedButton == tryAgainButton) {
+                        this->onFileChangedOutsideRecursive(path, depth + 1);
+                        return;
+                    }
+                    else if (clickedButton == yesButton) {
+                        // Remove the tab and stop tracking the file.
+                        this->fileTabs->removeTab(index);
+                        this->openFiles.removeAt(index);
+                    }
+                    else {
+                        fileEditor->document()->setModified(true);
                         openFile.isTemporary = true;
                     }
                 }
@@ -72,33 +110,46 @@ namespace CustomWidgets {
                             tr(g_Messages[MessageKeys::g_MessageBoxFileChangedOutsideErrorMessage]).arg(path)
                         );
 
+                        fileEditor->document()->setModified(true);
                         openFile.isTemporary = true;
                         if (!this->fileWatcher->removePath(path)) {
                             qWarning() << "Failed to remove path from file watcher:" << path;
                         }
                     }
                     else {
-                        QPlainTextEdit* fileEditor = qobject_cast<QPlainTextEdit*>(this->fileTabs->widget(index));
-                        if (fileEditor == nullptr) {
-                            this->closeAllFiles();
-                            qFatal() << "Failed to cast tab widget to QPlainTextEdit." << __LINE__ << __FILE__;
-                        }
-
                         if (!fileEditor->document()->isModified() && !openFile.isTemporary) {
                             // This will get executed even when we modify and save the file ourselves.
                             fileEditor->setPlainText(newFile.readAll());
+                            fileEditor->document()->setModified(false);
+
+                            if (newFile.error() != QFile::NoError) {
+                                QMessageBox::warning(
+                                    this,
+                                    tr(g_Messages[MessageKeys::g_MessageBoxFileReadErrorTitle]),
+                                    tr(g_Messages[MessageKeys::g_MessageBoxFileReadErrorMessage]).arg(path)
+                                );
+                            }
                         }
                         else {
                             QMessageBox::StandardButton result = QMessageBox::question(
                                 this,
                                 tr(g_Messages[MessageKeys::g_MessageBoxFileChangedOutsideTitle]),
                                 tr(g_Messages[MessageKeys::g_MessageBoxFileChangedOutsideMessage]).arg(path),
-                                QMessageBox::Yes | QMessageBox::No,
+                                QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
                                 QMessageBox::No
                             );
 
                             if (result == QMessageBox::Yes) {
                                 fileEditor->setPlainText(newFile.readAll());
+                                fileEditor->document()->setModified(false);
+
+                                if (newFile.error() != QFile::NoError) {
+                                    QMessageBox::warning(
+                                        this,
+                                        tr(g_Messages[MessageKeys::g_MessageBoxFileReadErrorTitle]),
+                                        tr(g_Messages[MessageKeys::g_MessageBoxFileReadErrorMessage]).arg(path)
+                                    );
+                                }
                             }
                             else {
                                 fileEditor->document()->setModified(true);

@@ -1,5 +1,9 @@
-#include "main_window.h"
+#ifndef NDEBUG
+#include <vld.h>
+#endif
+
 #include <QtWidgets/QApplication>
+#include "main_window.h"
 
 int main(int argc, char *argv[]) {
     QApplication application(argc, argv);

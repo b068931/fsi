@@ -1,4 +1,6 @@
-#include <qcoreapplication.h>
+#include <QCoreApplication>
+#include <QLibraryInfo>
+
 #include "interface_translator.h"
 
 namespace Components::Internationalization {
@@ -13,7 +15,11 @@ namespace Components::Internationalization {
     }
 
     InterfaceTranslator::~InterfaceTranslator() noexcept {
-        if (QTranslator* currentTranslator = this->activeTranslator.get()) {
+        if (QTranslator* currentTranslator = this->applicationTranslator.get()) {
+            qApp->removeTranslator(currentTranslator);
+        }
+
+        if (QTranslator* currentTranslator = this->qtTranslator.get()) {
             qApp->removeTranslator(currentTranslator);
         }
     }
@@ -35,26 +41,42 @@ namespace Components::Internationalization {
         constexpr char resourcePath[] = ":/i18n";
         constexpr char resourcePrefix[] = "_";
         constexpr char fileName[] = "translation_visual_environment";
+        constexpr char qtTranslationFileName[] = "qt";
         constexpr char resourceSuffix[] = ".qm";
 
-        if (QTranslator* currentTranslator = this->activeTranslator.get()) {
+        if (QTranslator* currentTranslator = this->applicationTranslator.get()) {
             qApp->removeTranslator(currentTranslator);
-            this->activeTranslator.reset();
+            this->applicationTranslator.reset();
+        }
+
+        if (QTranslator* currentTranslator = this->qtTranslator.get()) {
+            qApp->removeTranslator(currentTranslator);
+            this->qtTranslator.reset();
         }
 
         if (locale != nullptr) {
-            this->activeTranslator.reset(new QTranslator{});
-            if (this->activeTranslator->load(
+            this->applicationTranslator.reset(new QTranslator{});
+            if (!this->applicationTranslator->load(
                 *locale, 
                 fileName, 
                 resourcePrefix, 
                 resourcePath, 
                 resourceSuffix)) {
-                qApp->installTranslator(this->activeTranslator.get());
+                qWarning() << "Failed to load own translator for locale:" << locale->system().name();
             }
-            else {
-                qWarning() << "Failed to load translator for locale:" << *locale;
+
+            this->qtTranslator.reset(new QTranslator{});
+            if (!this->qtTranslator->load(
+                *locale,
+                qtTranslationFileName,
+                resourcePrefix,
+                QLibraryInfo::path(QLibraryInfo::TranslationsPath),
+                resourceSuffix)) {
+                qWarning() << "Failed to load Qt's translator for locale:" << locale->system().name();
             }
+
+            qApp->installTranslator(this->qtTranslator.get());
+            qApp->installTranslator(this->applicationTranslator.get());
         }
 
         // It is expected that clients will rely on QTranslator's capabilities,

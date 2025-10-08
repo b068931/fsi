@@ -38,7 +38,11 @@ namespace Windows {
     public slots:
         void onRetranslateUI();
 
+        void onMenuFileNew();
         void onMenuFileOpen();
+        void onMenuFileSave();
+        void onMenuFileSaveAs();
+        void onMenuFileClose();
 
         void onMenuWorkingDirectoryOpen();
         void onMenuWorkingDirectoryClose();

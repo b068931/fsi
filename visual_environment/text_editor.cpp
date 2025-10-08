@@ -22,6 +22,14 @@
 #include "text_editor_messages.h"
 
 namespace CustomWidgets {
+    QString TextEditor::OpenedFile::getNormalizedName() const {
+        if (this->filePath.isEmpty()) {
+            return tr(g_Messages[MessageKeys::g_TemporaryFileName]);
+        }
+
+        return this->filePath;
+    }
+
     TextEditor::TextEditor(QWidget* parent)
         : QWidget{ parent }, fileWatcher{ new QFileSystemWatcher(this) }
     {
@@ -140,6 +148,11 @@ namespace CustomWidgets {
 
             QPlainTextEdit* fileEditor = new QPlainTextEdit;
             fileEditor->setPlainText(file.readAll());
+            fileEditor->document()->setModified(false);
+
+            if (file.error() != QFile::NoError) {
+                throw tr(g_Messages[MessageKeys::g_MessageBoxFileReadErrorMessage]).arg(filePath);
+            }
 
             this->openFiles.append(
                 {
@@ -158,6 +171,7 @@ namespace CustomWidgets {
             // It is not really a good practice to throw exceptions which are not derived
             // from std::exception, but creating a custom class for this isolated case is
             // not worth the effort.
+
             QMessageBox::warning(
                 this,
                 tr(g_Messages[MessageKeys::g_MessageBoxFileOpenErrorTitle]),
@@ -166,54 +180,161 @@ namespace CustomWidgets {
         }
     }
 
+    void TextEditor::createTemporaryFile() {
+        QPlainTextEdit* fileEditor = new QPlainTextEdit;
+        fileEditor->setPlainText("");
+        fileEditor->document()->setModified(false);
+
+        this->openFiles.append(
+            {
+                .filePath = QString(),
+                .isTemporary = true
+            }
+        );
+
+        const int newTabIndex = this->fileTabs->addTab(fileEditor, tr(g_Messages[MessageKeys::g_TemporaryFileName]));
+        this->fileTabs->setCurrentIndex(newTabIndex);
+        this->fileTabs->setTabToolTip(newTabIndex, tr(g_Messages[MessageKeys::g_TemporaryFileName]));
+        this->fileTabs->widget(newTabIndex)->setStatusTip(tr(g_Messages[MessageKeys::g_TemporaryFileName]));
+    }
+
+    void TextEditor::saveCurrentFile() {
+        if (this->fileTabs->currentIndex() == -1) 
+            return;
+
+        this->saveFileAtIndex(
+            this->fileTabs->currentIndex()
+        );
+    }
+
+    void TextEditor::saveCurrentFileAs() {
+        if (this->fileTabs->currentIndex() == -1) 
+            return;
+
+        int currentIndex = this->fileTabs->currentIndex();
+        OpenedFile& openFile = this->openFiles[currentIndex];
+
+        // Try to save the file as if it was temporary, and didn't have a save path.
+        bool savedTemporaryStatus = openFile.isTemporary;
+        QString savedFilePath = std::move(
+            openFile.filePath
+        );
+
+        openFile.isTemporary = true;
+        this->saveFileAtIndex(currentIndex);
+
+        // The file is still temporary, so the user must have cancelled the save operation.
+        // Restore the previous state.
+        if (openFile.isTemporary) {
+            openFile.isTemporary = savedTemporaryStatus;
+            openFile.filePath = std::move(savedFilePath);
+        }
+    }
+
+    void TextEditor::closeCurrentFile() {
+        if (this->fileTabs->currentIndex() == -1) 
+            return;
+
+        this->closeFileAtIndex(
+            this->fileTabs->currentIndex()
+        );
+    }
+
     void TextEditor::closeFileAtIndex(int index) {
         Q_ASSERT(this->fileTabs != nullptr && "The file tabs have not been set up.");
         Q_ASSERT(this->fileTabs->count() == this->openFiles.count() && "The file tabs and open files count do not match.");
         Q_ASSERT(index < this->fileTabs->count() && index >= 0 && "The specified index is out of range.");
 
-        // TODO: Prompt the user with the "Are you sure you want to close without saving?" dialog before calling saveFileAtIndex or closing it without saving.
-
         OpenedFile& openFile = this->openFiles[index];
-        QPlainTextEdit* fileEditor = qobject_cast<QPlainTextEdit*>(this->fileTabs->widget(index));
+        QPlainTextEdit* fileEditor = this->getEditorAtIndex(index);
+        if (fileEditor->document()->isModified()) {
+            QMessageBox::StandardButton result = QMessageBox::question(
+                this,
+                tr(g_Messages[MessageKeys::g_MessageBoxFileCloseConfirmationTitle]),
+                tr(g_Messages[MessageKeys::g_MessageBoxFileCloseConfirmationMessage]).arg(
+                    openFile.getNormalizedName()
+                ),
+                QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+                QMessageBox::Yes
+            );
 
-        this->saveFileAtIndex(index);
-        this->fileTabs->removeTab(index);
-        this->openFiles.remove(index);
+            if (result == QMessageBox::Yes) {
+                this->saveFileAtIndex(index);
+            }
+            else if (result == QMessageBox::No) {
+                this->fileTabs->removeTab(index);
+                this->openFiles.removeAt(index);
 
-        if (!this->fileWatcher->removePath(openFile.filePath)) {
-            qWarning() << "Failed to remove file from the file watcher at path :" << openFile.filePath;
+                if (!openFile.filePath.isEmpty() && !openFile.isTemporary) {
+                    if (!this->fileWatcher->removePath(openFile.filePath)) {
+                        qWarning() << "Failed to remove file from the file watcher at path:" << openFile.filePath;
+                    }
+                }
+            }
+            else {
+                // The user closed the message box without making a choice.
+                // Do nothing and return.
+                return;
+            }
+        }
+
+        if (!fileEditor->document()->isModified()) {
+            this->fileTabs->removeTab(index);
+            this->openFiles.removeAt(index);
+
+            if (!openFile.filePath.isEmpty() && !openFile.isTemporary) {
+                if (!this->fileWatcher->removePath(openFile.filePath)) {
+                    qWarning() << "Failed to remove file from the file watcher at path:" << openFile.filePath;
+                }
+            }
         }
     }
 
     void TextEditor::saveFileAtIndex(int index) {
         Q_ASSERT(this->fileTabs && "The file tabs have not been set up.");
+        Q_ASSERT(this->fileTabs->count() == this->openFiles.count() && "The file tabs and open files count do not match.");
         Q_ASSERT(index < this->fileTabs->count() && index >= 0 && "The specified index is out of range.");
 
         OpenedFile& openFile = this->openFiles[index];
-        QPlainTextEdit* fileEditor = qobject_cast<QPlainTextEdit*>(this->fileTabs->widget(index));
-        if (fileEditor == nullptr) {
-            this->closeAllFiles();
-            qFatal() << "Failed to cast the file editor widget to QPlainTextEdit." << __LINE__ << __FILE__;
-        }
+        QPlainTextEdit* fileEditor = this->getEditorAtIndex(index);
 
         if (fileEditor->document()->isModified() && !openFile.isTemporary) {
             QFile oldFile(openFile.filePath);
             if (oldFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
                 fileEditor->document()->setModified(false);
-                oldFile.write(fileEditor->toPlainText().toUtf8());
+
+                QByteArray buffer = fileEditor->toPlainText().toUtf8();
+                qint64 bytesWritten = oldFile.write(buffer);
+                if (bytesWritten != buffer.size() || oldFile.error() != QFile::NoError) {
+                    fileEditor->document()->setModified(true);
+                    QMessageBox::warning(
+                        this,
+                        tr(g_Messages[MessageKeys::g_MessageBoxFileWriteErrorTitle]),
+                        tr(g_Messages[MessageKeys::g_MessageBoxFileWriteErrorMessage]).arg(
+                            openFile.getNormalizedName()
+                        )
+                    );
+                }
+
                 oldFile.close();
             }
             else {
+                fileEditor->document()->setModified(true);
                 openFile.isTemporary = true;
+
                 QMessageBox::warning(
                     this,
                     tr(g_Messages[MessageKeys::g_MessageBoxFileSaveErrorTitle]),
-                    tr(g_Messages[MessageKeys::g_MessageBoxFileSaveErrorMessage]).arg(openFile.filePath)
+                    tr(g_Messages[MessageKeys::g_MessageBoxFileSaveErrorMessage]).arg(
+                        openFile.getNormalizedName()
+                    )
                 );
             }
         }
         else if (openFile.isTemporary) {
-            // TODO: Check if a file already has filePath set. This can happen when file was removed from the outside of the text editor, for example.
+            // The file is temporary, so we need to ask the user where to save it.
+            // Notice that the default directory is either the working directory or
+            // the last known directory of the file.
 
             QString filePath = QFileDialog::getSaveFileName(
                 this,
@@ -235,26 +356,57 @@ namespace CustomWidgets {
                     this->fileTabs->setTabToolTip(index, fileInfo.absoluteFilePath());
                     this->fileTabs->widget(index)->setStatusTip(fileInfo.absoluteFilePath());
 
-                    // TODO: Implement additional to check to ensure that the file was fully written.
-                    // TODO: Handle the case when the file was not fully written.
-                    // TODO: Check whether readAll function can fail and handle that case.
+                    QByteArray buffer = fileEditor->toPlainText().toUtf8();
+                    qint64 bytesWritten = newFile.write(buffer);
+                    if (bytesWritten != buffer.size() || newFile.error() != QFile::NoError) {
+                        fileEditor->document()->setModified(true);
+                        openFile.isTemporary = true;
 
-                    newFile.write(fileEditor->toPlainText().toUtf8());
-                    newFile.close();
-
-                    if (!this->fileWatcher->addPath(fileInfo.absoluteFilePath())) {
-                        qWarning() << "Failed to add newly saved file to the file watcher at path :" << fileInfo.absoluteFilePath();
+                        QMessageBox::warning(
+                            this,
+                            tr(g_Messages[MessageKeys::g_MessageBoxFileWriteErrorTitle]),
+                            tr(g_Messages[MessageKeys::g_MessageBoxFileWriteErrorMessage]).arg(
+                                fileInfo.absoluteFilePath()
+                            )
+                        );
                     }
+                    else {
+                        // Don't watch for file changes if the write fails. Assume that the file is inaccessible to the user.
+                        if (!this->fileWatcher->addPath(fileInfo.absoluteFilePath())) {
+                            qWarning() << "Failed to add newly saved file to the file watcher at path :" << fileInfo.absoluteFilePath();
+                        }
+                    }
+
+                    newFile.close();
                 }
                 else {
                     QMessageBox::warning(
                         this,
                         tr(g_Messages[MessageKeys::g_MessageBoxFileSaveErrorTitle]),
-                        tr(g_Messages[MessageKeys::g_MessageBoxFileSaveErrorMessage]).arg(openFile.filePath)
+                        tr(g_Messages[MessageKeys::g_MessageBoxFileSaveErrorMessage]).arg(
+                            openFile.getNormalizedName()
+                        )
                     );
                 }
             }
         }
+    }
+
+    QPlainTextEdit* TextEditor::getEditorAtIndex(int index) {
+        QPlainTextEdit* fileEditor = qobject_cast<QPlainTextEdit*>(this->fileTabs->widget(index));
+        if (fileEditor == nullptr) {
+            // Remove a possibly corrupted tab and its associated data.
+            this->fileTabs->removeTab(index);
+            this->openFiles.removeAt(index);
+
+            // Then try to salvage other open files by closing all of them.
+            this->closeAllFiles();
+            qFatal() << "Failed to cast the file editor widget to QPlainTextEdit." << __LINE__ << __FILE__;
+
+            return nullptr;
+        }
+
+        return fileEditor;
     }
 
     void TextEditor::openWorkingDirectory(const QString& directoryPath) {
