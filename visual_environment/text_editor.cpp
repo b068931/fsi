@@ -113,10 +113,22 @@ namespace CustomWidgets {
         this->splitter->setSizes(newSizes);
     }
 
-    void TextEditor::closeAllFiles() {
-        for (int index = 0; index < this->openFiles.size(); ++index) {
-            this->closeFileAtIndex(index);
+    bool TextEditor::closeAllFiles() {
+        constexpr int firstElement = 0;
+        if (this->openFiles.isEmpty()) {
+            return true;
         }
+
+        qsizetype previousCount;
+        qsizetype newCount = this->openFiles.size();
+        do {
+            // Keep removing the first element up until user cancels the operation, or we run out of files.
+            previousCount = newCount;
+            this->closeFileAtIndex(firstElement);
+            newCount = this->openFiles.size();
+        } while (newCount < previousCount && !this->openFiles.isEmpty());
+
+        return this->openFiles.isEmpty();
     }
 
     void TextEditor::openNewFile(const QString& filePath) {

@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>Visual Environment</string>
   </property>
+  <property name="toolTip">
+   <string/>
+  </property>
   <property name="locale">
    <locale language="English" country="UnitedStates"/>
   </property>
@@ -29,6 +32,12 @@
     </rect>
    </property>
    <widget class="QMenu" name="fileMenu">
+    <property name="toolTip">
+     <string/>
+    </property>
+    <property name="statusTip">
+     <string/>
+    </property>
     <property name="title">
      <string>File</string>
     </property>
@@ -39,6 +48,9 @@
     <addaction name="closeFileMenuAction"/>
    </widget>
    <widget class="QMenu" name="folderMenu">
+    <property name="statusTip">
+     <string/>
+    </property>
     <property name="title">
      <string>Working Folder</string>
     </property>
@@ -53,12 +65,22 @@
     <addaction name="executionEnvironmentMenuAction"/>
    </widget>
    <widget class="QMenu" name="programAboutMenu">
+    <property name="toolTip">
+     <string/>
+    </property>
+    <property name="statusTip">
+     <string/>
+    </property>
     <property name="title">
      <string>About</string>
     </property>
     <widget class="QMenu" name="documentationFSIMenu">
      <property name="title">
       <string>FSI Documentation</string>
+     </property>
+     <property name="icon">
+      <iconset resource="visual_environment.qrc">
+       <normaloff>:/icons/documentation_icon.svg</normaloff>:/icons/documentation_icon.svg</iconset>
      </property>
      <addaction name="documentationFSIInstallationMenuAction"/>
      <addaction name="documentationFSIReleaseLayoutMenuAction"/>
@@ -72,6 +94,12 @@
     <addaction name="shortDescriptionMenuAction"/>
    </widget>
    <widget class="QMenu" name="menuLanguages">
+    <property name="toolTip">
+     <string/>
+    </property>
+    <property name="statusTip">
+     <string/>
+    </property>
     <property name="title">
      <string>Languages</string>
     </property>
@@ -96,93 +124,195 @@
    </attribute>
   </widget>
   <action name="saveFileMenuAction">
+   <property name="icon">
+    <iconset resource="visual_environment.qrc">
+     <normaloff>:/icons/save_file_icon.svg</normaloff>:/icons/save_file_icon.svg</iconset>
+   </property>
    <property name="text">
     <string>Save</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
   </action>
   <action name="saveFileAsMenuAction">
+   <property name="icon">
+    <iconset resource="visual_environment.qrc">
+     <normaloff>:/icons/save_file_as_icon.svg</normaloff>:/icons/save_file_as_icon.svg</iconset>
+   </property>
    <property name="text">
     <string>Save as...</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
+   </property>
   </action>
   <action name="closeFileMenuAction">
+   <property name="icon">
+    <iconset resource="visual_environment.qrc">
+     <normaloff>:/icons/close_file_icon.svg</normaloff>:/icons/close_file_icon.svg</iconset>
+   </property>
    <property name="text">
     <string>Close</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
    </property>
   </action>
   <action name="openFileMenuAction">
+   <property name="icon">
+    <iconset resource="visual_environment.qrc">
+     <normaloff>:/icons/open_file_icon.svg</normaloff>:/icons/open_file_icon.svg</iconset>
+   </property>
    <property name="text">
     <string>Open...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
    </property>
   </action>
   <action name="openFolderMenuAction">
+   <property name="icon">
+    <iconset resource="visual_environment.qrc">
+     <normaloff>:/icons/open_working_directory_icon.svg</normaloff>:/icons/open_working_directory_icon.svg</iconset>
+   </property>
    <property name="text">
     <string>Open...</string>
    </property>
+   <property name="statusTip">
+    <string/>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+W</string>
+   </property>
   </action>
   <action name="closeFolderMenuAction">
+   <property name="icon">
+    <iconset resource="visual_environment.qrc">
+     <normaloff>:/icons/close_working_directory.svg</normaloff>:/icons/close_working_directory.svg</iconset>
+   </property>
    <property name="text">
     <string>Close</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
   </action>
   <action name="translateAndRunMenuAction">
+   <property name="icon">
+    <iconset resource="visual_environment.qrc">
+     <normaloff>:/icons/translate_and_run_icon.svg</normaloff>:/icons/translate_and_run_icon.svg</iconset>
+   </property>
    <property name="text">
     <string>Translate and Run</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
   </action>
   <action name="executionEnvironmentMenuAction">
+   <property name="icon">
+    <iconset resource="visual_environment.qrc">
+     <normaloff>:/icons/runtime_environment_icon.svg</normaloff>:/icons/runtime_environment_icon.svg</iconset>
+   </property>
    <property name="text">
     <string>Runtime Environment</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
+   </property>
   </action>
   <action name="visualEnvironmentDocumentationMenuAction">
+   <property name="icon">
+    <iconset resource="visual_environment.qrc">
+     <normaloff>:/icons/documentation_icon.svg</normaloff>:/icons/documentation_icon.svg</iconset>
+   </property>
    <property name="text">
     <string>Visual Environment Documentation</string>
    </property>
   </action>
   <action name="shortDescriptionMenuAction">
+   <property name="icon">
+    <iconset resource="visual_environment.qrc">
+     <normaloff>:/icons/about_program_icon.svg</normaloff>:/icons/about_program_icon.svg</iconset>
+   </property>
    <property name="text">
     <string>Short Overview...</string>
    </property>
   </action>
   <action name="documentationFSIInstallationMenuAction">
+   <property name="icon">
+    <iconset resource="visual_environment.qrc">
+     <normaloff>:/icons/documentation_icon.svg</normaloff>:/icons/documentation_icon.svg</iconset>
+   </property>
    <property name="text">
     <string>Installation</string>
    </property>
   </action>
   <action name="documentationFSIReleaseLayoutMenuAction">
+   <property name="icon">
+    <iconset resource="visual_environment.qrc">
+     <normaloff>:/icons/documentation_icon.svg</normaloff>:/icons/documentation_icon.svg</iconset>
+   </property>
    <property name="text">
     <string>Release Layout</string>
    </property>
   </action>
   <action name="documentationFSIUseTranslatorMenuAction">
+   <property name="icon">
+    <iconset resource="visual_environment.qrc">
+     <normaloff>:/icons/documentation_icon.svg</normaloff>:/icons/documentation_icon.svg</iconset>
+   </property>
    <property name="text">
     <string>Using Translator</string>
    </property>
   </action>
   <action name="documentationFSIUseExecutionEnvironmentMenuAction">
+   <property name="icon">
+    <iconset resource="visual_environment.qrc">
+     <normaloff>:/icons/documentation_icon.svg</normaloff>:/icons/documentation_icon.svg</iconset>
+   </property>
    <property name="text">
     <string>Using Execution Engine</string>
    </property>
   </action>
   <action name="documentationFSIEngineMultithreadingMenuAction">
+   <property name="icon">
+    <iconset resource="visual_environment.qrc">
+     <normaloff>:/icons/documentation_icon.svg</normaloff>:/icons/documentation_icon.svg</iconset>
+   </property>
    <property name="text">
     <string>Engine Multithreading</string>
    </property>
   </action>
   <action name="actionUkrainian">
+   <property name="icon">
+    <iconset resource="visual_environment.qrc">
+     <normaloff>:/icons/ukrainian_icon.svg</normaloff>:/icons/ukrainian_icon.svg</iconset>
+   </property>
    <property name="text">
     <string>Ukrainian</string>
    </property>
   </action>
   <action name="actionEnglish">
+   <property name="icon">
+    <iconset resource="visual_environment.qrc">
+     <normaloff>:/icons/english_icon.svg</normaloff>:/icons/english_icon.svg</iconset>
+   </property>
    <property name="text">
     <string>English</string>
    </property>
   </action>
   <action name="newFileMenuAction">
+   <property name="icon">
+    <iconset resource="visual_environment.qrc">
+     <normaloff>:/icons/new_file_icon.svg</normaloff>:/icons/new_file_icon.svg</iconset>
+   </property>
    <property name="text">
     <string>New</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
    </property>
   </action>
  </widget>

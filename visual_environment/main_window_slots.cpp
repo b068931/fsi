@@ -14,11 +14,12 @@ namespace Windows {
             QStatusTipEvent* statusTipEvent = dynamic_cast<QStatusTipEvent*>(event);
             Q_ASSERT(statusTipEvent != nullptr && "Unexpected: the event is not of type QStatusTipEvent.");
 
-            this->enrichedStatusBar->toolTip(
-                Components::Internationalization::QStringWrapper::wrap(
-                    statusTipEvent->tip()
-                )
-            );
+            QString statusTip = statusTipEvent->tip();
+            if (!statusTip.isEmpty()) {
+                this->enrichedStatusBar->toolTip(
+                    Components::Internationalization::QStringWrapper::wrap(std::move(statusTip))
+                );
+            }
 
             return true;
         }
@@ -28,9 +29,17 @@ namespace Windows {
 
     void MainWindow::closeEvent(QCloseEvent* event) {
         Q_ASSERT(this->editor && "The text editor has not been set up.");
-
-        this->editor->closeAllFiles();
-        QMainWindow::closeEvent(event);
+        if (this->editor->closeAllFiles()) {
+            QMainWindow::closeEvent(event);
+        }
+        else {
+            event->ignore();
+            this->enrichedStatusBar->toolTip(
+                Components::Internationalization::QStringWrapper::wrap(
+                    tr(g_Messages[g_StatusTipCloseCanceled])
+                )
+            );
+        }
     }
 
     void MainWindow::onMenuFileNew() {
@@ -71,6 +80,11 @@ namespace Windows {
 
     void MainWindow::onRetranslateUI() {
         this->ui.retranslateUi(this);
+        this->enrichedStatusBar->toolTip(
+            Components::Internationalization::QStringWrapper::wrap(
+                tr(g_Messages[g_StatusTipLanguageChanged])
+            )
+        );
     }
 
     void MainWindow::onMenuLanguageUkrainian() {
