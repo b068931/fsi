@@ -210,6 +210,9 @@
     <ClInclude Include="translatable_string_interface.h" />
     <ClInclude Include="static_translatable_string.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="dark_theme.qss" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
     <Import Project="$(QtMsBuild)\qt.targets" />
