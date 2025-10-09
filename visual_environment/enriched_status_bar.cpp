@@ -128,7 +128,7 @@ namespace CustomWidgets {
         this->setToolTips();
 
         // Margins so that text on the edges is not close to the window border.
-        this->workingDirectoryLabel->setContentsMargins(0, 0, 5, 0);
+        this->workingDirectoryLabel->setContentsMargins(5, 0, 5, 0);
         this->statusToolTipLabel->setContentsMargins(5, 0, 5, 0);
     }
 

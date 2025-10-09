@@ -60,6 +60,9 @@
     <Filter Include="Header Files\Custom Widgets\Text Editor">
       <UniqueIdentifier>{9b0a59f0-4775-4e69-9066-62f19fd812dd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="QSS Files">
+      <UniqueIdentifier>{42210e96-528d-4d30-9dee-b73b399cfa3d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="main_window.ui">
@@ -144,5 +147,10 @@
     <ClInclude Include="text_editor_messages.h">
       <Filter>Header Files\Custom Widgets\Text Editor</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="dark_theme.qss">
+      <Filter>QSS Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
