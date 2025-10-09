@@ -4,4 +4,19 @@
         <file>translation_visual_environment_uk_UA.qm</file>
         <file>translation_visual_environment_en_GB.qm</file>
     </qresource>
+    <qresource prefix="/icons">
+        <file>new_file_icon.svg</file>
+        <file>about_program_icon.svg</file>
+        <file>close_file_icon.svg</file>
+        <file>close_working_directory.svg</file>
+        <file>documentation_icon.svg</file>
+        <file>english_icon.svg</file>
+        <file>open_file_icon.svg</file>
+        <file>open_working_directory_icon.svg</file>
+        <file>runtime_environment_icon.svg</file>
+        <file>save_file_as_icon.svg</file>
+        <file>save_file_icon.svg</file>
+        <file>translate_and_run_icon.svg</file>
+        <file>ukrainian_icon.svg</file>
+    </qresource>
 </RCC>

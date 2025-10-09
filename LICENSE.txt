@@ -1,4 +1,5 @@
-Portable or installer releases of this software may contain the following files:
+1. All emojis designed by OpenMoji – the open-source emoji and icon project. License: CC BY-SA 4.0
+2. Portable or installer releases of this software may contain the following files:
 - concrt140.dll
 - msvcp140.dll
 - msvcp140_1.dll
@@ -14,6 +15,7 @@ These are provided as per https://learn.microsoft.com/en-us/visualstudio/release
 They are provided in accordance with the Microsoft Visual Studio Community 2022 license terms, 
 in an unmodified form. They are not covered by the MIT License below.
 
+3. Everything else in this repository is licensed under the terms below.
 MIT License
 
 Copyright (c) 2023 https://github.com/b068931

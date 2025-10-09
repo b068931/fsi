@@ -83,7 +83,8 @@ namespace CustomWidgets {
         /// Closes all open files in the editor.
         /// Prompts the user to save any unsaved changes before closing.
         /// </summary>
-        void closeAllFiles();
+        /// <returns>True if all files were closed successfully, false if the operation was cancelled.</returns>
+        bool closeAllFiles();
 
     protected:
         virtual void showEvent(QShowEvent* event) override;
