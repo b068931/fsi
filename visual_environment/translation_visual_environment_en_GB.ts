@@ -212,134 +212,134 @@
         <translation type="vanished">Dynamically change the language of the application.</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="100"/>
+        <location filename="main_window.ui" line="104"/>
         <source>Languages</source>
         <translation>Languages</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="124"/>
+        <location filename="main_window.ui" line="132"/>
         <source>Save</source>
         <translation>Save</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="127"/>
+        <location filename="main_window.ui" line="135"/>
         <source>Ctrl+S</source>
         <translation>Ctrl+S</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="132"/>
+        <location filename="main_window.ui" line="144"/>
         <source>Save as...</source>
         <translation>Save as...</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="135"/>
+        <location filename="main_window.ui" line="147"/>
         <source>Ctrl+Shift+S</source>
         <translation>Ctrl+Shift+S</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="140"/>
-        <location filename="main_window.ui" line="167"/>
+        <location filename="main_window.ui" line="156"/>
+        <location filename="main_window.ui" line="195"/>
         <source>Close</source>
         <translation>Close</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="143"/>
+        <location filename="main_window.ui" line="159"/>
         <source>Ctrl+Q</source>
         <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="148"/>
-        <location filename="main_window.ui" line="156"/>
+        <location filename="main_window.ui" line="168"/>
+        <location filename="main_window.ui" line="180"/>
         <source>Open...</source>
         <translation>Open...</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="151"/>
+        <location filename="main_window.ui" line="171"/>
         <source>Ctrl+O</source>
         <translation>Ctrl+O</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="162"/>
+        <location filename="main_window.ui" line="186"/>
         <source>Ctrl+W</source>
         <translation>Ctrl+W</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="170"/>
+        <location filename="main_window.ui" line="198"/>
         <source>Ctrl+C</source>
         <translation>Ctrl+C</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="175"/>
+        <location filename="main_window.ui" line="207"/>
         <source>Translate and Run</source>
         <translation>Translate and Run</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="178"/>
+        <location filename="main_window.ui" line="210"/>
         <source>Ctrl+R</source>
         <translation>Ctrl+R</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="183"/>
+        <location filename="main_window.ui" line="219"/>
         <source>Runtime Environment</source>
         <translation>Runtime Environment</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="186"/>
+        <location filename="main_window.ui" line="222"/>
         <source>Ctrl+E</source>
         <translation>Ctrl+E</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="191"/>
+        <location filename="main_window.ui" line="231"/>
         <source>Visual Environment Documentation</source>
         <translation>Visual Environment Documentation</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="196"/>
+        <location filename="main_window.ui" line="240"/>
         <source>Short Overview...</source>
         <translation>Short Overview...</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="201"/>
+        <location filename="main_window.ui" line="249"/>
         <source>Installation</source>
         <translation>Installation</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="206"/>
+        <location filename="main_window.ui" line="258"/>
         <source>Release Layout</source>
         <translation>Release Layout</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="211"/>
+        <location filename="main_window.ui" line="267"/>
         <source>Using Translator</source>
         <translation>Using Translator</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="216"/>
+        <location filename="main_window.ui" line="276"/>
         <source>Using Execution Engine</source>
         <translation>Using Execution Engine</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="221"/>
+        <location filename="main_window.ui" line="285"/>
         <source>Engine Multithreading</source>
         <translation>Engine Multithreading</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="226"/>
+        <location filename="main_window.ui" line="294"/>
         <source>Ukrainian</source>
         <translation>Ukrainian</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="231"/>
+        <location filename="main_window.ui" line="303"/>
         <source>English</source>
         <translation>English</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="236"/>
+        <location filename="main_window.ui" line="312"/>
         <source>New</source>
         <translation>New</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="239"/>
+        <location filename="main_window.ui" line="315"/>
         <source>Ctrl+N</source>
         <translation>Ctrl+N</translation>
     </message>
@@ -390,6 +390,36 @@ Default message displayed in the status bar for the translator</extracomment>
         <source>Close canceled. Unsaved changes remain.</source>
         <extracomment>Status tip after user tries to close the application with unsaved files, and then cancels the action.</extracomment>
         <translation>Close cancelled. Unsaved changes remain.</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="33"/>
+        <source>Working directory selection canceled.</source>
+        <extracomment>Status tip after user cancels the working directory selection dialog.</extracomment>
+        <translation>Working directory selection cancelled.</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="36"/>
+        <source>File save canceled.</source>
+        <extracomment>Status tip after file save operation fails.</extracomment>
+        <translation>File save cancelled.</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="39"/>
+        <source>File saved successfully.</source>
+        <extracomment>Status tip after file save operation succeeds.</extracomment>
+        <translation>File saved successfully.</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="42"/>
+        <source>File close canceled.</source>
+        <extracomment>Status tip after file close operation is canceled.</extracomment>
+        <translation>File close cancelled.</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="45"/>
+        <source>No file selected.</source>
+        <extracomment>Status tip after user wants to do an action with file when no file is selected.</extracomment>
+        <translation>No file selected.</translation>
     </message>
 </context>
 </TS>

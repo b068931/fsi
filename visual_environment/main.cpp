@@ -1,5 +1,5 @@
 #ifndef NDEBUG
-#include <vld.h>
+//#include <vld.h>
 #endif
 
 #include <QtWidgets/QApplication>

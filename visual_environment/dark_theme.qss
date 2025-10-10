@@ -12,7 +12,7 @@ QMainWindow, QDialog, QWidget {
 QMenuBar {
     background-color: #32333d;
     color: #dedede;
-    border-bottom: 1px solid #3a3b45;
+    border-bottom: 2px solid #3a3b45;
     padding: 2px;
 }
 
@@ -20,7 +20,8 @@ QMenuBar::item {
     background-color: transparent;
     padding: 5px 10px;
     margin: 2px;
-    border-radius: 3px;
+    border: 1px solid transparent;
+    border-radius: 5px;
 }
 
 QMenuBar::item:selected {
@@ -42,6 +43,7 @@ QMenu {
 
 QMenu::item {
     padding: 5px 25px 5px 25px;
+    border: 1px solid transparent;
     border-radius: 3px;
     min-height: 24px;
 }
@@ -99,7 +101,7 @@ QToolButton:pressed {
 
 /* Text Editor / Plain Text Edit */
 QPlainTextEdit, QTextEdit {
-    background-color: #262730;
+    background-color: #32333d;
     color: #dedede;
     border: 1px solid #3a3b45;
     selection-background-color: #3d3e4a;
@@ -107,7 +109,7 @@ QPlainTextEdit, QTextEdit {
     padding: 5px;
 }
 
-QPlainTextEdit:focus, QTextEdit:focus {
+QPlainTextEdit:focus, QTextEdit:focus, QTreeView:focus {
     border: 1px solid #00d700; /* Green cursor/focus color */
 }
 
@@ -165,7 +167,6 @@ QScrollBar:vertical {
 QScrollBar::handle:vertical {
     background-color: #4a4b58;
     min-height: 20px;
-    border-radius: 7px;
     margin: 2px;
 }
 
@@ -187,7 +188,6 @@ QScrollBar:horizontal {
 QScrollBar::handle:horizontal {
     background-color: #4a4b58;
     min-width: 20px;
-    border-radius: 7px;
     margin: 2px;
 }
 
@@ -267,6 +267,7 @@ QStatusBar::item {
 
 QStatusBar QLabel {
     color: #b5b5b5;
+    font-size: 9pt;
 }
 
 /* Combo Box */
@@ -293,7 +294,7 @@ QComboBox::drop-down {
 }
 
 QComboBox::down-arrow {
-    image: url(:/icons/down-arrow.svg);
+    image: url(:/icons/branch_open_icon.svg);
     width: 12px;
     height: 12px;
 }
@@ -412,29 +413,6 @@ QSplitter::handle:hover {
     background-color: #4a4b58;
 }
 
-/* Dock Widget */
-QDockWidget {
-    color: #dedede;
-    titlebar-close-icon: url(:/icons/close.svg);
-    titlebar-normal-icon: url(:/icons/float.svg);
-}
-
-QDockWidget::title {
-    background-color: #32333d;
-    border: 1px solid #3a3b45;
-    padding: 5px;
-}
-
-QDockWidget::close-button, QDockWidget::float-button {
-    background-color: transparent;
-    border: none;
-    padding: 2px;
-}
-
-QDockWidget::close-button:hover, QDockWidget::float-button:hover {
-    background-color: #3d3e4a;
-}
-
 /* Tool Tip */
 QToolTip {
     background-color: #32333d;
@@ -442,18 +420,6 @@ QToolTip {
     border: 1px solid #3a3b45;
     padding: 5px;
     border-radius: 3px;
-}
-
-/* Headers */
-QHeaderView::section {
-    background-color: #32333d;
-    color: #b5b5b5;
-    border: 1px solid #3a3b45;
-    padding: 5px;
-}
-
-QHeaderView::section:hover {
-    background-color: #3d3e4a;
 }
 
 /* Slider */

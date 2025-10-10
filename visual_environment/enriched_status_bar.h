@@ -96,6 +96,9 @@ namespace CustomWidgets {
         std::unique_ptr<ITranslatableString> savedEnvironmentStateMessage;
         std::unique_ptr<ITranslatableString> savedTranslatorResultMessage;
 
+        static void setVisualHintForLabel(QLabel* label, ColorHint hint);
+        static void elideText(QLabel* label, const QString& text);
+
         void setupUIComponents();
         void setToolTips();
     };

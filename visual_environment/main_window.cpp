@@ -84,45 +84,11 @@ namespace Windows {
 
         this->editor = new CustomWidgets::TextEditor(centralWidget);
         centralLayout->addWidget(this->editor);
-
-        QString defaultWorkingDirectory = QDir::currentPath();
-        this->editor->openWorkingDirectory(defaultWorkingDirectory);
-        this->enrichedStatusBar->workingDirectory(
-            Components::Internationalization::QStringWrapper::wrap(
-                std::move(defaultWorkingDirectory)
-            )
-        );
     }
 
     void MainWindow::setupStatusBar() {
         this->enrichedStatusBar = new CustomWidgets::EnrichedStatusBar(this);
         this->setStatusBar(this->enrichedStatusBar);
-
-        //: Value for the status bar when no working directory is set.
-        this->enrichedStatusBar->workingDirectory(
-            Components::Internationalization::StaticTranslatableString::wrap(
-                g_Context,
-                g_Messages[MessageKeys::g_StatusBarDefaultWorkingDirectory]
-            )
-        );
-
-        //: Value for the status bar when execution environment has not been started once yet.
-        this->enrichedStatusBar->environmentState(
-            Components::Internationalization::StaticTranslatableString::wrap(
-                g_Context,
-                g_Messages[MessageKeys::g_StatusBarDefaultEnvironmentState]
-            ),
-            CustomWidgets::EnrichedStatusBar::ColorHint::neutral
-        );
-
-        //: Value for the status bar when translator has not been run once yet.
-        this->enrichedStatusBar->translatorResult(
-            Components::Internationalization::StaticTranslatableString::wrap(
-                g_Context,
-                g_Messages[MessageKeys::g_StatusBarDefaultTranslatorState]
-            ),
-            CustomWidgets::EnrichedStatusBar::ColorHint::neutral
-        );
     }
 }
 
