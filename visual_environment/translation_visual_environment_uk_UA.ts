@@ -137,7 +137,7 @@
         <location filename="text_editor_messages.h" line="63"/>
         <source>You have unsaved changes in &quot;%1&quot;. Do you want to save them before closing?</source>
         <extracomment>Text for the message box which pops up when the user tries to close a file tab for the file which has not been saved.</extracomment>
-        <translation>У файлі &quot;%1&quot; є незбереженні зміни. Зберегти їх перед закриттям вкладки?</translation>
+        <translation>У файлі &quot;%1&quot; є незбережені зміни. Зберегти їх перед закриттям вкладки?</translation>
     </message>
     <message>
         <location filename="text_editor_messages.h" line="66"/>
@@ -150,6 +150,96 @@
         <source>Check Again</source>
         <extracomment>Text for the additional button in &quot;File Removed&quot; dialog. Asks the user whether they want the app to check if file exists again.</extracomment>
         <translation>Первірити ще раз</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="72"/>
+        <source>Open</source>
+        <extracomment>Context menu action to open a file or expand a directory.</extracomment>
+        <translation>Відкрити</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="75"/>
+        <source>New File</source>
+        <extracomment>Context menu action to create a new file.</extracomment>
+        <translation>Новий файл</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="78"/>
+        <source>New Directory</source>
+        <extracomment>Context menu action to create a new directory.</extracomment>
+        <translation>Новий каталог</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="81"/>
+        <source>Remove</source>
+        <extracomment>Context menu action to remove a file or directory.</extracomment>
+        <translation>Видалити</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="84"/>
+        <source>Create New File</source>
+        <extracomment>Input dialog title for creating a new file.</extracomment>
+        <translation>Створення нового файлу</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="87"/>
+        <source>Enter file name:</source>
+        <extracomment>Input dialog label for creating a new file.</extracomment>
+        <translation>Введіть назву файлу:</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="90"/>
+        <source>Create New Directory</source>
+        <extracomment>Input dialog title for creating a new directory.</extracomment>
+        <translation>Створення нового каталогу</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="93"/>
+        <source>Enter directory name:</source>
+        <extracomment>Input dialog label for creating a new directory.</extracomment>
+        <translation>Введіть назву каталогу:</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="96"/>
+        <source>Confirm Removal</source>
+        <extracomment>Confirmation dialog title for removing a file or directory.</extracomment>
+        <translation>Підтвердження видалення</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="99"/>
+        <source>Are you sure you want to remove the file &quot;%1&quot;?</source>
+        <extracomment>Confirmation dialog text for removing a file.</extracomment>
+        <translation>Ви впевнені, що хочете видалити файл &quot;%1&quot;?</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="102"/>
+        <source>Are you sure you want to remove the directory &quot;%1&quot; and all its contents?</source>
+        <extracomment>Confirmation dialog text for removing a directory.</extracomment>
+        <translation>Ви впевнені, що хочете видалити каталог &quot;%1&quot; та весь його вміст?</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="105"/>
+        <source>Failed to create file &quot;%1&quot;.</source>
+        <extracomment>Error message when file creation fails.</extracomment>
+        <translation>Не вдалося створити файл &quot;%1&quot;.</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="108"/>
+        <source>Failed to create directory &quot;%1&quot;.</source>
+        <extracomment>Error message when directory creation fails.</extracomment>
+        <translation>Не вдалося створити каталог &quot;%1&quot;.</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="111"/>
+        <source>Failed to remove &quot;%1&quot;.</source>
+        <extracomment>Error message when file or directory removal fails.</extracomment>
+        <translation>Не вдалося видалити &quot;%1&quot;.</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="114"/>
+        <source>File System Error</source>
+        <extracomment>Error message title for file system operations.</extracomment>
+        <translation>Помилка файлової системи</translation>
     </message>
     <message>
         <source>Error</source>
@@ -191,6 +281,24 @@
     </message>
 </context>
 <context>
+    <name>FSIToolsForm</name>
+    <message>
+        <location filename="fsi_tools_window.ui" line="14"/>
+        <source>Form</source>
+        <translation>Форма</translation>
+    </message>
+    <message>
+        <location filename="fsi_tools_window.ui" line="21"/>
+        <source>Tab 1</source>
+        <translation>Вкладка 1</translation>
+    </message>
+    <message>
+        <location filename="fsi_tools_window.ui" line="26"/>
+        <source>Tab 2</source>
+        <translation>Вкладка 2</translation>
+    </message>
+</context>
+<context>
     <name>MainWindow</name>
     <message>
         <source>Working directory not set</source>
@@ -221,17 +329,17 @@ Value for the status bar when translator has not been run once yet.</extracommen
         <translation type="vanished">Відкрити новий файл або працювати з файлом у вибраній вкладці.</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="42"/>
+        <location filename="main_window.ui" line="52"/>
         <source>File</source>
         <translation>Файл</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="55"/>
+        <location filename="main_window.ui" line="65"/>
         <source>Working Folder</source>
         <translation>Робочий Каталог</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="62"/>
+        <location filename="main_window.ui" line="72"/>
         <source>Program</source>
         <translation>Програма</translation>
     </message>
@@ -240,12 +348,12 @@ Value for the status bar when translator has not been run once yet.</extracommen
         <translation type="vanished">Про FSI та цей редактор.</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="75"/>
+        <location filename="main_window.ui" line="85"/>
         <source>About</source>
         <translation>Про Програму</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="79"/>
+        <location filename="main_window.ui" line="89"/>
         <source>FSI Documentation</source>
         <translation>Документація FSI</translation>
     </message>
@@ -254,90 +362,90 @@ Value for the status bar when translator has not been run once yet.</extracommen
         <translation type="vanished">Змінити мову застосунку (без перезавантаження).</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="104"/>
+        <location filename="main_window.ui" line="114"/>
         <source>Languages</source>
         <translation>Доступні мови</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="132"/>
+        <location filename="main_window.ui" line="146"/>
         <source>Save</source>
         <translation>Зберегти</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="135"/>
+        <location filename="main_window.ui" line="149"/>
         <source>Ctrl+S</source>
         <translation>Ctrl+s</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="144"/>
+        <location filename="main_window.ui" line="158"/>
         <source>Save as...</source>
         <translation>Зберегти як...</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="147"/>
+        <location filename="main_window.ui" line="161"/>
         <source>Ctrl+Shift+S</source>
         <translation>Ctrl+Shift+S</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="156"/>
-        <location filename="main_window.ui" line="195"/>
+        <location filename="main_window.ui" line="170"/>
+        <location filename="main_window.ui" line="209"/>
         <source>Close</source>
         <translation>Закрити</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="159"/>
+        <location filename="main_window.ui" line="173"/>
         <source>Ctrl+Q</source>
         <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="168"/>
-        <location filename="main_window.ui" line="180"/>
+        <location filename="main_window.ui" line="182"/>
+        <location filename="main_window.ui" line="194"/>
         <source>Open...</source>
         <translation>Відкрити...</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="171"/>
+        <location filename="main_window.ui" line="185"/>
         <source>Ctrl+O</source>
         <translation>Ctrl+O</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="186"/>
+        <location filename="main_window.ui" line="200"/>
         <source>Ctrl+W</source>
         <translation>Ctrl+W</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="198"/>
+        <location filename="main_window.ui" line="212"/>
         <source>Ctrl+C</source>
         <translation>Ctrl+C</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="210"/>
+        <location filename="main_window.ui" line="224"/>
         <source>Ctrl+R</source>
         <translation>Ctrl+R</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="222"/>
+        <location filename="main_window.ui" line="236"/>
         <source>Ctrl+E</source>
         <translation>Ctrl+E</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="294"/>
+        <location filename="main_window.ui" line="308"/>
         <source>Ukrainian</source>
         <translation>Українська</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="303"/>
+        <location filename="main_window.ui" line="317"/>
         <source>English</source>
         <translation>Англійська</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="312"/>
+        <location filename="main_window.ui" line="326"/>
         <source>New</source>
         <translatorcomment>Новий</translatorcomment>
         <translation>Новий</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="315"/>
+        <location filename="main_window.ui" line="329"/>
         <source>Ctrl+N</source>
         <translation>Ctrl+N</translation>
     </message>
@@ -346,47 +454,47 @@ Value for the status bar when translator has not been run once yet.</extracommen
         <translation type="vanished">Закрити</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="207"/>
+        <location filename="main_window.ui" line="221"/>
         <source>Translate and Run</source>
         <translation>Транслювати і Запустити</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="219"/>
+        <location filename="main_window.ui" line="233"/>
         <source>Runtime Environment</source>
         <translation>Середовище Виконання</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="231"/>
+        <location filename="main_window.ui" line="245"/>
         <source>Visual Environment Documentation</source>
         <translation>Документація До Середовища Виконання</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="240"/>
+        <location filename="main_window.ui" line="254"/>
         <source>Short Overview...</source>
         <translation>Короткий Огляд...</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="249"/>
+        <location filename="main_window.ui" line="263"/>
         <source>Installation</source>
         <translation>Встановлення</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="258"/>
+        <location filename="main_window.ui" line="272"/>
         <source>Release Layout</source>
         <translation>Розміщення Файлів</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="267"/>
+        <location filename="main_window.ui" line="281"/>
         <source>Using Translator</source>
         <translation>Використання Транслятора</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="276"/>
+        <location filename="main_window.ui" line="290"/>
         <source>Using Execution Engine</source>
         <translation>Використання Середовища Виконання</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="285"/>
+        <location filename="main_window.ui" line="299"/>
         <source>Engine Multithreading</source>
         <translation>Паралельність Середовища Виконання</translation>
     </message>
@@ -494,6 +602,12 @@ Default message displayed in the status bar for the translator</extracomment>
         <source>No file selected.</source>
         <extracomment>Status tip after user wants to do an action with file when no file is selected.</extracomment>
         <translation>Жодного файлу не обрано.</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="48"/>
+        <source>Ready to work.</source>
+        <extracomment>Status tip just after starting the application.</extracomment>
+        <translation>Готово до роботи.</translation>
     </message>
 </context>
 </TS>

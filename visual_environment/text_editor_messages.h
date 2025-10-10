@@ -67,6 +67,51 @@ constexpr const char* g_Messages[] = {
 
     //: Text for the additional button in "File Removed" dialog. Asks the user whether they want the app to check if file exists again.
     QT_TRANSLATE_NOOP("CustomWidgets::TextEditor", "Check Again"),
+
+    //: Context menu action to open a file or expand a directory.
+    QT_TRANSLATE_NOOP("CustomWidgets::TextEditor", "Open"),
+
+    //: Context menu action to create a new file.
+    QT_TRANSLATE_NOOP("CustomWidgets::TextEditor", "New File"),
+
+    //: Context menu action to create a new directory.
+    QT_TRANSLATE_NOOP("CustomWidgets::TextEditor", "New Directory"),
+
+    //: Context menu action to remove a file or directory.
+    QT_TRANSLATE_NOOP("CustomWidgets::TextEditor", "Remove"),
+
+    //: Input dialog title for creating a new file.
+    QT_TRANSLATE_NOOP("CustomWidgets::TextEditor", "Create New File"),
+
+    //: Input dialog label for creating a new file.
+    QT_TRANSLATE_NOOP("CustomWidgets::TextEditor", "Enter file name:"),
+
+    //: Input dialog title for creating a new directory.
+    QT_TRANSLATE_NOOP("CustomWidgets::TextEditor", "Create New Directory"),
+
+    //: Input dialog label for creating a new directory.
+    QT_TRANSLATE_NOOP("CustomWidgets::TextEditor", "Enter directory name:"),
+
+    //: Confirmation dialog title for removing a file or directory.
+    QT_TRANSLATE_NOOP("CustomWidgets::TextEditor", "Confirm Removal"),
+
+    //: Confirmation dialog text for removing a file.
+    QT_TRANSLATE_NOOP("CustomWidgets::TextEditor", "Are you sure you want to remove the file \"%1\"?"),
+
+    //: Confirmation dialog text for removing a directory.
+    QT_TRANSLATE_NOOP("CustomWidgets::TextEditor", "Are you sure you want to remove the directory \"%1\" and all its contents?"),
+
+    //: Error message when file creation fails.
+    QT_TRANSLATE_NOOP("CustomWidgets::TextEditor", "Failed to create file \"%1\"."),
+
+    //: Error message when directory creation fails.
+    QT_TRANSLATE_NOOP("CustomWidgets::TextEditor", "Failed to create directory \"%1\"."),
+
+    //: Error message when file or directory removal fails.
+    QT_TRANSLATE_NOOP("CustomWidgets::TextEditor", "Failed to remove \"%1\"."),
+
+    //: Error message title for file system operations.
+    QT_TRANSLATE_NOOP("CustomWidgets::TextEditor", "File System Error"),
 };
 
 enum MessageKeys {
@@ -91,6 +136,21 @@ enum MessageKeys {
     g_MessageBoxFileCloseConfirmationMessage = 18,
     g_TemporaryFileName = 19,
     g_CheckAgainFileRemovedButton = 20,
+    g_ContextMenuOpen = 21,
+    g_ContextMenuNewFile = 22,
+    g_ContextMenuNewDirectory = 23,
+    g_ContextMenuRemove = 24,
+    g_InputDialogNewFileTitle = 25,
+    g_InputDialogNewFileLabel = 26,
+    g_InputDialogNewDirectoryTitle = 27,
+    g_InputDialogNewDirectoryLabel = 28,
+    g_ConfirmRemovalTitle = 29,
+    g_ConfirmRemovalFileMessage = 30,
+    g_ConfirmRemovalDirectoryMessage = 31,
+    g_ErrorFileCreationMessage = 32,
+    g_ErrorDirectoryCreationMessage = 33,
+    g_ErrorRemovalMessage = 34,
+    g_ErrorFileSystemTitle = 35,
 };
 
 #endif

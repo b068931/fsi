@@ -34,6 +34,7 @@ namespace CustomWidgets {
         : QWidget{ parent }, fileWatcher{ new QFileSystemWatcher(this) }
     {
         this->setupEditorComponents();
+        this->setupWorkingDirectoryContextMenu();
         this->connectSignalsManually();
     }
 
@@ -48,6 +49,9 @@ namespace CustomWidgets {
         // at application startup.
         connect(this->workingDirectory, &QTreeView::doubleClicked,
             this, &TextEditor::onWorkingDirectoryItemDoubleClicked);
+
+        connect(this->workingDirectory, &QTreeView::customContextMenuRequested,
+            this, &TextEditor::onWorkingDirectoryContextMenu);
 
         connect(this->fileTabs, &QTabWidget::tabCloseRequested,
             this, &TextEditor::onTabCloseRequested);
@@ -91,6 +95,20 @@ namespace CustomWidgets {
         this->workingDirectory->setStatusTip(
             tr(g_Messages[MessageKeys::g_TooltipWorkingDirectoryView])
         );
+
+    }
+
+    void TextEditor::setupWorkingDirectoryContextMenu() {
+        Q_ASSERT(this->workingDirectory != nullptr && "The working directory has not been set up.");
+
+        // Setup the context menu for the working directory
+        this->workingDirectoryContextMenu = new QMenu(this);
+        this->openAction = this->workingDirectoryContextMenu->addAction(tr(g_Messages[MessageKeys::g_ContextMenuOpen]));
+        this->workingDirectoryContextMenu->addSeparator();
+        this->newFileAction = this->workingDirectoryContextMenu->addAction(tr(g_Messages[MessageKeys::g_ContextMenuNewFile]));
+        this->newDirectoryAction = this->workingDirectoryContextMenu->addAction(tr(g_Messages[MessageKeys::g_ContextMenuNewDirectory]));
+        this->workingDirectoryContextMenu->addSeparator();
+        this->removeAction = this->workingDirectoryContextMenu->addAction(tr(g_Messages[MessageKeys::g_ContextMenuRemove]));
     }
 
     void TextEditor::setDefaultSplitterRatio() {

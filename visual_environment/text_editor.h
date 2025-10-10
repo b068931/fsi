@@ -10,6 +10,8 @@
 #include <QtGlobal>
 #include <QFileSystemWatcher>
 #include <QPlainTextEdit>
+#include <QMenu>
+#include <QAction>
 
 namespace CustomWidgets {
     /// <summary>
@@ -100,6 +102,7 @@ namespace CustomWidgets {
         void onFileChangedOutside(const QString& path);
         void onTabCloseRequested(int index);
         void onTabMoved(int from, int to);
+        void onWorkingDirectoryContextMenu(const QPoint& position);
 
     public slots:
         void onRetranslateUI();
@@ -130,6 +133,13 @@ namespace CustomWidgets {
         QTreeView* workingDirectory{};
         QFileSystemWatcher* fileWatcher{};
 
+        // Context menu and actions
+        QMenu* workingDirectoryContextMenu{};
+        QAction* openAction{};
+        QAction* newFileAction{};
+        QAction* newDirectoryAction{};
+        QAction* removeAction{};
+
         QPlainTextEdit* getEditorAtIndex(int index);
         bool closeFileAtIndex(int index);
         bool saveFileAtIndex(int index);
@@ -137,6 +147,7 @@ namespace CustomWidgets {
 
         void connectSignalsManually();
         void setupEditorComponents();
+        void setupWorkingDirectoryContextMenu();
     };
 }
 
