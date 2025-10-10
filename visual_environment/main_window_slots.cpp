@@ -29,17 +29,50 @@ namespace Windows {
 
     void MainWindow::closeEvent(QCloseEvent* event) {
         Q_ASSERT(this->editor && "The text editor has not been set up.");
+        Q_ASSERT(this->enrichedStatusBar && "The status bar has not been set up.");
+
         if (this->editor->closeAllFiles()) {
             QMainWindow::closeEvent(event);
         }
         else {
             event->ignore();
             this->enrichedStatusBar->toolTip(
-                Components::Internationalization::QStringWrapper::wrap(
-                    tr(g_Messages[g_StatusTipCloseCanceled])
+                Components::Internationalization::StaticTranslatableString::wrap(
+                    g_Context,
+                    g_Messages[g_StatusTipCloseCanceled]
                 )
             );
         }
+    }
+
+    void MainWindow::showEvent(QShowEvent* event) {
+        if (!event->spontaneous()) {
+            QString defaultWorkingDirectory = QDir::currentPath();
+            this->editor->openWorkingDirectory(defaultWorkingDirectory);
+            this->enrichedStatusBar->workingDirectory(
+                Components::Internationalization::QStringWrapper::wrap(
+                    std::move(defaultWorkingDirectory)
+                )
+            );
+
+            this->enrichedStatusBar->environmentState(
+                Components::Internationalization::StaticTranslatableString::wrap(
+                    g_Context,
+                    g_Messages[MessageKeys::g_StatusBarDefaultEnvironmentState]
+                ),
+                CustomWidgets::EnrichedStatusBar::ColorHint::neutral
+            );
+
+            this->enrichedStatusBar->translatorResult(
+                Components::Internationalization::StaticTranslatableString::wrap(
+                    g_Context,
+                    g_Messages[MessageKeys::g_StatusBarDefaultTranslatorState]
+                ),
+                CustomWidgets::EnrichedStatusBar::ColorHint::neutral
+            );
+        }
+
+        QMainWindow::showEvent(event);
     }
 
     void MainWindow::onMenuFileNew() {
@@ -65,24 +98,100 @@ namespace Windows {
 
     void MainWindow::onMenuFileSave() {
         Q_ASSERT(this->editor && "The text editor has not been set up.");
-        this->editor->saveCurrentFile();
+        Q_ASSERT(this->enrichedStatusBar && "The status bar has not been set up.");
+        if (!this->editor->hasSelectedFile()) {
+            this->enrichedStatusBar->toolTip(
+                Components::Internationalization::StaticTranslatableString::wrap(
+                    g_Context,
+                    g_Messages[g_StatusTipNoFileSelected]
+                )
+            );
+
+            return;
+        }
+
+        if (this->editor->saveCurrentFile()) {
+            this->enrichedStatusBar->toolTip(
+                Components::Internationalization::StaticTranslatableString::wrap(
+                    g_Context,
+                    g_Messages[g_StatusTipFileSaveSucceeded]
+                )
+            );
+        }
+        else {
+            this->enrichedStatusBar->toolTip(
+                Components::Internationalization::StaticTranslatableString::wrap(
+                    g_Context,
+                    g_Messages[g_StatusTipFileSaveCanceled]
+                )
+            );
+        }
     }
 
     void MainWindow::onMenuFileSaveAs() {
         Q_ASSERT(this->editor && "The text editor has not been set up.");
-        this->editor->saveCurrentFileAs();
+        Q_ASSERT(this->enrichedStatusBar && "The status bar has not been set up.");
+        if (!this->editor->hasSelectedFile()) {
+            this->enrichedStatusBar->toolTip(
+                Components::Internationalization::StaticTranslatableString::wrap(
+                    g_Context,
+                    g_Messages[g_StatusTipNoFileSelected]
+                )
+            );
+
+            return;
+        }
+
+        if (this->editor->saveCurrentFileAs()) {
+            this->enrichedStatusBar->toolTip(
+                Components::Internationalization::StaticTranslatableString::wrap(
+                    g_Context,
+                    g_Messages[g_StatusTipFileSaveSucceeded]
+                )
+            );
+        }
+        else {
+            this->enrichedStatusBar->toolTip(
+                Components::Internationalization::StaticTranslatableString::wrap(
+                    g_Context,
+                    g_Messages[g_StatusTipFileSaveCanceled]
+                )
+            );
+        }
     }
 
     void MainWindow::onMenuFileClose() {
         Q_ASSERT(this->editor && "The text editor has not been set up.");
-        this->editor->closeCurrentFile();
+        Q_ASSERT(this->enrichedStatusBar && "The status bar has not been set up.");
+        if (!this->editor->hasSelectedFile()) {
+            this->enrichedStatusBar->toolTip(
+                Components::Internationalization::StaticTranslatableString::wrap(
+                    g_Context,
+                    g_Messages[g_StatusTipNoFileSelected]
+                )
+            );
+
+            return;
+        }
+
+        if (!this->editor->closeCurrentFile()) {
+            this->enrichedStatusBar->toolTip(
+                Components::Internationalization::StaticTranslatableString::wrap(
+                    g_Context,
+                    g_Messages[g_StatusTipFileCloseCanceled]
+                )
+            );
+        }
     }
 
     void MainWindow::onRetranslateUI() {
+        Q_ASSERT(this->enrichedStatusBar && "The status bar has not been set up.");
+
         this->ui.retranslateUi(this);
         this->enrichedStatusBar->toolTip(
-            Components::Internationalization::QStringWrapper::wrap(
-                tr(g_Messages[g_StatusTipLanguageChanged])
+            Components::Internationalization::StaticTranslatableString::wrap(
+                g_Context,
+                g_Messages[g_StatusTipLanguageChanged]
             )
         );
     }
@@ -112,12 +221,22 @@ namespace Windows {
             QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
         );
 
-        this->editor->openWorkingDirectory(newWorkingDirectory);
-        this->enrichedStatusBar->workingDirectory(
-            Components::Internationalization::QStringWrapper::wrap(
-                std::move(newWorkingDirectory)
-            )
-        );
+        if (!newWorkingDirectory.isEmpty()) {
+            this->editor->openWorkingDirectory(newWorkingDirectory);
+            this->enrichedStatusBar->workingDirectory(
+                Components::Internationalization::QStringWrapper::wrap(
+                    std::move(newWorkingDirectory)
+                )
+            );
+        }
+        else {
+           this->enrichedStatusBar->toolTip(
+                Components::Internationalization::StaticTranslatableString::wrap(
+                    g_Context,
+                    g_Messages[g_StatusTipWorkingDirectorySelectionCanceled]
+                )
+           );
+        }
     }
 
     void MainWindow::onMenuWorkingDirectoryClose() {

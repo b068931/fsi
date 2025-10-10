@@ -131,6 +131,10 @@ namespace CustomWidgets {
         return this->openFiles.isEmpty();
     }
 
+    bool TextEditor::hasSelectedFile() const noexcept {
+        return this->fileTabs->currentIndex() != -1;
+    }
+
     void TextEditor::openNewFile(const QString& filePath) {
         Q_ASSERT(!filePath.isEmpty() && "The provided file path is empty.");
         Q_ASSERT(this->fileTabs != nullptr && "The file tabs have not been set up.");
@@ -158,7 +162,8 @@ namespace CustomWidgets {
                 throw tr(g_Messages[MessageKeys::g_MessageBoxFileOpenErrorMessage]).arg(filePath);
             }
 
-            QPlainTextEdit* fileEditor = new QPlainTextEdit;
+            QPlainTextEdit* fileEditor = new QPlainTextEdit(this);
+            fileEditor->setLineWrapMode(QPlainTextEdit::NoWrap);
             fileEditor->setPlainText(file.readAll());
             fileEditor->document()->setModified(false);
 
@@ -176,7 +181,6 @@ namespace CustomWidgets {
             const int newTabIndex = this->fileTabs->addTab(fileEditor, fileInfo.fileName());
             this->fileTabs->setCurrentIndex(newTabIndex);
             this->fileTabs->setTabToolTip(newTabIndex, absoluteFilePath);
-            this->fileTabs->widget(newTabIndex)->setStatusTip(absoluteFilePath);
         }
         catch (const QString& message) {
             // This is not a critical error, so we can just show a message box.
@@ -193,7 +197,8 @@ namespace CustomWidgets {
     }
 
     void TextEditor::createTemporaryFile() {
-        QPlainTextEdit* fileEditor = new QPlainTextEdit;
+        QPlainTextEdit* fileEditor = new QPlainTextEdit(this);
+        fileEditor->setLineWrapMode(QPlainTextEdit::NoWrap);
         fileEditor->setPlainText("");
         fileEditor->document()->setModified(false);
 
@@ -207,21 +212,20 @@ namespace CustomWidgets {
         const int newTabIndex = this->fileTabs->addTab(fileEditor, tr(g_Messages[MessageKeys::g_TemporaryFileName]));
         this->fileTabs->setCurrentIndex(newTabIndex);
         this->fileTabs->setTabToolTip(newTabIndex, tr(g_Messages[MessageKeys::g_TemporaryFileName]));
-        this->fileTabs->widget(newTabIndex)->setStatusTip(tr(g_Messages[MessageKeys::g_TemporaryFileName]));
     }
 
-    void TextEditor::saveCurrentFile() {
+    bool TextEditor::saveCurrentFile() {
         if (this->fileTabs->currentIndex() == -1) 
-            return;
+            return false;
 
-        this->saveFileAtIndex(
+        return this->saveFileAtIndex(
             this->fileTabs->currentIndex()
         );
     }
 
-    void TextEditor::saveCurrentFileAs() {
+    bool TextEditor::saveCurrentFileAs() {
         if (this->fileTabs->currentIndex() == -1) 
-            return;
+            return false;
 
         int currentIndex = this->fileTabs->currentIndex();
         OpenedFile& openFile = this->openFiles[currentIndex];
@@ -233,7 +237,7 @@ namespace CustomWidgets {
         );
 
         openFile.isTemporary = true;
-        this->saveFileAtIndex(currentIndex);
+        bool result = this->saveFileAtIndex(currentIndex);
 
         // The file is still temporary, so the user must have cancelled the save operation.
         // Restore the previous state.
@@ -241,18 +245,20 @@ namespace CustomWidgets {
             openFile.isTemporary = savedTemporaryStatus;
             openFile.filePath = std::move(savedFilePath);
         }
+
+        return result;
     }
 
-    void TextEditor::closeCurrentFile() {
+    bool TextEditor::closeCurrentFile() {
         if (this->fileTabs->currentIndex() == -1) 
-            return;
+            return false;
 
-        this->closeFileAtIndex(
+        return this->closeFileAtIndex(
             this->fileTabs->currentIndex()
         );
     }
 
-    void TextEditor::closeFileAtIndex(int index) {
+    bool TextEditor::closeFileAtIndex(int index) {
         Q_ASSERT(this->fileTabs != nullptr && "The file tabs have not been set up.");
         Q_ASSERT(this->fileTabs->count() == this->openFiles.count() && "The file tabs and open files count do not match.");
         Q_ASSERT(index < this->fileTabs->count() && index >= 0 && "The specified index is out of range.");
@@ -271,6 +277,7 @@ namespace CustomWidgets {
             );
 
             if (result == QMessageBox::Yes) {
+                // Discard the return value, as we can't do anything if the save gets cancelled.
                 this->saveFileAtIndex(index);
             }
             else if (result == QMessageBox::No) {
@@ -282,11 +289,13 @@ namespace CustomWidgets {
                         qWarning() << "Failed to remove file from the file watcher at path:" << openFile.filePath;
                     }
                 }
+
+                return true;
             }
             else {
                 // The user closed the message box without making a choice.
                 // Do nothing and return.
-                return;
+                return false;
             }
         }
 
@@ -299,10 +308,14 @@ namespace CustomWidgets {
                     qWarning() << "Failed to remove file from the file watcher at path:" << openFile.filePath;
                 }
             }
+
+            return true;
         }
+
+        return false;
     }
 
-    void TextEditor::saveFileAtIndex(int index) {
+    bool TextEditor::saveFileAtIndex(int index) {
         Q_ASSERT(this->fileTabs && "The file tabs have not been set up.");
         Q_ASSERT(this->fileTabs->count() == this->openFiles.count() && "The file tabs and open files count do not match.");
         Q_ASSERT(index < this->fileTabs->count() && index >= 0 && "The specified index is out of range.");
@@ -326,9 +339,12 @@ namespace CustomWidgets {
                             openFile.getNormalizedName()
                         )
                     );
+
+                    return false;
                 }
 
                 oldFile.close();
+                return true;
             }
             else {
                 fileEditor->document()->setModified(true);
@@ -341,6 +357,8 @@ namespace CustomWidgets {
                         openFile.getNormalizedName()
                     )
                 );
+
+                return false;
             }
         }
         else if (openFile.isTemporary) {
@@ -366,7 +384,6 @@ namespace CustomWidgets {
 
                     this->fileTabs->setTabText(index, fileInfo.fileName());
                     this->fileTabs->setTabToolTip(index, fileInfo.absoluteFilePath());
-                    this->fileTabs->widget(index)->setStatusTip(fileInfo.absoluteFilePath());
 
                     QByteArray buffer = fileEditor->toPlainText().toUtf8();
                     qint64 bytesWritten = newFile.write(buffer);
@@ -381,6 +398,8 @@ namespace CustomWidgets {
                                 fileInfo.absoluteFilePath()
                             )
                         );
+
+                        return false;
                     }
                     else {
                         // Don't watch for file changes if the write fails. Assume that the file is inaccessible to the user.
@@ -390,6 +409,7 @@ namespace CustomWidgets {
                     }
 
                     newFile.close();
+                    return true;
                 }
                 else {
                     QMessageBox::warning(
@@ -399,9 +419,13 @@ namespace CustomWidgets {
                             openFile.getNormalizedName()
                         )
                     );
+
+                    return false;
                 }
             }
         }
+
+        return false;
     }
 
     QPlainTextEdit* TextEditor::getEditorAtIndex(int index) {

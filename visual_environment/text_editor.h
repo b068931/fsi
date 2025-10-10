@@ -60,17 +60,17 @@ namespace CustomWidgets {
         /// <summary>
         /// Saves the file which is currently selected in the tab widget.
         /// </summary>
-        void saveCurrentFile();
+        bool saveCurrentFile();
 
         /// <summary>
         /// A convenience function which saves the currently opened file under a new name.
         /// </summary>
-        void saveCurrentFileAs();
+        bool saveCurrentFileAs();
 
         /// <summary>
         /// Closes the file which is currently selected in the tab widget.
         /// </summary>
-        void closeCurrentFile();
+        bool closeCurrentFile();
 
         /// <summary>
         /// Sets the splitter ratio to its default value.
@@ -85,6 +85,12 @@ namespace CustomWidgets {
         /// </summary>
         /// <returns>True if all files were closed successfully, false if the operation was cancelled.</returns>
         bool closeAllFiles();
+
+        /// <summary>
+        /// Checks if any file has been selected.
+        /// </summary>
+        /// <returns>true if a file has been selected; otherwise, false.</returns>
+        bool hasSelectedFile() const noexcept;
 
     protected:
         virtual void showEvent(QShowEvent* event) override;
@@ -124,9 +130,9 @@ namespace CustomWidgets {
         QTreeView* workingDirectory{};
         QFileSystemWatcher* fileWatcher{};
 
-        void closeFileAtIndex(int index);
-        void saveFileAtIndex(int index);
         QPlainTextEdit* getEditorAtIndex(int index);
+        bool closeFileAtIndex(int index);
+        bool saveFileAtIndex(int index);
         void onFileChangedOutsideRecursive(const QString& path, int depth);
 
         void connectSignalsManually();

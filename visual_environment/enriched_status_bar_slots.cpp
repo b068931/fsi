@@ -4,25 +4,29 @@ namespace CustomWidgets {
     void EnrichedStatusBar::onRetranslateUI() {
         this->setToolTips();
 
-        this->statusToolTipLabel->setText(
+        elideText(
+            this->statusToolTipLabel,
             this->savedToolTipMessage
                 ? this->savedToolTipMessage->freeze()
                 : QString{}
         );
 
-        this->workingDirectoryLabel->setText(
+        elideText(
+            this->workingDirectoryLabel,
             this->savedWorkingDirectoryMessage
                 ? this->savedWorkingDirectoryMessage->freeze()
                 : QString{}
         );
 
-        this->environmentStateLabel->setText(
+        elideText(
+            this->environmentStateLabel,
             this->savedEnvironmentStateMessage
                 ? this->savedEnvironmentStateMessage->freeze()
                 : QString{}
         );
 
-        this->translatorResultLabel->setText(
+        elideText(
+            this->translatorResultLabel,
             this->savedTranslatorResultMessage
                 ? this->savedTranslatorResultMessage->freeze()
                 : QString{}

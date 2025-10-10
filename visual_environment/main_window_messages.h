@@ -27,7 +27,23 @@ constexpr const char* g_Messages[] = {
     QT_TRANSLATE_NOOP("Windows::MainWindow", "Changed application language. A few displayed strings may linger."),
 
     //: Status tip after user tries to close the application with unsaved files, and then cancels the action.
-    QT_TRANSLATE_NOOP("Windows::MainWindow", "Close canceled. Unsaved changes remain.")
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "Close canceled. Unsaved changes remain."),
+
+    //: Status tip after user cancels the working directory selection dialog.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "Working directory selection canceled."),
+
+    //: Status tip after file save operation fails.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "File save canceled."),
+
+    //: Status tip after file save operation succeeds.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "File saved successfully."),
+
+    //: Status tip after file close operation is canceled.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "File close canceled."),
+
+    //: Status tip after user wants to do an action with file when no file is selected.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "No file selected."),
+
 };
 
 enum MessageKeys {
@@ -38,7 +54,12 @@ enum MessageKeys {
     g_DialogTitleOpenFile = 4,
     g_DialogFilterSourceFiles = 5,
     g_StatusTipLanguageChanged = 6,
-    g_StatusTipCloseCanceled = 7
+    g_StatusTipCloseCanceled = 7,
+    g_StatusTipWorkingDirectorySelectionCanceled = 8,
+    g_StatusTipFileSaveCanceled = 9,
+    g_StatusTipFileSaveSucceeded = 10,
+    g_StatusTipFileCloseCanceled = 11,
+    g_StatusTipNoFileSelected = 12
 };
 
 #endif

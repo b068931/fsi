@@ -63,9 +63,15 @@
     <Filter Include="QSS Files">
       <UniqueIdentifier>{42210e96-528d-4d30-9dee-b73b399cfa3d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Windows\FSI Tools Window">
+      <UniqueIdentifier>{f26cdb5a-46c1-411a-b506-84714bf532ee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="main_window.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="fsi_tools_window.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
@@ -118,6 +124,9 @@
     </QtMoc>
     <QtMoc Include="text_editor.h">
       <Filter>Header Files\Custom Widgets\Text Editor</Filter>
+    </QtMoc>
+    <QtMoc Include="fsi_tools_window.h">
+      <Filter>Header Files\Windows\FSI Tools Window</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

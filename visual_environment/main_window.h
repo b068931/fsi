@@ -1,9 +1,11 @@
 #ifndef QT_VISUAL_ENVIRONMENT_MAIN_WINDOW_H
 #define QT_VISUAL_ENVIRONMENT_MAIN_WINDOW_H
 
-#include <QEvent>
-#include <QtGlobal>
 #include <QtWidgets/QMainWindow>
+#include <QEvent>
+#include <QCloseEvent>
+#include <QShowEvent>
+#include <QtGlobal>
 #include <QString>
 #include <QScopedPointerDeleteLater>
 #include <QScopedPointer>
@@ -53,6 +55,7 @@ namespace Windows {
     protected:
         virtual bool event(QEvent* event) override;
         virtual void closeEvent(QCloseEvent* event) override;
+        virtual void showEvent(QShowEvent* event) override;
 
     private:
         Ui::MainWindowClass ui{};
