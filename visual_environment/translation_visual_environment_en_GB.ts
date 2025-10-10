@@ -43,6 +43,12 @@
         <translation>Error: Opening New File</translation>
     </message>
     <message>
+        <location filename="text_editor_messages.h" line="15"/>
+        <source>Couldn&apos;t open file &quot;%1&quot; for reading.</source>
+        <extracomment>Text for the message box which pops up when text editor can&apos;t open a file.</extracomment>
+        <translation>Couldn&apos;t open file &quot;%1&quot; for reading.</translation>
+    </message>
+    <message>
         <location filename="text_editor_messages.h" line="18"/>
         <source>File Changed</source>
         <extracomment>Title for the message box which pops up when a file has been modified outside the text editor.</extracomment>
@@ -152,15 +158,112 @@
         <translation>Check Again</translation>
     </message>
     <message>
-        <source>Error</source>
-        <extracomment>Title for the message box which pops up when text editor can&apos;t open a file.</extracomment>
-        <translation type="vanished">Error</translation>
+        <location filename="text_editor_messages.h" line="72"/>
+        <source>Open</source>
+        <extracomment>Context menu action to open a file or expand a directory.</extracomment>
+        <translation>Open</translation>
     </message>
     <message>
-        <location filename="text_editor_messages.h" line="15"/>
-        <source>Couldn&apos;t open file &quot;%1&quot; for reading.</source>
-        <extracomment>Text for the message box which pops up when text editor can&apos;t open a file.</extracomment>
-        <translation>Couldn&apos;t open file &quot;%1&quot; for reading.</translation>
+        <location filename="text_editor_messages.h" line="75"/>
+        <source>New File</source>
+        <extracomment>Context menu action to create a new file.</extracomment>
+        <translation>New File</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="78"/>
+        <source>New Directory</source>
+        <extracomment>Context menu action to create a new directory.</extracomment>
+        <translation>New Directory</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="81"/>
+        <source>Remove</source>
+        <extracomment>Context menu action to remove a file or directory.</extracomment>
+        <translation>Remove</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="84"/>
+        <source>Create New File</source>
+        <extracomment>Input dialog title for creating a new file.</extracomment>
+        <translation>Create New File</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="87"/>
+        <source>Enter file name:</source>
+        <extracomment>Input dialog label for creating a new file.</extracomment>
+        <translation>Enter file name:</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="90"/>
+        <source>Create New Directory</source>
+        <extracomment>Input dialog title for creating a new directory.</extracomment>
+        <translation>Create New Directory</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="93"/>
+        <source>Enter directory name:</source>
+        <extracomment>Input dialog label for creating a new directory.</extracomment>
+        <translation>Enter directory name:</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="96"/>
+        <source>Confirm Removal</source>
+        <extracomment>Confirmation dialog title for removing a file or directory.</extracomment>
+        <translation>Confirm Removal</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="99"/>
+        <source>Are you sure you want to remove the file &quot;%1&quot;?</source>
+        <extracomment>Confirmation dialog text for removing a file.</extracomment>
+        <translation>Are you sure you want to remove the file &quot;%1&quot;?</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="102"/>
+        <source>Are you sure you want to remove the directory &quot;%1&quot; and all its contents?</source>
+        <extracomment>Confirmation dialog text for removing a directory.</extracomment>
+        <translation>Are you sure you want to remove the directory &quot;%1&quot; and all its contents?</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="105"/>
+        <source>Failed to create file &quot;%1&quot;.</source>
+        <extracomment>Error message when file creation fails.</extracomment>
+        <translation>Failed to create file &quot;%1&quot;.</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="108"/>
+        <source>Failed to create directory &quot;%1&quot;.</source>
+        <extracomment>Error message when directory creation fails.</extracomment>
+        <translation>Failed to create directory &quot;%1&quot;.</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="111"/>
+        <source>Failed to remove &quot;%1&quot;.</source>
+        <extracomment>Error message when file or directory removal fails.</extracomment>
+        <translation>Failed to remove &quot;%1&quot;.</translation>
+    </message>
+    <message>
+        <location filename="text_editor_messages.h" line="114"/>
+        <source>File System Error</source>
+        <extracomment>Error message title for file system operations.</extracomment>
+        <translation>File System Error</translation>
+    </message>
+</context>
+<context>
+    <name>FSIToolsForm</name>
+    <message>
+        <location filename="fsi_tools_window.ui" line="14"/>
+        <source>Form</source>
+        <translation>Form</translation>
+    </message>
+    <message>
+        <location filename="fsi_tools_window.ui" line="21"/>
+        <source>Tab 1</source>
+        <translation>Tab 1</translation>
+    </message>
+    <message>
+        <location filename="fsi_tools_window.ui" line="26"/>
+        <source>Tab 2</source>
+        <translation>Tab 2</translation>
     </message>
 </context>
 <context>
@@ -179,17 +282,17 @@
         <translation type="vanished">Open a new file or work with the currently selected tab.</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="42"/>
+        <location filename="main_window.ui" line="52"/>
         <source>File</source>
         <translation>File</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="55"/>
+        <location filename="main_window.ui" line="65"/>
         <source>Working Folder</source>
         <translation>Working Folder</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="62"/>
+        <location filename="main_window.ui" line="72"/>
         <source>Program</source>
         <translation>Program</translation>
     </message>
@@ -198,12 +301,12 @@
         <translation type="vanished">About FSI and this editor.</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="75"/>
+        <location filename="main_window.ui" line="85"/>
         <source>About</source>
         <translation>About</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="79"/>
+        <location filename="main_window.ui" line="89"/>
         <source>FSI Documentation</source>
         <translation>FSI Documentation</translation>
     </message>
@@ -212,134 +315,134 @@
         <translation type="vanished">Dynamically change the language of the application.</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="104"/>
+        <location filename="main_window.ui" line="114"/>
         <source>Languages</source>
         <translation>Languages</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="132"/>
+        <location filename="main_window.ui" line="146"/>
         <source>Save</source>
         <translation>Save</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="135"/>
+        <location filename="main_window.ui" line="149"/>
         <source>Ctrl+S</source>
         <translation>Ctrl+S</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="144"/>
+        <location filename="main_window.ui" line="158"/>
         <source>Save as...</source>
         <translation>Save as...</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="147"/>
+        <location filename="main_window.ui" line="161"/>
         <source>Ctrl+Shift+S</source>
         <translation>Ctrl+Shift+S</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="156"/>
-        <location filename="main_window.ui" line="195"/>
+        <location filename="main_window.ui" line="170"/>
+        <location filename="main_window.ui" line="209"/>
         <source>Close</source>
         <translation>Close</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="159"/>
+        <location filename="main_window.ui" line="173"/>
         <source>Ctrl+Q</source>
         <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="168"/>
-        <location filename="main_window.ui" line="180"/>
+        <location filename="main_window.ui" line="182"/>
+        <location filename="main_window.ui" line="194"/>
         <source>Open...</source>
         <translation>Open...</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="171"/>
+        <location filename="main_window.ui" line="185"/>
         <source>Ctrl+O</source>
         <translation>Ctrl+O</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="186"/>
+        <location filename="main_window.ui" line="200"/>
         <source>Ctrl+W</source>
         <translation>Ctrl+W</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="198"/>
+        <location filename="main_window.ui" line="212"/>
         <source>Ctrl+C</source>
         <translation>Ctrl+C</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="207"/>
+        <location filename="main_window.ui" line="221"/>
         <source>Translate and Run</source>
         <translation>Translate and Run</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="210"/>
+        <location filename="main_window.ui" line="224"/>
         <source>Ctrl+R</source>
         <translation>Ctrl+R</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="219"/>
+        <location filename="main_window.ui" line="233"/>
         <source>Runtime Environment</source>
         <translation>Runtime Environment</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="222"/>
+        <location filename="main_window.ui" line="236"/>
         <source>Ctrl+E</source>
         <translation>Ctrl+E</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="231"/>
+        <location filename="main_window.ui" line="245"/>
         <source>Visual Environment Documentation</source>
         <translation>Visual Environment Documentation</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="240"/>
+        <location filename="main_window.ui" line="254"/>
         <source>Short Overview...</source>
         <translation>Short Overview...</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="249"/>
+        <location filename="main_window.ui" line="263"/>
         <source>Installation</source>
         <translation>Installation</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="258"/>
+        <location filename="main_window.ui" line="272"/>
         <source>Release Layout</source>
         <translation>Release Layout</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="267"/>
+        <location filename="main_window.ui" line="281"/>
         <source>Using Translator</source>
         <translation>Using Translator</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="276"/>
+        <location filename="main_window.ui" line="290"/>
         <source>Using Execution Engine</source>
         <translation>Using Execution Engine</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="285"/>
+        <location filename="main_window.ui" line="299"/>
         <source>Engine Multithreading</source>
         <translation>Engine Multithreading</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="294"/>
+        <location filename="main_window.ui" line="308"/>
         <source>Ukrainian</source>
         <translation>Ukrainian</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="303"/>
+        <location filename="main_window.ui" line="317"/>
         <source>English</source>
         <translation>English</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="312"/>
+        <location filename="main_window.ui" line="326"/>
         <source>New</source>
         <translation>New</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="315"/>
+        <location filename="main_window.ui" line="329"/>
         <source>Ctrl+N</source>
         <translation>Ctrl+N</translation>
     </message>
@@ -420,6 +523,12 @@ Default message displayed in the status bar for the translator</extracomment>
         <source>No file selected.</source>
         <extracomment>Status tip after user wants to do an action with file when no file is selected.</extracomment>
         <translation>No file selected.</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="48"/>
+        <source>Ready to work.</source>
+        <extracomment>Status tip just after starting the application.</extracomment>
+        <translation>Ready to work.</translation>
     </message>
 </context>
 </TS>

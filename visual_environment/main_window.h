@@ -25,6 +25,11 @@ namespace Windows {
     /// </summary>
     class MainWindow final : public QMainWindow
     {
+        // TODO: Implement a menu which will allow users to switch themes (light/dark).
+        // TODO: Implement a menu which will allow users to change font size, font family, etc. in the text editor.
+        // TODO: Implement syntax highlighting for FSI scripts.
+        // TODO: Save settings like window size, last opened directory, language, etc.
+
         Q_OBJECT
 
     public:

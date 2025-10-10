@@ -20,6 +20,7 @@
         <file>ukrainian_icon.svg</file>
         <file>branch_closed_icon.svg</file>
         <file>branch_open_icon.svg</file>
+        <file>application_icon.svg</file>
     </qresource>
     <qresource prefix="/styles">
         <file>dark_theme.qss</file>

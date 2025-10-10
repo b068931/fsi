@@ -4,6 +4,8 @@
 #include <QMessageBox>
 #include <QPlainTextEdit>
 #include <QPushButton>
+#include <QInputDialog>
+#include <QDir>
 
 #include "text_editor.h"
 #include "text_editor_messages.h"
@@ -63,29 +65,29 @@ namespace CustomWidgets {
 
                 QPlainTextEdit* fileEditor = this->getEditorAtIndex(index);
                 if (!fileInfo.exists()) {
-                    QMessageBox msgBox(this);
-                    msgBox.setWindowTitle(tr(g_Messages[MessageKeys::g_MessageBoxFileRemovedTitle]));
-                    msgBox.setText(tr(g_Messages[MessageKeys::g_MessageBoxFileRemovedMessage]).arg(path));
-                    msgBox.setIcon(QMessageBox::Question);
+                    QMessageBox messageBox(this);
+                    messageBox.setWindowTitle(tr(g_Messages[MessageKeys::g_MessageBoxFileRemovedTitle]));
+                    messageBox.setText(tr(g_Messages[MessageKeys::g_MessageBoxFileRemovedMessage]).arg(path));
+                    messageBox.setIcon(QMessageBox::Question);
                     
-                    QPushButton* yesButton = msgBox.addButton(QMessageBox::Yes);
-                    QPushButton* noButton = msgBox.addButton(QMessageBox::No);
+                    QPushButton* yesButton = messageBox.addButton(QMessageBox::Yes);
+                    QPushButton* noButton = messageBox.addButton(QMessageBox::No);
                     
                     QPushButton* tryAgainButton = nullptr;
                     if (depth < maximumFileExistenceRetries) {
-                        tryAgainButton = msgBox.addButton(
+                        tryAgainButton = messageBox.addButton(
                             tr(g_Messages[MessageKeys::g_CheckAgainFileRemovedButton]),
                             QMessageBox::ActionRole
                         );
 
-                        msgBox.setDefaultButton(tryAgainButton);
+                        messageBox.setDefaultButton(tryAgainButton);
                     }
                     else {
-                        msgBox.setDefaultButton(noButton);
+                        messageBox.setDefaultButton(noButton);
                     }
                     
-                    msgBox.exec();
-                    QAbstractButton* clickedButton = msgBox.clickedButton();
+                    messageBox.exec();
+                    QAbstractButton* clickedButton = messageBox.clickedButton();
 
                     if (clickedButton == tryAgainButton) {
                         this->onFileChangedOutsideRecursive(path, depth + 1);
@@ -180,8 +182,189 @@ namespace CustomWidgets {
     }
 
     void TextEditor::onRetranslateUI() {
+        Q_ASSERT(this->workingDirectory && "The working directory has not been set up.");
+        Q_ASSERT(this->openAction && "The open action has not been set up.");
+        Q_ASSERT(this->newFileAction && "The new file action has not been set up.");
+        Q_ASSERT(this->newDirectoryAction && "The new directory action has not been set up.");
+        Q_ASSERT(this->removeAction && "The remove action has not been set up.");
+
         this->workingDirectory->setStatusTip(
             tr(g_Messages[MessageKeys::g_TooltipWorkingDirectoryView])
         );
+
+        this->openAction->setText(tr(g_Messages[MessageKeys::g_ContextMenuOpen]));
+        this->newFileAction->setText(tr(g_Messages[MessageKeys::g_ContextMenuNewFile]));
+        this->newDirectoryAction->setText(tr(g_Messages[MessageKeys::g_ContextMenuNewDirectory]));
+        this->removeAction->setText(tr(g_Messages[MessageKeys::g_ContextMenuRemove]));
+    }
+
+    void TextEditor::onWorkingDirectoryContextMenu(const QPoint& position) {
+        Q_ASSERT(this->workingDirectory != nullptr && "The working directory has not been set up.");
+        Q_ASSERT(this->workingDirectoryContextMenu && "The working directory context menu has not been set up.");
+        Q_ASSERT(this->openAction && "The open action has not been set up.");
+        Q_ASSERT(this->newFileAction && "The new file action has not been set up.");
+        Q_ASSERT(this->newDirectoryAction && "The new directory action has not been set up.");
+        Q_ASSERT(this->removeAction && "The remove action has not been set up.");
+
+        QFileSystemModel* fileModel = qobject_cast<QFileSystemModel*>(this->workingDirectory->model());
+        if (!fileModel) {
+            return;
+        }
+
+        QModelIndex index = this->workingDirectory->indexAt(position);
+        QString clickedPath;
+        bool isDirectory = false;
+        bool isValidItem = false;
+
+        if (index.isValid()) {
+            clickedPath = fileModel->filePath(index);
+
+            QFileInfo fileInfo(clickedPath);
+            isDirectory = fileInfo.isDir();
+            isValidItem = true;
+        }
+
+        // Enable/disable actions based on what was clicked
+        this->openAction->setEnabled(isValidItem);
+        this->removeAction->setEnabled(isValidItem);
+
+        // Show menu and get selected action
+        QAction* selectedAction = this->workingDirectoryContextMenu->exec(
+            this->workingDirectory->viewport()->mapToGlobal(position)
+        );
+
+        if (!selectedAction) {
+            return;
+        }
+
+        // Handle selected action
+        if (selectedAction == this->openAction) {
+            if (isDirectory) {
+                if (this->workingDirectory->isExpanded(index)) {
+                    this->workingDirectory->collapse(index);
+                }
+                else {
+                    this->workingDirectory->expand(index);
+                }
+            }
+            else {
+                this->openNewFile(clickedPath);
+            }
+        }
+        else if (selectedAction == this->newFileAction) {
+            QString parentDirectory;
+            if (isValidItem && isDirectory) {
+                parentDirectory = clickedPath;
+            }
+            else if (isValidItem && !isDirectory) {
+                QFileInfo fileInfo(clickedPath);
+                parentDirectory = fileInfo.absolutePath();
+            }
+            else {
+                parentDirectory = this->getWorkingDirectoryPath();
+            }
+
+            bool ok;
+            QString fileName = QInputDialog::getText(
+                this,
+                tr(g_Messages[MessageKeys::g_InputDialogNewFileTitle]),
+                tr(g_Messages[MessageKeys::g_InputDialogNewFileLabel]),
+                QLineEdit::Normal,
+                QString(),
+                &ok
+            );
+
+            if (ok && !fileName.isEmpty()) {
+                QString newFilePath = parentDirectory + QDir::separator() + fileName;
+                QFile newFile(newFilePath);
+                
+                if (newFile.open(QIODevice::NewOnly | QIODevice::Text)) {
+                    newFile.close();
+                    this->openNewFile(newFilePath);
+                }
+                else {
+                    QMessageBox::warning(
+                        this,
+                        tr(g_Messages[MessageKeys::g_ErrorFileSystemTitle]),
+                        tr(g_Messages[MessageKeys::g_ErrorFileCreationMessage]).arg(newFilePath)
+                    );
+                }
+            }
+        }
+        else if (selectedAction == this->newDirectoryAction) {
+            // Determine parent directory
+            QString parentDirectory;
+            if (isValidItem && isDirectory) {
+                parentDirectory = clickedPath;
+            }
+            else if (isValidItem && !isDirectory) {
+                QFileInfo fileInfo(clickedPath);
+                parentDirectory = fileInfo.absolutePath();
+            }
+            else {
+                parentDirectory = this->getWorkingDirectoryPath();
+            }
+
+            bool ok;
+            QString directoryName = QInputDialog::getText(
+                this,
+                tr(g_Messages[MessageKeys::g_InputDialogNewDirectoryTitle]),
+                tr(g_Messages[MessageKeys::g_InputDialogNewDirectoryLabel]),
+                QLineEdit::Normal,
+                QString(),
+                &ok
+            );
+
+            if (ok && !directoryName.isEmpty()) {
+                QString newDirectoryPath = parentDirectory + QDir::separator() + directoryName;
+                QDir directory;
+                
+                if (!directory.mkpath(newDirectoryPath)) {
+                    QMessageBox::warning(
+                        this,
+                        tr(g_Messages[MessageKeys::g_ErrorFileSystemTitle]),
+                        tr(g_Messages[MessageKeys::g_ErrorDirectoryCreationMessage]).arg(newDirectoryPath)
+                    );
+                }
+            }
+        }
+        else if (selectedAction == this->removeAction) {
+            QString confirmMessage;
+            if (isDirectory) {
+                confirmMessage = tr(g_Messages[MessageKeys::g_ConfirmRemovalDirectoryMessage]).arg(clickedPath);
+            }
+            else {
+                confirmMessage = tr(g_Messages[MessageKeys::g_ConfirmRemovalFileMessage]).arg(clickedPath);
+            }
+
+            QMessageBox::StandardButton reply = QMessageBox::question(
+                this,
+                tr(g_Messages[MessageKeys::g_ConfirmRemovalTitle]),
+                confirmMessage,
+                QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+                QMessageBox::No
+            );
+
+            if (reply == QMessageBox::Yes) {
+                bool success = false;
+                
+                if (isDirectory) {
+                    QDir dir(clickedPath);
+                    success = dir.removeRecursively();
+                }
+                else {
+                    QFile file(clickedPath);
+                    success = file.remove();
+                }
+
+                if (!success) {
+                    QMessageBox::warning(
+                        this,
+                        tr(g_Messages[MessageKeys::g_ErrorFileSystemTitle]),
+                        tr(g_Messages[MessageKeys::g_ErrorRemovalMessage]).arg(clickedPath)
+                    );
+                }
+            }
+        }
     }
 }
