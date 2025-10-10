@@ -46,12 +46,22 @@ namespace Windows {
     }
 
     void MainWindow::showEvent(QShowEvent* event) {
+        Q_ASSERT(this->enrichedStatusBar && "The status bar has not been set up.");
+        Q_ASSERT(this->editor && "The editor has not been set up.");
+
         if (!event->spontaneous()) {
             QString defaultWorkingDirectory = QDir::currentPath();
             this->editor->openWorkingDirectory(defaultWorkingDirectory);
             this->enrichedStatusBar->workingDirectory(
                 Components::Internationalization::QStringWrapper::wrap(
                     std::move(defaultWorkingDirectory)
+                )
+            );
+
+            this->enrichedStatusBar->toolTip(
+                Components::Internationalization::StaticTranslatableString::wrap(
+                    g_Context,
+                    g_Messages[MessageKeys::g_StatusTipStartup]
                 )
             );
 

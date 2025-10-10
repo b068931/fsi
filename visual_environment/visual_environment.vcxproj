@@ -160,6 +160,7 @@
     <QtMoc Include="enriched_status_bar.h" />
     <ClCompile Include="enriched_status_bar.cpp" />
     <ClCompile Include="enriched_status_bar_slots.cpp" />
+    <ClCompile Include="fsi_tools_window.cpp" />
     <ClCompile Include="interface_translator.cpp" />
     <ClCompile Include="main_window_slots.cpp" />
     <ClCompile Include="qstring_wrapper.cpp" />

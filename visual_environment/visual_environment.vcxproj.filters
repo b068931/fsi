@@ -21,9 +21,6 @@
       <UniqueIdentifier>{639EADAA-A684-42e4-A9AD-28FC9BCB8F7C}</UniqueIdentifier>
       <Extensions>ts</Extensions>
     </Filter>
-    <Filter Include="Source Files\Main Window">
-      <UniqueIdentifier>{8af7c87e-ade8-4f18-b3bd-cc13409dbb91}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Custom Widgets">
       <UniqueIdentifier>{e1342918-40e8-4111-b2d9-7baacf1035b9}</UniqueIdentifier>
     </Filter>
@@ -66,6 +63,15 @@
     <Filter Include="Header Files\Windows\FSI Tools Window">
       <UniqueIdentifier>{f26cdb5a-46c1-411a-b506-84714bf532ee}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Windows">
+      <UniqueIdentifier>{ba0ea0e2-65ec-47d6-8343-c1ced5d700ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Windows\Main Window">
+      <UniqueIdentifier>{8af7c87e-ade8-4f18-b3bd-cc13409dbb91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Windows\FSI Tools Window">
+      <UniqueIdentifier>{554628e4-6455-442a-b36e-f618a10d203d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="main_window.ui">
@@ -80,10 +86,10 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main_window.cpp">
-      <Filter>Source Files\Main Window</Filter>
+      <Filter>Source Files\Windows\Main Window</Filter>
     </ClCompile>
     <ClCompile Include="main_window_slots.cpp">
-      <Filter>Source Files\Main Window</Filter>
+      <Filter>Source Files\Windows\Main Window</Filter>
     </ClCompile>
     <ClCompile Include="text_editor.cpp">
       <Filter>Source Files\Custom Widgets\Text Editor</Filter>
@@ -105,6 +111,9 @@
     </ClCompile>
     <ClCompile Include="qstring_wrapper.cpp">
       <Filter>Source Files\Components\Internationalization</Filter>
+    </ClCompile>
+    <ClCompile Include="fsi_tools_window.cpp">
+      <Filter>Source Files\Windows\FSI Tools Window</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
