@@ -2,25 +2,26 @@
 #define FSI_TOOLS_WINDOW_H
 
 #include <QWidget>
-
 #include "ui_fsi_tools_window.h"
 
-class FsiToolsWindow : public QWidget
-{
-    Q_OBJECT
-        
-public:
-    explicit FsiToolsWindow(QWidget *parent = nullptr);
-    ~FsiToolsWindow() noexcept override;
+namespace Windows {
+    class FsiToolsWindow : public QWidget
+    {
+        Q_OBJECT
 
-    FsiToolsWindow(const FsiToolsWindow&) = delete;
-    FsiToolsWindow& operator= (const FsiToolsWindow&) = delete;
+    public:
+        explicit FsiToolsWindow(QWidget* parent = nullptr);
+        ~FsiToolsWindow() noexcept override;
 
-    FsiToolsWindow(FsiToolsWindow&&) = delete;
-    FsiToolsWindow& operator= (FsiToolsWindow&&) = delete;
+        FsiToolsWindow(const FsiToolsWindow&) = delete;
+        FsiToolsWindow& operator= (const FsiToolsWindow&) = delete;
 
-private:
-    Ui::FSIToolsForm ui;
-};
+        FsiToolsWindow(FsiToolsWindow&&) = delete;
+        FsiToolsWindow& operator= (FsiToolsWindow&&) = delete;
+
+    private:
+        Ui::FSIToolsForm ui;
+    };
+}
 
 #endif

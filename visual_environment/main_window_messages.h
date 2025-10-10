@@ -44,6 +44,8 @@ constexpr const char* g_Messages[] = {
     //: Status tip after user wants to do an action with file when no file is selected.
     QT_TRANSLATE_NOOP("Windows::MainWindow", "No file selected."),
 
+    //: Status tip just after starting the application.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "Ready to work.")
 };
 
 enum MessageKeys {
@@ -59,7 +61,8 @@ enum MessageKeys {
     g_StatusTipFileSaveCanceled = 9,
     g_StatusTipFileSaveSucceeded = 10,
     g_StatusTipFileCloseCanceled = 11,
-    g_StatusTipNoFileSelected = 12
+    g_StatusTipNoFileSelected = 12,
+    g_StatusTipStartup = 13
 };
 
 #endif
