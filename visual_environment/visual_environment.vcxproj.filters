@@ -60,24 +60,21 @@
     <Filter Include="QSS Files">
       <UniqueIdentifier>{42210e96-528d-4d30-9dee-b73b399cfa3d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Windows\FSI Tools Window">
-      <UniqueIdentifier>{f26cdb5a-46c1-411a-b506-84714bf532ee}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Windows">
       <UniqueIdentifier>{ba0ea0e2-65ec-47d6-8343-c1ced5d700ac}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Windows\Main Window">
       <UniqueIdentifier>{8af7c87e-ade8-4f18-b3bd-cc13409dbb91}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Windows\FSI Tools Window">
-      <UniqueIdentifier>{554628e4-6455-442a-b36e-f618a10d203d}</UniqueIdentifier>
+    <Filter Include="Header Files\Components\FSI Tools">
+      <UniqueIdentifier>{42614f9b-4d0c-403a-b387-5d033ae362c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Components\FSI Tools">
+      <UniqueIdentifier>{92b457d8-5359-46be-b3d2-36c662922830}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="main_window.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="fsi_tools_window.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
@@ -112,8 +109,11 @@
     <ClCompile Include="qstring_wrapper.cpp">
       <Filter>Source Files\Components\Internationalization</Filter>
     </ClCompile>
-    <ClCompile Include="fsi_tools_window.cpp">
-      <Filter>Source Files\Windows\FSI Tools Window</Filter>
+    <ClCompile Include="fsi_tools_adapter.cpp">
+      <Filter>Source Files\Components\FSI Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="fsi_tools_adapter_slots.cpp">
+      <Filter>Source Files\Components\FSI Tools</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -134,8 +134,8 @@
     <QtMoc Include="text_editor.h">
       <Filter>Header Files\Custom Widgets\Text Editor</Filter>
     </QtMoc>
-    <QtMoc Include="fsi_tools_window.h">
-      <Filter>Header Files\Windows\FSI Tools Window</Filter>
+    <QtMoc Include="fsi_tools_adapter.h">
+      <Filter>Header Files\Components\FSI Tools</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

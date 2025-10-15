@@ -160,14 +160,14 @@
     <QtMoc Include="enriched_status_bar.h" />
     <ClCompile Include="enriched_status_bar.cpp" />
     <ClCompile Include="enriched_status_bar_slots.cpp" />
-    <ClCompile Include="fsi_tools_window.cpp" />
+    <ClCompile Include="fsi_tools_adapter.cpp" />
+    <ClCompile Include="fsi_tools_adapter_slots.cpp" />
     <ClCompile Include="interface_translator.cpp" />
     <ClCompile Include="main_window_slots.cpp" />
     <ClCompile Include="qstring_wrapper.cpp" />
     <ClCompile Include="static_translatable_string.cpp" />
     <ClCompile Include="text_editor.cpp" />
     <ClCompile Include="text_editor_slots.cpp" />
-    <QtUic Include="fsi_tools_window.ui" />
     <QtUic Include="main_window.ui" />
     <QtMoc Include="main_window.h" />
     <ClCompile Include="main_window.cpp" />
@@ -206,7 +206,7 @@
   <ItemGroup>
     <QtMoc Include="interface_translator.h" />
     <ClInclude Include="enriched_status_bar_messages.h" />
-    <QtMoc Include="fsi_tools_window.h" />
+    <QtMoc Include="fsi_tools_adapter.h" />
     <ClInclude Include="main_window_messages.h" />
     <ClInclude Include="qstring_wrapper.h" />
     <ClInclude Include="text_editor_messages.h" />

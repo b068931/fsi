@@ -32,14 +32,13 @@ namespace Components::Internationalization {
 
         // This is an interface-like class, so all of its operations do nothing.
         ITranslatableString() = default;
+        virtual ~ITranslatableString() noexcept = default;
 
         ITranslatableString(const ITranslatableString&) = default;
         ITranslatableString& operator=(const ITranslatableString&) = default;
 
         ITranslatableString(ITranslatableString&&) noexcept = default;
         ITranslatableString& operator=(ITranslatableString&&) noexcept = default;
-
-        virtual ~ITranslatableString() noexcept = default;
     };
 }
 

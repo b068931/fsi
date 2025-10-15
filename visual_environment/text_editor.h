@@ -24,14 +24,13 @@ namespace CustomWidgets {
 
     public:
         explicit TextEditor(QWidget* parent = nullptr);
+        ~TextEditor() noexcept override;
 
         TextEditor(const TextEditor&) = delete;
         TextEditor& operator=(const TextEditor&) = delete;
 
         TextEditor(TextEditor&&) = delete;
         TextEditor& operator=(TextEditor&&) = delete;
-
-        ~TextEditor() noexcept override;
 
         /// <summary>
         /// Opens the specified working directory. Closes currently open directory if received an empty string.
@@ -117,6 +116,9 @@ namespace CustomWidgets {
 
         // TODO: Implement messages for different error codes from the QFile operations.
         //       Right now, I just have a generic error message for all file operation errors.
+
+        // TODO: Translate temporary file names. Right now, they are not dynamically translatable.
+        //       At the moment, they just retain the name based on the current locale when created.
 
         struct OpenedFile {
             QString filePath;

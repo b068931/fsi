@@ -27,14 +27,13 @@ namespace CustomWidgets {
         };
 
         explicit EnrichedStatusBar(QWidget* parent = nullptr);
+        ~EnrichedStatusBar() noexcept override;
 
         EnrichedStatusBar(const EnrichedStatusBar&) = delete;
         EnrichedStatusBar& operator=(const EnrichedStatusBar&) = delete;
 
         EnrichedStatusBar(EnrichedStatusBar&&) = delete;
         EnrichedStatusBar& operator=(EnrichedStatusBar&&) = delete;
-
-        ~EnrichedStatusBar() noexcept override;
 
         /// <summary>
         /// Displays a tooltip with the specified message.

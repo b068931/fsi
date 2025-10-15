@@ -11,7 +11,7 @@ namespace Components::Internationalization {
     /// Component which manages application translation.
     /// Automatically emits the retranslateUI() signal when the language is changed.
     /// </summary>
-    class InterfaceTranslator : public QObject {
+    class InterfaceTranslator final : public QObject {
         Q_OBJECT
 
     public:
@@ -48,10 +48,6 @@ namespace Components::Internationalization {
         QScopedPointer<QTranslator> applicationTranslator;
         QScopedPointer<QTranslator> qtTranslator;
 
-        /// <summary>
-        /// Loads a translator resource by its name.
-        /// </summary>
-        /// <param name="locale">The name of the translator resource to load. Nullptr for default language (English).</param>
         void loadTranslator(const QLocale* locale);
         void startupProbeLocales();
     };
