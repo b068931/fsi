@@ -162,6 +162,7 @@
     <ClCompile Include="enriched_status_bar_slots.cpp" />
     <ClCompile Include="fsi_tools_adapter.cpp" />
     <ClCompile Include="fsi_tools_adapter_slots.cpp" />
+    <ClCompile Include="fsi_ui_configuration_options.cpp" />
     <ClCompile Include="interface_translator.cpp" />
     <ClCompile Include="main_window_slots.cpp" />
     <ClCompile Include="qstring_wrapper.cpp" />
@@ -205,8 +206,10 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="interface_translator.h" />
+    <ClInclude Include="background_service.h" />
     <ClInclude Include="enriched_status_bar_messages.h" />
     <QtMoc Include="fsi_tools_adapter.h" />
+    <ClInclude Include="fsi_ui_configuration_options.h" />
     <ClInclude Include="main_window_messages.h" />
     <ClInclude Include="qstring_wrapper.h" />
     <ClInclude Include="text_editor_messages.h" />
@@ -215,6 +218,30 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="dark_theme.qss" />
+    <CopyFileToFolders Include="mediator-stub.bat">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)$(Platform)\$(Configuration)\bin\</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">$(SolutionDir)$(Platform)\$(Configuration)\bin\</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)$(Platform)\$(Configuration)\bin\</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="translator-stub.bat">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)$(Platform)\$(Configuration)\bin\</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">$(SolutionDir)$(Platform)\$(Configuration)\bin\</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)$(Platform)\$(Configuration)\bin\</DestinationFolders>
+    </CopyFileToFolders>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

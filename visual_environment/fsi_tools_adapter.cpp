@@ -45,17 +45,19 @@ namespace Components::FSITools {
         }
     }
 
-    bool FSIToolsAdapter::startProgramTranslation(
+    void FSIToolsAdapter::startProgramTranslation(
             const QString& programPath,
             const QString& outputPath,
             TranslatorFlags debugFlag
         )
     {
         Q_ASSERT(this->translator && "Translator process has not been set up.");
-        constexpr char executableName[]{ "fsi-translator.exe" };
+
+        constexpr char executableName[]{ "translator-stub.bat" };
+        constexpr int maximumWaitTime = 5000;
 
         if (this->translator->state() != QProcess::NotRunning) {
-            return false;
+            emit this->translationResult(DefaultReturnCode, ChildResult::alreadyRunning);
         }
 
         // Save last known paths
@@ -70,12 +72,12 @@ namespace Components::FSITools {
                          : QStringLiteral("no-debug"));
 
         this->translator->start(executableName, arguments);
-        emit this->translatorStarted();
+        this->translator->waitForStarted(maximumWaitTime);
 
-        return true;
+        emit this->translatorStarted();
     }
 
-    bool FSIToolsAdapter::startExecutionEnvironment(
+    void FSIToolsAdapter::startExecutionEnvironment(
             const QString& configurationPath,
             int executorsCount,
             const QString& translatedProgramPath,
@@ -83,14 +85,16 @@ namespace Components::FSITools {
         )
     {
         Q_ASSERT(this->executionEnvironment && "Execution environment process has not been set up.");
-        constexpr char executableName[]{ "fsi-mediator.exe" };
+
+        constexpr char executableName[]{ "mediator-stub.bat" };
+        constexpr int maximumWaitTime = 5000;
 
         if (this->executionEnvironment->state() != QProcess::NotRunning) {
-            return false;
+            emit this->executionEnvironmentResult(DefaultReturnCode, ChildResult::alreadyRunning);
         }
 
         if (executorsCount < 1) {
-            return false;
+            emit this->executionEnvironmentResult(DefaultReturnCode, ChildResult::failedToStart);
         }
 
         // Close any existing log handle and recreate it for the new start.
@@ -119,7 +123,7 @@ namespace Components::FSITools {
         this->executionEnvironmentLogFile = logHandle;
         if (this->executionEnvironmentLogFile == INVALID_HANDLE_VALUE) {
             // If we failed to create a log file, keep INVALID_HANDLE_VALUE.
-            return false;
+            emit this->executionEnvironmentResult(DefaultReturnCode, ChildResult::failedToStart);
         }
 
         // Save last known program/configuration
@@ -132,9 +136,9 @@ namespace Components::FSITools {
                   << translatedProgramPath;
 
         this->executionEnvironment->start(executableName, arguments);
-        emit this->executionEnvironmentStarted();
+        this->executionEnvironment->waitForStarted(maximumWaitTime);
 
-        return true;
+        emit this->executionEnvironmentStarted();
     }
 
     QString FSIToolsAdapter::getLastTranslationTarget() const {
@@ -163,10 +167,6 @@ namespace Components::FSITools {
         this->translator->setProcessChannelMode(QProcess::ForwardedChannels);
         this->translator->setWorkingDirectory(QCoreApplication::applicationDirPath());
         this->translator->setCreateProcessArgumentsModifier([](QProcess::CreateProcessArguments* arguments) {
-            // Do not allow other children to inherit these handles.
-            arguments->processAttributes->bInheritHandle = FALSE;
-            arguments->threadAttributes->bInheritHandle = FALSE;
-
             arguments->inheritHandles = FALSE;
 
             arguments->flags |= CREATE_NEW_CONSOLE;
@@ -191,10 +191,6 @@ namespace Components::FSITools {
         this->executionEnvironment->setCreateProcessArgumentsModifier([this](QProcess::CreateProcessArguments* arguments) {
             // TODO: Configure this so that the child inherits only the file handle for the log file.
             //       For now, we will just let it inherit everything.
-
-            // Do not allow other children to inherit these handles.
-            arguments->processAttributes->bInheritHandle = FALSE;
-            arguments->threadAttributes->bInheritHandle = FALSE;
 
             arguments->inheritHandles = TRUE;
             arguments->flags |= CREATE_NEW_CONSOLE;

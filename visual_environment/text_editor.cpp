@@ -95,7 +95,6 @@ namespace CustomWidgets {
         this->workingDirectory->setStatusTip(
             tr(g_Messages[MessageKeys::g_TooltipWorkingDirectoryView])
         );
-
     }
 
     void TextEditor::setupWorkingDirectoryContextMenu() {
@@ -215,6 +214,8 @@ namespace CustomWidgets {
     }
 
     void TextEditor::createTemporaryFile() {
+        Q_ASSERT(this->fileTabs != nullptr && "The file tabs have not been set up.");
+
         QPlainTextEdit* fileEditor = new QPlainTextEdit(this);
         fileEditor->setLineWrapMode(QPlainTextEdit::NoWrap);
         fileEditor->setPlainText("");
@@ -232,7 +233,17 @@ namespace CustomWidgets {
         this->fileTabs->setTabToolTip(newTabIndex, tr(g_Messages[MessageKeys::g_TemporaryFileName]));
     }
 
+    const QString& TextEditor::getCurrentFilePath() const noexcept {
+        Q_ASSERT(this->fileTabs != nullptr && "The file tabs have not been set up.");
+        Q_ASSERT(this->fileTabs->currentIndex() != -1 && "No file is currently selected.");
+        Q_ASSERT(this->fileTabs->currentIndex() < this->openFiles.count() && "The current index is out of range.");
+
+        return this->openFiles[this->fileTabs->currentIndex()].filePath;
+    }
+
     bool TextEditor::saveCurrentFile() {
+        Q_ASSERT(this->fileTabs != nullptr && "The file tabs have not been set up.");
+
         if (this->fileTabs->currentIndex() == -1) 
             return false;
 
@@ -242,6 +253,8 @@ namespace CustomWidgets {
     }
 
     bool TextEditor::saveCurrentFileAs() {
+        Q_ASSERT(this->fileTabs != nullptr && "The file tabs have not been set up.");
+
         if (this->fileTabs->currentIndex() == -1) 
             return false;
 
@@ -268,6 +281,8 @@ namespace CustomWidgets {
     }
 
     bool TextEditor::closeCurrentFile() {
+        Q_ASSERT(this->fileTabs != nullptr && "The file tabs have not been set up.");
+
         if (this->fileTabs->currentIndex() == -1) 
             return false;
 
@@ -447,6 +462,8 @@ namespace CustomWidgets {
     }
 
     QPlainTextEdit* TextEditor::getEditorAtIndex(int index) {
+        Q_ASSERT(this->fileTabs != nullptr && "The file tabs have not been set up.");
+
         QPlainTextEdit* fileEditor = qobject_cast<QPlainTextEdit*>(this->fileTabs->widget(index));
         if (fileEditor == nullptr) {
             // Remove a possibly corrupted tab and its associated data.

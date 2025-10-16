@@ -1,14 +1,16 @@
 #ifndef FSI_TOOLS_ADAPTER_H
 #define FSI_TOOLS_ADAPTER_H
 
+#include <QObject>
+#include <QString>
+#include <QProcess>
+
 // While I am using QProcess, I still need to do some windows-specific configuration.
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <windows.h>
 
-#include <QObject>
-#include <QString>
-#include <QProcess>
+#include <limits>
 
 namespace Components::FSITools {
     /// <summary>
@@ -20,11 +22,13 @@ namespace Components::FSITools {
         Q_OBJECT
 
     public:
+        constexpr static int DefaultReturnCode = std::numeric_limits<int>::min();
         enum class ChildResult {
-            terminated = 0,
-            failedToStart = 1,
-            crashed = 2,
-            unknownError = 3
+            terminated,
+            failedToStart,
+            crashed,
+            alreadyRunning,
+            unknownError
         };
 
         enum class TranslatorFlags {
@@ -48,8 +52,7 @@ namespace Components::FSITools {
         /// <param name="programPath">The file path to the program to be translated.</param>
         /// <param name="outputPath">The file path where the translation output will be saved.</param>
         /// <param name="debugFlag">Flags that control debugging options for the translation process.</param>
-        /// <returns>true if the translation process starts successfully; otherwise, false.</returns>
-        bool startProgramTranslation(
+        void startProgramTranslation(
             const QString& programPath, 
             const QString& outputPath,
             TranslatorFlags debugFlag
@@ -64,8 +67,7 @@ namespace Components::FSITools {
         /// <param name="configurationPath">The path to the configuration file for the execution environment.</param>
         /// <param name="executorsCount">The number of executor instances to launch.</param>
         /// <param name="logFilePath">The path to the log file.</param>
-        /// <returns>True if the execution environment was started successfully; otherwise, false.</returns>
-        bool startExecutionEnvironment(
+        void startExecutionEnvironment(
             const QString& configurationPath,
             int executorsCount,
             const QString& translatedProgramPath,
@@ -122,11 +124,11 @@ namespace Components::FSITools {
         void executionEnvironmentResult(int exitCode, ChildResult result);
 
     private slots:
-        void onTranslatorFinished(int exitCode, QProcess::ExitStatus status);
-        void onTranslatorErrorOccurred(QProcess::ProcessError error);
+        void onTranslatorFinished(int exitCode, QProcess::ExitStatus status) noexcept;
+        void onTranslatorErrorOccurred(QProcess::ProcessError error) noexcept;
 
-        void onExecutionEnvironmentFinished(int exitCode, QProcess::ExitStatus status);
-        void onExecutionEnvironmentErrorOccurred(QProcess::ProcessError error);
+        void onExecutionEnvironmentFinished(int exitCode, QProcess::ExitStatus status) noexcept;
+        void onExecutionEnvironmentErrorOccurred(QProcess::ProcessError error) noexcept;
 
     private:
         QProcess* translator;

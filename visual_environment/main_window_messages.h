@@ -45,7 +45,10 @@ constexpr const char* g_Messages[] = {
     QT_TRANSLATE_NOOP("Windows::MainWindow", "No file selected."),
 
     //: Status tip just after starting the application.
-    QT_TRANSLATE_NOOP("Windows::MainWindow", "Ready to work.")
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "Ready to work."),
+
+    //: The name of the translation result file.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "build.bfsi")
 };
 
 enum MessageKeys {
@@ -62,7 +65,8 @@ enum MessageKeys {
     g_StatusTipFileSaveSucceeded = 10,
     g_StatusTipFileCloseCanceled = 11,
     g_StatusTipNoFileSelected = 12,
-    g_StatusTipStartup = 13
+    g_StatusTipStartup = 13,
+    g_TranslationResultFileName = 14
 };
 
 #endif

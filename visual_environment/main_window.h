@@ -14,6 +14,8 @@
 #include "text_editor.h"
 #include "enriched_status_bar.h"
 #include "interface_translator.h"
+#include "fsi_tools_adapter.h"
+#include "background_service.h"
 
 namespace Windows {
     /// <summary>
@@ -42,20 +44,37 @@ namespace Windows {
         MainWindow(MainWindow&&) = delete;
         MainWindow& operator= (MainWindow&&) = delete;
 
-    public slots:
-        void onRetranslateUI();
+    private slots:
+        void onRetranslateUI() noexcept;
 
-        void onMenuFileNew();
-        void onMenuFileOpen();
-        void onMenuFileSave();
-        void onMenuFileSaveAs();
-        void onMenuFileClose();
+        void onMenuFileNew() noexcept;
+        void onMenuFileOpen() noexcept;
+        void onMenuFileSave() noexcept;
+        void onMenuFileSaveAs() noexcept;
+        void onMenuFileClose() noexcept;
 
-        void onMenuWorkingDirectoryOpen();
-        void onMenuWorkingDirectoryClose();
+        void onMenuWorkingDirectoryOpen() noexcept;
+        void onMenuWorkingDirectoryClose() noexcept;
 
-        void onMenuLanguageUkrainian();
-        void onMenuLanguageEnglish();
+        void onProgramTranslate() noexcept;
+        void onRunLastTranslatedProgram() noexcept;
+        void onTranslateAndRun() noexcept;
+        void onRuntimeEnvironmentLogs() noexcept;
+
+        void onMenuLanguageUkrainian() noexcept;
+        void onMenuLanguageEnglish() noexcept;
+
+        void onProgramTranslatorStarted() noexcept;
+        void onProgramTranslationResult(
+            int exitCode, 
+            Components::FSITools::FSIToolsAdapter::ChildResult result
+        ) noexcept;
+
+        void onExecutionEnvironmentStarted() noexcept;
+        void onExecutionEnvironmentResult(
+            int exitCode, 
+            Components::FSITools::FSIToolsAdapter::ChildResult result
+        ) noexcept;
 
     protected:
         virtual bool event(QEvent* event) override;
@@ -63,7 +82,12 @@ namespace Windows {
         virtual void showEvent(QShowEvent* event) override;
 
     private:
+        // Main parts of the main window.
         Ui::MainWindowClass ui{};
+        Utility::BackgroundService<
+            Components::FSITools::FSIToolsAdapter
+        > languageService{};
+
         QScopedPointer<
             Components::Internationalization::InterfaceTranslator,
             QScopedPointerDeleteLater
@@ -72,9 +96,13 @@ namespace Windows {
         CustomWidgets::TextEditor* editor{};
         CustomWidgets::EnrichedStatusBar* enrichedStatusBar{};
 
-        void connectSignalsManually();
+        // State fields.
+        bool runAfterTranslation{ false };
+
+        // Configuration methods.
         void setupTextEditor();
         void setupStatusBar();
+        void connectSignalsManually();
     };
 }
 

@@ -7,6 +7,7 @@
 #include "qstring_wrapper.h"
 #include "main_window_messages.h"
 #include "static_translatable_string.h"
+#include "fsi_ui_configuration_options.h"
 
 namespace Windows {
     bool MainWindow::event(QEvent* event) {
@@ -85,12 +86,12 @@ namespace Windows {
         QMainWindow::showEvent(event);
     }
 
-    void MainWindow::onMenuFileNew() {
+    void MainWindow::onMenuFileNew() noexcept {
         Q_ASSERT(this->editor && "The text editor has not been set up.");
         this->editor->createTemporaryFile();
     }
 
-    void MainWindow::onMenuFileOpen() {
+    void MainWindow::onMenuFileOpen() noexcept {
         Q_ASSERT(this->editor && "The text editor has not been set up.");
 
         QString filePath = QFileDialog::getOpenFileName(
@@ -106,7 +107,7 @@ namespace Windows {
         }
     }
 
-    void MainWindow::onMenuFileSave() {
+    void MainWindow::onMenuFileSave() noexcept {
         Q_ASSERT(this->editor && "The text editor has not been set up.");
         Q_ASSERT(this->enrichedStatusBar && "The status bar has not been set up.");
         if (!this->editor->hasSelectedFile()) {
@@ -138,7 +139,7 @@ namespace Windows {
         }
     }
 
-    void MainWindow::onMenuFileSaveAs() {
+    void MainWindow::onMenuFileSaveAs() noexcept {
         Q_ASSERT(this->editor && "The text editor has not been set up.");
         Q_ASSERT(this->enrichedStatusBar && "The status bar has not been set up.");
         if (!this->editor->hasSelectedFile()) {
@@ -170,7 +171,7 @@ namespace Windows {
         }
     }
 
-    void MainWindow::onMenuFileClose() {
+    void MainWindow::onMenuFileClose() noexcept {
         Q_ASSERT(this->editor && "The text editor has not been set up.");
         Q_ASSERT(this->enrichedStatusBar && "The status bar has not been set up.");
         if (!this->editor->hasSelectedFile()) {
@@ -194,7 +195,7 @@ namespace Windows {
         }
     }
 
-    void MainWindow::onRetranslateUI() {
+    void MainWindow::onRetranslateUI() noexcept {
         Q_ASSERT(this->enrichedStatusBar && "The status bar has not been set up.");
 
         this->ui.retranslateUi(this);
@@ -206,21 +207,21 @@ namespace Windows {
         );
     }
 
-    void MainWindow::onMenuLanguageUkrainian() {
+    void MainWindow::onMenuLanguageUkrainian() noexcept {
         Q_ASSERT(this->i18n && "The internationalization component has not been set up.");
         this->i18n->setLanguage(
             Components::Internationalization::InterfaceTranslator::Language::Ukrainian
         );
     }
 
-    void MainWindow::onMenuLanguageEnglish() {
+    void MainWindow::onMenuLanguageEnglish() noexcept {
         Q_ASSERT(this->i18n && "The internationalization component has not been set up.");
         this->i18n->setLanguage(
             Components::Internationalization::InterfaceTranslator::Language::English
         );
     }
 
-    void MainWindow::onMenuWorkingDirectoryOpen() {
+    void MainWindow::onMenuWorkingDirectoryOpen() noexcept {
         Q_ASSERT(this->editor && "The text editor has not been set up.");
         Q_ASSERT(this->enrichedStatusBar && "The status bar has not been set up.");
 
@@ -249,7 +250,7 @@ namespace Windows {
         }
     }
 
-    void MainWindow::onMenuWorkingDirectoryClose() {
+    void MainWindow::onMenuWorkingDirectoryClose() noexcept {
         Q_ASSERT(this->editor && "The text editor has not been set up.");
         Q_ASSERT(this->enrichedStatusBar && "The status bar has not been set up.");
 
@@ -261,4 +262,57 @@ namespace Windows {
             )
         );
     }
+
+    void MainWindow::onProgramTranslate() noexcept {
+        if (!this->editor->hasSelectedFile()) {
+           this->enrichedStatusBar->toolTip(
+                Components::Internationalization::StaticTranslatableString::wrap(
+                    g_Context,
+                    g_Messages[g_StatusTipNoFileSelected]
+                )
+            );
+
+           return;
+        }
+
+        QString selectedFile = this->editor->getCurrentFilePath();
+        QString translationResult = QDir(this->editor->getWorkingDirectoryPath())
+            .filePath(g_Messages[MessageKeys::g_TranslationResultFileName]);
+
+        auto debugFlag = 
+            Components::FSITools::ConfigurationOptions::getTranslatorDebugFlag();
+
+        this->languageService.send(
+            [selectedFile, translationResult, debugFlag]
+            (Components::FSITools::FSIToolsAdapter* adapter) {
+            adapter->startProgramTranslation(
+                selectedFile,
+                translationResult,
+                debugFlag
+            );
+        });
+    }
+
+    void MainWindow::onRunLastTranslatedProgram() noexcept {
+        
+    }
+
+    void MainWindow::onTranslateAndRun() noexcept {}
+
+    void MainWindow::onRuntimeEnvironmentLogs() noexcept {}
+
+    void MainWindow::onProgramTranslatorStarted() noexcept {}
+
+    void MainWindow::onProgramTranslationResult(
+        int exitCode,
+        Components::FSITools::FSIToolsAdapter::ChildResult result
+    ) noexcept {}
+
+    void MainWindow::onExecutionEnvironmentStarted() noexcept {}
+
+    void MainWindow::onExecutionEnvironmentResult(
+        int exitCode,
+        Components::FSITools::FSIToolsAdapter::ChildResult result
+    ) noexcept {}
+
 }

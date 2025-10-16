@@ -72,6 +72,12 @@
     <Filter Include="Source Files\Components\FSI Tools">
       <UniqueIdentifier>{92b457d8-5359-46be-b3d2-36c662922830}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Utility">
+      <UniqueIdentifier>{ddb720fd-c3db-4f58-b01d-4b534440cb47}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Other">
+      <UniqueIdentifier>{f939c29f-3af9-4f4c-ac88-65f0c6212768}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="main_window.ui">
@@ -113,6 +119,9 @@
       <Filter>Source Files\Components\FSI Tools</Filter>
     </ClCompile>
     <ClCompile Include="fsi_tools_adapter_slots.cpp">
+      <Filter>Source Files\Components\FSI Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="fsi_ui_configuration_options.cpp">
       <Filter>Source Files\Components\FSI Tools</Filter>
     </ClCompile>
   </ItemGroup>
@@ -165,10 +174,24 @@
     <ClInclude Include="text_editor_messages.h">
       <Filter>Header Files\Custom Widgets\Text Editor</Filter>
     </ClInclude>
+    <ClInclude Include="background_service.h">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="fsi_ui_configuration_options.h">
+      <Filter>Header Files\Components\FSI Tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="dark_theme.qss">
       <Filter>QSS Files</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="mediator-stub.bat">
+      <Filter>Other</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="translator-stub.bat">
+      <Filter>Other</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
 </Project>

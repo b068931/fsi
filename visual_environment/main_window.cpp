@@ -14,6 +14,8 @@ namespace Windows {
         this->setupStatusBar();
         this->setupTextEditor();
         this->connectSignalsManually();
+
+        this->languageService.start();
     }
 
     MainWindow::~MainWindow() noexcept = default;
@@ -28,6 +30,31 @@ namespace Windows {
 
         connect(this->i18n.data(), &Components::Internationalization::InterfaceTranslator::retranslateUI,
             this->enrichedStatusBar, &CustomWidgets::EnrichedStatusBar::onRetranslateUI);
+
+        // Connect FSIToolsAdapter signals to their respective slots.
+        this->languageService.receive(
+            &Components::FSITools::FSIToolsAdapter::translatorStarted,
+            this,
+            &MainWindow::onProgramTranslatorStarted
+        );
+
+        this->languageService.receive(
+            &Components::FSITools::FSIToolsAdapter::translationResult,
+            this,
+            &MainWindow::onProgramTranslationResult
+        );
+
+        this->languageService.receive(
+            &Components::FSITools::FSIToolsAdapter::executionEnvironmentStarted,
+            this,
+            &MainWindow::onExecutionEnvironmentStarted
+        );
+
+        this->languageService.receive(
+            &Components::FSITools::FSIToolsAdapter::executionEnvironmentResult,
+            this,
+            &MainWindow::onExecutionEnvironmentResult
+        );
 
         // Connect menu actions to their respective slots.
         connect(this->ui.actionUkrainian, &QAction::triggered,
@@ -56,6 +83,18 @@ namespace Windows {
 
         connect(this->ui.closeFileMenuAction, &QAction::triggered,
             this, &MainWindow::onMenuFileClose);
+
+        connect(this->ui.translateOnlyMenuAction, &QAction::triggered, 
+            this, &MainWindow::onProgramTranslate);
+
+        connect(this->ui.runLastTranslatedMenuAction, &QAction::triggered, 
+            this, &MainWindow::onRunLastTranslatedProgram);
+
+        connect(this->ui.translateAndRunMenuAction, &QAction::triggered, 
+            this, &MainWindow::onTranslateAndRun);
+
+        connect(this->ui.executionEnvironmentMenuAction, &QAction::triggered,
+            this, &MainWindow::onRuntimeEnvironmentLogs);
     }
 
     void MainWindow::setupTextEditor() {

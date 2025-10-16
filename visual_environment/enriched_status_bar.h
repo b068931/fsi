@@ -72,7 +72,7 @@ namespace CustomWidgets {
         );
 
     public slots:
-        void onRetranslateUI();
+        void onRetranslateUI() noexcept;
 
     private:
         using ITranslatableString = Components::Internationalization::ITranslatableString;

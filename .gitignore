@@ -368,3 +368,4 @@ FodyWeavers.xsd
 *.msi
 *.exe
 *.qm
+/examples/build.bfsi

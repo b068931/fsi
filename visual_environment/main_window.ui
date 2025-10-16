@@ -71,6 +71,8 @@
     <property name="title">
      <string>Program</string>
     </property>
+    <addaction name="translateOnlyMenuAction"/>
+    <addaction name="runLastTranslatedMenuAction"/>
     <addaction name="translateAndRunMenuAction"/>
     <addaction name="executionEnvironmentMenuAction"/>
    </widget>
@@ -135,6 +137,8 @@
    <addaction name="newFileMenuAction"/>
    <addaction name="openFileMenuAction"/>
    <addaction name="saveFileMenuAction"/>
+   <addaction name="translateOnlyMenuAction"/>
+   <addaction name="runLastTranslatedMenuAction"/>
    <addaction name="translateAndRunMenuAction"/>
   </widget>
   <action name="saveFileMenuAction">
@@ -327,6 +331,30 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="translateOnlyMenuAction">
+   <property name="icon">
+    <iconset resource="visual_environment.qrc">
+     <normaloff>:/icons/translate_only_icon.svg</normaloff>:/icons/translate_only_icon.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Translate</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+B</string>
+   </property>
+  </action>
+  <action name="runLastTranslatedMenuAction">
+   <property name="icon">
+    <iconset resource="visual_environment.qrc">
+     <normaloff>:/icons/run_last_translated_icon.svg</normaloff>:/icons/run_last_translated_icon.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Run Last Translated</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
    </property>
   </action>
  </widget>

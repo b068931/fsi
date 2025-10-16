@@ -18,7 +18,7 @@ namespace CustomWidgets {
         }
     }
 
-    void TextEditor::onWorkingDirectoryItemDoubleClicked(const QModelIndex& index) {
+    void TextEditor::onWorkingDirectoryItemDoubleClicked(const QModelIndex& index) noexcept {
         Q_ASSERT(this->workingDirectory != nullptr && "The working directory has not been set up.");
 
         QFileSystemModel* fileModel = qobject_cast<QFileSystemModel*>(this->workingDirectory->model());
@@ -34,11 +34,11 @@ namespace CustomWidgets {
         }
     }
 
-    void TextEditor::onFileChangedOutside(const QString& path) {
+    void TextEditor::onFileChangedOutside(const QString& path) noexcept {
         this->onFileChangedOutsideRecursive(path, 0);
     }
 
-    void TextEditor::onFileChangedOutsideRecursive(const QString& path, int depth) {
+    void TextEditor::onFileChangedOutsideRecursive(const QString& path, int depth) noexcept {
         Q_ASSERT(this->fileWatcher && "The file watcher has not been set up.");
         constexpr int maximumFileExistenceRetries = 4;
 
@@ -170,18 +170,18 @@ namespace CustomWidgets {
         }
     }
 
-    void TextEditor::onTabCloseRequested(int index) {
+    void TextEditor::onTabCloseRequested(int index) noexcept {
         this->closeFileAtIndex(index);
     }
 
-    void TextEditor::onTabMoved(int from, int to) {
+    void TextEditor::onTabMoved(int from, int to) noexcept {
         Q_ASSERT(from < this->openFiles.size() && "The 'from' index is out of range.");
         Q_ASSERT(to < this->openFiles.size() && "The 'to' index is out of range.");
 
         this->openFiles.move(from, to);
     }
 
-    void TextEditor::onRetranslateUI() {
+    void TextEditor::onRetranslateUI() noexcept {
         Q_ASSERT(this->workingDirectory && "The working directory has not been set up.");
         Q_ASSERT(this->openAction && "The open action has not been set up.");
         Q_ASSERT(this->newFileAction && "The new file action has not been set up.");
@@ -198,7 +198,7 @@ namespace CustomWidgets {
         this->removeAction->setText(tr(g_Messages[MessageKeys::g_ContextMenuRemove]));
     }
 
-    void TextEditor::onWorkingDirectoryContextMenu(const QPoint& position) {
+    void TextEditor::onWorkingDirectoryContextMenu(const QPoint& position) noexcept {
         Q_ASSERT(this->workingDirectory != nullptr && "The working directory has not been set up.");
         Q_ASSERT(this->workingDirectoryContextMenu && "The working directory context menu has not been set up.");
         Q_ASSERT(this->openAction && "The open action has not been set up.");

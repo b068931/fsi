@@ -1,7 +1,7 @@
 #include "enriched_status_bar.h"
 
 namespace CustomWidgets {
-    void EnrichedStatusBar::onRetranslateUI() {
+    void EnrichedStatusBar::onRetranslateUI() noexcept {
         this->setToolTips();
 
         elideText(

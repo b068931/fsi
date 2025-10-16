@@ -2,7 +2,7 @@
 #include "fsi_tools_adapter.h"
 
 namespace Components::FSITools {
-    void FSIToolsAdapter::onTranslatorFinished(int exitCode, QProcess::ExitStatus status) {
+    void FSIToolsAdapter::onTranslatorFinished(int exitCode, QProcess::ExitStatus status) noexcept {
         ChildResult result = ChildResult::unknownError;
         switch (status) {
         case QProcess::NormalExit:
@@ -19,13 +19,13 @@ namespace Components::FSITools {
         emit this->translationResult(exitCode, result);
     }
 
-    void FSIToolsAdapter::onTranslatorErrorOccurred(QProcess::ProcessError error) {
+    void FSIToolsAdapter::onTranslatorErrorOccurred(QProcess::ProcessError error) noexcept {
         if (error == QProcess::FailedToStart) {
-            emit this->translationResult(0, ChildResult::failedToStart);
+            emit this->translationResult(DefaultReturnCode, ChildResult::failedToStart);
         }
     }
 
-    void FSIToolsAdapter::onExecutionEnvironmentFinished(int exitCode, QProcess::ExitStatus status) {
+    void FSIToolsAdapter::onExecutionEnvironmentFinished(int exitCode, QProcess::ExitStatus status) noexcept {
         ChildResult result = ChildResult::unknownError;
         switch (status) {
         case QProcess::NormalExit:
@@ -49,7 +49,7 @@ namespace Components::FSITools {
         emit this->executionEnvironmentResult(exitCode, result);
     }
 
-    void FSIToolsAdapter::onExecutionEnvironmentErrorOccurred(QProcess::ProcessError error) {
+    void FSIToolsAdapter::onExecutionEnvironmentErrorOccurred(QProcess::ProcessError error) noexcept {
         if (error == QProcess::FailedToStart) {
             if (this->executionEnvironmentLogFile != NULL && this->executionEnvironmentLogFile != INVALID_HANDLE_VALUE) {
                 FlushFileBuffers(this->executionEnvironmentLogFile);
@@ -57,7 +57,7 @@ namespace Components::FSITools {
                 this->executionEnvironmentLogFile = INVALID_HANDLE_VALUE;
             }
 
-            emit this->executionEnvironmentResult(0, ChildResult::failedToStart);
+            emit this->executionEnvironmentResult(DefaultReturnCode, ChildResult::failedToStart);
         }
     }
 }

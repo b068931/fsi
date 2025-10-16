@@ -59,6 +59,12 @@ namespace CustomWidgets {
         void createTemporaryFile();
 
         /// <summary>
+        /// Returns the file path to the currently selected file in the tab widget.
+        /// </summary>
+        /// <returns>A const reference to a QString containing the path to the current file.</returns>
+        const QString& getCurrentFilePath() const noexcept;
+
+        /// <summary>
         /// Saves the file which is currently selected in the tab widget.
         /// </summary>
         bool saveCurrentFile();
@@ -97,14 +103,14 @@ namespace CustomWidgets {
         virtual void showEvent(QShowEvent* event) override;
 
     private slots:
-        void onWorkingDirectoryItemDoubleClicked(const QModelIndex& index);
-        void onFileChangedOutside(const QString& path);
-        void onTabCloseRequested(int index);
-        void onTabMoved(int from, int to);
-        void onWorkingDirectoryContextMenu(const QPoint& position);
+        void onWorkingDirectoryItemDoubleClicked(const QModelIndex& index) noexcept;
+        void onFileChangedOutside(const QString& path) noexcept;
+        void onTabCloseRequested(int index) noexcept;
+        void onTabMoved(int from, int to) noexcept;
+        void onWorkingDirectoryContextMenu(const QPoint& position) noexcept;
 
     public slots:
-        void onRetranslateUI();
+        void onRetranslateUI() noexcept;
 
     private:
         // So that you can't accidentally change the layout of this widget
@@ -145,7 +151,7 @@ namespace CustomWidgets {
         QPlainTextEdit* getEditorAtIndex(int index);
         bool closeFileAtIndex(int index);
         bool saveFileAtIndex(int index);
-        void onFileChangedOutsideRecursive(const QString& path, int depth);
+        void onFileChangedOutsideRecursive(const QString& path, int depth) noexcept;
 
         void connectSignalsManually();
         void setupEditorComponents();
