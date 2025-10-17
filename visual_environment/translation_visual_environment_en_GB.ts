@@ -2,6 +2,45 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en_GB">
 <context>
+    <name>Components::FSITools</name>
+    <message>
+        <location filename="fsi_tools_messages.h" line="9"/>
+        <source>Choose a Debug Option</source>
+        <extracomment>Title for the input dialog message box shown when user is asked to provide a flag for the translator debug options.</extracomment>
+        <translation>Choose a Debug Option</translation>
+    </message>
+    <message>
+        <location filename="fsi_tools_messages.h" line="12"/>
+        <source>Debug information flag for the translator:</source>
+        <extracomment>Message for the input dialog message box shown when user is asked to provide a flag for the translator debug options.</extracomment>
+        <translation>Debug information flag for the translator:</translation>
+    </message>
+    <message>
+        <location filename="fsi_tools_messages.h" line="15"/>
+        <source>Choose a Configuration File</source>
+        <extracomment>Title for the input dialog message box shown when user is asked to choose a configuration file for the execution environment.</extracomment>
+        <translation>Choose a Configuration File</translation>
+    </message>
+    <message>
+        <location filename="fsi_tools_messages.h" line="18"/>
+        <source>Configuration file describes which modules will be loaded:</source>
+        <extracomment>Message for the input dialog message box shown when user is asked to choose a configuration file for the execution environment.</extracomment>
+        <translation>Configuration file describes which modules will be loaded:</translation>
+    </message>
+    <message>
+        <location filename="fsi_tools_messages.h" line="21"/>
+        <source>FSI Translator</source>
+        <extracomment>Console window title for the translator child process.</extracomment>
+        <translation>FSI Translator</translation>
+    </message>
+    <message>
+        <location filename="fsi_tools_messages.h" line="24"/>
+        <source>FSI Mediator</source>
+        <extracomment>Console window title for the execution environment child process.</extracomment>
+        <translation>FSI Mediator</translation>
+    </message>
+</context>
+<context>
     <name>CustomWidgets::EnrichedStatusBar</name>
     <message>
         <location filename="enriched_status_bar_messages.h" line="9"/>
@@ -71,7 +110,7 @@
         <location filename="text_editor_messages.h" line="27"/>
         <source>File &quot;%1&quot; has been modified outside the editor. However, it can&apos;t be reloaded.</source>
         <extracomment>Text for the message box which pops up when a file has been modified outside the text editor. But the file can&apos;t be opened.</extracomment>
-        <translation>File &quot;%1&quot; has been modified outside the eidotr. However, it can&apos;t be reloaded.</translation>
+        <translation>File &quot;%1&quot; has been modified outside the editor. However, it can&apos;t be reloaded.</translation>
     </message>
     <message>
         <location filename="text_editor_messages.h" line="30"/>
@@ -143,7 +182,7 @@
         <location filename="text_editor_messages.h" line="63"/>
         <source>You have unsaved changes in &quot;%1&quot;. Do you want to save them before closing?</source>
         <extracomment>Text for the message box which pops up when the user tries to close a file tab for the file which has not been saved.</extracomment>
-        <translation>You have unsaved changes in &quot;%1&quot;. Do youo want to save them before closing?</translation>
+        <translation>You have unsaved changes in &quot;%1&quot;. Do you want to save them before closing?</translation>
     </message>
     <message>
         <location filename="text_editor_messages.h" line="66"/>
@@ -251,19 +290,16 @@
 <context>
     <name>FSIToolsForm</name>
     <message>
-        <location filename="fsi_tools_window.ui" line="14"/>
         <source>Form</source>
-        <translation>Form</translation>
+        <translation type="vanished">Form</translation>
     </message>
     <message>
-        <location filename="fsi_tools_window.ui" line="21"/>
         <source>Tab 1</source>
-        <translation>Tab 1</translation>
+        <translation type="vanished">Tab 1</translation>
     </message>
     <message>
-        <location filename="fsi_tools_window.ui" line="26"/>
         <source>Tab 2</source>
-        <translation>Tab 2</translation>
+        <translation type="vanished">Tab 2</translation>
     </message>
 </context>
 <context>
@@ -301,12 +337,12 @@
         <translation type="vanished">About FSI and this editor.</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="85"/>
+        <location filename="main_window.ui" line="87"/>
         <source>About</source>
         <translation>About</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="89"/>
+        <location filename="main_window.ui" line="91"/>
         <source>FSI Documentation</source>
         <translation>FSI Documentation</translation>
     </message>
@@ -315,136 +351,156 @@
         <translation type="vanished">Dynamically change the language of the application.</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="114"/>
+        <location filename="main_window.ui" line="116"/>
         <source>Languages</source>
         <translation>Languages</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="146"/>
+        <location filename="main_window.ui" line="150"/>
         <source>Save</source>
         <translation>Save</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="149"/>
+        <location filename="main_window.ui" line="153"/>
         <source>Ctrl+S</source>
         <translation>Ctrl+S</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="158"/>
+        <location filename="main_window.ui" line="162"/>
         <source>Save as...</source>
         <translation>Save as...</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="161"/>
+        <location filename="main_window.ui" line="165"/>
         <source>Ctrl+Shift+S</source>
         <translation>Ctrl+Shift+S</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="170"/>
-        <location filename="main_window.ui" line="209"/>
+        <location filename="main_window.ui" line="174"/>
+        <location filename="main_window.ui" line="213"/>
         <source>Close</source>
         <translation>Close</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="173"/>
+        <location filename="main_window.ui" line="177"/>
         <source>Ctrl+Q</source>
         <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="182"/>
-        <location filename="main_window.ui" line="194"/>
+        <location filename="main_window.ui" line="186"/>
+        <location filename="main_window.ui" line="198"/>
         <source>Open...</source>
         <translation>Open...</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="185"/>
+        <location filename="main_window.ui" line="189"/>
         <source>Ctrl+O</source>
         <translation>Ctrl+O</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="200"/>
+        <location filename="main_window.ui" line="204"/>
         <source>Ctrl+W</source>
         <translation>Ctrl+W</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="212"/>
+        <location filename="main_window.ui" line="216"/>
         <source>Ctrl+C</source>
         <translation>Ctrl+C</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="221"/>
+        <location filename="main_window.ui" line="225"/>
         <source>Translate and Run</source>
         <translation>Translate and Run</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="224"/>
+        <location filename="main_window.ui" line="228"/>
         <source>Ctrl+R</source>
         <translation>Ctrl+R</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="233"/>
+        <location filename="main_window.ui" line="237"/>
         <source>Runtime Environment</source>
         <translation>Runtime Environment</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="236"/>
+        <location filename="main_window.ui" line="240"/>
         <source>Ctrl+E</source>
         <translation>Ctrl+E</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="245"/>
+        <location filename="main_window.ui" line="249"/>
         <source>Visual Environment Documentation</source>
         <translation>Visual Environment Documentation</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="254"/>
+        <location filename="main_window.ui" line="258"/>
         <source>Short Overview...</source>
         <translation>Short Overview...</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="263"/>
+        <location filename="main_window.ui" line="267"/>
         <source>Installation</source>
         <translation>Installation</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="272"/>
+        <location filename="main_window.ui" line="276"/>
         <source>Release Layout</source>
         <translation>Release Layout</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="281"/>
+        <location filename="main_window.ui" line="285"/>
         <source>Using Translator</source>
         <translation>Using Translator</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="290"/>
+        <location filename="main_window.ui" line="294"/>
         <source>Using Execution Engine</source>
         <translation>Using Execution Engine</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="299"/>
+        <location filename="main_window.ui" line="303"/>
         <source>Engine Multithreading</source>
         <translation>Engine Multithreading</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="308"/>
+        <location filename="main_window.ui" line="312"/>
         <source>Ukrainian</source>
         <translation>Ukrainian</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="317"/>
+        <location filename="main_window.ui" line="321"/>
         <source>English</source>
         <translation>English</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="326"/>
+        <location filename="main_window.ui" line="330"/>
         <source>New</source>
         <translation>New</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="329"/>
+        <location filename="main_window.ui" line="333"/>
         <source>Ctrl+N</source>
         <translation>Ctrl+N</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="342"/>
+        <source>Translate</source>
+        <translation>Translate</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="345"/>
+        <source>Ctrl+B</source>
+        <translation>Ctrl+B</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="354"/>
+        <source>Run Last Translated</source>
+        <translation>Run Last Translated</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="357"/>
+        <source>Ctrl+L</source>
+        <translation>Ctrl+L</translation>
     </message>
 </context>
 <context>
@@ -529,6 +585,132 @@ Default message displayed in the status bar for the translator</extracomment>
         <source>Ready to work.</source>
         <extracomment>Status tip just after starting the application.</extracomment>
         <translation>Ready to work.</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="51"/>
+        <source>build.bfsi</source>
+        <extracomment>The name of the translation result file.</extracomment>
+        <translation>build.bfsi</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="54"/>
+        <location filename="main_window_messages.h" line="57"/>
+        <source>Action Cancelled</source>
+        <extracomment>Status tip after translation flag option dialog was cancelled, this cancels program translation.
+----------
+Status tip after execution environment configuration file input dialog was cancelled, this cancels program execution.</extracomment>
+        <translation>Action Cancelled</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="60"/>
+        <source>runtime.log</source>
+        <extracomment>The name of the execution environment log file.</extracomment>
+        <translation>runtime.log</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="63"/>
+        <location filename="main_window_messages.h" line="99"/>
+        <source>Running...</source>
+        <extracomment>Status tip after FSI translator has just been started.
+----------
+Status tip after FSI Mediator has just been started.</extracomment>
+        <translation>Running...</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="66"/>
+        <location filename="main_window_messages.h" line="102"/>
+        <source>Success!</source>
+        <extracomment>Status tip after FSI translator finished successfully.
+----------
+Status tip after FSI Mediator finished successfully.</extracomment>
+        <translation>Success!</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="69"/>
+        <location filename="main_window_messages.h" line="105"/>
+        <source>Errors Detected</source>
+        <extracomment>Status tip after FSI translator finished with errors.
+----------
+Status tip after FSI Mediator finished with errors.</extracomment>
+        <translation>Errors Detected</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="72"/>
+        <location filename="main_window_messages.h" line="108"/>
+        <source>Already Running</source>
+        <extracomment>Status tip after FSI translator is already running, but user tries to start another one.
+----------
+Status tip after FSI Mediator is already running, but user tries to start another one.</extracomment>
+        <translation>Already Running</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="75"/>
+        <location filename="main_window_messages.h" line="111"/>
+        <source>Instance is Already Active</source>
+        <extracomment>Title for the message box which pops up to catch user attention after they try to start a translator, while there is another running instance.
+----------
+Title for the message box which pops up to catch user attention after they try to start a mediator, while there is another running instance.</extracomment>
+        <translation>Instance is Already Active</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="78"/>
+        <source>There is an already active instance of the FSI Translator. Close the previous window before starting another one.</source>
+        <extracomment>Message for the message box which pops up to catch user attention after they try to start a translator, while there is another running instance.</extracomment>
+        <translation>There is an already active instance of the FSI Translator. Close the previous window before starting another one.</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="81"/>
+        <location filename="main_window_messages.h" line="84"/>
+        <location filename="main_window_messages.h" line="117"/>
+        <location filename="main_window_messages.h" line="120"/>
+        <source>Instance Crashed</source>
+        <extracomment>Status tip after FSI translator crashes.
+----------
+Title for the message box which pops up to catch user attention after the FSI translator crashes.
+----------
+Status tip after FSI Mediator crashes.
+----------
+Title for the message box which pops up to catch user attention after the FSI Mediator crashes.</extracomment>
+        <translation>Instance Crashed</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="87"/>
+        <source>The FSI Translator has crashed. Please restart the application.</source>
+        <extracomment>Message for the message box which pops up to catch user attention after the FSI translator crashes.</extracomment>
+        <translation>The FSI Translator has crashed. Please restart the application.</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="90"/>
+        <location filename="main_window_messages.h" line="126"/>
+        <source>Start Failed</source>
+        <extracomment>Status tip after FSI translator failed to start.
+----------
+Status tip after FSI Mediator failed to start.</extracomment>
+        <translation>Start Failed</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="93"/>
+        <source>Unknown Result</source>
+        <extracomment>Title for the message box which pops when a child returns an unknown result.</extracomment>
+        <translation>Unknown Result</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="96"/>
+        <source>The operation returned an unknown result. Most likely, the developer of this application has failed to handle some edge case.</source>
+        <extracomment>Message for the message box which pops when a child returns an unknown result.</extracomment>
+        <translation>The operation returned an unknown result. Most likely, the developer of this application has failed to handle some edge case.</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="114"/>
+        <source>There is an already active instance of the FSI Mediator. Close the previous window before starting another one.</source>
+        <extracomment>Message for the message box which pops up to catch user attention after they try to start a mediator, while there is another running instance.</extracomment>
+        <translation>There is an already active instance of the FSI Mediator. Close the previous window before starting another one.</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="123"/>
+        <source>The FSI Mediator has crashed. Please restart the application.</source>
+        <extracomment>Message for the message box which pops up to catch user attention after the FSI Mediator crashes.</extracomment>
+        <translation>The FSI Mediator has crashed. Please restart the application.</translation>
     </message>
 </context>
 </TS>

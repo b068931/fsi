@@ -2,6 +2,45 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="uk_UA">
 <context>
+    <name>Components::FSITools</name>
+    <message>
+        <location filename="fsi_tools_messages.h" line="9"/>
+        <source>Choose a Debug Option</source>
+        <extracomment>Title for the input dialog message box shown when user is asked to provide a flag for the translator debug options.</extracomment>
+        <translation>Оберіть опцію зневадження</translation>
+    </message>
+    <message>
+        <location filename="fsi_tools_messages.h" line="12"/>
+        <source>Debug information flag for the translator:</source>
+        <extracomment>Message for the input dialog message box shown when user is asked to provide a flag for the translator debug options.</extracomment>
+        <translation>Прапорець зневаджувальної інформації для транслятора:</translation>
+    </message>
+    <message>
+        <location filename="fsi_tools_messages.h" line="15"/>
+        <source>Choose a Configuration File</source>
+        <extracomment>Title for the input dialog message box shown when user is asked to choose a configuration file for the execution environment.</extracomment>
+        <translation>Оберіть файл конфігурації</translation>
+    </message>
+    <message>
+        <location filename="fsi_tools_messages.h" line="18"/>
+        <source>Configuration file describes which modules will be loaded:</source>
+        <extracomment>Message for the input dialog message box shown when user is asked to choose a configuration file for the execution environment.</extracomment>
+        <translation>Файл конфігурації описує, які модулі буде завантажено:</translation>
+    </message>
+    <message>
+        <location filename="fsi_tools_messages.h" line="21"/>
+        <source>FSI Translator</source>
+        <extracomment>Console window title for the translator child process.</extracomment>
+        <translation>Транслятор FSI</translation>
+    </message>
+    <message>
+        <location filename="fsi_tools_messages.h" line="24"/>
+        <source>FSI Mediator</source>
+        <extracomment>Console window title for the execution environment child process.</extracomment>
+        <translation>Посередник FSI</translation>
+    </message>
+</context>
+<context>
     <name>CustomWidgets::EnrichedStatusBar</name>
     <message>
         <location filename="enriched_status_bar_messages.h" line="9"/>
@@ -283,19 +322,16 @@
 <context>
     <name>FSIToolsForm</name>
     <message>
-        <location filename="fsi_tools_window.ui" line="14"/>
         <source>Form</source>
-        <translation>Форма</translation>
+        <translation type="vanished">Форма</translation>
     </message>
     <message>
-        <location filename="fsi_tools_window.ui" line="21"/>
         <source>Tab 1</source>
-        <translation>Вкладка 1</translation>
+        <translation type="vanished">Вкладка 1</translation>
     </message>
     <message>
-        <location filename="fsi_tools_window.ui" line="26"/>
         <source>Tab 2</source>
-        <translation>Вкладка 2</translation>
+        <translation type="vanished">Вкладка 2</translation>
     </message>
 </context>
 <context>
@@ -348,12 +384,12 @@ Value for the status bar when translator has not been run once yet.</extracommen
         <translation type="vanished">Про FSI та цей редактор.</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="85"/>
+        <location filename="main_window.ui" line="87"/>
         <source>About</source>
         <translation>Про Програму</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="89"/>
+        <location filename="main_window.ui" line="91"/>
         <source>FSI Documentation</source>
         <translation>Документація FSI</translation>
     </message>
@@ -362,139 +398,159 @@ Value for the status bar when translator has not been run once yet.</extracommen
         <translation type="vanished">Змінити мову застосунку (без перезавантаження).</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="114"/>
+        <location filename="main_window.ui" line="116"/>
         <source>Languages</source>
         <translation>Доступні мови</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="146"/>
+        <location filename="main_window.ui" line="150"/>
         <source>Save</source>
         <translation>Зберегти</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="149"/>
+        <location filename="main_window.ui" line="153"/>
         <source>Ctrl+S</source>
         <translation>Ctrl+s</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="158"/>
+        <location filename="main_window.ui" line="162"/>
         <source>Save as...</source>
         <translation>Зберегти як...</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="161"/>
+        <location filename="main_window.ui" line="165"/>
         <source>Ctrl+Shift+S</source>
         <translation>Ctrl+Shift+S</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="170"/>
-        <location filename="main_window.ui" line="209"/>
+        <location filename="main_window.ui" line="174"/>
+        <location filename="main_window.ui" line="213"/>
         <source>Close</source>
         <translation>Закрити</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="173"/>
+        <location filename="main_window.ui" line="177"/>
         <source>Ctrl+Q</source>
         <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="182"/>
-        <location filename="main_window.ui" line="194"/>
+        <location filename="main_window.ui" line="186"/>
+        <location filename="main_window.ui" line="198"/>
         <source>Open...</source>
         <translation>Відкрити...</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="185"/>
+        <location filename="main_window.ui" line="189"/>
         <source>Ctrl+O</source>
         <translation>Ctrl+O</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="200"/>
+        <location filename="main_window.ui" line="204"/>
         <source>Ctrl+W</source>
         <translation>Ctrl+W</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="212"/>
+        <location filename="main_window.ui" line="216"/>
         <source>Ctrl+C</source>
         <translation>Ctrl+C</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="224"/>
+        <location filename="main_window.ui" line="228"/>
         <source>Ctrl+R</source>
         <translation>Ctrl+R</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="236"/>
+        <location filename="main_window.ui" line="240"/>
         <source>Ctrl+E</source>
         <translation>Ctrl+E</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="308"/>
+        <location filename="main_window.ui" line="312"/>
         <source>Ukrainian</source>
         <translation>Українська</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="317"/>
+        <location filename="main_window.ui" line="321"/>
         <source>English</source>
         <translation>Англійська</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="326"/>
+        <location filename="main_window.ui" line="330"/>
         <source>New</source>
         <translatorcomment>Новий</translatorcomment>
         <translation>Новий</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="329"/>
+        <location filename="main_window.ui" line="333"/>
         <source>Ctrl+N</source>
         <translation>Ctrl+N</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="342"/>
+        <source>Translate</source>
+        <translation>Транслювати</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="345"/>
+        <source>Ctrl+B</source>
+        <translation>Ctrl+B</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="354"/>
+        <source>Run Last Translated</source>
+        <translation>Запустити останній результат</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="357"/>
+        <source>Ctrl+L</source>
+        <translation>Ctrl+L</translation>
     </message>
     <message>
         <source>Закрити</source>
         <translation type="vanished">Закрити</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="221"/>
+        <location filename="main_window.ui" line="225"/>
         <source>Translate and Run</source>
         <translation>Транслювати і Запустити</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="233"/>
+        <location filename="main_window.ui" line="237"/>
         <source>Runtime Environment</source>
         <translation>Середовище Виконання</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="245"/>
+        <location filename="main_window.ui" line="249"/>
         <source>Visual Environment Documentation</source>
         <translation>Документація До Середовища Виконання</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="254"/>
+        <location filename="main_window.ui" line="258"/>
         <source>Short Overview...</source>
         <translation>Короткий Огляд...</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="263"/>
+        <location filename="main_window.ui" line="267"/>
         <source>Installation</source>
         <translation>Встановлення</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="272"/>
+        <location filename="main_window.ui" line="276"/>
         <source>Release Layout</source>
         <translation>Розміщення Файлів</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="281"/>
+        <location filename="main_window.ui" line="285"/>
         <source>Using Translator</source>
         <translation>Використання Транслятора</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="290"/>
+        <location filename="main_window.ui" line="294"/>
         <source>Using Execution Engine</source>
         <translation>Використання Середовища Виконання</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="299"/>
+        <location filename="main_window.ui" line="303"/>
         <source>Engine Multithreading</source>
         <translation>Паралельність Середовища Виконання</translation>
     </message>
@@ -608,6 +664,132 @@ Default message displayed in the status bar for the translator</extracomment>
         <source>Ready to work.</source>
         <extracomment>Status tip just after starting the application.</extracomment>
         <translation>Готово до роботи.</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="51"/>
+        <source>build.bfsi</source>
+        <extracomment>The name of the translation result file.</extracomment>
+        <translation>build.bfsi</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="54"/>
+        <location filename="main_window_messages.h" line="57"/>
+        <source>Action Cancelled</source>
+        <extracomment>Status tip after translation flag option dialog was cancelled, this cancels program translation.
+----------
+Status tip after execution environment configuration file input dialog was cancelled, this cancels program execution.</extracomment>
+        <translation>Дію скасовано</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="60"/>
+        <source>runtime.log</source>
+        <extracomment>The name of the execution environment log file.</extracomment>
+        <translation>runtime.log</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="63"/>
+        <location filename="main_window_messages.h" line="99"/>
+        <source>Running...</source>
+        <extracomment>Status tip after FSI translator has just been started.
+----------
+Status tip after FSI Mediator has just been started.</extracomment>
+        <translation>Виконується...</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="66"/>
+        <location filename="main_window_messages.h" line="102"/>
+        <source>Success!</source>
+        <extracomment>Status tip after FSI translator finished successfully.
+----------
+Status tip after FSI Mediator finished successfully.</extracomment>
+        <translation>Успіх!</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="69"/>
+        <location filename="main_window_messages.h" line="105"/>
+        <source>Errors Detected</source>
+        <extracomment>Status tip after FSI translator finished with errors.
+----------
+Status tip after FSI Mediator finished with errors.</extracomment>
+        <translation>Виявлено помилки</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="72"/>
+        <location filename="main_window_messages.h" line="108"/>
+        <source>Already Running</source>
+        <extracomment>Status tip after FSI translator is already running, but user tries to start another one.
+----------
+Status tip after FSI Mediator is already running, but user tries to start another one.</extracomment>
+        <translation>Вже виконується</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="75"/>
+        <location filename="main_window_messages.h" line="111"/>
+        <source>Instance is Already Active</source>
+        <extracomment>Title for the message box which pops up to catch user attention after they try to start a translator, while there is another running instance.
+----------
+Title for the message box which pops up to catch user attention after they try to start a mediator, while there is another running instance.</extracomment>
+        <translation>Екземпляр вже активний</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="78"/>
+        <source>There is an already active instance of the FSI Translator. Close the previous window before starting another one.</source>
+        <extracomment>Message for the message box which pops up to catch user attention after they try to start a translator, while there is another running instance.</extracomment>
+        <translation>Вже існує активний екземпляр транслятора FSI. Закрийте попереднє вікно перед запуском нового.</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="81"/>
+        <location filename="main_window_messages.h" line="84"/>
+        <location filename="main_window_messages.h" line="117"/>
+        <location filename="main_window_messages.h" line="120"/>
+        <source>Instance Crashed</source>
+        <extracomment>Status tip after FSI translator crashes.
+----------
+Title for the message box which pops up to catch user attention after the FSI translator crashes.
+----------
+Status tip after FSI Mediator crashes.
+----------
+Title for the message box which pops up to catch user attention after the FSI Mediator crashes.</extracomment>
+        <translation>Екземпляр аварійно завершив роботу</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="87"/>
+        <source>The FSI Translator has crashed. Please restart the application.</source>
+        <extracomment>Message for the message box which pops up to catch user attention after the FSI translator crashes.</extracomment>
+        <translation>Транслятор FSI аварійно завершив роботу. Будь ласка, перезапустіть програму.</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="90"/>
+        <location filename="main_window_messages.h" line="126"/>
+        <source>Start Failed</source>
+        <extracomment>Status tip after FSI translator failed to start.
+----------
+Status tip after FSI Mediator failed to start.</extracomment>
+        <translation>Не вдалося запустити</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="93"/>
+        <source>Unknown Result</source>
+        <extracomment>Title for the message box which pops when a child returns an unknown result.</extracomment>
+        <translation>Невідомий результат</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="96"/>
+        <source>The operation returned an unknown result. Most likely, the developer of this application has failed to handle some edge case.</source>
+        <extracomment>Message for the message box which pops when a child returns an unknown result.</extracomment>
+        <translation>Операція повернула невідомий результат. Ймовірно, розробник цієї програми не зміг обробити якийсь винятковий випадок.</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="114"/>
+        <source>There is an already active instance of the FSI Mediator. Close the previous window before starting another one.</source>
+        <extracomment>Message for the message box which pops up to catch user attention after they try to start a mediator, while there is another running instance.</extracomment>
+        <translation>Вже існує активний екземпляр посередника FSI. Закрийте попереднє вікно перед запуском нового.</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="123"/>
+        <source>The FSI Mediator has crashed. Please restart the application.</source>
+        <extracomment>Message for the message box which pops up to catch user attention after the FSI Mediator crashes.</extracomment>
+        <translation>Посередник FSI аварійно завершив роботу. Будь ласка, перезапустіть програму.</translation>
     </message>
 </context>
 </TS>

@@ -1,0 +1,388 @@
+$stack-size d4096; /* Increased stack size for matrix data */
+
+from prts import <
+    io.std.out, 
+    io.std.in, 
+    memory.allocate, 
+    memory.deallocate,
+    memory.allocated-size
+>
+
+$redefine symbol-base d48;
+$define-string prompt-n ''''Enter matrix size (N): ''''
+$define-string prompt-matrix ''''Enter matrix elements (one per line):''''
+$define-string result-message ''''Transposed matrix:
+''''
+
+function memory-copy(memory destination, memory source, eight-bytes size) {
+    @repeat;
+    compare variable  eight-bytes size, 
+            immediate eight-bytes d0;
+    jump-equal point end;
+        decrement variable eight-bytes size;
+
+        move dereference one-byte destination[size], 
+             dereference one-byte source     [size];
+    jump point repeat;
+    @end;
+}
+
+function memory-copy-reversed(memory destination, memory source, eight-bytes size) {
+    $declare eight-bytes destination-index;
+    move variable  eight-bytes destination-index, 
+         immediate eight-bytes d0;
+
+    @repeat;
+    compare variable  eight-bytes size, 
+            immediate eight-bytes d0;
+    jump-equal point end;
+        decrement variable eight-bytes size;
+
+        move dereference one-byte destination[destination-index], 
+             dereference one-byte source     [size];
+    increment variable eight-bytes destination-index;
+        jump point repeat;
+
+    @end;
+}
+
+function eight-bytes-to-string(eight-bytes value) {
+    $declare memory result;
+    $declare memory result-copy;
+    $declare eight-bytes result-size;
+    $declare eight-bytes result-copy-size;
+    $declare eight-bytes symbol;
+
+    move variable  eight-bytes result-size, 
+         immediate eight-bytes d0;
+    move variable  eight-bytes result-copy-size, 
+         immediate eight-bytes d0;
+
+    @repeat;
+    divide variable  eight-bytes value, 
+           immediate eight-bytes d10;
+    increment variable eight-bytes result-copy-size;
+
+        result-copy: prts->memory.allocate(
+            variable eight-bytes result-copy-size
+        )
+
+        memory-copy(
+            variable memory      result-copy, 
+            variable memory      result, 
+            variable eight-bytes result-size
+        )
+   
+        result: prts->memory.deallocate()
+
+        /* 'load-value' retrieves remainder from 'divide' */
+        load-value variable eight-bytes symbol;
+    add variable  eight-bytes symbol, 
+        immediate eight-bytes symbol-base;
+    move dereference one-byte result-copy[result-size], 
+         variable    one-byte symbol;
+    move-pointer variable memory result, 
+                 variable memory result-copy;
+    move variable eight-bytes result-size, 
+         variable eight-bytes result-copy-size;
+    compare variable  eight-bytes value, 
+            immediate eight-bytes d0;
+    jump-equal point end;
+        jump point repeat;
+
+    @end;
+
+    increment variable eight-bytes result-copy-size;
+    result-copy: prts->memory.allocate(
+        variable eight-bytes result-copy-size
+    )
+   
+    memory-copy-reversed(
+        variable memory      result-copy, 
+        variable memory      result, 
+        variable eight-bytes result-size
+    )
+
+    result: prts->memory.deallocate()
+    save-value variable memory result-copy;
+}
+
+/* * Converts a string (from std.in) to an eight-bytes integer.
+ * Assumes 'subtract' and 'multiply' instructions are available.
+ */
+function string-to-eight-bytes(memory str, eight-bytes len) {
+    $declare eight-bytes result;
+    $declare eight-bytes index;
+    $declare eight-bytes digit;
+
+    move variable eight-bytes result, immediate eight-bytes d0;
+    move variable eight-bytes index, immediate eight-bytes d0;
+
+    @loop;
+    /* Stop if we've processed all characters */
+    compare variable eight-bytes index, variable eight-bytes len;
+    jump-equal point end;
+
+    /* Load the ASCII character byte */
+    move variable eight-bytes digit, immediate eight-bytes d0;
+    move variable one-byte digit, dereference one-byte str[index];
+    
+    /* Stop if we hit a newline (h0A) or carriage return (h0D) */
+    compare variable eight-bytes digit, immediate eight-bytes h0A;
+    jump-equal point end;
+    compare variable eight-bytes digit, immediate eight-bytes h0D;
+    jump-equal point end;
+
+    /* Convert ASCII '0'-'9' to integer 0-9 */
+    subtract variable eight-bytes digit, immediate eight-bytes symbol-base;
+
+    /* result = result * 10 */
+    multiply variable eight-bytes result, immediate eight-bytes d10;
+    
+    /* result = result + digit */
+    add variable eight-bytes result, variable eight-bytes digit;
+
+    increment variable eight-bytes index;
+    jump point loop;
+
+    @end;
+    save-value variable eight-bytes result;
+}
+
+function read-number() {
+    $declare memory input-buffer;
+    $declare eight-bytes bytes-read;
+    $declare eight-bytes result-number;
+    $declare eight-bytes buffer-size;
+    
+    move variable eight-bytes buffer-size, immediate eight-bytes d100;
+    input-buffer: prts->memory.allocate(variable eight-bytes buffer-size)
+
+    bytes-read: prts->io.std.in(
+        variable memory input-buffer, 
+        variable eight-bytes buffer-size
+    )
+
+    /* Convert the read string to an integer */
+    string-to-eight-bytes(
+        variable memory input-buffer, 
+        variable eight-bytes bytes-read
+    )
+    load-value variable eight-bytes result-number;
+
+    input-buffer: prts->memory.deallocate()
+    save-value variable eight-bytes result-number;
+}
+
+
+function main() {
+    $main-function main;
+    $expose-function main;
+
+    $declare eight-bytes n-size;
+    $declare eight-bytes matrix-size-bytes;
+    $declare memory matrix;
+    $declare memory message-storage;
+    $declare eight-bytes zero;
+
+    move variable eight-bytes zero, immediate eight-bytes d0;
+
+    /* Allocate enough memory into the message storage so that it is guaranteed that everything fits there */
+    message-storage: prts->memory.allocate(immediate eight-bytes d100)
+    
+    /* Store '8' in a variable for offset calculations */
+    $declare eight-bytes eight;
+    move variable eight-bytes eight, immediate eight-bytes d8;
+
+    /* ----------------------------------- */
+    /* 1. Get Matrix Size (N)              */
+    /* ----------------------------------- */
+    copy-string variable memory message-storage, string prompt-n;
+    void: prts->io.std.out(
+        variable memory message-storage,
+        size-of eight-bytes prompt-n
+    )
+
+    read-number()
+    load-value variable eight-bytes n-size;
+
+    /* ------------------------------------- */
+    /* 2. Allocate Matrix Memory (N * N * 8) */
+    /* ------------------------------------- */
+    move variable eight-bytes matrix-size-bytes, variable eight-bytes n-size;
+    multiply variable eight-bytes matrix-size-bytes, variable eight-bytes n-size;
+    multiply variable eight-bytes matrix-size-bytes, variable eight-bytes eight;
+    matrix: prts->memory.allocate(variable eight-bytes matrix-size-bytes)
+
+    /* ----------------------------------- */
+    /* 3. Read Matrix Elements             */
+    /* ----------------------------------- */
+    copy-string variable memory message-storage, string prompt-matrix;
+    void: prts->io.std.out(
+        variable memory message-storage,
+        size-of eight-bytes prompt-matrix
+    )
+    
+    $declare eight-bytes row;
+    $declare eight-bytes col;
+    $declare eight-bytes elem;
+    $declare eight-bytes offset;
+    $declare eight-bytes temp-index;
+
+    move variable eight-bytes row, immediate eight-bytes d0;
+    @read-row-loop;
+        compare variable eight-bytes row, variable eight-bytes n-size;
+        jump-equal point read-row-end;
+
+        move variable eight-bytes col, immediate eight-bytes d0;
+        @read-col-loop;
+            compare variable eight-bytes col, variable eight-bytes n-size;
+            jump-equal point read-col-end;
+
+            /* Read the element */
+            read-number()
+            load-value variable eight-bytes elem;
+
+            /* Calculate offset = (row * n-size + col) * 8 */
+            move variable eight-bytes temp-index, variable eight-bytes row;
+            multiply variable eight-bytes temp-index, variable eight-bytes n-size;
+            add variable eight-bytes temp-index, variable eight-bytes col;
+            move variable eight-bytes offset, variable eight-bytes temp-index;
+            multiply variable eight-bytes offset, variable eight-bytes eight;
+
+            /* Store element: matrix[offset] = elem */
+            move dereference eight-bytes matrix[offset], variable eight-bytes elem;
+
+            increment variable eight-bytes col;
+            jump point read-col-loop;
+        @read-col-end;
+
+        increment variable eight-bytes row;
+        jump point read-row-loop;
+    @read-row-end;
+
+    /* ----------------------------------- */
+    /* 4. Transpose Matrix (In-Place)      */
+    /* ----------------------------------- */
+    $declare eight-bytes offset1;
+    $declare eight-bytes offset2;
+    $declare eight-bytes temp-val;
+
+    move variable eight-bytes row, immediate eight-bytes d0;
+    @transpose-row-loop;
+        /* for (row = 0; row < n-size; row++) */
+        compare variable eight-bytes row, variable eight-bytes n-size;
+        jump-equal point transpose-row-end;
+
+        /* for (col = row + 1; col < n-size; col++) */
+        move variable eight-bytes col, variable eight-bytes row;
+        increment variable eight-bytes col;
+        
+        @transpose-col-loop;
+            compare variable eight-bytes col, variable eight-bytes n-size;
+            jump-equal point transpose-col-end;
+
+            /* Get address of matrix[row][col] */
+            /* offset1 = (row * n-size + col) * 8 */
+            move variable eight-bytes temp-index, variable eight-bytes row;
+            multiply variable eight-bytes temp-index, variable eight-bytes n-size;
+            add variable eight-bytes temp-index, variable eight-bytes col;
+            move variable eight-bytes offset1, variable eight-bytes temp-index;
+            multiply variable eight-bytes offset1, variable eight-bytes eight;
+
+            /* Get address of matrix[col][row] */
+            /* offset2 = (col * n-size + row) * 8 */
+            move variable eight-bytes temp-index, variable eight-bytes col;
+            multiply variable eight-bytes temp-index, variable eight-bytes n-size;
+            add variable eight-bytes temp-index, variable eight-bytes row;
+            move variable eight-bytes offset2, variable eight-bytes temp-index;
+            multiply variable eight-bytes offset2, variable eight-bytes eight;
+
+            /* Swap elements */
+            move variable eight-bytes temp-val, dereference eight-bytes matrix[offset1];
+            move dereference eight-bytes matrix[offset1], dereference eight-bytes matrix[offset2];
+            move dereference eight-bytes matrix[offset2], variable eight-bytes temp-val;
+
+            increment variable eight-bytes col;
+            jump point transpose-col-loop;
+        @transpose-col-end;
+
+        increment variable eight-bytes row;
+        jump point transpose-row-loop;
+    @transpose-row-end;
+
+    /* ----------------------------------- */
+    /* 5. Print Transposed Matrix          */
+    /* ----------------------------------- */
+    copy-string variable memory message-storage, string result-message;
+    void: prts->io.std.out(
+        variable memory message-storage,
+        size-of eight-bytes result-message
+    )
+
+    $declare memory elem-string;
+    $declare eight-bytes elem-string-size;
+
+    move variable eight-bytes row, immediate eight-bytes d0;
+    @print-row-loop;
+        compare variable eight-bytes row, variable eight-bytes n-size;
+        jump-equal point print-row-end;
+
+        move variable eight-bytes col, immediate eight-bytes d0;
+        @print-col-loop;
+            compare variable eight-bytes col, variable eight-bytes n-size;
+            jump-equal point print-col-end;
+
+            /* Calculate offset = (row * n-size + col) * 8 */
+            move variable eight-bytes temp-index, variable eight-bytes row;
+            multiply variable eight-bytes temp-index, variable eight-bytes n-size;
+            add variable eight-bytes temp-index, variable eight-bytes col;
+            move variable eight-bytes offset, variable eight-bytes temp-index;
+            multiply variable eight-bytes offset, variable eight-bytes eight;
+
+            /* Get element: elem = matrix[offset] */
+            move variable eight-bytes elem, dereference eight-bytes matrix[offset];
+
+            /* Convert element to string */
+            eight-bytes-to-string(variable eight-bytes elem)
+            load-value variable memory elem-string;
+
+            /* Get string size and print it */
+            elem-string-size: prts->memory.allocated-size(
+                variable memory elem-string
+            )
+
+            decrement variable eight-bytes elem-string-size;
+            
+            void: prts->io.std.out(
+                variable memory elem-string, 
+                variable eight-bytes elem-string-size
+            )
+            elem-string: prts->memory.deallocate()
+
+            move dereference one-byte message-storage[zero], d32;
+            void: prts->io.std.out(
+                variable memory message-storage,
+                immediate eight-bytes d1
+            )
+
+            increment variable eight-bytes col;
+            jump point print-col-loop;
+        @print-col-end;
+
+        /* Print a newline after the row */
+	move dereference one-byte message-storage[zero], d10;
+	void: prts->io.std.out(
+	    variable memory message-storage,
+	    immediate eight-bytes d1
+	)
+
+        increment variable eight-bytes row;
+        jump point print-row-loop;
+    @print-row-end;
+
+    /* ----------------------------------- */
+    /* 6. Cleanup                          */
+    /* ----------------------------------- */
+    matrix: prts->memory.deallocate()
+}
