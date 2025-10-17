@@ -11,6 +11,7 @@
 #include <windows.h>
 
 #include <limits>
+#include <string>
 
 namespace Components::FSITools {
     /// <summary>
@@ -130,10 +131,16 @@ namespace Components::FSITools {
         void onExecutionEnvironmentFinished(int exitCode, QProcess::ExitStatus status) noexcept;
         void onExecutionEnvironmentErrorOccurred(QProcess::ProcessError error) noexcept;
 
+    public slots:
+        void onRetranslateUI();
+
     private:
         QProcess* translator;
         QProcess* executionEnvironment;
         HANDLE executionEnvironmentLogFile;
+
+        std::wstring translatorWindowTitle;
+        std::wstring executionEnvironmentWindowTitle;
 
         QString lastTranslationTarget;
         QString lastTranslationResult;

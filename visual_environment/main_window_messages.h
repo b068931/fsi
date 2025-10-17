@@ -48,7 +48,83 @@ constexpr const char* g_Messages[] = {
     QT_TRANSLATE_NOOP("Windows::MainWindow", "Ready to work."),
 
     //: The name of the translation result file.
-    QT_TRANSLATE_NOOP("Windows::MainWindow", "build.bfsi")
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "build.bfsi"),
+
+    //: Status tip after translation flag option dialog was cancelled, this cancels program translation.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "Action Cancelled"),
+
+    //: Status tip after execution environment configuration file input dialog was cancelled, this cancels program execution.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "Action Cancelled"),
+
+    //: The name of the execution environment log file.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "runtime.log"),
+
+    //: Status tip after FSI translator has just been started.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "Running..."),
+
+    //: Status tip after FSI translator finished successfully.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "Success!"),
+
+    //: Status tip after FSI translator finished with errors.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "Errors Detected"),
+
+    //: Status tip after FSI translator is already running, but user tries to start another one.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "Already Running"),
+
+    //: Title for the message box which pops up to catch user attention after they try to start a translator, while there is another running instance.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "Instance is Already Active"),
+
+    //: Message for the message box which pops up to catch user attention after they try to start a translator, while there is another running instance.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "There is an already active instance of the FSI Translator. Close the previous window before starting another one."),
+
+    //: Status tip after FSI translator crashes.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "Instance Crashed"),
+
+    //: Title for the message box which pops up to catch user attention after the FSI translator crashes.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "Instance Crashed"),
+
+    //: Message for the message box which pops up to catch user attention after the FSI translator crashes.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "The FSI Translator has crashed. Please restart the application."),
+
+    //: Status tip after FSI translator failed to start.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "Start Failed"),
+
+    //: Title for the message box which pops when a child returns an unknown result.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "Unknown Result"),
+
+    //: Message for the message box which pops when a child returns an unknown result.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "The operation returned an unknown result. Most likely, the developer of this application has failed to handle some edge case."),
+
+    //: Status tip after FSI Mediator has just been started.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "Running..."),
+
+    //: Status tip after FSI Mediator finished successfully.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "Success!"),
+
+    //: Status tip after FSI Mediator finished with errors.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "Errors Detected"),
+
+    //: Status tip after FSI Mediator is already running, but user tries to start another one.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "Already Running"),
+
+    //: Title for the message box which pops up to catch user attention after they try to start a mediator, while there is another running instance.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "Instance is Already Active"),
+
+    //: Message for the message box which pops up to catch user attention after they try to start a mediator, while there is another running instance.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "There is an already active instance of the FSI Mediator. Close the previous window before starting another one."),
+
+    //: Status tip after FSI Mediator crashes.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "Instance Crashed"),
+
+    //: Title for the message box which pops up to catch user attention after the FSI Mediator crashes.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "Instance Crashed"),
+
+    //: Message for the message box which pops up to catch user attention after the FSI Mediator crashes.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "The FSI Mediator has crashed. Please restart the application."),
+
+    //: Status tip after FSI Mediator failed to start.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "Start Failed"),
+
 };
 
 enum MessageKeys {
@@ -66,7 +142,32 @@ enum MessageKeys {
     g_StatusTipFileCloseCanceled = 11,
     g_StatusTipNoFileSelected = 12,
     g_StatusTipStartup = 13,
-    g_TranslationResultFileName = 14
+    g_TranslationResultFileName = 14,
+    g_StatusTipProgramTranslationCancelled = 15,
+    g_StatusTipProgramExecutionCancelled = 16,
+    g_EELogFileName = 17,
+    g_StatusTipTranslatorStarted = 18,
+    g_StatusTipTranslatorSuccess = 19,
+    g_StatusTipTranslatorProgramHasErrors = 20,
+    g_StatusTipTranslatorAlreadyRunning = 21,
+    g_DialogTitleTranslatorAlreadyRunning = 22,
+    g_DialogMessageTranslatorAlreadyRunning = 23,
+    g_StatusTipTranslatorCrashed = 24,
+    g_DialogTitleTranslatorCrashed = 25,
+    g_DialogMessageTranslatorCrashed = 26,
+    g_StatusTipTranslatorFailedToStart = 27,
+    g_DialogTitleUnknownResult = 28,
+    g_DialogMessageUnknownResult = 29,
+    g_StatusTipExecutionEnvironmentStarted = 30,
+    g_StatusTipExecutionEnvironmentSuccess = 31,
+    g_StatusTipExecutionEnvironmentProgramHasErrors = 32,
+    g_StatusTipExecutionEnvironmentAlreadyRunning = 33,
+    g_DialogTitleExecutionEnvironmentAlreadyRunning = 34,
+    g_DialogMessageExecutionEnvironmentAlreadyRunning = 35,
+    g_StatusTipExecutionEnvironmentCrashed = 36,
+    g_DialogTitleExecutionEnvironmentCrashed = 37,
+    g_DialogMessageExecutionEnvironmentCrashed = 38,
+    g_StatusTipExecutionEnvironmentFailedToStart = 39,
 };
 
 #endif

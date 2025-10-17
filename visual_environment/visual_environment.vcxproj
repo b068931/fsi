@@ -209,6 +209,7 @@
     <ClInclude Include="background_service.h" />
     <ClInclude Include="enriched_status_bar_messages.h" />
     <QtMoc Include="fsi_tools_adapter.h" />
+    <ClInclude Include="fsi_tools_messages.h" />
     <ClInclude Include="fsi_ui_configuration_options.h" />
     <ClInclude Include="main_window_messages.h" />
     <ClInclude Include="qstring_wrapper.h" />

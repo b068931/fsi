@@ -166,11 +166,22 @@ namespace Components::FSITools {
         // All interaction with the user will be done through its own console window.
         this->translator->setProcessChannelMode(QProcess::ForwardedChannels);
         this->translator->setWorkingDirectory(QCoreApplication::applicationDirPath());
-        this->translator->setCreateProcessArgumentsModifier([](QProcess::CreateProcessArguments* arguments) {
+        this->translator->setCreateProcessArgumentsModifier([this](QProcess::CreateProcessArguments* arguments) {
+            constexpr DWORD GREY_BACKGROUND = BACKGROUND_INTENSITY;
+            constexpr DWORD WHITE_FOREGROUND = FOREGROUND_INTENSITY
+                | FOREGROUND_RED
+                | FOREGROUND_GREEN
+                | FOREGROUND_BLUE;
+
             arguments->inheritHandles = FALSE;
+            arguments->startupInfo->lpTitle = this->translatorWindowTitle.data();
 
             arguments->flags |= CREATE_NEW_CONSOLE;
             arguments->startupInfo->dwFlags &= ~STARTF_USESTDHANDLES;
+
+            arguments->startupInfo->dwFlags |= STARTF_USEFILLATTRIBUTE;
+            arguments->startupInfo->dwFillAttribute |= GREY_BACKGROUND;
+            arguments->startupInfo->dwFillAttribute |= WHITE_FOREGROUND;
         });
 
         // For the execution environment, we want to capture its errors.
@@ -192,13 +203,24 @@ namespace Components::FSITools {
             // TODO: Configure this so that the child inherits only the file handle for the log file.
             //       For now, we will just let it inherit everything.
 
+            constexpr DWORD GREY_BACKGROUND = BACKGROUND_INTENSITY;
+            constexpr DWORD WHITE_FOREGROUND = FOREGROUND_INTENSITY
+                | FOREGROUND_RED
+                | FOREGROUND_GREEN
+                | FOREGROUND_BLUE;
+
             arguments->inheritHandles = TRUE;
             arguments->flags |= CREATE_NEW_CONSOLE;
+            arguments->startupInfo->lpTitle = this->executionEnvironmentWindowTitle.data();
 
             arguments->startupInfo->dwFlags |= STARTF_USESTDHANDLES;
             arguments->startupInfo->hStdError = this->executionEnvironmentLogFile;
             arguments->startupInfo->hStdInput = NULL;  // Will be replaced with console handle.
             arguments->startupInfo->hStdOutput = NULL; // Will be replaced with console handle.
+
+            arguments->startupInfo->dwFlags |= STARTF_USEFILLATTRIBUTE;
+            arguments->startupInfo->dwFillAttribute |= GREY_BACKGROUND;
+            arguments->startupInfo->dwFillAttribute |= WHITE_FOREGROUND;
         });
 
         // Now just connect the signals.

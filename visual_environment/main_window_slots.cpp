@@ -1,6 +1,8 @@
 #include <QStatusTipEvent>
 #include <QFileDialog>
 #include <QDir>
+#include <QMessageBox>
+
 #include <memory>
 
 #include "main_window.h"
@@ -264,6 +266,9 @@ namespace Windows {
     }
 
     void MainWindow::onProgramTranslate() noexcept {
+        Q_ASSERT(this->editor && "The text editor has not been set up.");
+        Q_ASSERT(this->enrichedStatusBar && "The status bar has not been set up.");
+
         if (!this->editor->hasSelectedFile()) {
            this->enrichedStatusBar->toolTip(
                 Components::Internationalization::StaticTranslatableString::wrap(
@@ -280,39 +285,295 @@ namespace Windows {
             .filePath(g_Messages[MessageKeys::g_TranslationResultFileName]);
 
         auto debugFlag = 
-            Components::FSITools::ConfigurationOptions::getTranslatorDebugFlag();
+            Components::FSITools::ConfigurationOptions::getTranslatorDebugFlag(this);
 
-        this->languageService.send(
-            [selectedFile, translationResult, debugFlag]
-            (Components::FSITools::FSIToolsAdapter* adapter) {
-            adapter->startProgramTranslation(
-                selectedFile,
-                translationResult,
-                debugFlag
+        if (debugFlag.has_value()) {
+            this->languageService.send(
+                [selectedFile, translationResult, debugFlag]
+                (Components::FSITools::FSIToolsAdapter* adapter) {
+                    adapter->startProgramTranslation(
+                        selectedFile,
+                        translationResult,
+                        debugFlag.value()
+                    );
+                });
+        }
+        else {
+            this->enrichedStatusBar->translatorResult(
+                Components::Internationalization::StaticTranslatableString::wrap(
+                    g_Context,
+                    g_Messages[MessageKeys::g_StatusTipProgramTranslationCancelled]
+                ),
+                CustomWidgets::EnrichedStatusBar::ColorHint::neutral
             );
-        });
+        }
     }
 
     void MainWindow::onRunLastTranslatedProgram() noexcept {
-        
+        Q_ASSERT(this->editor && "The text editor has not been set up.");
+        Q_ASSERT(this->enrichedStatusBar && "The status bar has not been set up.");
+
+        QString logFilePath = QDir(this->editor->getWorkingDirectoryPath())
+            .filePath(g_Messages[MessageKeys::g_EELogFileName]);
+
+        QString translationResult = QDir(this->editor->getWorkingDirectoryPath())
+            .filePath(g_Messages[MessageKeys::g_TranslationResultFileName]);
+
+        std::optional<QString> configurationFilePath =
+            Components::FSITools::ConfigurationOptions::getExecutionEnvironmentConfiguration(this);
+
+        if (configurationFilePath.has_value()) {
+            this->languageService.send(
+                [configurationFilePath, translationResult, logFilePath]
+                (Components::FSITools::FSIToolsAdapter* adapter) {
+                    adapter->startExecutionEnvironment(
+                        configurationFilePath.value(),
+                        Components::FSITools::ConfigurationOptions::getPreferredNumberOfExecutors(),
+                        translationResult,
+                        logFilePath
+                    );
+                }
+            );
+        }
+        else {
+            this->enrichedStatusBar->environmentState(
+                Components::Internationalization::StaticTranslatableString::wrap(
+                    g_Context,
+                    g_Messages[MessageKeys::g_StatusTipProgramExecutionCancelled]
+                ),
+                CustomWidgets::EnrichedStatusBar::ColorHint::neutral
+            );
+        }
     }
 
-    void MainWindow::onTranslateAndRun() noexcept {}
+    void MainWindow::onTranslateAndRun() noexcept {
+        this->runAfterTranslation = true;
+        this->onProgramTranslate();
+    }
 
-    void MainWindow::onRuntimeEnvironmentLogs() noexcept {}
+    void MainWindow::onRuntimeEnvironmentLogs() noexcept {
+        Q_ASSERT(this->editor && "The text editor has not been set up.");
 
-    void MainWindow::onProgramTranslatorStarted() noexcept {}
+        QString logFilePath = QDir(this->editor->getWorkingDirectoryPath())
+            .filePath(g_Messages[MessageKeys::g_EELogFileName]);
+
+        // Editor will automatically produce an error message if the file does not exist.
+        this->editor->openNewFile(logFilePath);
+    }
+
+    void MainWindow::onProgramTranslatorStarted() noexcept {
+        Q_ASSERT(this->enrichedStatusBar && "The status bar has not been set up.");
+
+        this->enrichedStatusBar->translatorResult(
+            Components::Internationalization::StaticTranslatableString::wrap(
+                g_Context,
+                g_Messages[MessageKeys::g_StatusTipTranslatorStarted]
+            ),
+            CustomWidgets::EnrichedStatusBar::ColorHint::neutral
+        );
+    }
 
     void MainWindow::onProgramTranslationResult(
         int exitCode,
         Components::FSITools::FSIToolsAdapter::ChildResult result
-    ) noexcept {}
+    ) noexcept {
+        Q_ASSERT(this->enrichedStatusBar && "The status bar has not been set up.");
 
-    void MainWindow::onExecutionEnvironmentStarted() noexcept {}
+        // Run after translation flag is always reset. However, the program is run only if
+        // the translation was successful.
+        bool savedRunAfterTranslationFlag = this->runAfterTranslation;
+        this->runAfterTranslation = false;
+
+        switch (result) {
+        case Components::FSITools::FSIToolsAdapter::ChildResult::terminated: {
+            // 0 indicates a successful exit.
+            if (exitCode) {
+                this->enrichedStatusBar->translatorResult(
+                    Components::Internationalization::StaticTranslatableString::wrap(
+                        g_Context,
+                        g_Messages[MessageKeys::g_StatusTipTranslatorProgramHasErrors]
+                    ),
+                    CustomWidgets::EnrichedStatusBar::ColorHint::failure
+                );
+            }
+            else {
+                this->enrichedStatusBar->translatorResult(
+                    Components::Internationalization::StaticTranslatableString::wrap(
+                        g_Context,
+                        g_Messages[MessageKeys::g_StatusTipTranslatorSuccess]
+                    ),
+                    CustomWidgets::EnrichedStatusBar::ColorHint::success
+                );
+
+                if (savedRunAfterTranslationFlag) {
+                    this->onRunLastTranslatedProgram();
+                }
+            }
+
+            break;
+        }
+
+        case Components::FSITools::FSIToolsAdapter::ChildResult::failedToStart: {
+            this->enrichedStatusBar->translatorResult(
+                Components::Internationalization::StaticTranslatableString::wrap(
+                    g_Context,
+                    g_Messages[MessageKeys::g_StatusTipTranslatorFailedToStart]
+                ),
+                CustomWidgets::EnrichedStatusBar::ColorHint::failure
+            );
+
+            break;
+        }
+
+        case Components::FSITools::FSIToolsAdapter::ChildResult::crashed: {
+            this->enrichedStatusBar->translatorResult(
+                Components::Internationalization::StaticTranslatableString::wrap(
+                    g_Context,
+                    g_Messages[MessageKeys::g_StatusTipTranslatorCrashed]
+                ),
+                CustomWidgets::EnrichedStatusBar::ColorHint::failure
+            );
+
+            QMessageBox::warning(
+            this,
+                tr(g_Messages[MessageKeys::g_DialogTitleTranslatorCrashed]),
+                tr(g_Messages[MessageKeys::g_DialogMessageTranslatorCrashed])
+            );
+
+            break;
+        }
+
+        case Components::FSITools::FSIToolsAdapter::ChildResult::alreadyRunning: {
+            this->enrichedStatusBar->translatorResult(
+                Components::Internationalization::StaticTranslatableString::wrap(
+                    g_Context,
+                    g_Messages[MessageKeys::g_StatusTipTranslatorAlreadyRunning]
+                ),
+                CustomWidgets::EnrichedStatusBar::ColorHint::failure
+            );
+
+            QMessageBox::warning(
+                this,
+                tr(g_Messages[MessageKeys::g_DialogTitleTranslatorAlreadyRunning]),
+                tr(g_Messages[MessageKeys::g_DialogMessageTranslatorAlreadyRunning])
+            );
+
+            break;
+        }
+
+        case Components::FSITools::FSIToolsAdapter::ChildResult::unknownError: {
+            QMessageBox::warning(
+                this,
+                tr(g_Messages[MessageKeys::g_DialogTitleUnknownResult]),
+                tr(g_Messages[MessageKeys::g_DialogMessageUnknownResult])
+            );
+
+            break;
+        }
+        }
+    }
+
+    void MainWindow::onExecutionEnvironmentStarted() noexcept {
+        Q_ASSERT(this->enrichedStatusBar && "The status bar has not been set up.");
+
+        this->enrichedStatusBar->environmentState(
+            Components::Internationalization::StaticTranslatableString::wrap(
+                g_Context,
+                g_Messages[MessageKeys::g_StatusTipTranslatorStarted]
+            ),
+            CustomWidgets::EnrichedStatusBar::ColorHint::neutral
+        );
+    }
 
     void MainWindow::onExecutionEnvironmentResult(
         int exitCode,
         Components::FSITools::FSIToolsAdapter::ChildResult result
-    ) noexcept {}
+    ) noexcept {
+        Q_ASSERT(this->enrichedStatusBar && "The status bar has not been set up.");
+
+        switch (result) {
+        case Components::FSITools::FSIToolsAdapter::ChildResult::terminated: {
+            // 0 indicates a successful exit.
+            if (exitCode) {
+                this->enrichedStatusBar->environmentState(
+                    Components::Internationalization::StaticTranslatableString::wrap(
+                        g_Context,
+                        g_Messages[MessageKeys::g_StatusTipExecutionEnvironmentProgramHasErrors]
+                    ),
+                    CustomWidgets::EnrichedStatusBar::ColorHint::failure
+                );
+            }
+            else {
+                this->enrichedStatusBar->environmentState(
+                    Components::Internationalization::StaticTranslatableString::wrap(
+                        g_Context,
+                        g_Messages[MessageKeys::g_StatusTipExecutionEnvironmentSuccess]
+                    ),
+                    CustomWidgets::EnrichedStatusBar::ColorHint::success
+                );
+            }
+
+            break;
+        }
+
+        case Components::FSITools::FSIToolsAdapter::ChildResult::failedToStart: {
+            this->enrichedStatusBar->environmentState(
+                Components::Internationalization::StaticTranslatableString::wrap(
+                    g_Context,
+                    g_Messages[MessageKeys::g_StatusTipExecutionEnvironmentFailedToStart]
+                ),
+                CustomWidgets::EnrichedStatusBar::ColorHint::failure
+            );
+
+            break;
+        }
+
+        case Components::FSITools::FSIToolsAdapter::ChildResult::crashed: {
+            this->enrichedStatusBar->environmentState(
+                Components::Internationalization::StaticTranslatableString::wrap(
+                    g_Context,
+                    g_Messages[MessageKeys::g_StatusTipExecutionEnvironmentCrashed]
+                ),
+                CustomWidgets::EnrichedStatusBar::ColorHint::failure
+            );
+
+            QMessageBox::warning(
+                this,
+                tr(g_Messages[MessageKeys::g_DialogTitleExecutionEnvironmentCrashed]),
+                tr(g_Messages[MessageKeys::g_DialogMessageExecutionEnvironmentCrashed])
+            );
+
+            break;
+        }
+
+        case Components::FSITools::FSIToolsAdapter::ChildResult::alreadyRunning: {
+            this->enrichedStatusBar->environmentState(
+                Components::Internationalization::StaticTranslatableString::wrap(
+                    g_Context,
+                    g_Messages[MessageKeys::g_StatusTipExecutionEnvironmentAlreadyRunning]
+                ),
+                CustomWidgets::EnrichedStatusBar::ColorHint::failure
+            );
+
+            QMessageBox::warning(
+                this,
+                tr(g_Messages[MessageKeys::g_DialogTitleExecutionEnvironmentAlreadyRunning]),
+                tr(g_Messages[MessageKeys::g_DialogMessageExecutionEnvironmentAlreadyRunning])
+            );
+
+            break;
+        }
+
+        case Components::FSITools::FSIToolsAdapter::ChildResult::unknownError: {
+            QMessageBox::warning(
+                this,
+                tr(g_Messages[MessageKeys::g_DialogTitleUnknownResult]),
+                tr(g_Messages[MessageKeys::g_DialogMessageUnknownResult])
+            );
+
+            break;
+        }
+        }
+    }
 
 }

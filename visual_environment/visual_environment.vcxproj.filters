@@ -180,6 +180,9 @@
     <ClInclude Include="fsi_ui_configuration_options.h">
       <Filter>Header Files\Components\FSI Tools</Filter>
     </ClInclude>
+    <ClInclude Include="fsi_tools_messages.h">
+      <Filter>Header Files\Components\FSI Tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="dark_theme.qss">

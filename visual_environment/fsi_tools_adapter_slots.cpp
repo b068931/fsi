@@ -1,5 +1,8 @@
 #include <QProcess>
+#include <QCoreApplication>
+
 #include "fsi_tools_adapter.h"
+#include "fsi_tools_messages.h"
 
 namespace Components::FSITools {
     void FSIToolsAdapter::onTranslatorFinished(int exitCode, QProcess::ExitStatus status) noexcept {
@@ -59,5 +62,22 @@ namespace Components::FSITools {
 
             emit this->executionEnvironmentResult(DefaultReturnCode, ChildResult::failedToStart);
         }
+    }
+
+    void FSIToolsAdapter::onRetranslateUI() {
+        // Must use "translate" explicitly with context because messages
+        // are not tied to the context of the FSIToolsAdapter class.
+
+        this->translatorWindowTitle =
+            QCoreApplication::translate(
+                g_Context,
+                g_Messages[MessageKeys::g_TranslatorConsoleWindowTitle]
+            ).toStdWString();
+
+        this->executionEnvironmentWindowTitle =
+            QCoreApplication::translate(
+                g_Context,
+                g_Messages[MessageKeys::g_EEConsoleWindowTitle]
+            ).toStdWString();
     }
 }

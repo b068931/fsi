@@ -31,6 +31,14 @@ namespace Windows {
         connect(this->i18n.data(), &Components::Internationalization::InterfaceTranslator::retranslateUI,
             this->enrichedStatusBar, &CustomWidgets::EnrichedStatusBar::onRetranslateUI);
 
+        connect(this->i18n.data(), &Components::Internationalization::InterfaceTranslator::retranslateUI,
+            [this] {
+                // For the language service we'll have to use this questionable approach.
+                this->languageService.send([] (Components::FSITools::FSIToolsAdapter* adapter) {
+                    adapter->onRetranslateUI();
+                });
+            });
+
         // Connect FSIToolsAdapter signals to their respective slots.
         this->languageService.receive(
             &Components::FSITools::FSIToolsAdapter::translatorStarted,

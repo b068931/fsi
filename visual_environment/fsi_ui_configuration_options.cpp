@@ -1,5 +1,9 @@
 #include <QtGlobal>
 #include <QDebug>
+#include <QInputDialog>
+#include <QCoreApplication>
+#include <QStringList>
+#include <QDir>
 #include <thread>
 
 #define WIN32_LEAN_AND_MEAN
@@ -8,12 +12,74 @@
 #include <windows.h>
 
 #include "fsi_ui_configuration_options.h"
+#include "fsi_tools_messages.h"
 
 namespace Components::FSITools {
-    FSIToolsAdapter::TranslatorFlags ConfigurationOptions::getTranslatorDebugFlag() noexcept {
+    std::optional<FSIToolsAdapter::TranslatorFlags> ConfigurationOptions::getTranslatorDebugFlag(QWidget* parent) noexcept {
+        constexpr const char* includeDebugOption = "Include Debug";
+        constexpr const char* noIncludeDebugOption = "No Debug Symbols";
+        constexpr int defaultOption = 0;
+        constexpr bool isEditable = false;
+
+        QStringList options = { includeDebugOption, noIncludeDebugOption };
+        bool successful = false;
+
+        QString result = QInputDialog::getItem(
+            parent,
+            QCoreApplication::translate(g_Context, g_Messages[MessageKeys::g_DebugOptionDialogTitle]),
+            QCoreApplication::translate(g_Context, g_Messages[MessageKeys::g_DebugOptionDialogMessage]),
+            options,
+            defaultOption,
+            isEditable,
+            &successful
+        );
+
+        if (successful) {
+            if (result == includeDebugOption) {
+                return FSIToolsAdapter::TranslatorFlags::includeDebug;
+            }
+
+            if (result == noIncludeDebugOption) {
+                return FSIToolsAdapter::TranslatorFlags::noIncludeDebug;
+            }
+        }
+
+        return {};
     }
 
-    QString ConfigurationOptions::getExecutionEnvironmentConfiguration() {
+    std::optional<QString> ConfigurationOptions::getExecutionEnvironmentConfiguration(QWidget* parent) {
+        constexpr const char* configurationFileFilter = "*.mods";
+        constexpr int defaultOption = 0;
+        constexpr bool isEditable = false;
+
+        QDir applicationDirectory(QCoreApplication::applicationDirPath());
+        QStringList foundConfigurations = applicationDirectory.entryList(
+            { configurationFileFilter },
+            QDir::Files | QDir::NoDotAndDotDot
+        );
+
+        for (QString& configurationFilePath : foundConfigurations) {
+            configurationFilePath = applicationDirectory.filePath(
+                configurationFilePath
+            );
+        }
+
+        bool successful = false;
+        QString result = QInputDialog::getItem(
+            parent,
+            QCoreApplication::translate(g_Context, g_Messages[MessageKeys::g_EEConfigurationFileDialogTitle]),
+            QCoreApplication::translate(g_Context, g_Messages[MessageKeys::g_EEConfigurationFileDialogMessage]),
+            foundConfigurations,
+            defaultOption,
+            isEditable,
+            &successful
+        );
+
+        if (successful) {
+            return result;
+        }
+
+        return {};
     }
 
     int ConfigurationOptions::getPreferredNumberOfExecutors() noexcept {

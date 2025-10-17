@@ -2,6 +2,9 @@
 #define FSI_UI_CONFIGURATION_OPTIONS_H
 
 #include <QString>
+#include <QWidget>
+#include <optional>
+
 #include "fsi_tools_adapter.h"
 
 namespace Components::FSITools {
@@ -14,15 +17,17 @@ namespace Components::FSITools {
     public:
         /// <summary>
         /// Asks the user to choose the translator debug flag. Required to be called from the main (GUI) thread.
+        /// Returns no value if user cancels the dialog.
         /// </summary>
         /// <returns>A user-chosen option.</returns>
-        static FSIToolsAdapter::TranslatorFlags getTranslatorDebugFlag() noexcept;
+        static std::optional<FSIToolsAdapter::TranslatorFlags> getTranslatorDebugFlag(QWidget* parent) noexcept;
 
         /// <summary>
         /// Retrieves the execution environment configuration from the user as a QString.
+        /// Returns no value if user cancels the dialog.
         /// </summary>
         /// <returns>A QString containing the path to the execution environment configuration.</returns>
-        static QString getExecutionEnvironmentConfiguration();
+        static std::optional<QString> getExecutionEnvironmentConfiguration(QWidget* parent);
 
         /// <summary>
         /// Returns the preferred number of executors for the current environment.
