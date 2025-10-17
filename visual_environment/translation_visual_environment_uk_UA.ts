@@ -791,5 +791,11 @@ Status tip after FSI Mediator failed to start.</extracomment>
         <extracomment>Message for the message box which pops up to catch user attention after the FSI Mediator crashes.</extracomment>
         <translation>Посередник FSI аварійно завершив роботу. Будь ласка, перезапустіть програму.</translation>
     </message>
+    <message>
+        <location filename="main_window_messages.h" line="129"/>
+        <source>Running old version of the file.</source>
+        <extracomment>Status tip after user cancels save operation before translation.</extracomment>
+        <translation>Використовую стару версію файлу.</translation>
+    </message>
 </context>
 </TS>

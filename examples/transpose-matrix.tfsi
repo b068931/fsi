@@ -11,8 +11,7 @@ from prts import <
 $redefine symbol-base d48;
 $define-string prompt-n ''''Enter matrix size (N): ''''
 $define-string prompt-matrix ''''Enter matrix elements (one per line):''''
-$define-string result-message ''''Transposed matrix:
-''''
+$define-string result-message ''''Transposed matrix:''''
 
 function memory-copy(memory destination, memory source, eight-bytes size) {
     @repeat;
@@ -184,6 +183,7 @@ function main() {
     $declare memory matrix;
     $declare memory message-storage;
     $declare eight-bytes zero;
+    $declare eight-bytes message-index;
 
     move variable eight-bytes zero, immediate eight-bytes d0;
 
@@ -198,9 +198,11 @@ function main() {
     /* 1. Get Matrix Size (N)              */
     /* ----------------------------------- */
     copy-string variable memory message-storage, string prompt-n;
+    move variable eight-bytes message-index, size-of eight-bytes prompt-n;
+    decrement variable eight-bytes message-index;
     void: prts->io.std.out(
         variable memory message-storage,
-        size-of eight-bytes prompt-n
+        variable eight-bytes message-index
     )
 
     read-number()
@@ -218,6 +220,9 @@ function main() {
     /* 3. Read Matrix Elements             */
     /* ----------------------------------- */
     copy-string variable memory message-storage, string prompt-matrix;
+    move variable eight-bytes message-index, size-of eight-bytes prompt-matrix;
+    decrement variable eight-bytes message-index;
+    move dereference one-byte message-storage[message-index], immediate one-byte d10;
     void: prts->io.std.out(
         variable memory message-storage,
         size-of eight-bytes prompt-matrix
@@ -315,6 +320,9 @@ function main() {
     /* 5. Print Transposed Matrix          */
     /* ----------------------------------- */
     copy-string variable memory message-storage, string result-message;
+    move variable eight-bytes message-index, size-of eight-bytes result-message;
+    decrement variable eight-bytes message-index;
+    move dereference one-byte message-storage[message-index], immediate one-byte d10;
     void: prts->io.std.out(
         variable memory message-storage,
         size-of eight-bytes result-message
@@ -360,7 +368,7 @@ function main() {
             )
             elem-string: prts->memory.deallocate()
 
-            move dereference one-byte message-storage[zero], d32;
+            move dereference one-byte message-storage[zero], immediate one-byte d32;
             void: prts->io.std.out(
                 variable memory message-storage,
                 immediate eight-bytes d1
@@ -371,7 +379,7 @@ function main() {
         @print-col-end;
 
         /* Print a newline after the row */
-	move dereference one-byte message-storage[zero], d10;
+	move dereference one-byte message-storage[zero], immediate one-byte d10;
 	void: prts->io.std.out(
 	    variable memory message-storage,
 	    immediate eight-bytes d1

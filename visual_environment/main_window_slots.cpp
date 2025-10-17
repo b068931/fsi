@@ -280,6 +280,18 @@ namespace Windows {
            return;
         }
 
+        // Ensure the current file is saved before translation.
+        // If the user cancels the save operation, the old version of the file is used.
+        // Automatically handles cases where the file is not modified.
+        if (!this->editor->saveCurrentFile()) {
+            this->enrichedStatusBar->toolTip(
+                Components::Internationalization::StaticTranslatableString::wrap(
+                    g_Context,
+                    g_Messages[g_StatusTipTranslationWithoutSave]
+                )
+            );
+        }
+
         QString selectedFile = this->editor->getCurrentFilePath();
         QString translationResult = QDir(this->editor->getWorkingDirectoryPath())
             .filePath(g_Messages[MessageKeys::g_TranslationResultFileName]);

@@ -60,7 +60,7 @@ namespace {
         return true;
     }
 
-    std::stringstream produce_bytecode(structure_builder::file* parser_value, std::string debug_parameter) {
+    std::pair<std::stringstream, bool> produce_bytecode(structure_builder::file* parser_value, std::string debug_parameter) {
         std::stringstream result{ std::ios::in | std::ios::out | std::ios::binary };
         bytecode_translator translator{ parser_value, &result };
 
@@ -82,7 +82,7 @@ namespace {
             std::cout << std::endl;
         }
 
-        return result;
+        return { std::move(result), !translator.errors().empty() };
     }
 
     std::vector<unsigned char> compress_bytecode(std::stringstream bytecode_stream) {
@@ -193,7 +193,7 @@ int main(int argc, char** argv) {
         }
 
         std::cout << "Now translating the program to bytecode..." << std::endl;
-        std::stringstream translated_program = produce_bytecode(&parser_value, argv[3]);
+        auto [translated_program, has_logic_errors] = produce_bytecode(&parser_value, argv[3]);
 
         translated_program.seekg(0, std::ios::end);
         std::size_t bytecode_size = translated_program.tellg();
@@ -220,6 +220,10 @@ int main(int argc, char** argv) {
             << std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count()
             << " microseconds."
             << std::endl;
+
+        if (has_logic_errors) {
+            return EXIT_FAILURE;
+        }
 
         return EXIT_SUCCESS;
     }

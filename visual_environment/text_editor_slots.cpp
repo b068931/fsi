@@ -121,9 +121,12 @@ namespace CustomWidgets {
                     else {
                         if (!fileEditor->document()->isModified() && !openFile.isTemporary) {
                             // This will get executed even when we modify and save the file ourselves.
-                            fileEditor->setPlainText(newFile.readAll());
-                            fileEditor->document()->setModified(false);
+                            QByteArray newBuffer = newFile.readAll();
+                            if (fileEditor->document()->toPlainText().toUtf8() != newBuffer) {
+                                fileEditor->setPlainText(newBuffer);
+                            }
 
+                            fileEditor->document()->setModified(false);
                             if (newFile.error() != QFile::NoError) {
                                 QMessageBox::warning(
                                     this,

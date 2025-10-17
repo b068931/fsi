@@ -23,7 +23,8 @@ void structure_builder::configure_parse_map() {
 				source_file_token::end_of_file,
 				source_file_token::endif_keyword,
 				source_file_token::expression_end,
-				source_file_token::function_body_start
+				source_file_token::function_body_start,
+				source_file_token::special_instruction
 			}
 		)
 		.set_redirection_for_token(

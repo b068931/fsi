@@ -457,6 +457,10 @@ namespace CustomWidgets {
                 }
             }
         }
+        else if (!fileEditor->document()->isModified() && !openFile.isTemporary && !openFile.filePath.isEmpty()) {
+            // Nothing to do, the file is already saved.
+            return true;
+        }
 
         return false;
     }

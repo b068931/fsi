@@ -125,6 +125,8 @@ constexpr const char* g_Messages[] = {
     //: Status tip after FSI Mediator failed to start.
     QT_TRANSLATE_NOOP("Windows::MainWindow", "Start Failed"),
 
+    //: Status tip after user cancels save operation before translation.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "Running old version of the file."),
 };
 
 enum MessageKeys {
@@ -168,6 +170,7 @@ enum MessageKeys {
     g_DialogTitleExecutionEnvironmentCrashed = 37,
     g_DialogMessageExecutionEnvironmentCrashed = 38,
     g_StatusTipExecutionEnvironmentFailedToStart = 39,
+    g_StatusTipTranslationWithoutSave = 40
 };
 
 #endif

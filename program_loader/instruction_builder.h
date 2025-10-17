@@ -410,7 +410,7 @@ protected:
 
 	std::uint8_t get_arguments_count() const { return static_cast<std::uint8_t>(this->instruction_types.size()); }
 	bool check_if_active_types_match() const { //makes sense only for group00 group01 group10
-		assert(this->instruction_types.size() >= 2);
+		this->assert_statement(this->instruction_types.size() >= 2, "Expected at least two arguments");
 
 		std::uint8_t sample = this->instruction_types[0] & 0b11;
 		for (std::size_t index = 1, instruction_types_count = this->instruction_types.size(); index < instruction_types_count; ++index) {
@@ -423,7 +423,7 @@ protected:
 		return true;
 	}
 
-	void assert_statement(bool result, std::string message, entity_id associated_id = 0) {
+	void assert_statement(bool result, std::string message, entity_id associated_id = 0) const {
 		if (!result) { //make changes to valid state only if it wasn't already invalid
 			throw program_compilation_error{ message, associated_id };
 		}

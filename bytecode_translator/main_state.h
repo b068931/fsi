@@ -32,6 +32,9 @@ public:
 		else if (token == source_file_token::expression_end && !read_map.is_token_generator_name_empty()) {
 			read_map.exit_with_error();
 		}
+		else if (token == source_file_token::special_instruction && !read_map.is_token_generator_name_empty()) {
+			read_map.exit_with_error();
+		}
 	}
 };
 
