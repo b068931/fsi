@@ -75,7 +75,7 @@ constexpr const char* g_Messages[] = {
     QT_TRANSLATE_NOOP("Windows::MainWindow", "Instance is Already Active"),
 
     //: Message for the message box which pops up to catch user attention after they try to start a translator, while there is another running instance.
-    QT_TRANSLATE_NOOP("Windows::MainWindow", "There is an already active instance of the FSI Translator. Close the previous window before starting another one."),
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "There is an already active instance of the FSI Translator (Source: %1, Destination: %2).\nClose the previous window before starting another one."),
 
     //: Status tip after FSI translator crashes.
     QT_TRANSLATE_NOOP("Windows::MainWindow", "Instance Crashed"),
@@ -111,7 +111,7 @@ constexpr const char* g_Messages[] = {
     QT_TRANSLATE_NOOP("Windows::MainWindow", "Instance is Already Active"),
 
     //: Message for the message box which pops up to catch user attention after they try to start a mediator, while there is another running instance.
-    QT_TRANSLATE_NOOP("Windows::MainWindow", "There is an already active instance of the FSI Mediator. Close the previous window before starting another one."),
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "There is an already active instance of the FSI Mediator (Program: %1, Configuration: %2).\nClose the previous window before starting another one."),
 
     //: Status tip after FSI Mediator crashes.
     QT_TRANSLATE_NOOP("Windows::MainWindow", "Instance Crashed"),
@@ -127,6 +127,15 @@ constexpr const char* g_Messages[] = {
 
     //: Status tip after user cancels save operation before translation.
     QT_TRANSLATE_NOOP("Windows::MainWindow", "Running old version of the file."),
+
+    //: Status tip after saving the file before translation.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "File saved before translation."),
+
+    //: Title for the message box which pops up when user refuses to save temporary file and tries to run translation.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "Unsaved Changes"),
+
+    //: Message for the message box which pops up when user refuses to save temporary file and tries to run translation.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "You have unsaved changes. Please save your work before running the translation. You can't translate a temporary file.")
 };
 
 enum MessageKeys {
@@ -170,7 +179,10 @@ enum MessageKeys {
     g_DialogTitleExecutionEnvironmentCrashed = 37,
     g_DialogMessageExecutionEnvironmentCrashed = 38,
     g_StatusTipExecutionEnvironmentFailedToStart = 39,
-    g_StatusTipTranslationWithoutSave = 40
+    g_StatusTipTranslationWithoutSave = 40,
+    g_StatusTipFileSavedBeforeTranslation = 41,
+    g_DialogTitleUnsavedTemporary = 42,
+    g_DialogMessageUnsavedTemporary = 43
 };
 
 #endif

@@ -223,6 +223,11 @@ namespace Windows {
         );
     }
 
+    void MainWindow::onMenuShortDescription() noexcept {
+        Q_ASSERT(this->aboutWindow && "The about window has not been set up.");
+        this->aboutWindow->show();
+    }
+
     void MainWindow::onMenuWorkingDirectoryOpen() noexcept {
         Q_ASSERT(this->editor && "The text editor has not been set up.");
         Q_ASSERT(this->enrichedStatusBar && "The status bar has not been set up.");
@@ -291,10 +296,28 @@ namespace Windows {
                 )
             );
         }
+        else {
+            this->enrichedStatusBar->toolTip(
+                Components::Internationalization::StaticTranslatableString::wrap(
+                    g_Context,
+                    g_Messages[MessageKeys::g_StatusTipFileSavedBeforeTranslation]
+                )
+            );
+        }
 
         QString selectedFile = this->editor->getCurrentFilePath();
         QString translationResult = QDir(this->editor->getWorkingDirectoryPath())
             .filePath(g_Messages[MessageKeys::g_TranslationResultFileName]);
+
+        if (selectedFile.isEmpty()) {
+            QMessageBox::warning(
+                this,
+                tr(g_Messages[MessageKeys::g_DialogTitleUnsavedTemporary]),
+                tr(g_Messages[MessageKeys::g_DialogMessageUnsavedTemporary])
+            );
+
+            return;
+        }
 
         auto debugFlag = 
             Components::FSITools::ConfigurationOptions::getTranslatorDebugFlag(this);
@@ -464,10 +487,24 @@ namespace Windows {
                 CustomWidgets::EnrichedStatusBar::ColorHint::failure
             );
 
+            QString lastTranslationTarget = this->languageService.send<QString>(
+                [] (const Components::FSITools::FSIToolsAdapter* adapter) {
+                    return adapter->getLastTranslationTarget();
+                }
+            );
+
+            QString lastTranslationResult = this->languageService.send<QString>(
+                [] (const Components::FSITools::FSIToolsAdapter* adapter) {
+                    return adapter->getLastTranslationResult();
+                }
+            );
+
             QMessageBox::warning(
                 this,
                 tr(g_Messages[MessageKeys::g_DialogTitleTranslatorAlreadyRunning]),
                 tr(g_Messages[MessageKeys::g_DialogMessageTranslatorAlreadyRunning])
+                    .arg(lastTranslationTarget)
+                    .arg(lastTranslationResult)
             );
 
             break;
@@ -567,10 +604,24 @@ namespace Windows {
                 CustomWidgets::EnrichedStatusBar::ColorHint::failure
             );
 
+            QString lastExecutionEnvironmentProgram = this->languageService.send<QString>(
+                [] (const Components::FSITools::FSIToolsAdapter* adapter) {
+                    return adapter->getLastExecutionEnvironmentProgram();
+                }
+            );
+
+            QString lastExecutionEnvironmentConfiguration = this->languageService.send<QString>(
+                [] (const Components::FSITools::FSIToolsAdapter* adapter) {
+                    return adapter->getLastExecutionEnvironmentConfiguration();
+                }
+            );
+
             QMessageBox::warning(
                 this,
                 tr(g_Messages[MessageKeys::g_DialogTitleExecutionEnvironmentAlreadyRunning]),
                 tr(g_Messages[MessageKeys::g_DialogMessageExecutionEnvironmentAlreadyRunning])
+                    .arg(lastExecutionEnvironmentProgram)
+                    .arg(lastExecutionEnvironmentConfiguration)
             );
 
             break;

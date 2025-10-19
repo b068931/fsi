@@ -13,6 +13,7 @@ namespace Windows {
 
         this->setupStatusBar();
         this->setupTextEditor();
+        this->setupChildWindows();
         this->connectSignalsManually();
 
         this->languageService.start();
@@ -103,6 +104,9 @@ namespace Windows {
 
         connect(this->ui.executionEnvironmentMenuAction, &QAction::triggered,
             this, &MainWindow::onRuntimeEnvironmentLogs);
+
+        connect(this->ui.shortDescriptionMenuAction, &QAction::triggered,
+            this, &MainWindow::onMenuShortDescription);
     }
 
     void MainWindow::setupTextEditor() {
@@ -136,6 +140,10 @@ namespace Windows {
     void MainWindow::setupStatusBar() {
         this->enrichedStatusBar = new CustomWidgets::EnrichedStatusBar(this);
         this->setStatusBar(this->enrichedStatusBar);
+    }
+
+    void MainWindow::setupChildWindows() {
+        this->aboutWindow = new AboutApplicationWindow(nullptr);
     }
 }
 

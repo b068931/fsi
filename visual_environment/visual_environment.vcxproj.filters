@@ -78,9 +78,18 @@
     <Filter Include="Other">
       <UniqueIdentifier>{f939c29f-3af9-4f4c-ac88-65f0c6212768}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Windows\About Window">
+      <UniqueIdentifier>{947daedb-7267-4d5e-9ad5-a7c094af7b92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Windows\About Window">
+      <UniqueIdentifier>{7f0436e5-859b-4675-a5ec-2dfbca9f0c2e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="main_window.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="about_application_window.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
@@ -124,6 +133,9 @@
     <ClCompile Include="fsi_ui_configuration_options.cpp">
       <Filter>Source Files\Components\FSI Tools</Filter>
     </ClCompile>
+    <ClCompile Include="about_application_window.cpp">
+      <Filter>Source Files\Windows\About Window</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="visual_environment.qrc">
@@ -145,6 +157,9 @@
     </QtMoc>
     <QtMoc Include="fsi_tools_adapter.h">
       <Filter>Header Files\Components\FSI Tools</Filter>
+    </QtMoc>
+    <QtMoc Include="about_application_window.h">
+      <Filter>Header Files\Windows\About Window</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

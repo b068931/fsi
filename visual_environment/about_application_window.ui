@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AboutApplicationWindow</class>
+ <widget class="QWidget" name="AboutApplicationWindow">
+  <property name="windowModality">
+   <enum>Qt::WindowModality::ApplicationModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>550</width>
+    <height>420</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>About This Application</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="visual_environment.qrc">
+    <normaloff>:/icons/application_icon.svg</normaloff>:/icons/application_icon.svg</iconset>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
+   <item>
+    <widget class="QLabel" name="aboutApplication">
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Simple text editor, file browsing, along with integration with FSI (From Scratch Interpreter) tools that &lt;a href=&quot;https://github.com/b068931&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#faa683;&quot;&gt;I&lt;/span&gt;&lt;/a&gt; built as my coursework.&lt;/p&gt;&lt;p&gt;This application could have been a complete IDE, if I had a debugger. Unfortunately, I do not. So instead it is called a &amp;quot;visual environment&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::TextFormat::RichText</enum>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignmentFlag::AlignCenter</set>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="builtWith">
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This application is build with &lt;a href=&quot;https://www.qt.io/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#faa683;&quot;&gt;Qt.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::TextFormat::RichText</enum>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignmentFlag::AlignBottom|Qt::AlignmentFlag::AlignHCenter</set>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="openMojiAttribution">
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;All emojis designed by &lt;a href=&quot;https://openmoji.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#faa683;&quot;&gt;OpenMoji&lt;/span&gt;&lt;/a&gt; – the open-source emoji and icon project. License: &lt;a href=&quot;https://creativecommons.org/licenses/by-sa/4.0/#&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#faa683;&quot;&gt;CC BY-SA 4.0.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::TextFormat::RichText</enum>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignmentFlag::AlignBottom|Qt::AlignmentFlag::AlignHCenter</set>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="visual_environment.qrc"/>
+ </resources>
+ <connections/>
+</ui>

@@ -23,6 +23,7 @@
         <file>application_icon.svg</file>
         <file>run_last_translated_icon.svg</file>
         <file>translate_only_icon.svg</file>
+        <file>about_application_image.svg</file>
     </qresource>
     <qresource prefix="/styles">
         <file>dark_theme.qss</file>

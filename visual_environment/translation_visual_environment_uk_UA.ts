@@ -2,6 +2,29 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="uk_UA">
 <context>
+    <name>AboutApplicationWindow</name>
+    <message>
+        <location filename="about_application_window.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished">Форма</translation>
+    </message>
+    <message>
+        <location filename="about_application_window.ui" line="24"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Simple text editor, file browsing, along with integration with FSI (From Scratch Interpreter) tools that &lt;a href=&quot;https://github.com/b068931&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#faa683;&quot;&gt;I&lt;/span&gt;&lt;/a&gt; built as my coursework.&lt;/p&gt;&lt;p&gt;This application could have been a complete IDE, if I had a debugger. Unfortunately, I do not. So instead it is called a &amp;quot;visual environment&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="about_application_window.ui" line="37"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This application is build with &lt;a href=&quot;https://www.qt.io/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#faa683;&quot;&gt;Qt.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="about_application_window.ui" line="50"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;All emojis designed by &lt;a href=&quot;https://openmoji.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#faa683;&quot;&gt;OpenMoji&lt;/span&gt;&lt;/a&gt; – the open-source emoji and icon project. License: &lt;a href=&quot;https://creativecommons.org/licenses/by-sa/4.0/#&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#faa683;&quot;&gt;CC BY-SA 4.0.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Components::FSITools</name>
     <message>
         <location filename="fsi_tools_messages.h" line="9"/>
@@ -335,6 +358,191 @@
     </message>
 </context>
 <context>
+    <name>MainApplicationWindow</name>
+    <message>
+        <location filename="main_window.ui" line="14"/>
+        <source>Visual Environment</source>
+        <translation type="unfinished">Візуальне Середовище Розробки</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="52"/>
+        <source>File</source>
+        <translation type="unfinished">Файл</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="65"/>
+        <source>Working Folder</source>
+        <translation type="unfinished">Робочий Каталог</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="72"/>
+        <source>Program</source>
+        <translation type="unfinished">Програма</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="87"/>
+        <source>About</source>
+        <translation type="unfinished">Про Програму</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="91"/>
+        <source>FSI Documentation</source>
+        <translation type="unfinished">Документація FSI</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="116"/>
+        <source>Languages</source>
+        <translation type="unfinished">Доступні мови</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="150"/>
+        <source>Save</source>
+        <translation type="unfinished">Зберегти</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="153"/>
+        <source>Ctrl+S</source>
+        <translation type="unfinished">Ctrl+s</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="162"/>
+        <source>Save as...</source>
+        <translation type="unfinished">Зберегти як...</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="165"/>
+        <source>Ctrl+Shift+S</source>
+        <translation type="unfinished">Ctrl+Shift+S</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="174"/>
+        <location filename="main_window.ui" line="213"/>
+        <source>Close</source>
+        <translation type="unfinished">Закрити</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="177"/>
+        <source>Ctrl+Q</source>
+        <translation type="unfinished">Ctrl+Q</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="186"/>
+        <location filename="main_window.ui" line="198"/>
+        <source>Open...</source>
+        <translation type="unfinished">Відкрити...</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="189"/>
+        <source>Ctrl+O</source>
+        <translation type="unfinished">Ctrl+O</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="204"/>
+        <source>Ctrl+W</source>
+        <translation type="unfinished">Ctrl+W</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="216"/>
+        <source>Ctrl+C</source>
+        <translation type="unfinished">Ctrl+C</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="225"/>
+        <source>Translate and Run</source>
+        <translation type="unfinished">Транслювати і Запустити</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="228"/>
+        <source>Ctrl+R</source>
+        <translation type="unfinished">Ctrl+R</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="237"/>
+        <source>Runtime Environment</source>
+        <translation type="unfinished">Середовище Виконання</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="240"/>
+        <source>Ctrl+E</source>
+        <translation type="unfinished">Ctrl+E</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="249"/>
+        <source>Visual Environment Documentation</source>
+        <translation type="unfinished">Документація До Середовища Виконання</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="258"/>
+        <source>Short Overview...</source>
+        <translation type="unfinished">Короткий Огляд...</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="267"/>
+        <source>Installation</source>
+        <translation type="unfinished">Встановлення</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="276"/>
+        <source>Release Layout</source>
+        <translation type="unfinished">Розміщення Файлів</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="285"/>
+        <source>Using Translator</source>
+        <translation type="unfinished">Використання Транслятора</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="294"/>
+        <source>Using Execution Engine</source>
+        <translation type="unfinished">Використання Середовища Виконання</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="303"/>
+        <source>Engine Multithreading</source>
+        <translation type="unfinished">Паралельність Середовища Виконання</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="312"/>
+        <source>Ukrainian</source>
+        <translation type="unfinished">Українська</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="321"/>
+        <source>English</source>
+        <translation type="unfinished">Англійська</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="330"/>
+        <source>New</source>
+        <translation type="unfinished">Новий</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="333"/>
+        <source>Ctrl+N</source>
+        <translation type="unfinished">Ctrl+N</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="342"/>
+        <source>Translate</source>
+        <translation type="unfinished">Транслювати</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="345"/>
+        <source>Ctrl+B</source>
+        <translation type="unfinished">Ctrl+B</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="354"/>
+        <source>Run Last Translated</source>
+        <translation type="unfinished">Запустити останній результат</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="357"/>
+        <source>Ctrl+L</source>
+        <translation type="unfinished">Ctrl+L</translation>
+    </message>
+</context>
+<context>
     <name>MainWindow</name>
     <message>
         <source>Working directory not set</source>
@@ -352,9 +560,8 @@ Value for the status bar when translator has not been run once yet.</extracommen
 <context>
     <name>MainWindowClass</name>
     <message>
-        <location filename="main_window.ui" line="14"/>
         <source>Visual Environment</source>
-        <translation>Візуальне Середовище Розробки</translation>
+        <translation type="vanished">Візуальне Середовище Розробки</translation>
     </message>
     <message>
         <source>Dynamically change the language of the editor.</source>
@@ -365,194 +572,157 @@ Value for the status bar when translator has not been run once yet.</extracommen
         <translation type="vanished">Відкрити новий файл або працювати з файлом у вибраній вкладці.</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="52"/>
         <source>File</source>
-        <translation>Файл</translation>
+        <translation type="vanished">Файл</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="65"/>
         <source>Working Folder</source>
-        <translation>Робочий Каталог</translation>
+        <translation type="vanished">Робочий Каталог</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="72"/>
         <source>Program</source>
-        <translation>Програма</translation>
+        <translation type="vanished">Програма</translation>
     </message>
     <message>
         <source>About FSI and this editor.</source>
         <translation type="vanished">Про FSI та цей редактор.</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="87"/>
         <source>About</source>
-        <translation>Про Програму</translation>
+        <translation type="vanished">Про Програму</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="91"/>
         <source>FSI Documentation</source>
-        <translation>Документація FSI</translation>
+        <translation type="vanished">Документація FSI</translation>
     </message>
     <message>
         <source>Dynamically change the language of the application.</source>
         <translation type="vanished">Змінити мову застосунку (без перезавантаження).</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="116"/>
         <source>Languages</source>
-        <translation>Доступні мови</translation>
+        <translation type="vanished">Доступні мови</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="150"/>
         <source>Save</source>
-        <translation>Зберегти</translation>
+        <translation type="vanished">Зберегти</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="153"/>
         <source>Ctrl+S</source>
-        <translation>Ctrl+s</translation>
+        <translation type="vanished">Ctrl+s</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="162"/>
         <source>Save as...</source>
-        <translation>Зберегти як...</translation>
+        <translation type="vanished">Зберегти як...</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="165"/>
         <source>Ctrl+Shift+S</source>
-        <translation>Ctrl+Shift+S</translation>
+        <translation type="vanished">Ctrl+Shift+S</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="174"/>
-        <location filename="main_window.ui" line="213"/>
         <source>Close</source>
-        <translation>Закрити</translation>
+        <translation type="vanished">Закрити</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="177"/>
         <source>Ctrl+Q</source>
-        <translation>Ctrl+Q</translation>
+        <translation type="vanished">Ctrl+Q</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="186"/>
-        <location filename="main_window.ui" line="198"/>
         <source>Open...</source>
-        <translation>Відкрити...</translation>
+        <translation type="vanished">Відкрити...</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="189"/>
         <source>Ctrl+O</source>
-        <translation>Ctrl+O</translation>
+        <translation type="vanished">Ctrl+O</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="204"/>
         <source>Ctrl+W</source>
-        <translation>Ctrl+W</translation>
+        <translation type="vanished">Ctrl+W</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="216"/>
         <source>Ctrl+C</source>
-        <translation>Ctrl+C</translation>
+        <translation type="vanished">Ctrl+C</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="228"/>
         <source>Ctrl+R</source>
-        <translation>Ctrl+R</translation>
+        <translation type="vanished">Ctrl+R</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="240"/>
         <source>Ctrl+E</source>
-        <translation>Ctrl+E</translation>
+        <translation type="vanished">Ctrl+E</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="312"/>
         <source>Ukrainian</source>
-        <translation>Українська</translation>
+        <translation type="vanished">Українська</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="321"/>
         <source>English</source>
-        <translation>Англійська</translation>
+        <translation type="vanished">Англійська</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="330"/>
         <source>New</source>
         <translatorcomment>Новий</translatorcomment>
-        <translation>Новий</translation>
+        <translation type="vanished">Новий</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="333"/>
         <source>Ctrl+N</source>
-        <translation>Ctrl+N</translation>
+        <translation type="vanished">Ctrl+N</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="342"/>
         <source>Translate</source>
-        <translation>Транслювати</translation>
+        <translation type="vanished">Транслювати</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="345"/>
         <source>Ctrl+B</source>
-        <translation>Ctrl+B</translation>
+        <translation type="vanished">Ctrl+B</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="354"/>
         <source>Run Last Translated</source>
-        <translation>Запустити останній результат</translation>
+        <translation type="vanished">Запустити останній результат</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="357"/>
         <source>Ctrl+L</source>
-        <translation>Ctrl+L</translation>
+        <translation type="vanished">Ctrl+L</translation>
     </message>
     <message>
         <source>Закрити</source>
         <translation type="vanished">Закрити</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="225"/>
         <source>Translate and Run</source>
-        <translation>Транслювати і Запустити</translation>
+        <translation type="vanished">Транслювати і Запустити</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="237"/>
         <source>Runtime Environment</source>
-        <translation>Середовище Виконання</translation>
+        <translation type="vanished">Середовище Виконання</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="249"/>
         <source>Visual Environment Documentation</source>
-        <translation>Документація До Середовища Виконання</translation>
+        <translation type="vanished">Документація До Середовища Виконання</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="258"/>
         <source>Short Overview...</source>
-        <translation>Короткий Огляд...</translation>
+        <translation type="vanished">Короткий Огляд...</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="267"/>
         <source>Installation</source>
-        <translation>Встановлення</translation>
+        <translation type="vanished">Встановлення</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="276"/>
         <source>Release Layout</source>
-        <translation>Розміщення Файлів</translation>
+        <translation type="vanished">Розміщення Файлів</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="285"/>
         <source>Using Translator</source>
-        <translation>Використання Транслятора</translation>
+        <translation type="vanished">Використання Транслятора</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="294"/>
         <source>Using Execution Engine</source>
-        <translation>Використання Середовища Виконання</translation>
+        <translation type="vanished">Використання Середовища Виконання</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="303"/>
         <source>Engine Multithreading</source>
-        <translation>Паралельність Середовища Виконання</translation>
+        <translation type="vanished">Паралельність Середовища Виконання</translation>
     </message>
 </context>
 <context>
@@ -733,9 +903,12 @@ Title for the message box which pops up to catch user attention after they try t
     </message>
     <message>
         <location filename="main_window_messages.h" line="78"/>
-        <source>There is an already active instance of the FSI Translator. Close the previous window before starting another one.</source>
+        <source>There is an already active instance of the FSI Translator (Source: %1, Destination: %2).
+Close the previous window before starting another one.</source>
+        <oldsource>There is an already active instance of the FSI Translator. Close the previous window before starting another one.</oldsource>
         <extracomment>Message for the message box which pops up to catch user attention after they try to start a translator, while there is another running instance.</extracomment>
-        <translation>Вже існує активний екземпляр транслятора FSI. Закрийте попереднє вікно перед запуском нового.</translation>
+        <translation>Вже існує активний екземпляр транслятора FSI (Початковий файл: %1, Вихідний файл: %2).
+Закрийте попереднє вікно перед запуском нового.</translation>
     </message>
     <message>
         <location filename="main_window_messages.h" line="81"/>
@@ -781,9 +954,12 @@ Status tip after FSI Mediator failed to start.</extracomment>
     </message>
     <message>
         <location filename="main_window_messages.h" line="114"/>
-        <source>There is an already active instance of the FSI Mediator. Close the previous window before starting another one.</source>
+        <source>There is an already active instance of the FSI Mediator (Program: %1, Configuration: %2).
+Close the previous window before starting another one.</source>
+        <oldsource>There is an already active instance of the FSI Mediator. Close the previous window before starting another one.</oldsource>
         <extracomment>Message for the message box which pops up to catch user attention after they try to start a mediator, while there is another running instance.</extracomment>
-        <translation>Вже існує активний екземпляр посередника FSI. Закрийте попереднє вікно перед запуском нового.</translation>
+        <translation>Вже існує активний екземпляр посередника FSI (Програма: %1, Конфігурація: %2).
+Закрийте попереднє вікно перед запуском нового.</translation>
     </message>
     <message>
         <location filename="main_window_messages.h" line="123"/>
@@ -796,6 +972,24 @@ Status tip after FSI Mediator failed to start.</extracomment>
         <source>Running old version of the file.</source>
         <extracomment>Status tip after user cancels save operation before translation.</extracomment>
         <translation>Використовую стару версію файлу.</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="132"/>
+        <source>File saved before translation.</source>
+        <extracomment>Status tip after saving the file before translation.</extracomment>
+        <translation>Файл збережено перед запуском траслятора.</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="135"/>
+        <source>Unsaved Changes</source>
+        <extracomment>Title for the message box which pops up when user refuses to save temporary file and tries to run translation.</extracomment>
+        <translation>Збереження змін</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="138"/>
+        <source>You have unsaved changes. Please save your work before running the translation. You can&apos;t translate a temporary file.</source>
+        <extracomment>Message for the message box which pops up when user refuses to save temporary file and tries to run translation.</extracomment>
+        <translation>У файлі є незбережені зміни. Будь ласка, запишіть цей файл на диск перед трансляцією. Трансляція файлу без запису на диск неможлива.</translation>
     </message>
 </context>
 </TS>

@@ -139,8 +139,18 @@ extern state_settings& configure_instruction_arguments(states_builder_type& buil
 			std::vector<source_file_token>{ parser_options::argument_end_tokens }
 		);
 
-	state_settings& instruction_arguments_base = builder.create_state<state_type>()
-		.set_error_message("Unexpected token inside instruction. You were expected to introduce a keyword for another arugment.")
+	state_settings& instruction_arguments_base = builder.create_anonymous_state(
+        [](structure_builder::file&,
+                                     structure_builder::builder_parameters&,
+                                     structure_builder::read_map_type& read_map) {
+            // Discard expression as incorrect if there is a name between coma (,) and the end of expression (;)
+            if (!read_map.is_token_generator_name_empty()) {
+				read_map.exit_with_error();
+            }
+        }
+	)
+		.set_error_message("Unexpected token inside instruction. You were expected to introduce a keyword for another argument.")
+		.add_handle_token(source_file_token::expression_end)
 		.set_redirection_for_tokens(
 			{
 				source_file_token::expression_end, source_file_token::function_arguments_end

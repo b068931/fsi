@@ -16,6 +16,7 @@
 #include "interface_translator.h"
 #include "fsi_tools_adapter.h"
 #include "background_service.h"
+#include "about_application_window.h"
 
 namespace Windows {
     /// <summary>
@@ -64,6 +65,8 @@ namespace Windows {
         void onMenuLanguageUkrainian() noexcept;
         void onMenuLanguageEnglish() noexcept;
 
+        void onMenuShortDescription() noexcept;
+
         void onProgramTranslatorStarted() noexcept;
         void onProgramTranslationResult(
             int exitCode, 
@@ -82,8 +85,11 @@ namespace Windows {
         virtual void showEvent(QShowEvent* event) override;
 
     private:
+        // Child windows.
+        AboutApplicationWindow* aboutWindow{};
+
         // Main parts of the main window.
-        Ui::MainWindowClass ui{};
+        Ui::MainApplicationWindow ui{};
         Utility::BackgroundService<
             Components::FSITools::FSIToolsAdapter
         > languageService{};
@@ -102,6 +108,7 @@ namespace Windows {
         // Configuration methods.
         void setupTextEditor();
         void setupStatusBar();
+        void setupChildWindows();
         void connectSignalsManually();
     };
 }

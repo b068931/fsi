@@ -314,14 +314,14 @@ namespace CustomWidgets {
                 this->saveFileAtIndex(index);
             }
             else if (result == QMessageBox::No) {
-                this->fileTabs->removeTab(index);
-                this->openFiles.removeAt(index);
-
                 if (!openFile.filePath.isEmpty() && !openFile.isTemporary) {
                     if (!this->fileWatcher->removePath(openFile.filePath)) {
                         qWarning() << "Failed to remove file from the file watcher at path:" << openFile.filePath;
                     }
                 }
+
+                this->fileTabs->removeTab(index);
+                this->openFiles.removeAt(index);
 
                 return true;
             }
@@ -333,14 +333,14 @@ namespace CustomWidgets {
         }
 
         if (!fileEditor->document()->isModified()) {
-            this->fileTabs->removeTab(index);
-            this->openFiles.removeAt(index);
-
             if (!openFile.filePath.isEmpty() && !openFile.isTemporary) {
                 if (!this->fileWatcher->removePath(openFile.filePath)) {
                     qWarning() << "Failed to remove file from the file watcher at path:" << openFile.filePath;
                 }
             }
+
+            this->fileTabs->removeTab(index);
+            this->openFiles.removeAt(index);
 
             return true;
         }
