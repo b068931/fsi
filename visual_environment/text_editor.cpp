@@ -152,7 +152,7 @@ namespace CustomWidgets {
         return this->fileTabs->currentIndex() != -1;
     }
 
-    void TextEditor::openNewFile(const QString& filePath) {
+    bool TextEditor::openNewFile(const QString& filePath, bool readOnly) {
         Q_ASSERT(!filePath.isEmpty() && "The provided file path is empty.");
         Q_ASSERT(this->fileTabs != nullptr && "The file tabs have not been set up.");
 
@@ -166,7 +166,7 @@ namespace CustomWidgets {
             for (int index = 0; index < this->openFiles.size(); ++index) {
                 if (this->openFiles[index].filePath == absoluteFilePath) {
                     this->fileTabs->setCurrentIndex(index);
-                    return;
+                    return true;
                 }
             }
 
@@ -183,8 +183,10 @@ namespace CustomWidgets {
             fileEditor->setLineWrapMode(QPlainTextEdit::NoWrap);
             fileEditor->setPlainText(file.readAll());
             fileEditor->document()->setModified(false);
+            fileEditor->setReadOnly(readOnly);
 
             if (file.error() != QFile::NoError) {
+                fileEditor->deleteLater();
                 throw tr(g_Messages[MessageKeys::g_MessageBoxFileReadErrorMessage]).arg(filePath);
             }
 
@@ -198,6 +200,8 @@ namespace CustomWidgets {
             const int newTabIndex = this->fileTabs->addTab(fileEditor, fileInfo.fileName());
             this->fileTabs->setCurrentIndex(newTabIndex);
             this->fileTabs->setTabToolTip(newTabIndex, absoluteFilePath);
+
+            return true;
         }
         catch (const QString& message) {
             // This is not a critical error, so we can just show a message box.
@@ -210,6 +214,8 @@ namespace CustomWidgets {
                 tr(g_Messages[MessageKeys::g_MessageBoxFileOpenErrorTitle]),
                 message
             );
+
+            return false;
         }
     }
 

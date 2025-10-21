@@ -12,6 +12,7 @@
 #include <QPlainTextEdit>
 #include <QMenu>
 #include <QAction>
+#include <QEvent>
 
 namespace CustomWidgets {
     /// <summary>
@@ -49,7 +50,9 @@ namespace CustomWidgets {
         /// Otherwise, it opens the file in a new tab.
         /// </summary>
         /// <param name="filePath">The path to the file to be opened.</param>
-        void openNewFile(const QString& filePath);
+        /// <param name="readOnly">If true, opens the file in read-only mode.</param>
+        /// <returns>True if the file was opened successfully or is already open; otherwise, false.</returns>
+        bool openNewFile(const QString& filePath, bool readOnly = false);
 
         /// <summary>
         /// Creates a temporary file tab. Temporary files are not associated with any file path on disk.
@@ -101,6 +104,7 @@ namespace CustomWidgets {
 
     protected:
         virtual void showEvent(QShowEvent* event) override;
+        virtual bool event(QEvent* event) override;
 
     private slots:
         void onWorkingDirectoryItemDoubleClicked(const QModelIndex& index) noexcept;

@@ -4,24 +4,28 @@
 <context>
     <name>AboutApplicationWindow</name>
     <message>
-        <location filename="about_application_window.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished">Form</translation>
+        <translation type="obsolete">Form</translation>
     </message>
     <message>
-        <location filename="about_application_window.ui" line="24"/>
+        <location filename="about_application_window.ui" line="17"/>
+        <source>About This Application</source>
+        <translation>About This Application</translation>
+    </message>
+    <message>
+        <location filename="about_application_window.ui" line="27"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Simple text editor, file browsing, along with integration with FSI (From Scratch Interpreter) tools that &lt;a href=&quot;https://github.com/b068931&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#faa683;&quot;&gt;I&lt;/span&gt;&lt;/a&gt; built as my coursework.&lt;/p&gt;&lt;p&gt;This application could have been a complete IDE, if I had a debugger. Unfortunately, I do not. So instead it is called a &amp;quot;visual environment&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Simple text editor, file browsing, along with integration with FSI (From Scratch Interpreter) tools that &lt;a href=&quot;https://github.com/b068931&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#faa683;&quot;&gt;I&lt;/span&gt;&lt;/a&gt; built as my coursework.&lt;/p&gt;&lt;p&gt;This application could have been a complete IDE, if I had a debugger. Unfortunately, I do not. So instead it is called a &amp;quot;visual environment&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="about_application_window.ui" line="37"/>
+        <location filename="about_application_window.ui" line="43"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This application is build with &lt;a href=&quot;https://www.qt.io/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#faa683;&quot;&gt;Qt.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This application is built with &lt;a href=&quot;https://www.qt.io/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#faa683;&quot;&gt;Qt.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="about_application_window.ui" line="50"/>
+        <location filename="about_application_window.ui" line="59"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;All emojis designed by &lt;a href=&quot;https://openmoji.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#faa683;&quot;&gt;OpenMoji&lt;/span&gt;&lt;/a&gt; – the open-source emoji and icon project. License: &lt;a href=&quot;https://creativecommons.org/licenses/by-sa/4.0/#&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#faa683;&quot;&gt;CC BY-SA 4.0.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;All emojis designed by &lt;a href=&quot;https://openmoji.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#faa683;&quot;&gt;OpenMoji&lt;/span&gt;&lt;/a&gt; – the open-source emoji and icon project. License: &lt;a href=&quot;https://creativecommons.org/licenses/by-sa/4.0/#&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#faa683;&quot;&gt;CC BY-SA 4.0.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -330,184 +334,199 @@
     <message>
         <location filename="main_window.ui" line="14"/>
         <source>Visual Environment</source>
-        <translation type="unfinished">Visual Environment</translation>
+        <translation>Visual Environment</translation>
     </message>
     <message>
         <location filename="main_window.ui" line="52"/>
         <source>File</source>
-        <translation type="unfinished">File</translation>
+        <translation>File</translation>
     </message>
     <message>
         <location filename="main_window.ui" line="65"/>
         <source>Working Folder</source>
-        <translation type="unfinished">Working Folder</translation>
+        <translation>Working Folder</translation>
     </message>
     <message>
         <location filename="main_window.ui" line="72"/>
         <source>Program</source>
-        <translation type="unfinished">Program</translation>
+        <translation>Program</translation>
     </message>
     <message>
         <location filename="main_window.ui" line="87"/>
         <source>About</source>
-        <translation type="unfinished">About</translation>
+        <translation>About</translation>
     </message>
     <message>
         <location filename="main_window.ui" line="91"/>
         <source>FSI Documentation</source>
-        <translation type="unfinished">FSI Documentation</translation>
+        <translation>FSI Documentation</translation>
     </message>
     <message>
         <location filename="main_window.ui" line="116"/>
         <source>Languages</source>
-        <translation type="unfinished">Languages</translation>
+        <translation>Languages</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="150"/>
+        <location filename="main_window.ui" line="123"/>
+        <source>Styles</source>
+        <translation>Styles</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="158"/>
         <source>Save</source>
-        <translation type="unfinished">Save</translation>
+        <translation>Save</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="153"/>
+        <location filename="main_window.ui" line="161"/>
         <source>Ctrl+S</source>
-        <translation type="unfinished">Ctrl+S</translation>
+        <translation>Ctrl+S</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="162"/>
+        <location filename="main_window.ui" line="170"/>
         <source>Save as...</source>
-        <translation type="unfinished">Save as...</translation>
+        <translation>Save as...</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="165"/>
+        <location filename="main_window.ui" line="173"/>
         <source>Ctrl+Shift+S</source>
-        <translation type="unfinished">Ctrl+Shift+S</translation>
+        <translation>Ctrl+Shift+S</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="174"/>
-        <location filename="main_window.ui" line="213"/>
+        <location filename="main_window.ui" line="182"/>
+        <location filename="main_window.ui" line="221"/>
         <source>Close</source>
-        <translation type="unfinished">Close</translation>
+        <translation>Close</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="177"/>
+        <location filename="main_window.ui" line="185"/>
         <source>Ctrl+Q</source>
-        <translation type="unfinished">Ctrl+Q</translation>
+        <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="186"/>
-        <location filename="main_window.ui" line="198"/>
+        <location filename="main_window.ui" line="194"/>
+        <location filename="main_window.ui" line="206"/>
         <source>Open...</source>
-        <translation type="unfinished">Open...</translation>
+        <translation>Open...</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="189"/>
+        <location filename="main_window.ui" line="197"/>
         <source>Ctrl+O</source>
-        <translation type="unfinished">Ctrl+O</translation>
+        <translation>Ctrl+O</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="204"/>
+        <location filename="main_window.ui" line="212"/>
         <source>Ctrl+W</source>
-        <translation type="unfinished">Ctrl+W</translation>
+        <translation>Ctrl+W</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="216"/>
+        <location filename="main_window.ui" line="224"/>
         <source>Ctrl+C</source>
-        <translation type="unfinished">Ctrl+C</translation>
+        <translation>Ctrl+C</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="225"/>
+        <location filename="main_window.ui" line="233"/>
         <source>Translate and Run</source>
-        <translation type="unfinished">Translate and Run</translation>
+        <translation>Translate and Run</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="228"/>
+        <location filename="main_window.ui" line="236"/>
         <source>Ctrl+R</source>
-        <translation type="unfinished">Ctrl+R</translation>
+        <translation>Ctrl+R</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="237"/>
+        <location filename="main_window.ui" line="245"/>
         <source>Runtime Environment</source>
-        <translation type="unfinished">Runtime Environment</translation>
+        <translation>Runtime Environment</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="240"/>
+        <location filename="main_window.ui" line="248"/>
         <source>Ctrl+E</source>
-        <translation type="unfinished">Ctrl+E</translation>
+        <translation>Ctrl+E</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="249"/>
+        <location filename="main_window.ui" line="257"/>
         <source>Visual Environment Documentation</source>
-        <translation type="unfinished">Visual Environment Documentation</translation>
+        <translation>Visual Environment Documentation</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="258"/>
+        <location filename="main_window.ui" line="266"/>
         <source>Short Overview...</source>
-        <translation type="unfinished">Short Overview...</translation>
+        <translation>Short Overview...</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="267"/>
+        <location filename="main_window.ui" line="275"/>
         <source>Installation</source>
-        <translation type="unfinished">Installation</translation>
+        <translation>Installation</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="276"/>
+        <location filename="main_window.ui" line="284"/>
         <source>Release Layout</source>
-        <translation type="unfinished">Release Layout</translation>
+        <translation>Release Layout</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="285"/>
+        <location filename="main_window.ui" line="293"/>
         <source>Using Translator</source>
-        <translation type="unfinished">Using Translator</translation>
+        <translation>Using Translator</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="294"/>
+        <location filename="main_window.ui" line="302"/>
         <source>Using Execution Engine</source>
-        <translation type="unfinished">Using Execution Engine</translation>
+        <translation>Using Execution Engine</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="303"/>
+        <location filename="main_window.ui" line="311"/>
         <source>Engine Multithreading</source>
-        <translation type="unfinished">Engine Multithreading</translation>
+        <translation>Engine Multithreading</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="312"/>
+        <location filename="main_window.ui" line="320"/>
         <source>Ukrainian</source>
-        <translation type="unfinished">Ukrainian</translation>
+        <translation>Ukrainian</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="321"/>
+        <location filename="main_window.ui" line="329"/>
         <source>English</source>
-        <translation type="unfinished">English</translation>
+        <translation>English</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="330"/>
+        <location filename="main_window.ui" line="338"/>
         <source>New</source>
-        <translation type="unfinished">New</translation>
+        <translation>New</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="333"/>
+        <location filename="main_window.ui" line="341"/>
         <source>Ctrl+N</source>
-        <translation type="unfinished">Ctrl+N</translation>
+        <translation>Ctrl+N</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="342"/>
+        <location filename="main_window.ui" line="350"/>
         <source>Translate</source>
-        <translation type="unfinished">Translate</translation>
+        <translation>Translate</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="345"/>
+        <location filename="main_window.ui" line="353"/>
         <source>Ctrl+B</source>
-        <translation type="unfinished">Ctrl+B</translation>
+        <translation>Ctrl+B</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="354"/>
+        <location filename="main_window.ui" line="362"/>
         <source>Run Last Translated</source>
-        <translation type="unfinished">Run Last Translated</translation>
+        <translation>Run Last Translated</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="357"/>
+        <location filename="main_window.ui" line="365"/>
         <source>Ctrl+L</source>
-        <translation type="unfinished">Ctrl+L</translation>
+        <translation>Ctrl+L</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="374"/>
+        <source>Dark</source>
+        <translation>Dark</translation>
+    </message>
+    <message>
+        <location filename="main_window.ui" line="383"/>
+        <source>Light</source>
+        <translation>Light</translation>
     </message>
 </context>
 <context>
@@ -911,6 +930,36 @@ Close the previous window before starting another one.</translation>
         <source>You have unsaved changes. Please save your work before running the translation. You can&apos;t translate a temporary file.</source>
         <extracomment>Message for the message box which pops up when user refuses to save temporary file and tries to run translation.</extracomment>
         <translation>You have unsaved changes. Please save your work before running the translation. You can&apos;t translate a temporary file.</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="141"/>
+        <source>Theme changed successfully.</source>
+        <extracomment>Status tip after user changes application theme successfully.</extracomment>
+        <translation>Theme changed successfully.</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="144"/>
+        <source>Failed to change theme.</source>
+        <extracomment>Status tip after user tries to change application theme, but an error occurs.</extracomment>
+        <translation>Failed to change theme.</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="147"/>
+        <source>../documentation/english/%1</source>
+        <extracomment>Base path to the documentation directory, changes based on the selected language.</extracomment>
+        <translation>../documentation/english/%1</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="150"/>
+        <source>Documentation file opened (read-only).</source>
+        <extracomment>Status tip after opening documentation.</extracomment>
+        <translation>Documentation file opened (read-only).</translation>
+    </message>
+    <message>
+        <location filename="main_window_messages.h" line="153"/>
+        <source>Killed By User.</source>
+        <extracomment>Status tip after child tool instance got killed by user.</extracomment>
+        <translation>Killed By User</translation>
     </message>
 </context>
 </TS>

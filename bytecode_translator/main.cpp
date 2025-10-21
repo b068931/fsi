@@ -6,6 +6,10 @@
 #error "Currently only MSVC is supported for the bytecode translator."
 #endif
 
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <windows.h>
+
 #include <iostream>
 #include <chrono>
 #include <cstdlib>
@@ -148,6 +152,17 @@ namespace {
 
         return result;
     }
+
+    BOOL CtrlHandler(DWORD dwCtrlType) {
+        if (dwCtrlType == CTRL_C_EVENT) {
+            constexpr int userTerminationErrorCode = 42;
+            ExitProcess(userTerminationErrorCode);
+
+            return TRUE;
+        }
+
+        return FALSE;
+    }
 }
 
 int main(int argc, char** argv) {
@@ -158,6 +173,10 @@ int main(int argc, char** argv) {
     }
 
     try {
+        if (!SetConsoleCtrlHandler(CtrlHandler, TRUE)) {
+            std::cout << "Failed to set control handler. This may impede user experience in fsi-visual-environment." << std::endl;
+        }
+
         generic_parser::parser_facade<
             source_file_token,
             structure_builder::context_key,

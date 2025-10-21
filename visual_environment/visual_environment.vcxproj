@@ -49,17 +49,17 @@
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
     <QtInstall>6.9.0_msvc2022_64</QtInstall>
-    <QtModules>core;gui;widgets</QtModules>
+    <QtModules>core;gui;widgets;svg</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'" Label="QtSettings">
     <QtInstall>6.9.0_msvc2022_64</QtInstall>
-    <QtModules>core;gui;widgets</QtModules>
+    <QtModules>core;gui;widgets;svg</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
     <QtInstall>6.9.0_msvc2022_64</QtInstall>
-    <QtModules>core;gui;widgets</QtModules>
+    <QtModules>core;gui;widgets;svg</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
   <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
@@ -159,6 +159,8 @@
   <ItemGroup>
     <QtMoc Include="enriched_status_bar.h" />
     <ClCompile Include="about_application_window.cpp" />
+    <ClCompile Include="about_application_window_slots.cpp" />
+    <ClCompile Include="application_styles_manager.cpp" />
     <ClCompile Include="enriched_status_bar.cpp" />
     <ClCompile Include="enriched_status_bar_slots.cpp" />
     <ClCompile Include="fsi_tools_adapter.cpp" />
@@ -168,6 +170,7 @@
     <ClCompile Include="main_window_slots.cpp" />
     <ClCompile Include="qstring_wrapper.cpp" />
     <ClCompile Include="static_translatable_string.cpp" />
+    <ClCompile Include="SVGImage.cpp" />
     <ClCompile Include="text_editor.cpp" />
     <ClCompile Include="text_editor_slots.cpp" />
     <QtUic Include="about_application_window.ui" />
@@ -209,6 +212,7 @@
   <ItemGroup>
     <QtMoc Include="interface_translator.h" />
     <QtMoc Include="about_application_window.h" />
+    <QtMoc Include="application_styles_manager.h" />
     <ClInclude Include="background_service.h" />
     <ClInclude Include="enriched_status_bar_messages.h" />
     <QtMoc Include="fsi_tools_adapter.h" />
@@ -216,6 +220,7 @@
     <ClInclude Include="fsi_ui_configuration_options.h" />
     <ClInclude Include="main_window_messages.h" />
     <ClInclude Include="qstring_wrapper.h" />
+    <QtMoc Include="SVGImage.h" />
     <ClInclude Include="text_editor_messages.h" />
     <ClInclude Include="translatable_string_interface.h" />
     <ClInclude Include="static_translatable_string.h" />
@@ -246,6 +251,7 @@
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">$(SolutionDir)$(Platform)\$(Configuration)\bin\</DestinationFolders>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)$(Platform)\$(Configuration)\bin\</DestinationFolders>
     </CopyFileToFolders>
+    <None Include="light_theme.qss" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

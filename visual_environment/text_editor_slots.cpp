@@ -18,6 +18,14 @@ namespace CustomWidgets {
         }
     }
 
+    bool TextEditor::event(QEvent* event) {
+        if (event->type() == QEvent::LanguageChange) {
+            this->onRetranslateUI();
+        }
+
+        return QWidget::event(event);
+    }
+
     void TextEditor::onWorkingDirectoryItemDoubleClicked(const QModelIndex& index) noexcept {
         Q_ASSERT(this->workingDirectory != nullptr && "The working directory has not been set up.");
 

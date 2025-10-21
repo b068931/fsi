@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.7.34009.444
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11116.177 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bytecode_translator", "bytecode_translator\bytecode_translator.vcxproj", "{E3EEA055-1FCF-456D-96D9-0297F9866563}"
 EndProject
@@ -47,13 +47,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "typename_array", "submodule_typename_array\typename-array\typename-array.vcxproj", "{DB1E244F-2629-402B-A7EA-E6772D475175}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
-	ProjectSection(SolutionItems) = preProject
-		documentation\engine-multithreading.txt = documentation\engine-multithreading.txt
-		documentation\installation.txt = documentation\installation.txt
-		documentation\release-layout.txt = documentation\release-layout.txt
-		documentation\use-fsi-mediator.txt = documentation\use-fsi-mediator.txt
-		documentation\use-fsi-translator.txt = documentation\use-fsi-translator.txt
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "compression_algorithms", "compression_algorithms\compression_algorithms.vcxproj", "{DD719431-ECE7-4C3F-8F0E-73E8A88E7783}"
 EndProject
@@ -66,6 +59,26 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "visual_environment", "visua
 		{E3EEA055-1FCF-456D-96D9-0297F9866563} = {E3EEA055-1FCF-456D-96D9-0297F9866563}
 		{EFFA46AB-91B0-4C85-9B61-998018F77CBC} = {EFFA46AB-91B0-4C85-9B61-998018F77CBC}
 		{FFFB66E6-5E8C-4F95-B0E8-A546ABEB983D} = {FFFB66E6-5E8C-4F95-B0E8-A546ABEB983D}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "English", "English", "{7E9CC7AC-1915-44C5-A417-875BF1B9DD59}"
+	ProjectSection(SolutionItems) = preProject
+		documentation\english\engine-multithreading.txt = documentation\english\engine-multithreading.txt
+		documentation\english\installation.txt = documentation\english\installation.txt
+		documentation\english\release-layout.txt = documentation\english\release-layout.txt
+		documentation\english\use-fsi-mediator.txt = documentation\english\use-fsi-mediator.txt
+		documentation\english\use-fsi-translator.txt = documentation\english\use-fsi-translator.txt
+		documentation\english\visual-environment.txt = documentation\english\visual-environment.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Ukrainian", "Ukrainian", "{700BAE54-0994-44E6-8271-3CA878DFADD2}"
+	ProjectSection(SolutionItems) = preProject
+		documentation\ukrainian\engine-multithreading.txt = documentation\ukrainian\engine-multithreading.txt
+		documentation\ukrainian\installation.txt = documentation\ukrainian\installation.txt
+		documentation\ukrainian\release-layout.txt = documentation\ukrainian\release-layout.txt
+		documentation\ukrainian\use-fsi-mediator.txt = documentation\ukrainian\use-fsi-mediator.txt
+		documentation\ukrainian\use-fsi-translator.txt = documentation\ukrainian\use-fsi-translator.txt
+		documentation\ukrainian\visual-environment.txt = documentation\ukrainian\visual-environment.txt
 	EndProjectSection
 EndProject
 Global
@@ -177,6 +190,8 @@ Global
 		{02EA681E-C7D8-13C7-8484-4AC65E1B71E8} = {EDAA1009-AF0E-4FD1-AAFE-EF360DF81916}
 		{DD719431-ECE7-4C3F-8F0E-73E8A88E7783} = {F9BEAC84-0B37-4963-9819-2F4B59FBC48F}
 		{F7DFB6D8-8221-4968-B0E5-5EE791492681} = {C857E16E-4CDC-448E-9A2E-6079AFEFC914}
+		{7E9CC7AC-1915-44C5-A417-875BF1B9DD59} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{700BAE54-0994-44E6-8271-3CA878DFADD2} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0389860B-44F1-4F73-9967-3737FD94893C}

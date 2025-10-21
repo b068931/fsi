@@ -118,10 +118,18 @@
     <addaction name="actionUkrainian"/>
     <addaction name="actionEnglish"/>
    </widget>
+   <widget class="QMenu" name="menuStyles">
+    <property name="title">
+     <string>Styles</string>
+    </property>
+    <addaction name="changeThemeDarkAction"/>
+    <addaction name="changeThemeLightAction"/>
+   </widget>
    <addaction name="fileMenu"/>
    <addaction name="folderMenu"/>
    <addaction name="programMenu"/>
    <addaction name="menuLanguages"/>
+   <addaction name="menuStyles"/>
    <addaction name="programAboutMenu"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
@@ -355,6 +363,24 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+L</string>
+   </property>
+  </action>
+  <action name="changeThemeDarkAction">
+   <property name="icon">
+    <iconset resource="visual_environment.qrc">
+     <normaloff>:/icons/dark_theme_icon.svg</normaloff>:/icons/dark_theme_icon.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Dark</string>
+   </property>
+  </action>
+  <action name="changeThemeLightAction">
+   <property name="icon">
+    <iconset resource="visual_environment.qrc">
+     <normaloff>:/icons/light_theme_icon.svg</normaloff>:/icons/light_theme_icon.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Light</string>
    </property>
   </action>
  </widget>

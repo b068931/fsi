@@ -6,6 +6,10 @@
 #error "Currently only MSVC is supported for the module mediator."
 #endif
 
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <windows.h>
+
 #include <iostream>
 #include <cstdlib>
 #include <filesystem>
@@ -142,6 +146,17 @@ namespace {
 
         return compressed_bytecode;
     }
+
+    BOOL CtrlHandler(DWORD dwCtrlType) {
+        if (dwCtrlType == CTRL_C_EVENT) {
+            constexpr int userTerminationExitCode = 42;
+            ExitProcess(userTerminationExitCode);
+
+            return TRUE;
+        }
+
+        return FALSE;
+    }
 }
 
 int main(int argc, char** argv) {
@@ -151,6 +166,10 @@ int main(int argc, char** argv) {
     }
 
     try {
+        if (!SetConsoleCtrlHandler(CtrlHandler, TRUE)) {
+            std::cerr << "Failed to set control handler. This may degrade user experience in fsi-visual-environment." << std::endl;
+        }
+
         // Funnily enough, CRT maintains std::set_terminate function on a per-thread basis
         // So we need to call this in each thread that the program uses
         module_mediator::crash_handling::install_crash_handlers();

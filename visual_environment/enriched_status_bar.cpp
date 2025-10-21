@@ -84,6 +84,10 @@ namespace CustomWidgets {
 
     void EnrichedStatusBar::setVisualHintForLabel(QLabel* label, CustomWidgets::EnrichedStatusBar::ColorHint hint) {
         Q_ASSERT(label && "Label is expected to be non-null.");
+        constexpr const char successColor[]{ "#38ff38" };
+        constexpr const char failureColor[]{ "#ff3838" };
+        constexpr const char neutralColor[]{ "#757575" };
+
         QString styleSheetTemplate = QString(
             "QLabel {" \
             "   color: %1;" \
@@ -92,15 +96,15 @@ namespace CustomWidgets {
 
         switch (hint) {
         case CustomWidgets::EnrichedStatusBar::ColorHint::success: {
-            styleSheetTemplate = styleSheetTemplate.arg("green");
+            styleSheetTemplate = styleSheetTemplate.arg(successColor);
             break;
         }
         case CustomWidgets::EnrichedStatusBar::ColorHint::neutral: {
-            styleSheetTemplate = styleSheetTemplate.arg("white");
+            styleSheetTemplate = styleSheetTemplate.arg(neutralColor);
             break;
         }
         case CustomWidgets::EnrichedStatusBar::ColorHint::failure: {
-            styleSheetTemplate = styleSheetTemplate.arg("red");
+            styleSheetTemplate = styleSheetTemplate.arg(failureColor);
             break;
         }
         default:

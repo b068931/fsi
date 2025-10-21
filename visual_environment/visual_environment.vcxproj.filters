@@ -84,6 +84,12 @@
     <Filter Include="Source Files\Windows\About Window">
       <UniqueIdentifier>{7f0436e5-859b-4675-a5ec-2dfbca9f0c2e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Components\Application Style">
+      <UniqueIdentifier>{ec4835a1-d9c4-4aaa-85e2-605dd65a2ef0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Components\Application Style">
+      <UniqueIdentifier>{21b72f2a-9fa0-4980-9cca-b9d7ba67a365}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="main_window.ui">
@@ -136,6 +142,15 @@
     <ClCompile Include="about_application_window.cpp">
       <Filter>Source Files\Windows\About Window</Filter>
     </ClCompile>
+    <ClCompile Include="SVGImage.cpp">
+      <Filter>Source Files\Custom Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="about_application_window_slots.cpp">
+      <Filter>Source Files\Windows\About Window</Filter>
+    </ClCompile>
+    <ClCompile Include="application_styles_manager.cpp">
+      <Filter>Source Files\Components\Application Style</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="visual_environment.qrc">
@@ -160,6 +175,12 @@
     </QtMoc>
     <QtMoc Include="about_application_window.h">
       <Filter>Header Files\Windows\About Window</Filter>
+    </QtMoc>
+    <QtMoc Include="SVGImage.h">
+      <Filter>Header Files\Custom Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="application_styles_manager.h">
+      <Filter>Header Files\Components\Application Style</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
@@ -201,6 +222,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="dark_theme.qss">
+      <Filter>QSS Files</Filter>
+    </None>
+    <None Include="light_theme.qss">
       <Filter>QSS Files</Filter>
     </None>
   </ItemGroup>

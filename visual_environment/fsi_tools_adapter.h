@@ -29,6 +29,7 @@ namespace Components::FSITools {
             failedToStart,
             crashed,
             alreadyRunning,
+            killedByUser,
             unknownError
         };
 

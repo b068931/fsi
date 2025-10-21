@@ -5,6 +5,8 @@
 #include <QLabel>
 #include <QWidget>
 #include <QString>
+#include <QEvent>
+
 #include <memory>
 
 #include "translatable_string_interface.h"
@@ -73,6 +75,9 @@ namespace CustomWidgets {
 
     public slots:
         void onRetranslateUI() noexcept;
+
+    protected:
+        virtual bool event(QEvent* event) override;
 
     private:
         using ITranslatableString = Components::Internationalization::ITranslatableString;

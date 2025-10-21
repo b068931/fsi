@@ -135,7 +135,22 @@ constexpr const char* g_Messages[] = {
     QT_TRANSLATE_NOOP("Windows::MainWindow", "Unsaved Changes"),
 
     //: Message for the message box which pops up when user refuses to save temporary file and tries to run translation.
-    QT_TRANSLATE_NOOP("Windows::MainWindow", "You have unsaved changes. Please save your work before running the translation. You can't translate a temporary file.")
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "You have unsaved changes. Please save your work before running the translation. You can't translate a temporary file."),
+
+    //: Status tip after user changes application theme successfully.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "Theme changed successfully."),
+
+    //: Status tip after user tries to change application theme, but an error occurs.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "Failed to change theme."),
+
+    //: Base path to the documentation directory, changes based on the selected language.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "../documentation/english/%1"),
+
+    //: Status tip after opening documentation.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "Documentation file opened (read-only)."),
+
+    //: Status tip after child tool instance got killed by user.
+    QT_TRANSLATE_NOOP("Windows::MainWindow", "Killed By User."),
 };
 
 enum MessageKeys {
@@ -182,7 +197,12 @@ enum MessageKeys {
     g_StatusTipTranslationWithoutSave = 40,
     g_StatusTipFileSavedBeforeTranslation = 41,
     g_DialogTitleUnsavedTemporary = 42,
-    g_DialogMessageUnsavedTemporary = 43
+    g_DialogMessageUnsavedTemporary = 43,
+    g_StatusTipThemeChangedSuccessfully = 44,
+    g_StatusTipThemeChangeFailed = 45,
+    g_DocumentationBasePath = 46,
+    g_StatusTipDocumentationOpened = 47,
+    g_StatusTipInstanceKilledByUser = 48,
 };
 
 #endif

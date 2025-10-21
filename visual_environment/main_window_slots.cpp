@@ -2,6 +2,7 @@
 #include <QFileDialog>
 #include <QDir>
 #include <QMessageBox>
+#include <QMetaObject>
 
 #include <memory>
 
@@ -25,6 +26,10 @@ namespace Windows {
             }
 
             return true;
+        }
+
+        if (event->type() == QEvent::LanguageChange) {
+            this->onRetranslateUI();
         }
 
         return QMainWindow::event(event);
@@ -223,6 +228,46 @@ namespace Windows {
         );
     }
 
+    void MainWindow::onMenuChangeThemeDark() noexcept {
+        Q_ASSERT(this->applicationStyle && "The application style manager has not been set up.");
+        if (this->applicationStyle->setStyle(Components::ApplicationStyle::ApplicationStylesManager::Style::Dark)) {
+            this->enrichedStatusBar->toolTip(
+                Components::Internationalization::StaticTranslatableString::wrap(
+                    g_Context,
+                    g_Messages[g_StatusTipThemeChangedSuccessfully]
+                )
+            );
+        }
+        else {
+            this->enrichedStatusBar->toolTip(
+                Components::Internationalization::StaticTranslatableString::wrap(
+                    g_Context,
+                    g_Messages[g_StatusTipThemeChangeFailed]
+                )
+            );
+        }
+    }
+
+    void MainWindow::onMenuChangeThemeLight() noexcept {
+        Q_ASSERT(this->applicationStyle && "The application style manager has not been set up.");
+        if (this->applicationStyle->setStyle(Components::ApplicationStyle::ApplicationStylesManager::Style::Light)) {
+            this->enrichedStatusBar->toolTip(
+                Components::Internationalization::StaticTranslatableString::wrap(
+                    g_Context,
+                    g_Messages[g_StatusTipThemeChangedSuccessfully]
+                )
+            );
+        }
+        else {
+            this->enrichedStatusBar->toolTip(
+                Components::Internationalization::StaticTranslatableString::wrap(
+                    g_Context,
+                    g_Messages[g_StatusTipThemeChangeFailed]
+                )
+            );
+        }
+    }
+
     void MainWindow::onMenuShortDescription() noexcept {
         Q_ASSERT(this->aboutWindow && "The about window has not been set up.");
         this->aboutWindow->show();
@@ -323,7 +368,7 @@ namespace Windows {
             Components::FSITools::ConfigurationOptions::getTranslatorDebugFlag(this);
 
         if (debugFlag.has_value()) {
-            this->languageService.send(
+            this->languageService->send(
                 [selectedFile, translationResult, debugFlag]
                 (Components::FSITools::FSIToolsAdapter* adapter) {
                     adapter->startProgramTranslation(
@@ -358,7 +403,7 @@ namespace Windows {
             Components::FSITools::ConfigurationOptions::getExecutionEnvironmentConfiguration(this);
 
         if (configurationFilePath.has_value()) {
-            this->languageService.send(
+            this->languageService->send(
                 [configurationFilePath, translationResult, logFilePath]
                 (Components::FSITools::FSIToolsAdapter* adapter) {
                     adapter->startExecutionEnvironment(
@@ -487,13 +532,13 @@ namespace Windows {
                 CustomWidgets::EnrichedStatusBar::ColorHint::failure
             );
 
-            QString lastTranslationTarget = this->languageService.send<QString>(
+            QString lastTranslationTarget = this->languageService->send<QString>(
                 [] (const Components::FSITools::FSIToolsAdapter* adapter) {
                     return adapter->getLastTranslationTarget();
                 }
             );
 
-            QString lastTranslationResult = this->languageService.send<QString>(
+            QString lastTranslationResult = this->languageService->send<QString>(
                 [] (const Components::FSITools::FSIToolsAdapter* adapter) {
                     return adapter->getLastTranslationResult();
                 }
@@ -505,6 +550,18 @@ namespace Windows {
                 tr(g_Messages[MessageKeys::g_DialogMessageTranslatorAlreadyRunning])
                     .arg(lastTranslationTarget)
                     .arg(lastTranslationResult)
+            );
+
+            break;
+        }
+
+        case Components::FSITools::FSIToolsAdapter::ChildResult::killedByUser: {
+            this->enrichedStatusBar->translatorResult(
+                Components::Internationalization::StaticTranslatableString::wrap(
+                    g_Context,
+                    g_Messages[MessageKeys::g_StatusTipInstanceKilledByUser]
+                ),
+                CustomWidgets::EnrichedStatusBar::ColorHint::neutral
             );
 
             break;
@@ -604,13 +661,13 @@ namespace Windows {
                 CustomWidgets::EnrichedStatusBar::ColorHint::failure
             );
 
-            QString lastExecutionEnvironmentProgram = this->languageService.send<QString>(
+            QString lastExecutionEnvironmentProgram = this->languageService->send<QString>(
                 [] (const Components::FSITools::FSIToolsAdapter* adapter) {
                     return adapter->getLastExecutionEnvironmentProgram();
                 }
             );
 
-            QString lastExecutionEnvironmentConfiguration = this->languageService.send<QString>(
+            QString lastExecutionEnvironmentConfiguration = this->languageService->send<QString>(
                 [] (const Components::FSITools::FSIToolsAdapter* adapter) {
                     return adapter->getLastExecutionEnvironmentConfiguration();
                 }
@@ -622,6 +679,18 @@ namespace Windows {
                 tr(g_Messages[MessageKeys::g_DialogMessageExecutionEnvironmentAlreadyRunning])
                     .arg(lastExecutionEnvironmentProgram)
                     .arg(lastExecutionEnvironmentConfiguration)
+            );
+
+            break;
+        }
+
+        case Components::FSITools::FSIToolsAdapter::ChildResult::killedByUser: {
+            this->enrichedStatusBar->environmentState(
+                Components::Internationalization::StaticTranslatableString::wrap(
+                    g_Context,
+                    g_Messages[MessageKeys::g_StatusTipInstanceKilledByUser]
+                ),
+                CustomWidgets::EnrichedStatusBar::ColorHint::neutral
             );
 
             break;

@@ -6,17 +6,28 @@
 
 namespace Components::FSITools {
     void FSIToolsAdapter::onTranslatorFinished(int exitCode, QProcess::ExitStatus status) noexcept {
+        constexpr int userTerminatedErrorCode = 42;
+        constexpr int NTSTATUS_CTRL_C_EXIT = -1073741510;
+
         ChildResult result = ChildResult::unknownError;
-        switch (status) {
-        case QProcess::NormalExit:
-            result = ChildResult::terminated;
-            break;
-        case QProcess::CrashExit:
-            result = ChildResult::crashed;
-            break;
-        default:
-            result = ChildResult::unknownError;
-            break;
+        if (exitCode == userTerminatedErrorCode || exitCode == NTSTATUS_CTRL_C_EXIT) {
+            result = ChildResult::killedByUser;
+        }
+        else {
+            switch (status) {
+            case QProcess::NormalExit: {
+                result = ChildResult::terminated;
+                break;
+            }
+            case QProcess::CrashExit: {
+                result = ChildResult::crashed;
+                break;
+            }
+            default: {
+                result = ChildResult::unknownError;
+                break;
+            }
+            }
         }
 
         emit this->translationResult(exitCode, result);
@@ -29,17 +40,28 @@ namespace Components::FSITools {
     }
 
     void FSIToolsAdapter::onExecutionEnvironmentFinished(int exitCode, QProcess::ExitStatus status) noexcept {
+        constexpr int userTerminatedErrorCode = 42;
+        constexpr int NTSTATUS_CTRL_C_EXIT = -1073741510;
+        
         ChildResult result = ChildResult::unknownError;
-        switch (status) {
-        case QProcess::NormalExit:
-            result = ChildResult::terminated;
-            break;
-        case QProcess::CrashExit:
-            result = ChildResult::crashed;
-            break;
-        default:
-            result = ChildResult::unknownError;
-            break;
+        if (exitCode == userTerminatedErrorCode || exitCode == NTSTATUS_CTRL_C_EXIT) {
+            result = ChildResult::killedByUser;
+        }
+        else {
+            switch (status) {
+            case QProcess::NormalExit: {
+                result = ChildResult::terminated;
+                break;
+            }
+            case QProcess::CrashExit: {
+                result = ChildResult::crashed;
+                break;
+            }
+            default: {
+                result = ChildResult::unknownError;
+                break;
+            }
+            }
         }
 
         // Flush and close the log handle after the process ends

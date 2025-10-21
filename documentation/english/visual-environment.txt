@@ -1,0 +1,11 @@
+By definition an IDE is a software application that provides comprehensive facilities to computer programmers for software development. 
+An IDE typically consists of a source code editor, build automation tools, and a debugger.
+fsi-visual-environment is not an IDE, as it does not provide all the features typically associated with an IDE. Hence, the term
+"visual environment" is used instead. Because it provides a visual interface for some of the tools that FSI has.
+
+The main features of fsi-visual-environment include:
+- A simple code editor, along with file browsing capabilities.
+- Some level of integration with FSI translator (see use-fsi-translator.txt) for more information.
+- Some level of integration with FSI mediator (see use-fsi-mediator.txt) for more information.
+- Translations into English and Ukrainian languages.
+- Themes support (light and dark themes).

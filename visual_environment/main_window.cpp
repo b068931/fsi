@@ -1,4 +1,7 @@
 ﻿#include <QDir>
+#include <QVector>
+#include <QPair>
+#include <QApplication>
 
 #include "main_window.h"
 #include "qstring_wrapper.h"
@@ -6,60 +9,52 @@
 #include "main_window_messages.h"
 
 namespace Windows {
-    MainWindow::MainWindow(QWidget* parent)
-        : QMainWindow(parent), i18n(new Components::Internationalization::InterfaceTranslator{})
+    MainWindow::MainWindow(
+        AboutApplicationWindow* aboutWindow,
+        Utility::BackgroundService<Components::FSITools::FSIToolsAdapter>* languageService,
+        Components::Internationalization::InterfaceTranslator* i18n,
+        Components::ApplicationStyle::ApplicationStylesManager* applicationStyle,
+        QWidget* parent
+    )
+        : QMainWindow(parent),
+          aboutWindow(aboutWindow),
+          languageService(languageService),
+          i18n(i18n),
+          applicationStyle(applicationStyle)
     {
         this->ui.setupUi(this);
 
         this->setupStatusBar();
         this->setupTextEditor();
-        this->setupChildWindows();
+        this->configureDocumentation();
         this->connectSignalsManually();
-
-        this->languageService.start();
     }
 
     MainWindow::~MainWindow() noexcept = default;
 
     void MainWindow::connectSignalsManually() {
-        // Connect the retranslateUI signal to the appropriate slots.
-        connect(this->i18n.data(), &Components::Internationalization::InterfaceTranslator::retranslateUI,
-            this, &MainWindow::onRetranslateUI);
-
-        connect(this->i18n.data(), &Components::Internationalization::InterfaceTranslator::retranslateUI,
-            this->editor, &CustomWidgets::TextEditor::onRetranslateUI);
-
-        connect(this->i18n.data(), &Components::Internationalization::InterfaceTranslator::retranslateUI,
-            this->enrichedStatusBar, &CustomWidgets::EnrichedStatusBar::onRetranslateUI);
-
-        connect(this->i18n.data(), &Components::Internationalization::InterfaceTranslator::retranslateUI,
-            [this] {
-                // For the language service we'll have to use this questionable approach.
-                this->languageService.send([] (Components::FSITools::FSIToolsAdapter* adapter) {
-                    adapter->onRetranslateUI();
-                });
-            });
+        Q_ASSERT(this->languageService && "The language service has not been set up.");
 
         // Connect FSIToolsAdapter signals to their respective slots.
-        this->languageService.receive(
+        this->languageService->receive(
             &Components::FSITools::FSIToolsAdapter::translatorStarted,
             this,
             &MainWindow::onProgramTranslatorStarted
         );
 
-        this->languageService.receive(
+        this->languageService->receive(
             &Components::FSITools::FSIToolsAdapter::translationResult,
             this,
             &MainWindow::onProgramTranslationResult
         );
 
-        this->languageService.receive(
+        this->languageService->receive(
             &Components::FSITools::FSIToolsAdapter::executionEnvironmentStarted,
             this,
             &MainWindow::onExecutionEnvironmentStarted
         );
 
-        this->languageService.receive(
+        this->languageService->receive(
             &Components::FSITools::FSIToolsAdapter::executionEnvironmentResult,
             this,
             &MainWindow::onExecutionEnvironmentResult
@@ -107,6 +102,12 @@ namespace Windows {
 
         connect(this->ui.shortDescriptionMenuAction, &QAction::triggered,
             this, &MainWindow::onMenuShortDescription);
+
+        connect(this->ui.changeThemeDarkAction, &QAction::triggered,
+            this, &MainWindow::onMenuChangeThemeDark);
+
+        connect(this->ui.changeThemeLightAction, &QAction::triggered,
+            this, &MainWindow::onMenuChangeThemeLight);
     }
 
     void MainWindow::setupTextEditor() {
@@ -142,8 +143,49 @@ namespace Windows {
         this->setStatusBar(this->enrichedStatusBar);
     }
 
-    void MainWindow::setupChildWindows() {
-        this->aboutWindow = new AboutApplicationWindow(nullptr);
+    void MainWindow::configureDocumentation() {
+        QVector<QPair<QAction*, QString>> documentationCorrelationPaths{
+            { this->ui.visualEnvironmentDocumentationMenuAction,
+                "visual-environment.txt"},
+
+            { this->ui.documentationFSIEngineMultithreadingMenuAction,
+                "engine-multithreading.txt"},
+
+            { this->ui.documentationFSIInstallationMenuAction,
+                "installation.txt"},
+
+            { this->ui.documentationFSIReleaseLayoutMenuAction,
+                "release-layout.txt"},
+
+            { this->ui.documentationFSIUseExecutionEnvironmentMenuAction,
+                "use-fsi-mediator.txt"},
+
+            { this->ui.documentationFSIUseTranslatorMenuAction,
+                "use-fsi-translator.txt"}
+        };
+
+        // Just open all documentation files in editor in read-only mode.
+        // If a file can't be modified, then text editor just won't do anything with it.
+        for (auto& [action, path] : documentationCorrelationPaths) {
+            connect(action, &QAction::triggered, this, [this, path]() {
+                constexpr bool readOnlyMode = true;
+                auto buildPathToFile = [](const QString& fileName) -> QString {
+                    // Convert path relative to the application binary path into
+                    // absolute system path.
+                    return QDir(QApplication::applicationDirPath()).filePath(
+                        tr(g_Messages[g_DocumentationBasePath]).arg(fileName));
+                };
+
+                if (this->editor->openNewFile(buildPathToFile(path), readOnlyMode)) {
+                    this->enrichedStatusBar->toolTip(
+                        Components::Internationalization::StaticTranslatableString::wrap(
+                            g_Context,
+                            g_Messages[g_StatusTipDocumentationOpened]
+                        )
+                    );
+                }
+            });
+        }
     }
 }
 

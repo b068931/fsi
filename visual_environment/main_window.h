@@ -17,6 +17,7 @@
 #include "fsi_tools_adapter.h"
 #include "background_service.h"
 #include "about_application_window.h"
+#include "application_styles_manager.h"
 
 namespace Windows {
     /// <summary>
@@ -28,7 +29,7 @@ namespace Windows {
     /// </summary>
     class MainWindow final : public QMainWindow
     {
-        // TODO: Implement a menu which will allow users to switch themes (light/dark).
+        // TODO: Add menu action to jump to line/column in the text editor.
         // TODO: Implement a menu which will allow users to change font size, font family, etc. in the text editor.
         // TODO: Implement syntax highlighting for FSI scripts.
         // TODO: Save settings like window size, last opened directory, language, etc.
@@ -36,7 +37,14 @@ namespace Windows {
         Q_OBJECT
 
     public:
-        explicit MainWindow(QWidget* parent = nullptr);
+        explicit MainWindow(
+            AboutApplicationWindow* aboutWindow,
+            Utility::BackgroundService<Components::FSITools::FSIToolsAdapter>* languageService,
+            Components::Internationalization::InterfaceTranslator* i18n,
+            Components::ApplicationStyle::ApplicationStylesManager* applicationStyle,
+            QWidget* parent = nullptr
+        );
+
         ~MainWindow() noexcept override;
 
         MainWindow(const MainWindow&) = delete;
@@ -45,9 +53,10 @@ namespace Windows {
         MainWindow(MainWindow&&) = delete;
         MainWindow& operator= (MainWindow&&) = delete;
 
-    private slots:
+    public slots:
         void onRetranslateUI() noexcept;
 
+    private slots:
         void onMenuFileNew() noexcept;
         void onMenuFileOpen() noexcept;
         void onMenuFileSave() noexcept;
@@ -64,6 +73,9 @@ namespace Windows {
 
         void onMenuLanguageUkrainian() noexcept;
         void onMenuLanguageEnglish() noexcept;
+
+        void onMenuChangeThemeDark() noexcept;
+        void onMenuChangeThemeLight() noexcept;
 
         void onMenuShortDescription() noexcept;
 
@@ -85,19 +97,17 @@ namespace Windows {
         virtual void showEvent(QShowEvent* event) override;
 
     private:
+        using LanguageService = Utility::BackgroundService<Components::FSITools::FSIToolsAdapter>;
+
         // Child windows.
         AboutApplicationWindow* aboutWindow{};
 
         // Main parts of the main window.
         Ui::MainApplicationWindow ui{};
-        Utility::BackgroundService<
-            Components::FSITools::FSIToolsAdapter
-        > languageService{};
 
-        QScopedPointer<
-            Components::Internationalization::InterfaceTranslator,
-            QScopedPointerDeleteLater
-        > i18n{};
+        LanguageService* languageService{};
+        Components::Internationalization::InterfaceTranslator* i18n;
+        Components::ApplicationStyle::ApplicationStylesManager* applicationStyle;
 
         CustomWidgets::TextEditor* editor{};
         CustomWidgets::EnrichedStatusBar* enrichedStatusBar{};
@@ -108,7 +118,7 @@ namespace Windows {
         // Configuration methods.
         void setupTextEditor();
         void setupStatusBar();
-        void setupChildWindows();
+        void configureDocumentation();
         void connectSignalsManually();
     };
 }

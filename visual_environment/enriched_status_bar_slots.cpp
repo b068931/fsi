@@ -32,4 +32,12 @@ namespace CustomWidgets {
                 : QString{}
         );
     }
+
+    bool EnrichedStatusBar::event(QEvent* event) {
+        if (event->type() == QEvent::LanguageChange) {
+            this->onRetranslateUI();
+        }
+
+        return QStatusBar::event(event);
+    }
 }
