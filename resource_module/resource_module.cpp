@@ -655,13 +655,23 @@ module_mediator::return_value verify_program_memory(module_mediator::arguments_s
 }
 
 program_container::~program_container() noexcept {
-    if (this->context && this->context->decrease_references_count() == 0) {
-        delete this->context;
+    // execution module will make sure that there are no active threads before destroying a program container
+    // this should happen only on program close (e.g. console got closed before the program is done)
+    // at this point logger module may have been unloaded already, so we can only use std::cerr here
+    if (this->threads_count == 0) {
+        if (this->context && this->context->decrease_references_count() == 0) {
+            delete this->context;
+        }
     }
-
-    //execution module will make sure that there are no active threads before destroying a program container
-    assert(this->threads_count == 0 && "destroying container while it still has running threads");
+    else {
+        std::osyncstream standard_error{ std::cerr };
+        standard_error << std::format(
+            "Warning: abandoning program container with {} active threads.\n",
+            this->threads_count
+        );
+    }
 }
+
 program_context::~program_context() noexcept {
     assert(this->references_count == 0 && "destroying program context that has active references");
     module_mediator::fast_call<

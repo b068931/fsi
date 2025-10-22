@@ -6,11 +6,10 @@
 
 namespace Components::FSITools {
     void FSIToolsAdapter::onTranslatorFinished(int exitCode, QProcess::ExitStatus status) noexcept {
-        constexpr int userTerminatedErrorCode = 42;
         constexpr int NTSTATUS_CTRL_C_EXIT = -1073741510;
 
         ChildResult result = ChildResult::unknownError;
-        if (exitCode == userTerminatedErrorCode || exitCode == NTSTATUS_CTRL_C_EXIT) {
+        if (exitCode == NTSTATUS_CTRL_C_EXIT) {
             result = ChildResult::killedByUser;
         }
         else {
@@ -40,11 +39,10 @@ namespace Components::FSITools {
     }
 
     void FSIToolsAdapter::onExecutionEnvironmentFinished(int exitCode, QProcess::ExitStatus status) noexcept {
-        constexpr int userTerminatedErrorCode = 42;
         constexpr int NTSTATUS_CTRL_C_EXIT = -1073741510;
         
         ChildResult result = ChildResult::unknownError;
-        if (exitCode == userTerminatedErrorCode || exitCode == NTSTATUS_CTRL_C_EXIT) {
+        if (exitCode == NTSTATUS_CTRL_C_EXIT) {
             result = ChildResult::killedByUser;
         }
         else {

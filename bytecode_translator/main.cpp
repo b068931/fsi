@@ -155,10 +155,9 @@ namespace {
 
     BOOL CtrlHandler(DWORD dwCtrlType) {
         if (dwCtrlType == CTRL_C_EVENT) {
-            constexpr int userTerminationErrorCode = 42;
-            ExitProcess(userTerminationErrorCode);
-
-            return TRUE;
+            // Using EXIT_SUCCESS here is a questionable decision, because it indicates normal termination.
+            // So just assume that the user wanted to terminate the program without errors.
+            std::quick_exit(EXIT_SUCCESS);
         }
 
         return FALSE;

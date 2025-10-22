@@ -15,12 +15,19 @@
 #include "../logger_module/logging.h"
 #include "../module_mediator/fsi_types.h"
 
+// Make it public so that it can be accessed from module initialization code.
+std::unordered_map<
+    std::uintptr_t,
+    std::pair<
+        std::unique_ptr<module_mediator::arguments_string_element[]>,
+        std::string>
+    >* exposed_functions{};
+
 namespace {
     std::mutex exposed_functions_mutex{};
-    std::unordered_map<std::uintptr_t, std::pair<std::unique_ptr<module_mediator::arguments_string_element[]>, std::string>> exposed_functions{};
     void merge_exposed_functions(std::unordered_map<std::uintptr_t, std::pair<std::unique_ptr<module_mediator::arguments_string_element[]>, std::string>>& new_exposed_functions) {
         std::lock_guard<std::mutex> lock{ ::exposed_functions_mutex };
-        ::exposed_functions.merge(new_exposed_functions);
+        ::exposed_functions->merge(new_exposed_functions);
     }
 }
 
@@ -579,7 +586,7 @@ module_mediator::return_value free_program(module_mediator::arguments_string_typ
         std::lock_guard<std::mutex> lock{ ::exposed_functions_mutex };
         for (std::uint32_t counter = 0; counter < exposed_functions_count; ++counter) {
             if (static_cast<void**>(exposed_functions_addresses)[counter] != nullptr) {
-                ::exposed_functions.erase(
+                ::exposed_functions->erase(
                     reinterpret_cast<std::uintptr_t>(static_cast<void**>(exposed_functions_addresses)[counter])
                 );
             }
@@ -610,8 +617,8 @@ module_mediator::return_value check_function_arguments(module_mediator::argument
     module_mediator::arguments_string_type found_signature_string{};
     {
         std::lock_guard<std::mutex> lock{ ::exposed_functions_mutex };
-        auto found_exposed_function_information = ::exposed_functions.find(function_address);
-        if (found_exposed_function_information != ::exposed_functions.end()) {
+        auto found_exposed_function_information = ::exposed_functions->find(function_address);
+        if (found_exposed_function_information != ::exposed_functions->end()) {
             found_signature_string = found_exposed_function_information->second.first.get();
         }
     }
@@ -636,8 +643,8 @@ module_mediator::return_value get_function_name(module_mediator::arguments_strin
     char* found_name = nullptr;
     {
         std::lock_guard<std::mutex> lock{ ::exposed_functions_mutex };
-        auto found_exposed_function_information = ::exposed_functions.find(function_address);
-        if (found_exposed_function_information != ::exposed_functions.end()) {
+        auto found_exposed_function_information = ::exposed_functions->find(function_address);
+        if (found_exposed_function_information != ::exposed_functions->end()) {
             found_name = found_exposed_function_information->second.second.data();
         }
     }

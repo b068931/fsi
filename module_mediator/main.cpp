@@ -14,6 +14,7 @@
 #include <cstdlib>
 #include <filesystem>
 #include <format>
+#include <syncstream>
 
 #include "fsi_types.h"
 #include "module_mediator.h"
@@ -147,17 +148,41 @@ namespace {
         return compressed_bytecode;
     }
 
+    module_mediator::module_part* global_module_part{ nullptr };
     BOOL CtrlHandler(DWORD dwCtrlType) {
         if (dwCtrlType == CTRL_C_EVENT) {
-            constexpr int userTerminationExitCode = 42;
-            ExitProcess(userTerminationExitCode);
+            std::osyncstream standard_error{ std::cerr };
+            standard_error << "*** Terminating the fsi-mediator with Ctrl-C is unsafe. " \
+                "You must terminate the process (for that just close the terminal)." << std::endl;
 
             return TRUE;
+        }
+
+        // Will kill the process either way, no need to "return TRUE"
+        // Must perform a specific cleanup routine here because PRTS may maintain std::thread global instances.
+        // This entire program is full of OS-specific behavior, so adding this is not a big deal.
+        // For example, I also rely on the fact that CRT generally won't unwind functions stack on std::exit, std::quick_exit, etc.
+        // So this means that I don't need to clean up std::threads in those cases.
+        // PRTS also wakes up all threads waiting on input, so waking them up and terminating the program (without stopping the executors)
+        // may cause a data race and raise a SEH exception. But the process is closing either way, so who cares.
+        if (dwCtrlType == CTRL_CLOSE_EVENT) {
+            std::size_t program_runtime_services = global_module_part->find_module_index("prts");
+            std::size_t detach_from_stdio = global_module_part->find_function_index(program_runtime_services, "detach_from_stdio");
+            module_mediator::fast_call(
+                global_module_part,
+                program_runtime_services,
+                detach_from_stdio
+            );
         }
 
         return FALSE;
     }
 }
+
+// TODO: Look into pattern introduced in program_loader where a global object gets explicitly allocated on a heap
+//       and then deallocated in "free_m" this is helpful in avoiding static destruction order fiasco.
+//       Maybe this pattern should be applied in all modules where global objects are used?
+//       Must also document this pattern somewhere.
 
 int main(int argc, char** argv) {
     if (argc != 4) {
@@ -184,10 +209,10 @@ int main(int argc, char** argv) {
         module_mediator::engine_module_mediator module_mediator{};
         std::string error_message = module_mediator.load_modules(modules_descriptor_file);
 
-        module_mediator::module_part* part = module_mediator.get_module_part();
+        global_module_part = module_mediator.get_module_part();
         if (error_message.empty()) {
             LOG_PROGRAM_INFO(
-                part,
+                global_module_part,
                 "All modules were loaded successfully."
             );
 
@@ -197,7 +222,7 @@ int main(int argc, char** argv) {
             );
 
             LOG_PROGRAM_INFO(
-                part,
+                global_module_part,
                 std::format(
                     "Decompressed bytecode '{}' into file: '{}'.",
                     argv[3],
@@ -205,12 +230,12 @@ int main(int argc, char** argv) {
                 )
             );
 
-            std::size_t program_loader = part->find_module_index("progload");
-            std::size_t load_program_to_memory = part->find_function_index(program_loader, "load_program_to_memory");
+            std::size_t program_loader = global_module_part->find_module_index("progload");
+            std::size_t load_program_to_memory = global_module_part->find_function_index(program_loader, "load_program_to_memory");
 
             std::string decompressed_bytecode_file_name = decompressed_bytecode.generic_string();
             module_mediator::fast_call<module_mediator::memory>(
-                part, program_loader, load_program_to_memory,
+                global_module_part, program_loader, load_program_to_memory,
                 const_cast<char*>(decompressed_bytecode_file_name.c_str()) // May God forgive me for this
             );
 
@@ -219,22 +244,22 @@ int main(int argc, char** argv) {
             std::filesystem::remove(decompressed_bytecode);
 
             // Attach to stdio does not manage stderr. That is done by the logger_module.
-            std::size_t program_runtime_services = part->find_module_index("prts");
-            std::size_t attach_to_stdio = part->find_function_index(program_runtime_services, "attach_to_stdio");
+            std::size_t program_runtime_services = global_module_part->find_module_index("prts");
+            std::size_t attach_to_stdio = global_module_part->find_function_index(program_runtime_services, "attach_to_stdio");
             module_mediator::fast_call(
-                part, program_runtime_services, attach_to_stdio
+                global_module_part, program_runtime_services, attach_to_stdio
             );
 
-            std::size_t execution_module = part->find_module_index("excm");
-            std::size_t startup = part->find_function_index(execution_module, "start");
+            std::size_t execution_module = global_module_part->find_module_index("excm");
+            std::size_t startup = global_module_part->find_function_index(execution_module, "start");
             module_mediator::fast_call<module_mediator::two_bytes>(
-                part, execution_module, startup,
+                global_module_part, execution_module, startup,
                 executors_count
             );
 
-            std::size_t detach_from_stdio = part->find_function_index(program_runtime_services, "detach_from_stdio");
+            std::size_t detach_from_stdio = global_module_part->find_function_index(program_runtime_services, "detach_from_stdio");
             module_mediator::fast_call(
-                part, program_runtime_services, detach_from_stdio
+                global_module_part, program_runtime_services, detach_from_stdio
             );
         }
         else {

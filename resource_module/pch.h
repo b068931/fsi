@@ -13,6 +13,7 @@
 #endif
 
 #include <windows.h>
+#include <iostream>
 #include <cstdint>
 #include <mutex>
 #include <vector>
@@ -27,5 +28,6 @@
 #include <algorithm>
 #include <atomic>
 #include <set>
+#include <syncstream>
 
 #endif
