@@ -1,4 +1,4 @@
-1. All emojis designed by OpenMoji – the open-source emoji and icon project. License: CC BY-SA 4.0
+1. All emojis (*.svg) designed by OpenMoji – the open-source emoji and icon project. License: CC BY-SA 4.0
 2. Portable or installer releases of this software may contain the following files:
 - concrt140.dll
 - msvcp140.dll
@@ -13,9 +13,75 @@
 - vc_redist.x64.exe
 These are provided as per https://learn.microsoft.com/en-us/visualstudio/releases/2022/redistribution.
 They are provided in accordance with the Microsoft Visual Studio Community 2022 license terms, 
-in an unmodified form. They are not covered by the MIT License below.
+in an unmodified form.
 
-3. fsi-visual-environment is built with Qt 6.9.0, which is licensed under the terms of LGPLv3.
+3. Portable or installer releases of this software may also contain the following file:
+- D3DCompiler_47.dll
+This is provided in accordance with Microsoft's software license for its SDK, without modification.
+
+4. dxcompiler.dll is licensed under the of University of Illinois Open Source License:
+University of Illinois/NCSA
+Open Source License
+
+Copyright (c) 2003-2015 University of Illinois at Urbana-Champaign.
+All rights reserved.
+
+Developed by:
+
+    LLVM Team
+
+    University of Illinois at Urbana-Champaign
+
+    http://llvm.org
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal with
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+
+    * Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimers.
+
+    * Redistributions in binary form must reproduce the above copyright notice,
+      this list of conditions and the following disclaimers in the
+      documentation and/or other materials provided with the distribution.
+
+    * Neither the names of the LLVM Team, University of Illinois at
+      Urbana-Champaign, nor the names of its contributors may be used to
+      endorse or promote products derived from this Software without specific
+      prior written permission.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE
+SOFTWARE.
+
+5. opengl32sw.dll's license:
+Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+BRIAN PAUL BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
+AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+6. fsi-visual-environment is built with Qt 6.9.0, which is licensed under the terms of LGPLv3.
 All *.qm files, all DLLs (except execution-module.dll, logger-module.dll, program-loader.dll,
 program-runtime-services.dll, resource-module.dll, and those mentioned above), are part of Qt
 framework. Now follows the text of the LGPLv3 license (https://doc.qt.io/qt-6/lgpl.html):
@@ -184,7 +250,7 @@ apply, that proxy's public statement of acceptance of any version is
 permanent authorization for you to choose that version for the
 Library.
 
-4. Everything else in this repository is licensed under the terms below.
+7. Everything else in this repository is licensed under the terms below.
 MIT License
 
 Copyright (c) 2023 https://github.com/b068931

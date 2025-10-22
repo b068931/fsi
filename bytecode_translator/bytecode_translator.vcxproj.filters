@@ -297,5 +297,8 @@
     <CopyFileToFolders Include="..\examples\unsynchronized-shared-memory.tfsi">
       <Filter>Examples</Filter>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="..\examples\transpose-matrix.tfsi">
+      <Filter>Examples</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
 </Project>

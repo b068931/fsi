@@ -184,6 +184,9 @@ namespace {
 //       Maybe this pattern should be applied in all modules where global objects are used?
 //       Must also document this pattern somewhere.
 
+// TODO: Null all memory descriptors before deallocating them, so that if a program references one, it gets
+//       a null pointer exception instead of random memory access. I am not sure if this will work though.
+
 int main(int argc, char** argv) {
     if (argc != 4) {
         std::cerr << "You need to provide three arguments: text file with the modules descriptions, executors count and a compiled file." << std::endl;

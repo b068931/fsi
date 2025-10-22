@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.0.11116.177 d18.0
+VisualStudioVersion = 18.0.11116.177
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bytecode_translator", "bytecode_translator\bytecode_translator.vcxproj", "{E3EEA055-1FCF-456D-96D9-0297F9866563}"
 EndProject
@@ -169,8 +169,8 @@ Global
 		{F7DFB6D8-8221-4968-B0E5-5EE791492681}.Debug Sanitaizer|x64.Build.0 = Debug Sanitaizer|x64
 		{F7DFB6D8-8221-4968-B0E5-5EE791492681}.Debug|x64.ActiveCfg = Debug|x64
 		{F7DFB6D8-8221-4968-B0E5-5EE791492681}.Debug|x64.Build.0 = Debug|x64
-		{F7DFB6D8-8221-4968-B0E5-5EE791492681}.Release (Installer)|x64.ActiveCfg = Release|x64
-		{F7DFB6D8-8221-4968-B0E5-5EE791492681}.Release (Installer)|x64.Build.0 = Release|x64
+		{F7DFB6D8-8221-4968-B0E5-5EE791492681}.Release (Installer)|x64.ActiveCfg = Release (Installer)|x64
+		{F7DFB6D8-8221-4968-B0E5-5EE791492681}.Release (Installer)|x64.Build.0 = Release (Installer)|x64
 		{F7DFB6D8-8221-4968-B0E5-5EE791492681}.Release|x64.ActiveCfg = Release|x64
 		{F7DFB6D8-8221-4968-B0E5-5EE791492681}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
