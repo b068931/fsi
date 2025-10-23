@@ -153,9 +153,7 @@ namespace {
         if (dwCtrlType == CTRL_C_EVENT) {
             std::osyncstream standard_error{ std::cerr };
             standard_error << "*** Terminating the fsi-mediator with Ctrl-C is unsafe. " \
-                "You must terminate the process (for that just close the terminal)." << std::endl;
-
-            return TRUE;
+                "Premature termination can lead to unsaved data." << std::endl;
         }
 
         // Will kill the process either way, no need to "return TRUE"
@@ -165,7 +163,7 @@ namespace {
         // So this means that I don't need to clean up std::threads in those cases.
         // PRTS also wakes up all threads waiting on input, so waking them up and terminating the program (without stopping the executors)
         // may cause a data race and raise a SEH exception. But the process is closing either way, so who cares.
-        if (dwCtrlType == CTRL_CLOSE_EVENT) {
+        if (dwCtrlType == CTRL_CLOSE_EVENT || dwCtrlType == CTRL_C_EVENT) {
             std::size_t program_runtime_services = global_module_part->find_module_index("prts");
             std::size_t detach_from_stdio = global_module_part->find_function_index(program_runtime_services, "detach_from_stdio");
             module_mediator::fast_call(
@@ -186,6 +184,8 @@ namespace {
 
 // TODO: Null all memory descriptors before deallocating them, so that if a program references one, it gets
 //       a null pointer exception instead of random memory access. I am not sure if this will work though.
+
+// TODO: Use a wmain instead of a regular main to support Unicode file paths on Windows.
 
 int main(int argc, char** argv) {
     if (argc != 4) {

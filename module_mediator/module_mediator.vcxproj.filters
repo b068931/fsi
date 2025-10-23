@@ -24,6 +24,9 @@
     <Filter Include="Header Files\Crash Handling">
       <UniqueIdentifier>{7375ddab-72f4-4e7b-b0a2-d7fa620ba5fc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{c1e65c45-f850-4563-bf89-1fe8de0136d0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="module_mediator.h">
@@ -79,8 +82,21 @@
     <ClInclude Include="local_crash_handle_setup.h">
       <Filter>Header Files\Crash Handling</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="engine.mods" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="module_mediator.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="executable_icon.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

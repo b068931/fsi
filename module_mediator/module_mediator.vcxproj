@@ -203,6 +203,7 @@
     <ClInclude Include="main_state.h" />
     <ClInclude Include="module_part.h" />
     <ClInclude Include="parser_options.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="type_definitions.h" />
     <ClInclude Include="global_crash_handle_setup.h" />
   </ItemGroup>
@@ -229,6 +230,12 @@
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">$(SolutionDir)$(Platform)\$(Configuration)\bin\</DestinationFolders>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)$(Platform)\$(Configuration)\bin\</DestinationFolders>
     </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="module_mediator.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="executable_icon.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

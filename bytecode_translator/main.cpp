@@ -164,6 +164,8 @@ namespace {
     }
 }
 
+// TODO: Use a wmain instead of a regular main to support Unicode file paths on Windows.
+
 int main(int argc, char** argv) {
     auto start_time = std::chrono::high_resolution_clock::now();
     if (argc != 4) {

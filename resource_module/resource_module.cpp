@@ -666,7 +666,7 @@ program_container::~program_container() noexcept {
     else {
         std::osyncstream standard_error{ std::cerr };
         standard_error << std::format(
-            "Warning: abandoning program container with {} active threads.\n",
+            "*** Warning: abandoning program container with {} active thread(s).\n",
             this->threads_count
         );
     }

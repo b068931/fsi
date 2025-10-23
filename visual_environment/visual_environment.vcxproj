@@ -276,11 +276,19 @@
     <ClInclude Include="main_window_messages.h" />
     <ClInclude Include="qstring_wrapper.h" />
     <QtMoc Include="SVGImage.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="text_editor_messages.h" />
     <ClInclude Include="translatable_string_interface.h" />
     <ClInclude Include="static_translatable_string.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="about_application_image.svg" />
+    <None Include="about_program_icon.svg" />
+    <None Include="application_icon.svg" />
+    <None Include="branch_closed_icon.svg" />
+    <None Include="branch_open_icon.svg" />
+    <None Include="close_file_icon.svg" />
+    <None Include="close_working_directory.svg" />
     <None Include="dark_theme.qss" />
     <CopyFileToFolders Include="mediator-stub.bat">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -312,7 +320,27 @@
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)$(Platform)\$(Configuration)\bin\</DestinationFolders>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release (Installer)|x64'">$(SolutionDir)$(Platform)\$(Configuration)\bin\</DestinationFolders>
     </CopyFileToFolders>
+    <None Include="dark_theme_icon.svg" />
+    <None Include="documentation_icon.svg" />
+    <None Include="english_icon.svg" />
     <None Include="light_theme.qss" />
+    <None Include="light_theme_icon.svg" />
+    <None Include="new_file_icon.svg" />
+    <None Include="open_file_icon.svg" />
+    <None Include="open_working_directory_icon.svg" />
+    <None Include="runtime_environment_icon.svg" />
+    <None Include="run_last_translated_icon.svg" />
+    <None Include="save_file_as_icon.svg" />
+    <None Include="save_file_icon.svg" />
+    <None Include="translate_and_run_icon.svg" />
+    <None Include="translate_only_icon.svg" />
+    <None Include="ukrainian_icon.svg" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="visual_environment.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="executable_icon.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

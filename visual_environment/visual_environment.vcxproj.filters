@@ -90,6 +90,9 @@
     <Filter Include="Source Files\Components\Application Style">
       <UniqueIdentifier>{21b72f2a-9fa0-4980-9cca-b9d7ba67a365}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Menu Icons">
+      <UniqueIdentifier>{4734d34c-d785-4239-a170-5c2364652468}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="main_window.ui">
@@ -219,6 +222,9 @@
     <ClInclude Include="fsi_tools_messages.h">
       <Filter>Header Files\Components\FSI Tools</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="dark_theme.qss">
@@ -226,6 +232,69 @@
     </None>
     <None Include="light_theme.qss">
       <Filter>QSS Files</Filter>
+    </None>
+    <None Include="about_application_image.svg">
+      <Filter>Resource Files\Menu Icons</Filter>
+    </None>
+    <None Include="about_program_icon.svg">
+      <Filter>Resource Files\Menu Icons</Filter>
+    </None>
+    <None Include="application_icon.svg">
+      <Filter>Resource Files\Menu Icons</Filter>
+    </None>
+    <None Include="branch_closed_icon.svg">
+      <Filter>Resource Files\Menu Icons</Filter>
+    </None>
+    <None Include="branch_open_icon.svg">
+      <Filter>Resource Files\Menu Icons</Filter>
+    </None>
+    <None Include="close_file_icon.svg">
+      <Filter>Resource Files\Menu Icons</Filter>
+    </None>
+    <None Include="close_working_directory.svg">
+      <Filter>Resource Files\Menu Icons</Filter>
+    </None>
+    <None Include="dark_theme_icon.svg">
+      <Filter>Resource Files\Menu Icons</Filter>
+    </None>
+    <None Include="documentation_icon.svg">
+      <Filter>Resource Files\Menu Icons</Filter>
+    </None>
+    <None Include="english_icon.svg">
+      <Filter>Resource Files\Menu Icons</Filter>
+    </None>
+    <None Include="light_theme_icon.svg">
+      <Filter>Resource Files\Menu Icons</Filter>
+    </None>
+    <None Include="new_file_icon.svg">
+      <Filter>Resource Files\Menu Icons</Filter>
+    </None>
+    <None Include="open_file_icon.svg">
+      <Filter>Resource Files\Menu Icons</Filter>
+    </None>
+    <None Include="open_working_directory_icon.svg">
+      <Filter>Resource Files\Menu Icons</Filter>
+    </None>
+    <None Include="run_last_translated_icon.svg">
+      <Filter>Resource Files\Menu Icons</Filter>
+    </None>
+    <None Include="runtime_environment_icon.svg">
+      <Filter>Resource Files\Menu Icons</Filter>
+    </None>
+    <None Include="save_file_as_icon.svg">
+      <Filter>Resource Files\Menu Icons</Filter>
+    </None>
+    <None Include="save_file_icon.svg">
+      <Filter>Resource Files\Menu Icons</Filter>
+    </None>
+    <None Include="translate_and_run_icon.svg">
+      <Filter>Resource Files\Menu Icons</Filter>
+    </None>
+    <None Include="translate_only_icon.svg">
+      <Filter>Resource Files\Menu Icons</Filter>
+    </None>
+    <None Include="ukrainian_icon.svg">
+      <Filter>Resource Files\Menu Icons</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -235,5 +304,15 @@
     <CopyFileToFolders Include="translator-stub.bat">
       <Filter>Other</Filter>
     </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="visual_environment.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="executable_icon.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

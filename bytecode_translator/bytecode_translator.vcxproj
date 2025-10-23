@@ -199,6 +199,7 @@
     <ClInclude Include="program_verification.h" />
     <ClInclude Include="redefine_states.h" />
     <ClInclude Include="regular_variable_argument_states.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="same_type_instruction.h" />
     <ClInclude Include="save_variable_state_instruction.h" />
     <ClInclude Include="sizeof_argument_states.h" />
@@ -498,6 +499,12 @@
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">$(SolutionDir)$(Platform)\$(Configuration)\examples\</DestinationFolders>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)$(Platform)\$(Configuration)\examples\</DestinationFolders>
     </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="bytecode_translator.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="executable_icon.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

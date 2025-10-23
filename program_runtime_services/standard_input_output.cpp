@@ -84,6 +84,8 @@ namespace {
         HANDLE haWaitingHandles[]{ hStdIn, hCancelIO };
         std::vector<char> result{};
 
+        // Ensure that PRTS knows that we are waiting on console input, so that it can try and cancel it if needed.
+        std::shared_lock synchronous_io_lock{ io_synchronizer };
         while (std::ranges::find(result, '\n') == result.end()) {
             DWORD dwConsoleWaitResult = WaitForMultipleObjects(std::size(haWaitingHandles), haWaitingHandles, FALSE, INFINITE);
             if (dwConsoleWaitResult == WAIT_OBJECT_0 + 1) {
@@ -1150,6 +1152,24 @@ module_mediator::return_value attach_to_stdio(module_mediator::arguments_string_
 }
 
 module_mediator::return_value detach_from_stdio(module_mediator::arguments_string_type) {
+    // Start by setting IO cancellation event so that worker threads can exit overlapped IO, and console IO operations.
+    BOOL signalIOEnd = SetEvent(hIOCancellationSignal);
+    if (!signalIOEnd) {
+        LOG_WARNING(
+            interoperation::get_module_part(),
+            std::format(
+                "Failed to set event for I/O cancellation with error code {}. " \
+                "This will lead to resource leaks. Detaching worker threads as a last-ditch effort.",
+                GetLastError()
+            )
+        );
+
+        input_worker_thread.detach();
+        output_worker_thread.detach();
+
+        return module_mediator::module_failure;
+    }
+
     {
         std::unique_lock<std::shared_mutex> io_lock(io_synchronizer, std::defer_lock);
         std::unique_lock<std::mutex> input_lock(input_queue::lock, std::defer_lock);
@@ -1219,23 +1239,6 @@ module_mediator::return_value detach_from_stdio(module_mediator::arguments_strin
     //In the last case they will read is_stdio_attached false and exit.
     input_queue::signaling.notify_one();
     output_queue::signaling.notify_one();
-
-    BOOL signalIOEnd = SetEvent(hIOCancellationSignal);
-    if (!signalIOEnd) {
-        LOG_WARNING(
-            interoperation::get_module_part(),
-            std::format(
-                "Failed to set event for I/O cancellation with error code {}. " \
-                "This will lead to resource leaks. Detaching worker threads as a last-ditch effort.",
-                GetLastError()
-            )
-        );
-
-        input_worker_thread.detach();
-        output_worker_thread.detach();
-
-        return module_mediator::module_failure;
-    }
 
     //This will block if the shutdown sequence fails.
     phase_coordination.arrive_and_wait();

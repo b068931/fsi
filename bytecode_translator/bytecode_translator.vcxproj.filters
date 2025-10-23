@@ -51,6 +51,9 @@
     <Filter Include="Header Files\Program Translation\Logic Errors Detection\Filters">
       <UniqueIdentifier>{0f908980-167c-40cf-93f3-485a38477f45}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{1bbb2105-9b30-4944-ac6d-89284ad3942d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="type_definitions.h">
@@ -221,6 +224,9 @@
     <ClInclude Include="expose_function_state.h">
       <Filter>Header Files\Source Code Parsing\Parse Map States\Special Instructions</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -300,5 +306,15 @@
     <CopyFileToFolders Include="..\examples\transpose-matrix.tfsi">
       <Filter>Examples</Filter>
     </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="bytecode_translator.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="executable_icon.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
