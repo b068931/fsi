@@ -1,5 +1,6 @@
 #include <QProcess>
 #include <QCoreApplication>
+#include <QDebug>
 
 #include "fsi_tools_adapter.h"
 #include "fsi_tools_messages.h"
@@ -35,6 +36,9 @@ namespace Components::FSITools {
     void FSIToolsAdapter::onTranslatorErrorOccurred(QProcess::ProcessError error) noexcept {
         if (error == QProcess::FailedToStart) {
             emit this->translationResult(DefaultReturnCode, ChildResult::failedToStart);
+        }
+        else {
+            qDebug() << "Translator process error occurred:" << static_cast<int>(error);
         }
     }
 
@@ -81,6 +85,9 @@ namespace Components::FSITools {
             }
 
             emit this->executionEnvironmentResult(DefaultReturnCode, ChildResult::failedToStart);
+        }
+        else {
+            qDebug() << "Execution environment process error occurred:" << static_cast<int>(error);
         }
     }
 

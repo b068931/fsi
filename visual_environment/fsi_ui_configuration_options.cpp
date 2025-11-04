@@ -104,7 +104,7 @@ namespace Components::FSITools {
             int coreCount = 0;
             BYTE* iterator = buffer.get();
             DWORD remaining = bufferLength;
-            while (remaining >= sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX)) {
+            while (remaining > 0) {
                 PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX logicalProcessorInfo = 
                     reinterpret_cast<PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX>(iterator);
 
@@ -113,6 +113,13 @@ namespace Components::FSITools {
                 }
 
                 DWORD blockSize = logicalProcessorInfo->Size;
+                if (blockSize > remaining) {
+                    // This should not happen. However, I don't really trust ->Size field.
+                    // It does not match sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX) in my tests.
+                    qWarning() << "Logical processor information block size exceeds remaining buffer size.";
+                    break;
+                }
+
                 iterator += blockSize;
                 remaining -= blockSize;
             }

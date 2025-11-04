@@ -1,5 +1,6 @@
 #include <QCoreApplication>
 #include <QStringList>
+#include <QFile>
 #include <string>
 
 #include "fsi_tools_adapter.h"
@@ -58,6 +59,12 @@ namespace Components::FSITools {
 
         if (this->translator->state() != QProcess::NotRunning) {
             emit this->translationResult(DefaultReturnCode, ChildResult::alreadyRunning);
+            return;
+        }
+
+        if (!QFile::exists(executableName)) {
+            emit this->translationResult(DefaultReturnCode, ChildResult::failedToStart);
+            return;
         }
 
         // Save last known paths
@@ -91,10 +98,17 @@ namespace Components::FSITools {
 
         if (this->executionEnvironment->state() != QProcess::NotRunning) {
             emit this->executionEnvironmentResult(DefaultReturnCode, ChildResult::alreadyRunning);
+            return;
         }
 
         if (executorsCount < 1) {
             emit this->executionEnvironmentResult(DefaultReturnCode, ChildResult::failedToStart);
+            return;
+        }
+
+        if (!QFile::exists(executableName)) {
+            emit this->executionEnvironmentResult(DefaultReturnCode, ChildResult::failedToStart);
+            return;
         }
 
         // Close any existing log handle and recreate it for the new start.
@@ -124,6 +138,7 @@ namespace Components::FSITools {
         if (this->executionEnvironmentLogFile == INVALID_HANDLE_VALUE) {
             // If we failed to create a log file, keep INVALID_HANDLE_VALUE.
             emit this->executionEnvironmentResult(DefaultReturnCode, ChildResult::failedToStart);
+            return;
         }
 
         // Save last known program/configuration
