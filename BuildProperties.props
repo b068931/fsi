@@ -5,7 +5,7 @@
     <VisualLeakDetectorDir Condition="'$(VisualLeakDetectorDir)' == ''">D:\Visual Leak Detector</VisualLeakDetectorDir>
 
     <!--Because Visual Studio's Intelisense does not see it for some reason-->
-    <QtIncludeDirectory Condition="'$(QtIncludeDirectory)' == ''">C:\Qt\6.9.0\msvc2022_64\include</QtIncludeDirectory>
+    <QtIncludeDirectory Condition="'$(QtIncludeDirectory)' == ''">D:\QtV6.10\6.10.1\msvc2022_64\include</QtIncludeDirectory>
   </PropertyGroup>
   <Target Name="EnsureVLDDir" BeforeTargets="PrepareForBuild" Condition="'$(VisualLeakDetectorDir)' == ''">
     <Error Text="ERROR: VisualLeakDetectorDir is not defined!" />

@@ -17,8 +17,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "resource_module", "resource
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Executables", "Executables", "{C857E16E-4CDC-448E-9A2E-6079AFEFC914}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Application Setup", "application_setup\application_setup.vdproj", "{BB720CD8-9861-4CAC-8B6B-FD54E1A4A7DB}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Legal", "Legal", "{EDAA1009-AF0E-4FD1-AAFE-EF360DF81916}"
 	ProjectSection(SolutionItems) = preProject
 		LICENSE.txt = LICENSE.txt
@@ -129,10 +127,6 @@ Global
 		{61A05BF4-34D6-48EB-A39B-ADEE8898671E}.Release (Installer)|x64.Build.0 = Release (Installer)|x64
 		{61A05BF4-34D6-48EB-A39B-ADEE8898671E}.Release|x64.ActiveCfg = Release|x64
 		{61A05BF4-34D6-48EB-A39B-ADEE8898671E}.Release|x64.Build.0 = Release|x64
-		{BB720CD8-9861-4CAC-8B6B-FD54E1A4A7DB}.Debug Sanitaizer|x64.ActiveCfg = Debug Sanitaizer
-		{BB720CD8-9861-4CAC-8B6B-FD54E1A4A7DB}.Debug|x64.ActiveCfg = Debug
-		{BB720CD8-9861-4CAC-8B6B-FD54E1A4A7DB}.Release (Installer)|x64.ActiveCfg = Release (Installer)
-		{BB720CD8-9861-4CAC-8B6B-FD54E1A4A7DB}.Release|x64.ActiveCfg = Release
 		{8D62A4D1-ACFE-44A6-A647-A51AC37C6D9C}.Debug Sanitaizer|x64.ActiveCfg = Debug Sanitaizer|x64
 		{8D62A4D1-ACFE-44A6-A647-A51AC37C6D9C}.Debug|x64.ActiveCfg = Debug|x64
 		{8D62A4D1-ACFE-44A6-A647-A51AC37C6D9C}.Release (Installer)|x64.ActiveCfg = Release|x64

@@ -4,10 +4,6 @@
 <context>
     <name>AboutApplicationWindow</name>
     <message>
-        <source>Form</source>
-        <translation type="obsolete">Form</translation>
-    </message>
-    <message>
         <location filename="about_application_window.ui" line="17"/>
         <source>About This Application</source>
         <translation>About This Application</translation>
@@ -315,21 +311,6 @@
     </message>
 </context>
 <context>
-    <name>FSIToolsForm</name>
-    <message>
-        <source>Form</source>
-        <translation type="vanished">Form</translation>
-    </message>
-    <message>
-        <source>Tab 1</source>
-        <translation type="vanished">Tab 1</translation>
-    </message>
-    <message>
-        <source>Tab 2</source>
-        <translation type="vanished">Tab 2</translation>
-    </message>
-</context>
-<context>
     <name>MainApplicationWindow</name>
     <message>
         <location filename="main_window.ui" line="14"/>
@@ -527,169 +508,6 @@
         <location filename="main_window.ui" line="383"/>
         <source>Light</source>
         <translation>Light</translation>
-    </message>
-</context>
-<context>
-    <name>MainWindowClass</name>
-    <message>
-        <source>Visual Environment</source>
-        <translation type="vanished">Visual Environment</translation>
-    </message>
-    <message>
-        <source>Dynamically change the language of the editor.</source>
-        <translation type="vanished">Dynamically change the language of the editor.</translation>
-    </message>
-    <message>
-        <source>Open a new file or work with the currently selected tab.</source>
-        <translation type="vanished">Open a new file or work with the currently selected tab.</translation>
-    </message>
-    <message>
-        <source>File</source>
-        <translation type="vanished">File</translation>
-    </message>
-    <message>
-        <source>Working Folder</source>
-        <translation type="vanished">Working Folder</translation>
-    </message>
-    <message>
-        <source>Program</source>
-        <translation type="vanished">Program</translation>
-    </message>
-    <message>
-        <source>About FSI and this editor.</source>
-        <translation type="vanished">About FSI and this editor.</translation>
-    </message>
-    <message>
-        <source>About</source>
-        <translation type="vanished">About</translation>
-    </message>
-    <message>
-        <source>FSI Documentation</source>
-        <translation type="vanished">FSI Documentation</translation>
-    </message>
-    <message>
-        <source>Dynamically change the language of the application.</source>
-        <translation type="vanished">Dynamically change the language of the application.</translation>
-    </message>
-    <message>
-        <source>Languages</source>
-        <translation type="vanished">Languages</translation>
-    </message>
-    <message>
-        <source>Save</source>
-        <translation type="vanished">Save</translation>
-    </message>
-    <message>
-        <source>Ctrl+S</source>
-        <translation type="vanished">Ctrl+S</translation>
-    </message>
-    <message>
-        <source>Save as...</source>
-        <translation type="vanished">Save as...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+S</source>
-        <translation type="vanished">Ctrl+Shift+S</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation type="vanished">Close</translation>
-    </message>
-    <message>
-        <source>Ctrl+Q</source>
-        <translation type="vanished">Ctrl+Q</translation>
-    </message>
-    <message>
-        <source>Open...</source>
-        <translation type="vanished">Open...</translation>
-    </message>
-    <message>
-        <source>Ctrl+O</source>
-        <translation type="vanished">Ctrl+O</translation>
-    </message>
-    <message>
-        <source>Ctrl+W</source>
-        <translation type="vanished">Ctrl+W</translation>
-    </message>
-    <message>
-        <source>Ctrl+C</source>
-        <translation type="vanished">Ctrl+C</translation>
-    </message>
-    <message>
-        <source>Translate and Run</source>
-        <translation type="vanished">Translate and Run</translation>
-    </message>
-    <message>
-        <source>Ctrl+R</source>
-        <translation type="vanished">Ctrl+R</translation>
-    </message>
-    <message>
-        <source>Runtime Environment</source>
-        <translation type="vanished">Runtime Environment</translation>
-    </message>
-    <message>
-        <source>Ctrl+E</source>
-        <translation type="vanished">Ctrl+E</translation>
-    </message>
-    <message>
-        <source>Visual Environment Documentation</source>
-        <translation type="vanished">Visual Environment Documentation</translation>
-    </message>
-    <message>
-        <source>Short Overview...</source>
-        <translation type="vanished">Short Overview...</translation>
-    </message>
-    <message>
-        <source>Installation</source>
-        <translation type="vanished">Installation</translation>
-    </message>
-    <message>
-        <source>Release Layout</source>
-        <translation type="vanished">Release Layout</translation>
-    </message>
-    <message>
-        <source>Using Translator</source>
-        <translation type="vanished">Using Translator</translation>
-    </message>
-    <message>
-        <source>Using Execution Engine</source>
-        <translation type="vanished">Using Execution Engine</translation>
-    </message>
-    <message>
-        <source>Engine Multithreading</source>
-        <translation type="vanished">Engine Multithreading</translation>
-    </message>
-    <message>
-        <source>Ukrainian</source>
-        <translation type="vanished">Ukrainian</translation>
-    </message>
-    <message>
-        <source>English</source>
-        <translation type="vanished">English</translation>
-    </message>
-    <message>
-        <source>New</source>
-        <translation type="vanished">New</translation>
-    </message>
-    <message>
-        <source>Ctrl+N</source>
-        <translation type="vanished">Ctrl+N</translation>
-    </message>
-    <message>
-        <source>Translate</source>
-        <translation type="vanished">Translate</translation>
-    </message>
-    <message>
-        <source>Ctrl+B</source>
-        <translation type="vanished">Ctrl+B</translation>
-    </message>
-    <message>
-        <source>Run Last Translated</source>
-        <translation type="vanished">Run Last Translated</translation>
-    </message>
-    <message>
-        <source>Ctrl+L</source>
-        <translation type="vanished">Ctrl+L</translation>
     </message>
 </context>
 <context>
