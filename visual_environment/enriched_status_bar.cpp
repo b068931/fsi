@@ -10,7 +10,11 @@ namespace {
 
 namespace CustomWidgets {
     EnrichedStatusBar::EnrichedStatusBar(QWidget* parent)
-        : QStatusBar{ parent }
+        : QStatusBar{ parent },
+        statusToolTipLabel{ nullptr },
+        workingDirectoryLabel{ nullptr },
+        environmentStateLabel{ nullptr },
+        translatorResultLabel{ nullptr }
     {
         this->setupUIComponents();
     }

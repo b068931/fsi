@@ -3,7 +3,8 @@
 #include "module_interoperation.h"
 #include "../module_mediator/fsi_types.h"
 
-std::chrono::steady_clock::time_point starting_time;
+extern std::chrono::steady_clock::time_point starting_time;
+std::chrono::steady_clock::time_point starting_time = {};
 
 namespace {
 	enum class message_type {
@@ -14,6 +15,9 @@ namespace {
 	};
 
 	void decode_message_type(message_type type, std::osyncstream& synchronized_logger) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wswitch-default"
+
 		synchronized_logger << '[';
 		switch (type) {
 		case message_type::info:
@@ -32,6 +36,8 @@ namespace {
 			synchronized_logger << "FATAL";
 			break;
 		}
+
+#pragma clang diagnostic pop
 
 		synchronized_logger << ']';
 	}
@@ -64,7 +70,7 @@ namespace {
 		log_message(
 			type,
 			static_cast<char*>(file_name),
-			static_cast<std::size_t>(file_line),
+			file_line,
 			static_cast<char*>(function_name),
 			static_cast<char*>(message)
 		);
@@ -103,7 +109,7 @@ namespace {
 		log_message(
 			type,
 			static_cast<char*>(file_name),
-			static_cast<std::size_t>(file_line),
+			file_line,
 			static_cast<char*>(function_name),
 			stream.str().c_str()
 		);

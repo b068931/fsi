@@ -12,6 +12,8 @@
 
 #include "parser_options.h"
 
+extern state_settings& configure_special_instructions(states_builder_type& builder);
+
 namespace {
     void configure_special_instruction_end(state_settings &last_state) {
         last_state
@@ -23,9 +25,9 @@ namespace {
     }
 }
 
-extern state_settings& configure_special_instructions(states_builder_type& builder) {
+state_settings& configure_special_instructions(states_builder_type& builder) {
     auto if_defined_if_not_defined_pop_check_custom =
-        [](generic_parser::parameters_container<structure_builder::parameters_enumeration>& parameters, structure_builder::builder_parameters& helper) -> bool {
+        [](generic_parser::parameters_container<structure_builder::parameters_enumeration>& parameters, structure_builder::builder_parameters&) -> bool {
         return parameters.retrieve_parameter<bool>(structure_builder::parameters_enumeration::if_defined_if_not_defined_pop_check);
     };
 

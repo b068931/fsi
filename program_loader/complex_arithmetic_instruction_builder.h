@@ -30,6 +30,7 @@ protected:
 		this->write_bytes('\x8b');
 		this->write_bytes('\xd8');
 	}
+
 	void store_value_from_rax_to_rbx() {
 		std::uint8_t rex = 0;
 		switch (this->get_active_type()) {
@@ -37,10 +38,13 @@ protected:
 			this->write_bytes('\x66');
 			break;
 		}
+
 		case 0b11: {
 			rex |= 0b01001000;
 			break;
 		}
+
+		default: break;
 		}
 
 		if (rex != 0) {

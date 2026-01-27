@@ -14,10 +14,13 @@ private:
 			this->write_bytes('\x66');
 			break;
 		}
+
 		case 0b11: {
 			rex |= 0b00001000;
 			break;
 		}
+
+		default: break;
 		}
 
 		this->write_bytes(rex);
@@ -27,6 +30,8 @@ private:
 	}
 
 public:
+	using instruction_builder::visit;
+
 	template<typename... args>
 	add_signed_add_builder(
 		args&&... instruction_builder_args

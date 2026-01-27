@@ -26,7 +26,7 @@ protected:
 	}
 
 	std::uint8_t get_active_type() const { return this->active_type; }
-	void set_active_type(std::uint8_t active_type) { this->active_type = active_type; }
+	void set_active_type(std::uint8_t new_active_type) { this->active_type = new_active_type; }
 
 public:
 	virtual void visit(std::unique_ptr<variable_imm<std::uint8_t>> value) override {

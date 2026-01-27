@@ -683,12 +683,12 @@ program_context::~program_context() noexcept {
         interoperation::get_module_part(),
         interoperation::index_getter::program_loader(),
         interoperation::index_getter::program_loader_free_program(),
-        static_cast<void*>(this->code),
+        this->code,
         this->functions_count,
-        static_cast<void*>(this->exposed_functions),
+        this->exposed_functions,
         this->exposed_functions_count,
         this->jump_table,
-        static_cast<void*>(this->program_strings),
-        this->program_strings_size
+        this->strings,
+        this->strings_size
     );
 }

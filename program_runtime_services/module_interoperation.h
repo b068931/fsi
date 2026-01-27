@@ -10,6 +10,8 @@
 #define PROGRAMRUNTIMESERVICES_API extern "C" __declspec(dllimport) 
 #endif
 
+PROGRAMRUNTIMESERVICES_API void initialize_m(module_mediator::module_part* part);
+
 namespace interoperation {
     module_mediator::module_part* get_module_part();
     module_mediator::return_value verify_thread_memory(

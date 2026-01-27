@@ -176,7 +176,7 @@ namespace compression_algorithms {
         /// <param name="symbol">Character/symbol value.</param>
         /// <param name="index">Position where to insert the new object.</param>
         void add_decode_object(size_type count, char_type symbol, std::size_t index) {
-            this->decode_table.insert(this->decode_table.begin() + index,
+            this->decode_table.insert(this->decode_table.begin() + static_cast<std::ptrdiff_t>(index),
                 std::make_unique<decode_object>(decode_object{
                     .count = count,
                     .left = nullptr,

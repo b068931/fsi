@@ -6,6 +6,8 @@
 
 class apply_right_hand_bits_on_left_hand_binary : public arithmetic_instruction_builder {
 public:
+	using instruction_builder::visit;
+
 	template<typename... args>
 	apply_right_hand_bits_on_left_hand_binary(
 		args&&... instruction_builder_args
@@ -51,10 +53,13 @@ public:
 			this->write_bytes('\x66');
 			break;
 		}
+
 		case 0b11: {
 			rex |= 0b00001000;
 			break;
 		}
+
+		default: break;
 		}
 
 		this->write_bytes(rex);

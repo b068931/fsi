@@ -5,8 +5,10 @@
 #include "parser_options.h"
 
 extern state_settings& configure_instruction_arguments(states_builder_type& builder);
+extern state_settings& configure_function_declaration(states_builder_type& builder, state_settings& function_body);
+extern state_settings& configure_inside_function(states_builder_type& builder, state_settings& special_instruction);
 
-extern state_settings& configure_function_declaration(states_builder_type& builder, state_settings& function_body) {
+state_settings& configure_function_declaration(states_builder_type& builder, state_settings& function_body) {
 	state_settings& declaration_or_definition = builder.create_state<declaration_or_definition_state>()
 		.set_error_message("Expected ';' or '{'.")
 		.set_handle_tokens(
@@ -72,7 +74,7 @@ extern state_settings& configure_function_declaration(states_builder_type& build
 	return function_name;
 }
 
-extern state_settings& configure_inside_function(states_builder_type& builder, state_settings& special_instruction) {
+state_settings& configure_inside_function(states_builder_type& builder, state_settings& special_instruction) {
 	state_settings& instruction_arguments = configure_instruction_arguments(builder);
 	state_settings& new_jump_point = builder.create_state<new_jump_point_state>()
 		.set_error_message("';' was expected.")

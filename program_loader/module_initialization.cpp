@@ -47,6 +47,6 @@ void initialize_m(module_mediator::module_part* module_part) {
 }
 
 void free_m() {
-	VirtualFree((LPVOID)default_function_address, 0, MEM_RELEASE);
+	VirtualFree(default_function_address, 0, MEM_RELEASE);
     delete exposed_functions;
 }

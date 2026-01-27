@@ -26,7 +26,7 @@ namespace backend {
         std::uint64_t size{};
 
         std::memcpy(&size, pointer, sizeof(std::uint64_t));
-        std::memcpy(static_cast<void*>(&data), pointer + sizeof(std::uint64_t), sizeof(std::uint64_t));
+        std::memcpy(&data, pointer + sizeof(std::uint64_t), sizeof(std::uint64_t));
 
         return { data, size };
     }
@@ -127,7 +127,7 @@ namespace backend {
         //save memory's base address
         module_mediator::memory base{};
         std::memcpy(
-            static_cast<void*>(&base), 
+            &base, 
             static_cast<char*>(address) + sizeof(std::uint64_t), 
             sizeof(std::uint64_t)
         );
@@ -136,7 +136,7 @@ namespace backend {
 
         module_mediator::memory cross_thread_sharing{};
         std::memcpy(
-            static_cast<void*>(&cross_thread_sharing), 
+            &cross_thread_sharing, 
             static_cast<char*>(address) + sizeof(std::uint64_t) * 2, 
             sizeof(std::uint64_t)
         );

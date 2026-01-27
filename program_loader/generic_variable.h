@@ -10,10 +10,14 @@ private:
 	std::uint8_t active_type;
 
 public:
-	generic_variable(std::uint8_t real_type, std::uint8_t active_type, entity_id id)
-		:variable_with_id{ id },
-		real_type{ real_type },
-		active_type{ active_type }
+	generic_variable(
+		std::uint8_t variable_real_type, 
+		std::uint8_t variable_active_type, 
+		entity_id variable_id
+	)
+		:variable_with_id{ variable_id },
+		real_type{ variable_real_type },
+		active_type{ variable_active_type }
 	{}
 
 	std::uint8_t get_active_type() const { return this->active_type; }

@@ -11,9 +11,12 @@
 namespace {
     module_mediator::module_part* part = nullptr;
     char* program_control_functions_addresses = nullptr;
-    thread_manager manager{};
+    thread_manager* manager{};
 
     void show_error(std::uint64_t error_code) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wcovered-switch-default"
+
         switch (static_cast<termination_codes>(error_code)) {
         case termination_codes::stack_overflow:
             LOG_PROGRAM_ERROR(::part, "Stack overflow. This can happen during function call, module function call, function prologue.");
@@ -44,6 +47,8 @@ namespace {
             std::terminate();
         }
 
+#pragma clang diagnostic pop
+
         LOG_PROGRAM_ERROR(::part, "Program execution error. Thread terminated.");
     }
 
@@ -70,12 +75,13 @@ char* get_program_control_functions_addresses() {
     return ::program_control_functions_addresses;
 }
 thread_manager& get_thread_manager() {
-    return ::manager;
+    return *::manager;
 }
 
 void initialize_m(module_mediator::module_part* module_part) {
     ::part = module_part;
     ::program_control_functions_addresses = new char[4 * sizeof(std::uint64_t)] {};
+    ::manager = new thread_manager{};
 
     backend::fill_in_register_array_entry(
         0,
@@ -104,4 +110,5 @@ void initialize_m(module_mediator::module_part* module_part) {
 
 void free_m() {
     delete[] ::program_control_functions_addresses;
+    delete ::manager;
 }

@@ -23,7 +23,7 @@ private:
 	std::vector<std::unique_ptr<variable>> type_objects;
 
 	std::vector<char> translated_instruction_symbols;
-	jump_table_builder& jump_table;
+	jump_table_builder& function_jump_table;
 
 	runs_container& general_file_information;
 
@@ -128,21 +128,23 @@ private:
 			this->get_variable_info(variable->get_id()).first - additional_displacement
 		);
 	}
+
 	void increment_argument_index() { ++this->argument_index; }
+
 protected:
 	instruction_builder(
 		std::uint8_t instruction_prefix,
-		run_reader<runs_container>::run& run,
-		std::map<entity_id, std::pair<std::int32_t, std::uint8_t>>& function_memory_layout,
+		run_reader<runs_container>::run& run_object,
+		std::map<entity_id, std::pair<std::int32_t, std::uint8_t>>& memory_layout,
 		jump_table_builder& jump_table,
-		runs_container& general_file_information
+		runs_container& file_information
 	)
 		:current_variable_type{},
 		argument_index{ 0 },
-		run{ run },
-		function_memory_layout{ function_memory_layout },
-		jump_table{ jump_table },
-		general_file_information{ general_file_information }
+		run{ run_object },
+		function_memory_layout{ memory_layout },
+		function_jump_table{ jump_table },
+		general_file_information{ file_information }
 	{
 		std::uint8_t instruction_arguments_count = instruction_prefix >> 4 & 0b1111;
 		for (std::uint8_t counter = 0, type_bytes_count = instruction_arguments_count / 2; counter < type_bytes_count; ++counter) {
@@ -232,6 +234,7 @@ protected:
 			rex |= 0b01001000;
 			break;
 		}
+		default: break;
 		}
 
 		if (is_R) {
@@ -242,12 +245,15 @@ protected:
 		this->translated_instruction_symbols.push_back(static_cast<char>(opcode));
 
 		if (is_dereference) {
-			this->translated_instruction_symbols.push_back(0 | reg << 3 & 0b00111000);
+			this->translated_instruction_symbols.push_back(
+				static_cast<char>(0 | reg << 3 & 0b00111000));
 		}
 		else {
-			this->translated_instruction_symbols.push_back('\xc0' | reg << 3 & 0b00111000); //r/m
+			this->translated_instruction_symbols.push_back(
+				static_cast<char>('\xc0' | reg << 3 & 0b00111000)); //r/m
 		}
 	}
+
 	void use_r8_on_reg_with_two_opcodes(std::uint8_t opcode00, std::uint8_t opcode, bool is_dereference, std::uint8_t active_type, bool is_R = false, std::uint8_t reg = 0) {
 		if (active_type == 0b00) {
 			this->use_r8_on_reg(opcode00, is_dereference, 0b00, is_R, reg);
@@ -273,10 +279,13 @@ protected:
 			this->translated_instruction_symbols.push_back('\x66');
 			break;
 		}
+
 		case 0b11: { //add REX prefix
 			rex |= 0b01001000;
 			break;
 		}
+
+		default: break;
 		}
 
 		if (rex_R) {
@@ -290,7 +299,10 @@ protected:
 		this->translated_instruction_symbols.push_back(static_cast<char>(opcode));
 		this->translated_instruction_symbols.push_back('\x85' | reg << 3 & 0b00111000); //r/m
 
-		this->write_variable_relative_address(variable, additional_displacement);
+		this->write_variable_relative_address(
+			variable, 
+			static_cast<std::int32_t>(additional_displacement)
+		);
 	}
 	void load_variable_address(entity_id id, bool is_R = false) {
 		auto variable_info = this->get_variable_info(id);
@@ -310,7 +322,9 @@ protected:
 		this->translated_instruction_symbols.push_back('\x8b');
 		this->translated_instruction_symbols.push_back('\xbd');
 
-		this->write_bytes(variable_info.first - additional_displacement);
+		this->write_bytes(
+			static_cast<std::uint32_t>(variable_info.first) - additional_displacement
+		);
 	}
 	void generate_pointer_size_check() {
 		this->translated_instruction_symbols.push_back('\x49'); //cmp r15, 0
@@ -447,10 +461,10 @@ protected:
 	}
 
 	std::size_t get_function_table_index(entity_id id) {
-		return this->jump_table.get_function_table_index(id);
+		return this->function_jump_table.get_function_table_index(id);
 	}
 	std::size_t get_jump_point_table_index(entity_id id) {
-		return this->jump_table.get_jump_point_table_index(id);
+		return this->function_jump_table.get_jump_point_table_index(id);
 	}
 
 	void self_call_by_type(std::uint8_t type_bits) {
@@ -465,33 +479,43 @@ public:
 	virtual void visit(std::unique_ptr<variable_imm<std::uint8_t>>) { 
 		this->assert_statement(false, "Instruction does not recognize arguments with type immediate (8 bits)."); 
 	}
+
 	virtual void visit(std::unique_ptr<variable_imm<std::uint16_t>>) { 
 		this->assert_statement(false, "Instruction does not recognize arguments with type immediate (16 bits).");
 	}
+
 	virtual void visit(std::unique_ptr<variable_imm<std::uint32_t>>) { 
 		this->assert_statement(false, "Instruction does not recognize arguments with type immediate (32 bits).");
 	}
+
 	virtual void visit(std::unique_ptr<variable_imm<std::uint64_t>>) { 
 		this->assert_statement(false, "Instruction does not recognize arguments with type immediate (64 bits).");
 	}
+
 	virtual void visit(std::unique_ptr<regular_variable> val) { 
 		this->assert_statement(false, "Instruction does not recognize regular variables.", val->get_id());
 	}
+
 	virtual void visit(std::unique_ptr<signed_variable> val) { 
 		this->assert_statement(false, "Instruction does not recognize signed variables.", val->get_id());
 	}
+
 	virtual void visit(std::unique_ptr<dereferenced_pointer> val) { 
 		this->assert_statement(false, "Instruction does not recognize pointer dereference.", val->get_id());
 	}
+
 	virtual void visit(std::unique_ptr<engine_module> val) { 
 		this->assert_statement(false, "Instruction does not recognize modules.", val->get_id());
 	}
+
 	virtual void visit(std::unique_ptr<specialized_variable> val) { 
 		this->assert_statement(false, "Instruction does not recognize specialized variable (the meaning of this argument depends on the instruction)", val->get_id());
 	}
+
 	virtual void visit(std::unique_ptr<function> val) { 
 		this->assert_statement(false, "Instruction does not recognize functions as arguments.", val->get_id());
 	}
+
 	virtual void visit(std::unique_ptr<pointer> val) { 
 		this->assert_statement(false, "Instruction does not use pointers as arguments.", val->get_id());
 	}

@@ -12,7 +12,7 @@
 #error "Currently only MSVC is supported for the program loader module."
 #endif
 
-#include <windows.h>
+#include <Windows.h>
 #include <map>
 #include <memory>
 #include <fstream>
@@ -31,3 +31,4 @@
 #include <ranges>
 
 #endif
+

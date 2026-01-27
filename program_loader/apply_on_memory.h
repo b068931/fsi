@@ -21,9 +21,10 @@ public:
 			this->get_code(variable->get_active_type()),
 			false,
 			variable.get(),
-			this->get_code_back()
+			static_cast<std::uint8_t>(this->get_code_back())
 		);
 	}
+
 	virtual void visit(std::unique_ptr<dereferenced_pointer> pointer) override {
 		this->accumulate_pointer_offset(pointer.get());
 		this->add_base_address_to_pointer_dereference(pointer.get());
@@ -34,10 +35,13 @@ public:
 			this->write_bytes<char>('\x66');
 			break;
 		}
+
 		case 0b11: {
 			rex |= 0b01001000;
 			break;
 		}
+
+		default: break;
 		}
 
 		this->write_bytes<std::uint8_t>(rex); //inc/dec {one_byte/two_bytes/four_bytes/eight_bytes} [r8]

@@ -62,9 +62,11 @@ namespace {
 module_mediator::return_value info(module_mediator::arguments_string_type bundle) {
 	return generic_log_message(bundle, log_type::info);
 }
+
 module_mediator::return_value warning(module_mediator::arguments_string_type bundle) {
 	return generic_log_message(bundle, log_type::warning);
 }
+
 module_mediator::return_value error(module_mediator::arguments_string_type bundle) {
 	return generic_log_message(bundle, log_type::error);
 }

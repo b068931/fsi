@@ -10,10 +10,14 @@ private:
 	std::vector<entity_id> dereference_indexes;
 
 public:
-	dereferenced_pointer(std::uint8_t active_type, entity_id id, std::vector<entity_id>&& dereference_indexes)
-		:variable_with_id{ id },
-		active_type{ active_type },
-		dereference_indexes{ std::move(dereference_indexes) }
+	dereferenced_pointer(
+		std::uint8_t pointer_active_type, 
+		entity_id pointer_id, 
+		std::vector<entity_id>&& pointer_dereference_indexes
+	)
+		:variable_with_id{ pointer_id },
+		active_type{ pointer_active_type },
+		dereference_indexes{ std::move(pointer_dereference_indexes) }
 	{}
 
 	std::uint8_t get_active_type() const { return this->active_type; }

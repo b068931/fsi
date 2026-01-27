@@ -15,9 +15,9 @@ namespace {
                 ));
 
         if (saved_variable[8] == module_mediator::memory_return_value) {
-            if (std::memcmp(saved_variable, static_cast<void*>(&address), sizeof(module_mediator::memory)) == 0) {
+            if (std::memcmp(saved_variable, &address, sizeof(module_mediator::memory)) == 0) {
                 module_mediator::memory null_pointer{};
-                std::memcpy(saved_variable, static_cast<void*>(&null_pointer), sizeof(module_mediator::memory));
+                std::memcpy(saved_variable, &null_pointer, sizeof(module_mediator::memory));
             }
         }
     }
@@ -42,7 +42,7 @@ module_mediator::return_value allocate_memory(module_mediator::arguments_string_
         LOG_PROGRAM_ERROR(interoperation::get_module_part(), "Failed memory allocation.");
     }
 
-    std::memcpy(return_address, static_cast<void*>(&allocated_memory), sizeof(module_mediator::memory));
+    std::memcpy(return_address, &allocated_memory, sizeof(module_mediator::memory));
     return module_mediator::execution_result_continue;
 }
 
@@ -56,7 +56,7 @@ module_mediator::return_value deallocate_memory(module_mediator::arguments_strin
     }
 
     module_mediator::memory address{};
-    std::memcpy(static_cast<void*>(&address), return_address, sizeof(module_mediator::memory));
+    std::memcpy(&address, return_address, sizeof(module_mediator::memory));
     if (address == nullptr) return module_mediator::execution_result_continue;
 
     if (interoperation::verify_thread_memory(interoperation::get_current_thread_id(), address) == module_mediator::module_failure) {
@@ -78,7 +78,7 @@ module_mediator::return_value deallocate_memory(module_mediator::arguments_strin
     );
 
     module_mediator::memory null_pointer{};
-    std::memcpy(return_address, static_cast<void*>(&null_pointer), sizeof(module_mediator::memory));
+    std::memcpy(return_address, &null_pointer, sizeof(module_mediator::memory));
 
     check_if_pointer_is_saved(address);
     return module_mediator::execution_result_continue;

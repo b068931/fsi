@@ -20,10 +20,13 @@ private:
 			this->write_bytes('\x66');
 			break;
 		}
+
 		case 0b11: { //add REX prefix
 			rex |= 0b01001000;
 			break;
 		}
+
+		default: break;
 		}
 
 		this->write_bytes(static_cast<char>(rex)); //rex

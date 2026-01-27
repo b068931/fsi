@@ -12,7 +12,7 @@
 #error "Currently only MSVC is supported for the program runtime services module."
 #endif
 
-#include <windows.h>
+#include <Windows.h>
 #include <memory>
 #include <vector>
 #include <utility>

@@ -197,7 +197,6 @@ namespace compression_algorithms {
             std::vector<unsigned char> working_place(this->buffer.size());
 
             auto working_place_begin = working_place.begin();
-            auto working_place_end = working_place.end();
 
             auto true_buffer_begin = this->buffer.begin();
             auto true_buffer_end = this->buffer.end();
@@ -232,7 +231,12 @@ namespace compression_algorithms {
                     for (auto work_begin = working_place_begin; work_begin != write; ++work_begin, ++out) {
                         unsigned char symbol = *work_begin;
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wsign-conversion"
+
                         *out = symbol;
+
+#pragma clang diagnostic pop
 
                         *buffer_iterator = symbol;
                         ++buffer_iterator;
@@ -256,7 +260,12 @@ namespace compression_algorithms {
                     for (auto work_begin = working_place_begin; work_begin != write; ++work_begin, ++out) {
                         unsigned char symbol = *work_begin;
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wsign-conversion"
+
                         *out = symbol;
+
+#pragma clang diagnostic pop
 
                         *buffer_iterator = symbol;
                         ++buffer_iterator;

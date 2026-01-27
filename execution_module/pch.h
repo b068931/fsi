@@ -12,7 +12,7 @@
 #error "Currently only MSVC is supported for the execution module."
 #endif
 
-#include <windows.h>
+#include <Windows.h>
 #include <cassert>
 #include <new>
 #include <set>

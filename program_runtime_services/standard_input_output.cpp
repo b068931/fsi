@@ -63,7 +63,7 @@ namespace {
     }
 
     void CloseHandleReport(HANDLE& handle, const char* lpsHandleName) {
-        if (handle != NULL && handle != INVALID_HANDLE_VALUE) {
+        if (handle != nullptr && handle != INVALID_HANDLE_VALUE) {
             if (!CloseHandle(handle)) {
                 LOG_WARNING(
                     interoperation::get_module_part(),
@@ -75,7 +75,7 @@ namespace {
                 );
             }
             else {
-                handle = NULL;
+                handle = nullptr;
             }
         }
     }
@@ -134,6 +134,9 @@ namespace {
                     return { {}, true };
                 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wtautological-constant-out-of-range-compare"
+
                 WORD dwTotalTextSize = 0;
                 for (DWORD dwInputBufferIndex = 0; dwInputBufferIndex < dwReadEvents; ++dwInputBufferIndex) {
                     if (buffer[dwInputBufferIndex].EventType == KEY_EVENT) {
@@ -149,6 +152,8 @@ namespace {
                     }
                 }
 
+#pragma clang diagnostic pop
+
                 if (dwTotalTextSize > 0) {
                     DWORD dwTextRead = 0;
                     std::unique_ptr<CHAR[]> lpTextBuffer{ new CHAR[dwTotalTextSize] };
@@ -158,7 +163,7 @@ namespace {
                         lpTextBuffer.get(),
                         dwTotalTextSize,
                         &dwTextRead,
-                        NULL
+                        nullptr 
                     );
 
                     if (!bConsoleReadResult) {
@@ -217,13 +222,13 @@ namespace {
 
         OVERLAPPED overlapped{};
         overlapped.hEvent = CreateEvent(
-            NULL, 
+            nullptr, 
             TRUE,
             FALSE,
-            NULL
+            nullptr 
         );
         
-        if (overlapped.hEvent == NULL) {
+        if (overlapped.hEvent == nullptr) {
             LOG_WARNING(
                 interoperation::get_module_part(),
                 std::format(
@@ -250,7 +255,7 @@ namespace {
 
         if constexpr (is_pipe) {
             DWORD dwMessageLeft = 0;
-            PeekNamedPipe(hStdIn, NULL, 0, NULL, &dwBufferSize, &dwMessageLeft);
+            PeekNamedPipe(hStdIn, nullptr, 0, nullptr, &dwBufferSize, &dwMessageLeft);
 
             dwBufferSize = std::max(dwBufferSize, dwMessageLeft);
             if (dwBufferSize == 0) { //If we still don't have any idea about what the buffer size should be.
@@ -402,7 +407,7 @@ namespace {
                     buffer.get(),
                     dwBufferSize - 1,
                     &dwBytesRead,
-                    NULL
+                    nullptr 
                 );
 
                 synchronous_io_lock.unlock();
@@ -549,7 +554,7 @@ namespace {
             output_buffer,
             static_cast<DWORD>(buffer_size),
             &dwBytesWritten,
-            NULL
+            nullptr 
         );
 
         synchronous_io_lock.unlock();
@@ -603,13 +608,13 @@ namespace {
 
         OVERLAPPED overlapped{};
         overlapped.hEvent = CreateEvent(
-            NULL,
+            nullptr,
             TRUE,
             FALSE,
-            NULL
+            nullptr 
         );
 
-        if (overlapped.hEvent == NULL) {
+        if (overlapped.hEvent == nullptr) {
             LOG_WARNING(
                 interoperation::get_module_part(),
                 std::format(
@@ -717,7 +722,7 @@ namespace {
                     output_buffer,
                     static_cast<DWORD>(buffer_size),
                     &dwBytesWritten,
-                    NULL
+                    nullptr 
                 );
 
                 synchronous_io_lock.unlock();
@@ -1094,7 +1099,7 @@ module_mediator::return_value attach_to_stdio(module_mediator::arguments_string_
     }
 
     hCapturedStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    if (hCapturedStdOut == INVALID_HANDLE_VALUE || hCapturedStdOut == NULL) {
+    if (hCapturedStdOut == INVALID_HANDLE_VALUE || hCapturedStdOut == nullptr) {
        LOG_WARNING(
            interoperation::get_module_part(),
             std::format(
@@ -1107,7 +1112,7 @@ module_mediator::return_value attach_to_stdio(module_mediator::arguments_string_
     }
 
     hCapturedStdIn = GetStdHandle(STD_INPUT_HANDLE);
-    if (hCapturedStdIn == INVALID_HANDLE_VALUE || hCapturedStdIn == NULL) {
+    if (hCapturedStdIn == INVALID_HANDLE_VALUE || hCapturedStdIn == nullptr) {
         LOG_WARNING(
             interoperation::get_module_part(),
             std::format(
@@ -1116,7 +1121,7 @@ module_mediator::return_value attach_to_stdio(module_mediator::arguments_string_
             )
         );
 
-        hCapturedStdOut = NULL;
+        hCapturedStdOut = nullptr;
         return module_mediator::module_failure;
     }
 
@@ -1130,18 +1135,18 @@ module_mediator::return_value attach_to_stdio(module_mediator::arguments_string_
             )
         );
 
-        hCapturedStdIn = NULL;
-        hCapturedStdOut = NULL;
+        hCapturedStdIn = nullptr;
+        hCapturedStdOut = nullptr;
 
         return module_mediator::module_failure;
     }
 
     is_stdio_attached = true;
     hIOCancellationSignal = CreateEventA(
-        NULL, 
+        nullptr, 
         TRUE,    
         FALSE,   
-        NULL 
+        nullptr 
     );
 
     input_worker_thread = std::thread(input_worker, hCapturedStdIn, hIOCancellationSignal);
@@ -1211,6 +1216,8 @@ module_mediator::return_value detach_from_stdio(module_mediator::arguments_strin
 
                     return module_mediator::module_failure;
                 }
+
+                continue;
             }
 
             is_stdio_attached = false;
@@ -1228,8 +1235,8 @@ module_mediator::return_value detach_from_stdio(module_mediator::arguments_strin
             break;
         }
 
-        if (hCapturedStdIn == NULL || hCapturedStdOut == NULL || hIOCancellationSignal == NULL) {
-            assert(hCapturedStdIn == NULL && hCapturedStdOut == NULL && hIOCancellationSignal == NULL);
+        if (hCapturedStdIn == nullptr || hCapturedStdOut == nullptr || hIOCancellationSignal == nullptr) {
+            assert(hCapturedStdIn == nullptr && hCapturedStdOut == nullptr && hIOCancellationSignal == nullptr);
             return module_mediator::module_success;
         }
     }
@@ -1250,7 +1257,7 @@ module_mediator::return_value detach_from_stdio(module_mediator::arguments_strin
     clean_output_queue();
 
     CloseHandleReport(hIOCancellationSignal, "hIOCancellationSignal");
-    hIOCancellationSignal = NULL;
+    hIOCancellationSignal = nullptr;
 
     if (GetFileType(hCapturedStdIn) == FILE_TYPE_CHAR && !RestoreConsoleInput(hCapturedStdIn, dwSavedConsoleState)) {
         LOG_WARNING(
@@ -1262,14 +1269,14 @@ module_mediator::return_value detach_from_stdio(module_mediator::arguments_strin
             )
         );
 
-        hCapturedStdOut = NULL;
-        hCapturedStdIn = NULL;
+        hCapturedStdOut = nullptr;
+        hCapturedStdIn = nullptr;
 
         return module_mediator::module_failure;
     }
 
-    hCapturedStdOut = NULL;
-    hCapturedStdIn = NULL;
+    hCapturedStdOut = nullptr;
+    hCapturedStdIn = nullptr;
 
     return module_mediator::module_success;
 }

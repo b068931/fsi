@@ -85,6 +85,11 @@ private:
     }
 
     static std::uint8_t convert_type_to_uint8(source_file_token token_type) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wswitch"
+#pragma clang diagnostic ignored "-Wswitch-enum"
+#pragma clang diagnostic ignored "-Wswitch-default"
+
         std::uint8_t type = 0;
         switch (token_type) {  // NOLINT(clang-diagnostic-switch-enum)
             case source_file_token::two_bytes_type_keyword: {
@@ -105,6 +110,8 @@ private:
             }
             default: break;
         }
+
+#pragma clang diagnostic pop
 
         return type;
     }
@@ -289,10 +296,10 @@ private:
         std::uint64_t run_size = 8;
         auto saved_position = this->write_run_header(modules_run);
 
-        this->write_8_bytes(static_cast<std::uint64_t>(this->file_structure->modules.size()));
+        this->write_8_bytes(this->file_structure->modules.size());
         for (const structure_builder::engine_module& mod : this->file_structure->modules) {
-            this->write_8_bytes(static_cast<std::uint64_t>(mod.id));
-            this->write_8_bytes(static_cast<std::uint64_t>(mod.functions_names.size()));
+            this->write_8_bytes(mod.id);
+            this->write_8_bytes(mod.functions_names.size());
 
             std::size_t module_name_size = mod.name.size();
             if (module_name_size > max_name_length) {
@@ -304,7 +311,7 @@ private:
             
             run_size += 17 + module_name_size;
             for (const structure_builder::module_function& mod_fnc : mod.functions_names) {
-                this->write_8_bytes(static_cast<std::uint64_t>(mod_fnc.id));
+                this->write_8_bytes(mod_fnc.id);
                 this->write_1_byte(static_cast<std::uint8_t>(mod_fnc.name.size()));
 
                 std::size_t module_function_name_size = mod_fnc.name.size();
@@ -332,7 +339,7 @@ private:
 
                 this->write_4_bytes(function_index);
                 this->write_4_bytes(jmp_point.index);
-                this->write_8_bytes(static_cast<std::uint64_t>(jmp_point.id));
+                this->write_8_bytes(jmp_point.id);
 
                 run_size += 16; //8 + 4 + 4
             }
@@ -348,7 +355,7 @@ private:
 
         this->write_4_bytes(static_cast<std::uint32_t>(this->file_structure->functions.size()));
         for (const structure_builder::function& fnc : this->file_structure->functions) {
-            this->write_8_bytes(static_cast<std::uint64_t>(fnc.id));
+            this->write_8_bytes(fnc.id);
             std::size_t function_arguments_count = fnc.arguments.size();
             if (function_arguments_count > max_function_arguments_count) {
                 this->add_new_logic_error(translator_error_type::too_many_function_arguments);
@@ -371,7 +378,7 @@ private:
         std::uint64_t run_size = 12; //8 bytes: signature's entity_id, 4 bytes: number of local variables
         auto saved_position = this->write_run_header(function_body_run);
 
-        this->write_8_bytes(static_cast<std::uint64_t>(func.id));
+        this->write_8_bytes(func.id);
         this->write_4_bytes(static_cast<std::uint32_t>(func.locals.size()));
 
         for (const structure_builder::regular_variable& var : func.locals) {
@@ -386,10 +393,10 @@ private:
         for (const structure_builder::instruction& current_instruction : func.body) {
             this->check_logic_errors(filters_list, current_instruction);
 
-            std::vector<char> instruction_symbols = instruction_encoder::encode_instruction(current_instruction, operation_codes);
+            std::vector<unsigned char> instruction_symbols = instruction_encoder::encode_instruction(current_instruction, operation_codes);
             run_size += instruction_symbols.size();
 
-            this->write_n_bytes(instruction_symbols.data(),
+            this->write_n_bytes(reinterpret_cast<char*>(instruction_symbols.data()),
                                 instruction_symbols.size());
         }
         
@@ -412,11 +419,11 @@ private:
             this->logic_errors.push_back(translator_error_type::main_not_exposed);
         }
 
-        this->write_8_bytes(static_cast<std::uint64_t>(this->file_structure->stack_size));
-        this->write_8_bytes(static_cast<std::uint64_t>(this->file_structure->main_function->id));
-        this->write_8_bytes(static_cast<std::uint64_t>(this->file_structure->exposed_functions.size()));
+        this->write_8_bytes(this->file_structure->stack_size);
+        this->write_8_bytes(this->file_structure->main_function->id);
+        this->write_8_bytes(this->file_structure->exposed_functions.size());
         for (structure_builder::function* exposed_function : this->file_structure->exposed_functions) {
-            this->write_8_bytes(static_cast<std::uint64_t>(exposed_function->id));
+            this->write_8_bytes(exposed_function->id);
             this->write_1_byte(static_cast<std::uint8_t>(exposed_function->name.size()));
             this->write_n_bytes(exposed_function->name.c_str(), exposed_function->name.size());
 
@@ -433,7 +440,7 @@ private:
         for (const auto& key_string : this->file_structure->program_strings) {
             std::size_t string_size = key_string.second.value.size();
 
-            this->write_8_bytes(static_cast<std::uint64_t>(key_string.second.id));
+            this->write_8_bytes(key_string.second.id);
             this->write_8_bytes(string_size);
 
             this->write_n_bytes(key_string.second.value.c_str(), string_size);

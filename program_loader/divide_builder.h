@@ -6,6 +6,8 @@
 
 class divide_builder : public complex_arithmetic_instruction_builder {
 public:
+	using instruction_builder::visit;
+
 	template<typename... args>
 	divide_builder(
 		args&&... instruction_builder_args

@@ -11,11 +11,11 @@ private:
 protected:
 	template<typename... args>
 	machine_codes_instruction_builder(
-		const std::vector<char>* machine_codes,
+		const std::vector<char>* instruction_machine_codes,
 		args&&... instruction_builder_args
 	)
 		:instruction_builder{ std::forward<args>(instruction_builder_args)... },
-		machine_codes{ machine_codes }
+		machine_codes{ instruction_machine_codes }
 	{
 		this->assert_statement(machine_codes, "This instruction must have machine codes."); //check whether machine codes for this instruction were passed
 	}

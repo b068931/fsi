@@ -56,14 +56,19 @@ private:
         mutable std::mutex lock;
         thread_states state;
         
-        void* thread_state;
+        void* state_buffer;
         const void* jump_table;
 
-        executable_thread(module_mediator::return_value id, thread_states state, void* thread_state, const void* jump_table)
-            :id{ id },
-            state{ state },
-            thread_state{ thread_state },
-            jump_table{ jump_table }
+        executable_thread(
+            module_mediator::return_value thread_id, 
+            thread_states thread_initial_state, 
+            void* thread_state_buffer, 
+            const void* thread_jump_table
+        )
+            :id{ thread_id },
+            state{ thread_initial_state },
+            state_buffer{ thread_state_buffer },
+            jump_table{ thread_jump_table }
         {}
 
         executable_thread(const executable_thread&) = delete;
@@ -72,7 +77,7 @@ private:
         executable_thread(executable_thread&& thread) noexcept
             :id{ thread.id },
             state{ thread.state },
-            thread_state{ thread.thread_state },
+            state_buffer{ thread.state_buffer },
             jump_table{ thread.jump_table }
         {}
 
@@ -80,7 +85,7 @@ private:
             this->id = thread.id;
             this->state = thread.state;
 
-            this->thread_state = thread.thread_state;
+            this->state_buffer = thread.state_buffer;
             this->jump_table = thread.jump_table;
 
             return *this;
@@ -96,9 +101,12 @@ private:
         mutable std::mutex lock;
         priority_list<executable_thread, module_mediator::return_value> threads;
 
-        thread_group(module_mediator::return_value id, std::uint64_t preferred_stack_size)
-            :id{ id },
-            preferred_stack_size{ preferred_stack_size }
+        thread_group(
+            module_mediator::return_value thread_group_id, 
+            std::uint64_t thread_group_preferred_stack_size
+        )
+            :id{ thread_group_id },
+            preferred_stack_size{ thread_group_preferred_stack_size }
         {}
 
         thread_group(const thread_group&) = delete;
@@ -259,7 +267,7 @@ public:
                         destination->thread_id = thread.first->id;
                         destination->thread_group_id = current_thread_group->id;
                         destination->jump_table = thread.first->jump_table;
-                        destination->thread_state = thread.first->thread_state;
+                        destination->thread_state = thread.first->state_buffer;
                         destination->state = thread.first->state;
                         destination->put_back_structure = thread.first;
 

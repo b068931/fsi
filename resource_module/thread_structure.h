@@ -9,9 +9,9 @@ struct thread_structure : public resource_container {
 
 	thread_structure() = default;
 
-	thread_structure(std::size_t program_container)
+	thread_structure(std::size_t program_container_id)
 		:resource_container{},
-		program_container{ program_container }
+		program_container{ program_container_id }
 	{}
 
     thread_structure(const thread_structure& structure) = delete;

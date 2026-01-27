@@ -15,7 +15,7 @@ void structure_builder::configure_parse_map() {
 	state_settings& function_body = configure_inside_function(builder, special_instruction);
 	state_settings& function_declaration = configure_function_declaration(builder, function_body);
 	
-	state_settings& base = builder.create_state<main_state>()
+	builder.create_state<main_state>()
 		.set_as_starting_state()
 		.set_error_message("Invalid token outside function.")
 		.set_handle_tokens(

@@ -6,7 +6,7 @@
 class declare_type_state : public state_type {
 public:
 	virtual void handle_token(
-		structure_builder::file& output_file_structure,
+		structure_builder::file&,
 		structure_builder::builder_parameters& helper,
 		structure_builder::read_map_type& read_map
 	) override {
@@ -27,13 +27,13 @@ public:
 class declare_name_state : public state_type {
 public:
 	virtual void handle_token(
-		structure_builder::file& output_file_structure,
+		structure_builder::file&,
 		structure_builder::builder_parameters& helper,
 		structure_builder::read_map_type& read_map
 	) override {
 		helper.active_function.get_current_function().locals.back().name =
 			helper.name_translations.translate_name(read_map.get_token_generator_name());
-	};
+	}
 };
 
 #endif

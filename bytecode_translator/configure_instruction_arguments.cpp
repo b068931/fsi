@@ -26,7 +26,8 @@ namespace {
 	}
 }
 
-extern state_settings& configure_instruction_arguments(states_builder_type& builder) {
+extern state_settings& configure_instruction_arguments(states_builder_type& builder);
+state_settings& configure_instruction_arguments(states_builder_type& builder) {
 	state_settings& function_address_argument = builder.create_state<function_address_argument_state>()
 		.set_error_message("Unexpected token inside instruction. Function name was expected.")
 		.set_handle_tokens(

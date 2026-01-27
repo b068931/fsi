@@ -33,8 +33,8 @@ private:
 	}
 
 public:
-	program_state_manager(char* program_state)
-		:program_state{ program_state }
+	program_state_manager(char* provided_program_state)
+		:program_state{ provided_program_state }
 	{}
 
 	std::uint64_t get_comparison_state() {

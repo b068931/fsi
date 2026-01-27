@@ -12,7 +12,7 @@ private:
 	std::vector<std::tuple<entity_id, std::uint32_t, std::uint32_t, std::uint64_t>> jump_addresses;
 
 	static void copy_uint64_t(char* destination, std::uint64_t value_to_write) {
-		std::memcpy(destination, reinterpret_cast<const char*>(&value_to_write), sizeof(std::uint64_t));
+		std::memcpy(destination, &value_to_write, sizeof(std::uint64_t));
 	}
 public:
 	void add_new_function_address(entity_id id, std::uint64_t address = {}) {
@@ -65,7 +65,8 @@ public:
                                                    });
 
 		if (found_function != this->function_addresses.end()) {
-			return sizeof(std::uint64_t) + sizeof(std::uint64_t) * (found_function - this->function_addresses.begin());
+			return sizeof(std::uint64_t) + 
+				sizeof(std::uint64_t) * static_cast<std::size_t>(found_function - this->function_addresses.begin());
 		}
 
 		return 0;
@@ -77,7 +78,8 @@ public:
                                                      });
 
 		if (found_jump_point != this->jump_addresses.end()) {
-			return sizeof(std::uint64_t) + this->function_addresses.size() * sizeof(std::uint64_t) + sizeof(std::uint64_t) * (found_jump_point - this->jump_addresses.begin());
+			return sizeof(std::uint64_t) + this->function_addresses.size() * sizeof(std::uint64_t) + 
+				sizeof(std::uint64_t) * static_cast<std::size_t>(found_jump_point - this->jump_addresses.begin());
 		}
 
 		return 0;

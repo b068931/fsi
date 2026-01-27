@@ -7,10 +7,15 @@ namespace module_mediator::parser::states {
 	class main_state : public state_type {
 	public:
 		virtual void handle_token(
-			components::engine_module_builder::result_type& modules,
+			components::engine_module_builder::result_type&,
 			components::engine_module_builder::builder_parameters& parameters,
 			components::engine_module_builder::read_map_type& read_map
 		) override {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wswitch"
+#pragma clang diagnostic ignored "-Wswitch-enum"
+#pragma clang diagnostic ignored "-Wswitch-default"
+
 			switch (read_map.get_current_token()) {
 			case components::engine_module_builder::file_tokens::name_and_public_name_separator:
 				parameters.function_name =
@@ -33,6 +38,8 @@ namespace module_mediator::parser::states {
 				parameters.is_visible = true;
 				break;
 			}
+
+#pragma clang diagnostic pop
 		}
 	};
 }

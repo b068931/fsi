@@ -27,7 +27,7 @@ namespace {
             static_cast<char*>(get_current_thread_group_jump_table());
 
         void* function_address = nullptr;
-        std::memcpy(static_cast<void*>(&function_address), jump_table_bytes + function_displacement, sizeof(void*));
+        std::memcpy(&function_address, jump_table_bytes + function_displacement, sizeof(void*));
 
         return function_address;
     }

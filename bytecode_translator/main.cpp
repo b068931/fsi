@@ -8,7 +8,7 @@
 
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
-#include <windows.h>
+#include <Windows.h>
 
 #include <iostream>
 #include <chrono>
@@ -216,7 +216,7 @@ int main(int argc, char** argv) {
         auto [translated_program, has_logic_errors] = produce_bytecode(&parser_value, argv[3]);
 
         translated_program.seekg(0, std::ios::end);
-        std::size_t bytecode_size = translated_program.tellg();
+        std::streamoff bytecode_size = translated_program.tellg();
 
         std::cout << "Now compressing the bytecode..." << std::endl;
         translated_program.seekg(0, std::ios::beg);

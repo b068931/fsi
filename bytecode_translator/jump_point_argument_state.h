@@ -9,7 +9,7 @@
 class jump_point_argument_state : public state_type {
 public:
 	virtual void handle_token(
-		structure_builder::file& output_file_structure,
+		structure_builder::file&,
 		structure_builder::builder_parameters& helper,
 		structure_builder::read_map_type& read_map
 	) override {

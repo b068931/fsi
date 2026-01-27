@@ -27,21 +27,27 @@ private:
 
 				break;
 			}
+
 			case 0b10: {
 				this->write_bytes('\x99'); //cdq
 				break;
 			}
+
 			case 0b11: {
 				this->write_bytes('\x48'); //cqo
 				this->write_bytes('\x99');
 
 				break;
 			}
+
+			default: break;
 			}
 		}
 	}
 
 public:
+	using instruction_builder::visit;
+
 	template<typename... args>
 	signed_divide_builder(
 		args&&... instruction_builder_args
@@ -62,6 +68,7 @@ public:
 			this->create_variable_instruction_with_two_opcodes('\x8a', '\x8b', true, variable.get());
 		}
 	}
+
 	virtual void visit(std::unique_ptr<dereferenced_pointer> pointer) override {
 		this->accumulate_pointer_offset(pointer.get());
 		this->add_base_address_to_pointer_dereference(pointer.get());

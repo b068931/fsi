@@ -9,11 +9,16 @@
 
 class instruction_encoder : public structure_builder::variable_visitor {
 private:
-    std::vector<char> instruction_symbols;
+    std::vector<unsigned char> instruction_symbols;
     std::size_t position_in_type_bytes{2};
 
     instruction_encoder() = default;
     static std::uint8_t convert_type_to_uint8(source_file_token token_type) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wswitch"
+#pragma clang diagnostic ignored "-Wswitch-enum"
+#pragma clang diagnostic ignored "-Wswitch-default"
+
         std::uint8_t type = 0;
         switch (token_type) {  // NOLINT(clang-diagnostic-switch-enum)
             case source_file_token::one_byte_type_keyword: {
@@ -40,28 +45,27 @@ private:
                 type = 3;
                 break;
             }
-            default: {
-                assert(false && "you should not see this");
-                break;
-            }
         }
+
+#pragma clang diagnostic pop
 
         return type;
     }
 
     template<typename type>
     void write_bytes(type value) {
-        char* bytes = reinterpret_cast<char*>(&value);
+        unsigned char* bytes = reinterpret_cast<unsigned char*>(&value);
         for (std::size_t counter = 0; counter < sizeof(value); ++counter) {
             this->instruction_symbols.push_back(bytes[counter]);
         }
     }
     void write_id(structure_builder::entity_id id) {
-        this->write_bytes<std::uint64_t>(static_cast<std::uint64_t>(id));
+        this->write_bytes<std::uint64_t>(id);
     }
     void encode_active_type(std::uint8_t active_type, std::uint8_t type_mod) {
         std::uint8_t type_bits =
-            (type_mod & 0b11) << 2 | 0b11 & active_type;
+            static_cast<std::uint8_t>((type_mod & 0b11) << 2 | 0b11 & active_type);
+
         std::size_t byte_index = this->position_in_type_bytes / 2 - 1 + 2;
         if (this->position_in_type_bytes % 2 == 0) {
             type_bits <<= 4;
@@ -71,11 +75,11 @@ private:
         this->instruction_symbols[byte_index] |= type_bits;
     }
 public:
-    virtual void visit(source_file_token active_type, const structure_builder::pointer_dereference* variable, bool is_signed) override {
+    virtual void visit(source_file_token active_type, const structure_builder::pointer_dereference* variable, bool) override {
         this->encode_active_type(instruction_encoder::convert_type_to_uint8(active_type), 0b10);
         this->write_id(variable->pointer_variable->id);
 
-        this->instruction_symbols.push_back(static_cast<char>(variable->derefernce_indexes.size()));
+        this->instruction_symbols.push_back(static_cast<unsigned char>(variable->derefernce_indexes.size()));
         for (structure_builder::regular_variable* var : variable->derefernce_indexes) {
             this->write_id(var->id);
         }
@@ -98,8 +102,15 @@ public:
 
         this->write_id(variable->id);
     }
-    virtual void visit(source_file_token active_type, const structure_builder::immediate_variable* variable, bool is_signed) override {
+    virtual void visit(source_file_token active_type, const structure_builder::immediate_variable* variable, bool) override {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wswitch"
+#pragma clang diagnostic ignored "-Wswitch-enum"
+#pragma clang diagnostic ignored "-Wswitch-default"
+
         this->encode_active_type(instruction_encoder::convert_type_to_uint8(active_type), 0b01);
+        // ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
+        // ReSharper disable once CppIncompleteSwitchStatement
         switch (variable->type) {
             case source_file_token::one_byte_type_keyword: {
                 this->write_bytes<std::uint8_t>(static_cast<std::uint8_t>(variable->imm_val));
@@ -114,41 +125,47 @@ public:
                 break;
             }
             case source_file_token::eight_bytes_type_keyword: {
-                this->write_bytes<std::uint64_t>(static_cast<std::uint64_t>(variable->imm_val));
+                this->write_bytes<std::uint64_t>(variable->imm_val);
                 break;
             }
-            default: break;
         }
+
+#pragma clang diagnostic pop
     }
-    virtual void visit(source_file_token active_type, const structure_builder::function_address* variable, bool is_signed) override {
+
+    virtual void visit(source_file_token, const structure_builder::function_address* variable, bool) override {
         this->encode_active_type(2, 0b11);
         this->write_id(variable->func->id);
     }
-    virtual void visit(source_file_token active_type, const structure_builder::module_variable* variable, bool is_signed) override {
+
+    virtual void visit(source_file_token, const structure_builder::module_variable* variable, bool) override {
         this->encode_active_type(0, 0b11);
         this->write_id(variable->mod->id);
     }
-    virtual void visit(source_file_token active_type, const structure_builder::module_function_variable* variable, bool is_signed) override {
+
+    virtual void visit(source_file_token, const structure_builder::module_function_variable* variable, bool) override {
         this->encode_active_type(2, 0b11);
         this->write_id(variable->func->id);
     }
-    virtual void visit(source_file_token active_type, const structure_builder::jump_point_variable* variable, bool is_signed) override {
+
+    virtual void visit(source_file_token, const structure_builder::jump_point_variable* variable, bool) override {
         this->encode_active_type(1, 0b11);
         this->write_id(variable->point->id);
     }
-    virtual void visit(source_file_token active_type, const structure_builder::string_constant* variable, bool is_signed) override {
+
+    virtual void visit(source_file_token, const structure_builder::string_constant* variable, bool) override {
         this->encode_active_type(1, 0b11);
         this->write_id(variable->value->id);
     }
 
-    static std::vector<char> encode_instruction(const structure_builder::instruction& current_instruction, const std::map<source_file_token, std::uint8_t>& operation_codes) {
+    static std::vector<unsigned char> encode_instruction(const structure_builder::instruction& current_instruction, const std::map<source_file_token, std::uint8_t>& operation_codes) {
         instruction_encoder self{};
         bool is_odd = current_instruction.operands_in_order.size() % 2;
 
         auto found_opcode = operation_codes.find(current_instruction.instruction_type);
         if (found_opcode != operation_codes.end()) {
-            self.instruction_symbols.push_back(static_cast<std::uint8_t>(current_instruction.operands_in_order.size()) << 4); //higher four bits: arguments count, lower four bits: additional type bits if argument count is odd
-            self.instruction_symbols.push_back(found_opcode->second);
+            self.instruction_symbols.push_back(static_cast<unsigned char>(current_instruction.operands_in_order.size() << 4)); //higher four bits: arguments count, lower four bits: additional type bits if argument count is odd
+            self.instruction_symbols.push_back(static_cast<unsigned char>(found_opcode->second));
             self.instruction_symbols.resize(self.instruction_symbols.size() + is_odd + current_instruction.operands_in_order.size() / 2);
 
             for (const auto& var : current_instruction.operands_in_order) {
@@ -167,7 +184,8 @@ public:
                 std::size_t additional_type_bits_index = 2 + current_instruction.operands_in_order.size() / 2; //move half filled type bits to prefix byte
                 self.instruction_symbols[0] |= self.instruction_symbols[additional_type_bits_index] >> 4 & 0b1111;
 
-                self.instruction_symbols.erase(self.instruction_symbols.begin() + additional_type_bits_index);
+                self.instruction_symbols.erase(self.instruction_symbols.begin() + 
+                    static_cast<std::ptrdiff_t>(additional_type_bits_index));
             }
         }
 

@@ -15,13 +15,18 @@ public:
 		generic_parser::file_position_type run_position;
 		generic_parser::file_position_type run_size;
 
-		std::shared_ptr<generic_parser::block_reader<1024>> reader; //we will use only one block_reader for all runs
+		std::shared_ptr<generic_parser::block_reader<1024>> run_reader; //we will use only one block_reader for all runs
+
 	public:
-		run(generic_parser::file_position_type start, generic_parser::file_position_type size, std::shared_ptr<generic_parser::block_reader<1024>> reader)
+		run(
+			generic_parser::file_position_type start, 
+			generic_parser::file_position_type size, 
+			std::shared_ptr<generic_parser::block_reader<1024>> reader
+		)
 			:run_start{ start },
 			run_position{ 0 },
 			run_size{ size },
-			reader{ reader }
+			run_reader{ reader }
 		{}
 
 		run(const run&) = delete;
@@ -32,7 +37,7 @@ public:
 
 		char get_symbol() {
 			if (this->run_position < this->run_size) {
-				return this->reader->get_symbol(this->run_start + this->run_position++);
+				return this->run_reader->get_symbol(this->run_start + this->run_position++);
 			}
 
 			return '\0';
@@ -46,7 +51,7 @@ public:
 			char* bytes = reinterpret_cast<char*>(&value);
 			for (generic_parser::file_position_type count = 0; count < sizeof(type) && this->run_position < this->run_size;
 				++count, ++this->run_position) {
-				bytes[count] = this->reader->get_symbol(this->run_start + this->run_position);
+				bytes[count] = this->run_reader->get_symbol(this->run_start + this->run_position);
 			}
 
 			return value;
@@ -90,4 +95,4 @@ public:
 	}
 };
 
-#endif // !RUN_READER_H=
+#endif // !RUN_READER_H

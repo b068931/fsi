@@ -74,9 +74,6 @@ namespace module_mediator::parser::components {
 		result_type modules;
 		builder_parameters parameters;
 
-		generic_parser::token_generator<file_tokens, context_keys>* generator;
-		std::vector<std::pair<std::string, engine_module_builder::file_tokens>>* names_stack;
-
 		engine_module_mediator* mediator;
 
 		read_map_type parse_map;
@@ -84,13 +81,11 @@ namespace module_mediator::parser::components {
 
 	public:
 		engine_module_builder(
-			std::vector<std::pair<std::string, engine_module_builder::file_tokens>>* names_stack,
+			std::vector<std::pair<std::string, engine_module_builder::file_tokens>>*,
 			generic_parser::token_generator<engine_module_builder::file_tokens, context_keys>* token_generator,
-			engine_module_mediator* mediator
+			engine_module_mediator* module_mediator
 		) //"mediator" will be used to initialize engine_module objects
-			:generator{ token_generator },
-			names_stack{ names_stack },
-			mediator{ mediator },
+			:mediator{ module_mediator },
 			parse_map{ file_tokens::end_of_file, file_tokens::name, token_generator }
 		{
 			this->configure_parse_map();

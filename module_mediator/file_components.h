@@ -15,7 +15,7 @@ namespace module_mediator::parser::components {
 		module_mediator::arguments_string_type arguments_symbols; //a sequence of bytes that represent this function's arguments
 
 		bool visible;
-		module_callable_function_type function_address;
+		module_callable_function_type address;
 
 		void delete_arguments_symbols() {
 			delete this->arguments_symbols;
@@ -25,30 +25,34 @@ namespace module_mediator::parser::components {
 			this->arguments_symbols = old_value.arguments_symbols;
 			this->name = std::move(old_value.name);
 			this->visible = old_value.visible;
-			this->function_address = old_value.function_address;
+			this->address = old_value.address;
 
 			old_value.arguments_symbols = nullptr;
 		}
 
-		bool compare_arguments_strings_arguments_count(module_mediator::arguments_string_type arguments_symbols) const {
-			return arguments_symbols[0] == this->arguments_symbols[0];
+		bool compare_arguments_strings_arguments_count(module_mediator::arguments_string_type other_arguments_symbols) const {
+			return other_arguments_symbols[0] == this->arguments_symbols[0];
 		}
-		bool check_arguments_strings_arguments_types(module_mediator::arguments_string_type arguments_symbols) const {
-			return std::memcmp(arguments_symbols, this->arguments_symbols, static_cast<std::size_t>(this->arguments_symbols[0]) + 1) == 0;
+		bool check_arguments_strings_arguments_types(module_mediator::arguments_string_type other_arguments_symbols) const {
+			return std::memcmp(other_arguments_symbols, this->arguments_symbols, static_cast<std::size_t>(this->arguments_symbols[0]) + 1) == 0;
 		}
 	public:
 		function()
 			:arguments_symbols{ nullptr },
 			visible{ false },
-			function_address{ nullptr }
+			address{ nullptr }
 		{
 		}
 
-		function(std::string&& name, module_callable_function_type function_address, module_mediator::arguments_string_type arguments_symbols, bool visible)
-			:name{ std::move(name) },
-			arguments_symbols{ arguments_symbols },
-			visible{ visible },
-			function_address{ function_address }
+		function(
+			std::string&& function_name, 
+			module_callable_function_type function_address, 
+			module_mediator::arguments_string_type function_arguments_symbols, 
+			bool visible_function)
+			:name{ std::move(function_name) },
+			arguments_symbols{ function_arguments_symbols },
+			visible{ visible_function },
+			address{ function_address }
 		{
 		}
 
@@ -63,15 +67,15 @@ namespace module_mediator::parser::components {
 			this->move_value(std::move(old_value));
 		}
 
-		bool compare_names(std::string_view name) const { return this->name == name; }
-		bool compare_arguments_types(module_mediator::arguments_string_type arguments_symbols) const { //true if equal
-			assert(arguments_symbols && "null pointer");
+		bool compare_names(std::string_view other_name) const { return this->name == other_name; }
+		bool compare_arguments_types(module_mediator::arguments_string_type other_arguments_symbols) const { //true if equal
+			assert(other_arguments_symbols && "null pointer");
 			if (this->arguments_symbols == nullptr) { //if function has no arguments symbols it means that it automatically accepts all arguments
 				return true;
 			}
 
-			if (this->compare_arguments_strings_arguments_count(arguments_symbols)) {
-				return this->check_arguments_strings_arguments_types(arguments_symbols);
+			if (this->compare_arguments_strings_arguments_count(other_arguments_symbols)) {
+				return this->check_arguments_strings_arguments_types(other_arguments_symbols);
 			}
 
 			return false;
@@ -79,7 +83,7 @@ namespace module_mediator::parser::components {
 
 		bool is_visible() const { return this->visible; }
 		module_mediator::return_value call(module_mediator::arguments_string_type arguments) const {
-			return this->function_address(arguments);
+			return this->address(arguments);
 		}
 
 		~function() {
@@ -99,7 +103,7 @@ namespace module_mediator::parser::components {
 			this->functions = std::move(old_value.functions);
 
 			this->loaded_module = old_value.loaded_module;
-			old_value.loaded_module = NULL;
+			old_value.loaded_module = nullptr;
 		}
 		void free_resources() {
 			this->free_module();
@@ -107,7 +111,7 @@ namespace module_mediator::parser::components {
 
 		void load_module(const std::string& module_path) {
 			this->loaded_module = LoadLibraryA(module_path.c_str());
-			if (this->loaded_module == NULL) {
+			if (this->loaded_module == nullptr) {
 				std::cerr << "Unable to load one of the modules. Process will be aborted."
 					<< " (Path: " << module_path << ')' << std::endl;
 
@@ -115,10 +119,10 @@ namespace module_mediator::parser::components {
 			}
 		}
 		void free_module() {
-			if (this->loaded_module != NULL) {
+			if (this->loaded_module != nullptr) {
 				FARPROC free = GetProcAddress(this->loaded_module, "free_m");
-				if (free != NULL) {
-					((void(*)())free)();
+				if (free != nullptr) {
+					reinterpret_cast<void(*)()>(free)();
 				}
 
 				BOOL freed_library = FreeLibrary(this->loaded_module);
@@ -132,14 +136,14 @@ namespace module_mediator::parser::components {
 		}
 		void initialize_module(module_mediator::module_part* mediator) {
 			FARPROC initialize = GetProcAddress(this->loaded_module, "initialize_m");
-			if (initialize == NULL) {
+			if (initialize == nullptr) {
 				std::cerr << "One of the modules does not define the initialize_m function. Process will be aborted."
 					<< "(Name: " << this->name << ')' << std::endl;
 
 				std::terminate();
 			}
 
-			((void(*)(module_mediator::module_part*))initialize)(mediator); //convert and call initialize_m
+			reinterpret_cast<void(*)(module_mediator::module_part*)>(initialize)(mediator); //convert and call initialize_m
 		}
 	public:
 		engine_module(
@@ -148,7 +152,7 @@ namespace module_mediator::parser::components {
 			module_mediator::module_part* mediator //pointer to module_part allows to access some of the engine_module_mediator functions
 		)
 			:name{ std::move(module_name) },
-			loaded_module{ NULL }
+			loaded_module{ nullptr }
 		{
 			this->load_module(module_path);
 			this->initialize_module(mediator);
@@ -169,10 +173,10 @@ namespace module_mediator::parser::components {
 			return this->name;
 		}
 
-		bool compare_names(std::string_view name) const { return this->name == name; }
-		std::size_t find_function_index(std::string_view name) const {
+		bool compare_names(std::string_view other_name) const { return this->name == other_name; }
+		std::size_t find_function_index(std::string_view other_name) const {
 			for (std::size_t find_index = 0, size = this->functions.size(); find_index < size; ++find_index) {
-				if (this->functions[find_index].compare_names(name)) {
+				if (this->functions[find_index].compare_names(other_name)) {
 					return find_index;
 				}
 			}
@@ -183,14 +187,14 @@ namespace module_mediator::parser::components {
 		const function& get_function(std::size_t index) const {
 			return this->functions.at(index);
 		}
-		bool add_function(const std::string& name, std::string&& export_name, module_mediator::arguments_string_type arguments_string, bool is_visible) {
-			FARPROC loaded_function = GetProcAddress(this->loaded_module, name.c_str());
-			if (loaded_function == NULL)
+		bool add_function(const std::string& other_name, std::string&& export_name, module_mediator::arguments_string_type arguments_string, bool is_visible) {
+			FARPROC loaded_function = GetProcAddress(this->loaded_module, other_name.c_str());
+			if (loaded_function == nullptr)
 				return false;
 
 			this->functions.emplace_back(
                 std::move(export_name),
-					(module_callable_function_type)loaded_function,
+					reinterpret_cast<module_callable_function_type>(loaded_function),
 					arguments_string,
 					is_visible
 

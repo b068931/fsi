@@ -9,21 +9,21 @@ private:
 	std::mutex references_mutex{};
 
 	program_context(
-		std::uint64_t preferred_stack_size,
-		void** code, std::uint32_t functions_count, 
-		void** exposed_functions, std::uint32_t exposed_functions_count, 
-		void* jump_table, std::uint64_t jump_table_size,
+		std::uint64_t program_preferred_stack_size,
+		void** program_code, std::uint32_t program_functions_count, 
+		void** program_exposed_functions, std::uint32_t program_exposed_functions_count, 
+		void* program_jump_table, std::uint64_t program_jump_table_size,
 		void** program_strings, std::uint64_t program_strings_size
 	)
-		:preferred_stack_size{ preferred_stack_size },
-		code{ code },
-		functions_count{ functions_count },
-		exposed_functions{ exposed_functions },
-		exposed_functions_count{ exposed_functions_count },
-		jump_table{ jump_table },
-		jump_table_size{ jump_table_size },
-		program_strings{ program_strings },
-		program_strings_size{ program_strings_size }
+		:preferred_stack_size{ program_preferred_stack_size },
+		code{ program_code },
+		functions_count{ program_functions_count },
+		exposed_functions{ program_exposed_functions },
+		exposed_functions_count{ program_exposed_functions_count },
+		jump_table{ program_jump_table },
+		jump_table_size{ program_jump_table_size },
+		strings{ program_strings },
+		strings_size{ program_strings_size }
 	{}
 
 public:
@@ -38,8 +38,8 @@ public:
 	void* jump_table{};
 	std::uint64_t jump_table_size{};
 
-	void** program_strings{};
-	std::uint64_t program_strings_size{};
+	void** strings{};
+	std::uint64_t strings_size{};
 
 	static program_context* create(
 		std::uint64_t preferred_stack_size,

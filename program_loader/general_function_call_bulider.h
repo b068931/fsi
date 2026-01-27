@@ -60,10 +60,13 @@ protected:
 			this->write_bytes('\x66');
 			break;
 		}
+
 		case 0b11: {
 			rex |= 0b01001000;
 			break;
 		}
+
+		default: break;
 		}
 
 		if (rex != 0) {

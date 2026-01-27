@@ -22,7 +22,6 @@ enum class translator_error_type {
     save_variable_state_instruction,
     load_variable_state_instruction,
     pointer_ref_instruction,
-    bit_shift_instruction,
     get_function_address_instruction,
     non_string_instruction,
     string_instruction,
@@ -30,6 +29,9 @@ enum class translator_error_type {
     main_not_exposed,
     unknown_instruction
 };
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wswitch-default"
 
 inline void translate_error(translator_error_type error, std::ostream& stream) {
     switch (error) {
@@ -129,11 +131,17 @@ inline void translate_error(translator_error_type error, std::ostream& stream) {
             stream << "Unknown instruction";
             break;
         }
-        default: {
-            stream << "Unknown error code";
+        case translator_error_type::name_too_long: {
+            stream << "One of the names used in the program is too long.";
+            break;
+        }
+        case translator_error_type::too_many_function_arguments:{
+            stream << "A function has too many arguments. No more than 15 arguments are allowed.";
             break;
         }
     }
 }
+
+#pragma clang diagnostic pop
 
 #endif

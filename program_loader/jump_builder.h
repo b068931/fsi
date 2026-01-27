@@ -15,7 +15,7 @@ public:
 		this->assert_statement(this->get_arguments_count() == 1, "This instruction must have only one argument.");
 	}
 
-	virtual void visit(std::unique_ptr<specialized_variable> jump_point) {
+	virtual void visit(std::unique_ptr<specialized_variable> jump_point) override {
 		this->write_bytes('\x41');
 		this->write_bytes(this->get_code_front());
 		this->write_bytes<char>('\x83' | this->get_code_back() << 3 & 0b00111000);

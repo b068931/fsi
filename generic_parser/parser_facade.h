@@ -22,14 +22,14 @@ namespace generic_parser {
 	public:
 		template<typename... builder_args> //names_stack, hard_symbols, separators, name_token, end_token, args that will be passed to initialize builder
 		parser_facade(
-			const std::vector<std::pair<std::string, token_type>>& names_stack,
+			const std::vector<std::pair<std::string, token_type>>& names,
 			const std::map<context_key_type, typename token_generator<token_type, context_key_type>::symbols_pair>& contexts,
 			token_type name_token,
 			token_type end_token,
 			context_key_type starting_context,
 			builder_args&&... args
 		)
-			:names_stack{ names_stack },
+			:names_stack{ names },
 			end_of_file{ end_token },
 			generator{ contexts, &this->names_stack, name_token, end_token, starting_context },
 			builder{ &this->names_stack, &this->generator, std::forward<builder_args>(args)... }

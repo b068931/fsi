@@ -9,6 +9,7 @@
 #include <memory>
 #include <cstdint>
 #include <limits>
+#include <stdexcept>
 
 #include "../submodule_typename_array/typename-array/typename-array-primitives/include-all-namespace.hpp"
 
@@ -188,6 +189,10 @@ namespace module_mediator {
             case 4:
                 result = arguments_string_element{ 10 };
                 break;
+
+            default: 
+                throw std::invalid_argument(
+                    "Invalid program type provided for conversion to arguments string type.");
             }
 
             return result;

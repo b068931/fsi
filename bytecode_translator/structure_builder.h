@@ -70,40 +70,43 @@ public:
         virtual void visit(source_file_token active_type, variable_visitor* visitor, bool is_signed) = 0;
         virtual ~variable() = default;
     };
+
     struct immediate_variable : public variable {
         immediate_type imm_val;
         source_file_token type;
 
-        immediate_variable(source_file_token type)
+        immediate_variable(source_file_token variable_type)
             :variable{},
-            imm_val{0},
-            type{type}
+            imm_val{ 0 },
+            type{ variable_type }
         {}
 
-        immediate_variable(source_file_token type, immediate_type value)
+        immediate_variable(source_file_token variable_type, immediate_type value)
             :variable{},
-            imm_val{value},
-            type{type}
+            imm_val{ value },
+            type{ variable_type }
         {}
 
         virtual void visit(source_file_token active_type, variable_visitor* visitor, bool is_signed) override {
             visitor->visit(active_type, this, is_signed);
         }
     };
+
     struct regular_variable : public variable, public entity {
         source_file_token type;
         std::string name;
 
-        regular_variable(entity_id object_id, source_file_token type) 
+        regular_variable(entity_id object_id, source_file_token variable_type) 
             :variable{},
-            entity{object_id},
-            type{type}
+            entity{ object_id },
+            type{ variable_type }
         {}
 
         virtual void visit(source_file_token active_type, variable_visitor* visitor, bool is_signed) override {
             visitor->visit(active_type, this, is_signed);
         }
     };
+
     struct function_address : public variable {
         function* func;
 
@@ -116,6 +119,7 @@ public:
             visitor->visit(active_type, this, is_signed);
         }
     };
+
     struct pointer_dereference : public variable {
         regular_variable* pointer_variable;
         std::vector<regular_variable*> derefernce_indexes;
@@ -129,30 +133,33 @@ public:
             visitor->visit(active_type, this, is_signed);
         }
     };
+
     struct jump_point_variable : public variable {
         jump_point* point;
 
-        jump_point_variable(jump_point* point)
+        jump_point_variable(jump_point* jump_point)
             :variable{},
-            point{point}
+            point{ jump_point }
         {}
 
         virtual void visit(source_file_token active_type, variable_visitor* visitor, bool is_signed) override {
             visitor->visit(active_type, this, is_signed);
         }
     };
+
     struct module_variable : public variable {
         engine_module* mod;
 
-        module_variable(engine_module* mod)
+        module_variable(engine_module* module_pointer)
             :variable{},
-            mod{mod}
+            mod{ module_pointer }
         {}
 
         virtual void visit(source_file_token active_type, variable_visitor* visitor, bool is_signed) override {
             visitor->visit(active_type, this, is_signed);
         }
     };
+
     struct module_function_variable : public variable {
         module_function* func;
 
@@ -165,10 +172,11 @@ public:
             visitor->visit(active_type, this, is_signed);
         }
     };
+
     struct string_constant : public variable {
         string* value;
-        string_constant(string* value)
-            :value{ value }
+        string_constant(string* string_value)
+            :value{ string_value }
         {}
 
         virtual void visit(source_file_token active_type, variable_visitor* visitor, bool is_signed) override {
@@ -193,22 +201,24 @@ public:
             :instruction_type{instruction}
         {}
     };
+
     struct jump_point : public entity {
         std::uint32_t index;
         std::string name;
 
-        jump_point(entity_id object_id, std::uint32_t index, std::string&& name)
+        jump_point(entity_id object_id, std::uint32_t point_index, std::string&& point_name)
             :entity{ object_id },
-            index{index},
-            name {std::move(name)}
+            index{ point_index },
+            name { std::move(point_name) }
         {}
 
-        jump_point(entity_id object_id, std::uint32_t index, const std::string& name)
+        jump_point(entity_id object_id, std::uint32_t point_index, const std::string& point_name)
             :entity{ object_id },
-            index{ index },
-            name{ name }
+            index{ point_index },
+            name{ point_name }
         {}
     };
+
     struct function : public entity {
         std::list<regular_variable> arguments;
         std::list<regular_variable> locals; //You can't use variables BEFORE their declaration, but in byte code used variables will be known at compile time. Also decl is not an actual instruction, that's why there is a "source_file_token::special_instruction" before it.
@@ -217,28 +227,31 @@ public:
         std::list<instruction> body;
 
         std::string name;
-        function(entity_id object_id, std::string&& name)
-            :entity{object_id},
-            name{std::move(name)}
+        function(entity_id object_id, std::string&& function_name)
+            :entity{ object_id },
+            name{ std::move(function_name) }
         {}
     };
+
     struct module_function : entity {
         std::string name;
-        module_function(entity_id object_id, std::string&& name)
-            :entity{object_id},
-            name{std::move(name) }
+        module_function(entity_id object_id, std::string&& module_name)
+            :entity{ object_id },
+            name{ std::move(module_name) }
         {}
     };
+
     struct engine_module : entity {
         std::string name;
         std::list<module_function> functions_names;
 
         engine_module(entity_id object_id, std::string&& module_name)
-            :entity{object_id},
-            name{std::move(module_name)},
+            :entity{ object_id },
+            name{ std::move(module_name) },
             functions_names{}
         {}
     };
+
     struct string : public entity {
         std::string value;
         string(entity_id object_id)
@@ -246,6 +259,7 @@ public:
             value{}
         {}
     };
+
     struct file {
         std::uint64_t stack_size{ 0 };
         function* main_function{};
@@ -426,7 +440,7 @@ public:
         ) {
             helper_parameters.active_function.get_last_instruction().func_addresses.emplace_back(); //add new function address to the list function addresses of specific instruction
 
-            function_address* func = &helper_parameters.active_function.get_last_instruction().func_addresses.back();
+            function_address* function_address = &helper_parameters.active_function.get_last_instruction().func_addresses.back();
             std::string function_name = helper_parameters.name_translations.translate_name(read_map.get_token_generator_name());
             auto found_function = std::ranges::find_if(file_structure.functions, //try to find function with specific name inside functions list
                                                        [&function_name](const function& func) {
@@ -439,9 +453,9 @@ public:
             }
 
             function* function = &*found_function;
-            func->func = function; //bind function address argument with specific function
+            function_address->func = function; //bind function address argument with specific function
 
-            helper_parameters.active_function.add_new_operand_to_last_instruction(source_file_token::function_address_argument_keyword, func, false);
+            helper_parameters.active_function.add_new_operand_to_last_instruction(source_file_token::function_address_argument_keyword, function_address, false);
         }
     };
     using read_map_type = generic_parser::read_map<source_file_token, context_key, file, builder_parameters, parameters_enumeration>;
@@ -480,6 +494,11 @@ public:
             .get_parameters_container()
             .retrieve_parameter<std::pair<bool, std::string>>(parameters_enumeration::inside_comment);
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wswitch"
+#pragma clang diagnostic ignored "-Wswitch-enum"
+#pragma clang diagnostic ignored "-Wswitch-default"
+
         switch (token) {  // NOLINT(clang-diagnostic-switch)
             case source_file_token::comment_start: {
                 saved_name = this->generator->get_name();
@@ -487,12 +506,14 @@ public:
 
                 return;
             }
+
             case source_file_token::comment_end: {
                 this->generator->set_current_context(context_key::main_context);
                 just_left_comment = true;
 
                 return;
             }
+
             case source_file_token::new_line: {
                 ++this->error_line;
 
@@ -506,8 +527,9 @@ public:
 
                 break;
             }
-            default: break;
         }
+
+#pragma clang diagnostic pop
 
         if (just_left_comment) {
             just_left_comment = false;

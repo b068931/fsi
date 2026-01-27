@@ -8,7 +8,7 @@
 
 // Handle SEH exceptions
 namespace {
-    LPTOP_LEVEL_EXCEPTION_FILTER g_pPreviousFilter = NULL;
+    LPTOP_LEVEL_EXCEPTION_FILTER g_pPreviousFilter = nullptr;
 
     void SafeAppend(char* sBuffer, std::size_t szBufferSize, std::size_t* szBufferPosition, const char* sAppend) {
         if (!sBuffer || !sAppend) return;
@@ -82,7 +82,7 @@ namespace {
         DWORD writtenTotal = 0;
         while (writtenTotal < dwTotalLength) {
             DWORD written = 0;
-            if (!WriteFile(hOut, data + writtenTotal, dwTotalLength - writtenTotal, &written, NULL)) {
+            if (!WriteFile(hOut, data + writtenTotal, dwTotalLength - writtenTotal, &written, nullptr)) {
                 return FALSE;
             }
             if (!written) {
@@ -118,7 +118,7 @@ namespace {
             sExceptionInfoBuffer,
             std::size(sExceptionInfoBuffer),
             &szBufferPosition,
-            static_cast<std::uintptr_t>(pExceptionInfo->ExceptionRecord->ExceptionCode)
+            pExceptionInfo->ExceptionRecord->ExceptionCode
         );
 
         SafeAppend(
@@ -157,7 +157,7 @@ namespace {
         );
 
         HANDLE hStdErr = GetStdHandle(STD_ERROR_HANDLE);
-        if (hStdErr != INVALID_HANDLE_VALUE && hStdErr != NULL) {
+        if (hStdErr != INVALID_HANDLE_VALUE && hStdErr != nullptr) {
             if (!WriteAll(hStdErr, sExceptionInfoBuffer, static_cast<DWORD>(szBufferPosition))) {
                 OutputDebugStringA(sExceptionInfoBuffer);
             }
@@ -169,13 +169,13 @@ namespace {
 
         // Fail instantly on Release builds. On Debug builds notify the debugger.
 #ifdef NDEBUG
-        if (g_pPreviousFilter != NULL) {
+        if (g_pPreviousFilter != nullptr) {
             return g_pPreviousFilter(pExceptionInfo);
         }
 
         return EXCEPTION_EXECUTE_HANDLER;
 #else
-        if (g_pPreviousFilter != NULL) {
+        if (g_pPreviousFilter != nullptr) {
             return g_pPreviousFilter(pExceptionInfo);
         }
 

@@ -30,7 +30,7 @@ namespace module_mediator::parser::states {
 							std::ranges::find(parameters.arguments, argument);
 
 						if (found_argument != parameters.arguments.end()) {
-							unsigned char previous_size = static_cast<unsigned char>(arguments_symbols[0]);
+							unsigned char previous_size = arguments_symbols[0];
 
 							module_mediator::arguments_string_type new_arguments_symbols = new module_mediator::arguments_string_element[static_cast<std::size_t>(previous_size) + 2];
 							new_arguments_symbols[0] = previous_size + 1;

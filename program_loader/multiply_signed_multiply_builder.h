@@ -11,6 +11,8 @@ private:
 	}
 
 public:
+	using instruction_builder::visit;
+
 	template<typename... args>
 	multiply_signed_multiply_builder(
 		args&&... instruction_builder_args

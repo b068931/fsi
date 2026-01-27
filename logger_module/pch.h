@@ -12,7 +12,7 @@
 #error "Currently only MSVC is supported for the logger module."
 #endif
 
-#include <windows.h>
+#include <Windows.h>
 #include <iostream>
 #include <sstream>
 #include <syncstream>

@@ -69,7 +69,7 @@ public:
 		}
 		else {
 			variable_imm<std::uint64_t> immediate_function_displacement{
-				static_cast<std::uint64_t>(this->get_function_table_index(fnc->get_id()))
+				(this->get_function_table_index(fnc->get_id()))
 			};
 
 			this->place_immediate(&immediate_function_displacement);

@@ -5,13 +5,14 @@ namespace {
     DWORD tls_index;
 }
 
-extern thread_local_structure* get_thread_local_structure() {
+extern thread_local_structure* get_thread_local_structure();
+thread_local_structure* get_thread_local_structure() {
     return std::launder(static_cast<thread_local_structure*>(TlsGetValue(tls_index)));
 }
 
-BOOL APIENTRY DllMain(HMODULE hModule,  // NOLINT(misc-use-internal-linkage)
-                      DWORD  ul_reason_for_call,
-                      LPVOID lpReserved)
+BOOL APIENTRY DllMain(HMODULE,  // NOLINT(misc-use-internal-linkage)
+                      DWORD ul_reason_for_call,
+                      LPVOID)
 {
     LPVOID allocated_memory;
     switch (ul_reason_for_call)
@@ -25,8 +26,10 @@ BOOL APIENTRY DllMain(HMODULE hModule,  // NOLINT(misc-use-internal-linkage)
             [[fallthrough]];
 
         case DLL_THREAD_ATTACH:
-            allocated_memory = (LPVOID)LocalAlloc(LPTR, sizeof(thread_local_structure));
-            if (allocated_memory != NULL) {
+            allocated_memory = 
+                LocalAlloc(LPTR, sizeof(thread_local_structure));
+
+            if (allocated_memory != nullptr) {
 
                 /*
                 * initialize thread_local_structure using default constructor
@@ -34,28 +37,28 @@ BOOL APIENTRY DllMain(HMODULE hModule,  // NOLINT(misc-use-internal-linkage)
                 * later in the program our object can be accessed only through std::launder.
                 */
 
-                new((void*)allocated_memory) thread_local_structure{};
+                new(allocated_memory) thread_local_structure{};
                 TlsSetValue(tls_index, allocated_memory);
             }
 
             break;
         case DLL_THREAD_DETACH:
             allocated_memory = TlsGetValue(tls_index);
-            if (allocated_memory != NULL) {
+            if (allocated_memory != nullptr) {
                 delete[] get_thread_local_structure()->execution_thread_state;
                 get_thread_local_structure()->~thread_local_structure(); //kinda sketchy, but it has default destructor, so its behavior is predictable.
 
-                LocalFree((HLOCAL)allocated_memory);
+                LocalFree(allocated_memory);
             }
 
             break;
         case DLL_PROCESS_DETACH:
             allocated_memory = TlsGetValue(tls_index);
-            if (allocated_memory != NULL) {
+            if (allocated_memory != nullptr) {
                 delete[] get_thread_local_structure()->execution_thread_state;
                 get_thread_local_structure()->~thread_local_structure();
 
-                LocalFree((HLOCAL)allocated_memory);
+                LocalFree(allocated_memory);
             }
 
             TlsFree(tls_index);

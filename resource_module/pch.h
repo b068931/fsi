@@ -12,7 +12,7 @@
 #error "Currently only MSVC is supported for the resource module."
 #endif
 
-#include <windows.h>
+#include <Windows.h>
 #include <iostream>
 #include <cstdint>
 #include <mutex>

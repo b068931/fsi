@@ -4,7 +4,8 @@
 
 #include "parser_options.h"
 
-extern state_settings& configure_modules_import(states_builder_type& builder) {
+extern state_settings& configure_modules_import(states_builder_type& builder);
+state_settings& configure_modules_import(states_builder_type& builder) {
 	state_settings &inside_functions_import = builder.create_state<functions_import_state>()
 		.set_error_message("',' or '>' are expected, got another token instead.")
 		.set_handle_tokens(

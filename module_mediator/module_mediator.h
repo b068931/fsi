@@ -45,8 +45,8 @@ namespace module_mediator {
 			engine_module_mediator* mediator;
 
 		public:
-			module_part_implementation(engine_module_mediator* mediator)
-				:mediator{ mediator }
+			module_part_implementation(engine_module_mediator* module_mediator)
+				:mediator{ module_mediator }
 			{
 			}
 

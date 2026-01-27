@@ -8,7 +8,7 @@
 
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
-#include <windows.h>
+#include <Windows.h>
 
 #include <iostream>
 #include <cstdlib>
@@ -136,10 +136,10 @@ namespace {
         }
 
         compressed_stream.seekg(0, std::ios::end);
-        std::size_t compressed_size = compressed_stream.tellg();
+        std::streamoff compressed_size = compressed_stream.tellg();
         compressed_stream.seekg(0, std::ios::beg);
 
-        compressed_bytecode.resize(compressed_size);
+        compressed_bytecode.resize(static_cast<std::size_t>(compressed_size));
         compressed_stream.read(
             reinterpret_cast<char*>(compressed_bytecode.data()), 
             static_cast<std::streamsize>(compressed_size)

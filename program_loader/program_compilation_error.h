@@ -14,9 +14,9 @@ public:
 		id_associated_with_error{ 0 }
 	{}
 
-	program_compilation_error(const std::string& message, entity_id id_associated_with_error)
+	program_compilation_error(const std::string& message, entity_id error_id)
 		:std::logic_error{ message },
-		id_associated_with_error{ id_associated_with_error }
+		id_associated_with_error{ error_id }
 	{}
 
 	entity_id get_associated_id() const {

@@ -79,6 +79,9 @@ namespace backend {
     }
 
     [[noreturn]] void call_module_error(module_mediator::module_part::call_error error) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wswitch-default"
+
         switch (error) {
         case module_mediator::module_part::call_error::function_is_not_visible:
             LOG_PROGRAM_ERROR(interoperation::get_module_part(), "Called module function is not visible. Thread terminated.");
@@ -94,6 +97,8 @@ namespace backend {
 
         case module_mediator::module_part::call_error::no_error: break;
         }
+
+#pragma clang diagnostic pop
 
         thread_terminate();
         load_execution_thread(get_thread_local_structure()->execution_thread_state);
@@ -281,7 +286,7 @@ namespace backend {
 
                 module_mediator::memory old_descriptor_address{};
                 std::memcpy(
-                    static_cast<void*>(&old_descriptor_address), 
+                    &old_descriptor_address, 
                     argument_address, 
                     sizeof(module_mediator::memory)
                 );
@@ -327,7 +332,7 @@ namespace backend {
 
                 module_mediator::memory cross_thread_sharing{};
                 std::memcpy(
-                    static_cast<void*>(&cross_thread_sharing),
+                    &cross_thread_sharing,
                     new_memory_descriptor + sizeof(std::uint64_t) * 2,
                     sizeof(module_mediator::memory)
                 );
@@ -345,7 +350,7 @@ namespace backend {
 
                 std::memcpy(
                     thread_stack_memory,
-                    static_cast<void*>(&new_memory_descriptor),
+                    &new_memory_descriptor,
                     type_size
                 );
             }

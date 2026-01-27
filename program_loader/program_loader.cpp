@@ -16,6 +16,13 @@
 #include "../module_mediator/fsi_types.h"
 
 // Make it public so that it can be accessed from module initialization code.
+extern std::unordered_map<
+    std::uintptr_t,
+    std::pair<
+        std::unique_ptr<module_mediator::arguments_string_element[]>,
+        std::string>
+    >* exposed_functions;
+
 std::unordered_map<
     std::uintptr_t,
     std::pair<
@@ -50,10 +57,10 @@ namespace {
             interoperation::index_getter::resource_module(),
             interoperation::index_getter::resource_module_create_new_program_container(),
             preferred_stack_size, main_function_index,
-            static_cast<void*>(code), functions_count,
-            static_cast<void*>(exposed_functions_addresses), exposed_functions_count,
+            code, functions_count,
+            exposed_functions_addresses, exposed_functions_count,
             jump_table, jump_table_size,
-            static_cast<void*>(program_strings), program_strings_count
+            program_strings, program_strings_count
         );
     }
 
@@ -395,7 +402,7 @@ namespace {
                 }
 
                 loaded_functions_addresses[function_index] = loaded_function;
-                jump_table.add_jump_base_address(static_cast<std::uint32_t>(function_index), reinterpret_cast<std::uintptr_t>(loaded_function) + prologue_size);
+                jump_table.add_jump_base_address(function_index, reinterpret_cast<std::uintptr_t>(loaded_function) + prologue_size);
                 jump_table.remap_function_address(current_function.function_signature, reinterpret_cast<std::uintptr_t>(loaded_function));
             }
 

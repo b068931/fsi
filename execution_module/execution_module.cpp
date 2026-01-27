@@ -31,7 +31,7 @@ module_mediator::return_value on_thread_creation(module_mediator::arguments_stri
         )
     );
 
-    //fill in thread_state - start
+    //fill in state_buffer - start
     backend::fill_in_register_array_entry( //function address
         1, 
         thread_state_memory, 
@@ -154,7 +154,7 @@ module_mediator::return_value get_thread_saved_variable(module_mediator::argumen
     char* thread_state = static_cast<char*>(get_thread_local_structure()->currently_running_thread_information.thread_state) + 40;
     module_mediator::memory thread_stack_end{};
 
-    std::memcpy(static_cast<void*>(&thread_stack_end), thread_state, sizeof(module_mediator::memory));
+    std::memcpy(&thread_stack_end, thread_state, sizeof(module_mediator::memory));
     return reinterpret_cast<std::uintptr_t>(thread_stack_end);
 }
 

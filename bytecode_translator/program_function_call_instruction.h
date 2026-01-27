@@ -7,7 +7,7 @@
 struct program_function_call_instruction {
     static constexpr translator_error_type error_message{ translator_error_type::program_function_call };
     static bool check(const structure_builder::instruction& instruction) {
-        if (bool program_function_call = instruction.modules.empty() && instruction.module_functions.empty()) {
+        if (instruction.modules.empty() && instruction.module_functions.empty()) {
             for (const auto& index : instruction.operands_in_order) {
                 if (std::get<2>(index)) {
                     return false;

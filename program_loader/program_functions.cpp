@@ -92,8 +92,13 @@ void generate_function_epilogue(std::vector<char>& destination, std::uint32_t de
 	destination.push_back('\x20');
 }
 void* create_executable_function(const std::vector<char>& source) {
-	char* destination = (char*)VirtualAlloc(NULL, source.size(), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-	if (destination == NULL) {
+	char* destination = static_cast<char*>(VirtualAlloc(
+		nullptr, 
+		source.size(), 
+		MEM_COMMIT | MEM_RESERVE, 
+		PAGE_READWRITE));
+
+	if (destination == nullptr) {
 		return nullptr;
 	}
 
