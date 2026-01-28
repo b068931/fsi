@@ -13,6 +13,12 @@
 #include <QMenu>
 #include <QAction>
 #include <QEvent>
+#include <QShortcut>
+#include <array>
+
+// TODO: Do a further decomposition of this widget into "WorkingTreeView" and "FileTabWidget" classes.
+//       Properly handle CTRL+TAB which does not work well with onTabMoved and onCurrentChanged, because
+//       these are emitted before the tab is dropped by the user.
 
 namespace CustomWidgets {
     /// <summary>
@@ -107,11 +113,15 @@ namespace CustomWidgets {
         virtual bool event(QEvent* event) override;
 
     private slots:
+        void onWorkingDirectoryContextMenu(const QPoint& position) noexcept;
         void onWorkingDirectoryItemDoubleClicked(const QModelIndex& index) noexcept;
+
+        void onTabSwitchShortcut();
         void onFileChangedOutside(const QString& path) noexcept;
+
         void onTabCloseRequested(int index) noexcept;
         void onTabMoved(int from, int to) noexcept;
-        void onWorkingDirectoryContextMenu(const QPoint& position) noexcept;
+        void onTabChanged(int index) noexcept;
 
     public slots:
         void onRetranslateUI() noexcept;
@@ -136,6 +146,10 @@ namespace CustomWidgets {
 
             QString getNormalizedName() const;
         };
+
+        // Allows switching only between current and previous tabs
+        std::array<int, 2> tabSelectionHistory{ -1, -1 };
+        QShortcut* tabSwitchShortcut{};
 
         QString workingDirectoryPath;
         QVector<OpenedFile> openFiles;

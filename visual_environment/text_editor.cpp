@@ -43,10 +43,14 @@ namespace CustomWidgets {
     void TextEditor::connectSignalsManually() {
         Q_ASSERT(this->workingDirectory != nullptr && "The working directory view has not been set up.");
         Q_ASSERT(this->fileTabs != nullptr && "The file tabs have not been set up.");
-        Q_ASSERT(this->fileWatcher && "The file watcher has not been set up.");
+        Q_ASSERT(this->fileWatcher != nullptr && "The file watcher has not been set up.");
+        Q_ASSERT(this->tabSwitchShortcut != nullptr && "The tab switch shortcut has not been set up.");
 
         // Connect signals for objects which were created manually
         // at application startup.
+        connect(this->tabSwitchShortcut, &QShortcut::activated,
+            this, &TextEditor::onTabSwitchShortcut);
+
         connect(this->workingDirectory, &QTreeView::doubleClicked,
             this, &TextEditor::onWorkingDirectoryItemDoubleClicked);
 
@@ -55,6 +59,9 @@ namespace CustomWidgets {
 
         connect(this->fileTabs, &QTabWidget::tabCloseRequested,
             this, &TextEditor::onTabCloseRequested);
+
+        connect(this->fileTabs, &QTabWidget::currentChanged, 
+            this, &TextEditor::onTabChanged);
 
         connect(this->fileTabs->tabBar(), &QTabBar::tabMoved,
             this, &TextEditor::onTabMoved);
@@ -67,6 +74,9 @@ namespace CustomWidgets {
         Q_ASSERT(this->splitter == nullptr && "The splitter has already been set up.");
         Q_ASSERT(this->workingDirectory == nullptr && "The working directory view has already been set up.");
         Q_ASSERT(this->fileTabs == nullptr && "The file tabs have already been set up.");
+        Q_ASSERT(this->tabSwitchShortcut == nullptr && "The tab switch shortcut has already been set up.");
+
+        this->tabSwitchShortcut = new QShortcut(QKeyCombination(Qt::CTRL | Qt::Key_Tab), this);
 
         // The layout won't contain anything else, apart from the splitter.
         QVBoxLayout* mainLayout = new QVBoxLayout(this);
@@ -482,7 +492,7 @@ namespace CustomWidgets {
 
             // Then try to salvage other open files by closing all of them.
             this->closeAllFiles();
-            qFatal() << "Failed to cast the file editor widget to QPlainTextEdit." << __LINE__ << __FILE__;
+            qFatal() << "Failed to cast the file editor widget to QPlainTextEdit.";
 
             return nullptr;
         }

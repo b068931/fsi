@@ -42,6 +42,14 @@ namespace CustomWidgets {
         }
     }
 
+    void TextEditor::onTabSwitchShortcut() {
+        Q_ASSERT(this->tabSelectionHistory.size() == 2 && "Unexpected history size.");
+        
+        if (this->tabSelectionHistory[1] > -1 && this->tabSelectionHistory[1] < this->fileTabs->count()) {
+            this->fileTabs->setCurrentIndex(this->tabSelectionHistory[1]);
+        }
+    }
+
     void TextEditor::onFileChangedOutside(const QString& path) noexcept {
         this->onFileChangedOutsideRecursive(path, 0);
     }
@@ -186,10 +194,17 @@ namespace CustomWidgets {
     }
 
     void TextEditor::onTabMoved(int from, int to) noexcept {
-        Q_ASSERT(from < this->openFiles.size() && "The 'from' index is out of range.");
-        Q_ASSERT(to < this->openFiles.size() && "The 'to' index is out of range.");
+        Q_ASSERT(from > -1 && from < this->openFiles.size() && "The 'from' index is out of range.");
+        Q_ASSERT(to > -1 && to < this->openFiles.size() && "The 'to' index is out of range.");
 
         this->openFiles.move(from, to);
+    }
+
+    void TextEditor::onTabChanged(int index) noexcept {
+        Q_ASSERT(this->tabSelectionHistory.size() == 2 && "Unexpected history size.");
+
+        this->tabSelectionHistory[1] = this->tabSelectionHistory[0];
+        this->tabSelectionHistory[0] = index;
     }
 
     void TextEditor::onRetranslateUI() noexcept {
