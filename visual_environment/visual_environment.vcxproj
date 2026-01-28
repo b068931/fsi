@@ -367,6 +367,24 @@
   <ItemGroup>
     <Image Include="executable_icon.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <Font Include="JetBrainsMono-Bold.ttf" />
+    <Font Include="JetBrainsMono-BoldItalic.ttf" />
+    <Font Include="JetBrainsMono-ExtraBold.ttf" />
+    <Font Include="JetBrainsMono-ExtraBoldItalic.ttf" />
+    <Font Include="JetBrainsMono-ExtraLight.ttf" />
+    <Font Include="JetBrainsMono-ExtraLightItalic.ttf" />
+    <Font Include="JetBrainsMono-Italic.ttf" />
+    <Font Include="JetBrainsMono-Light.ttf" />
+    <Font Include="JetBrainsMono-LightItalic.ttf" />
+    <Font Include="JetBrainsMono-Medium.ttf" />
+    <Font Include="JetBrainsMono-MediumItalic.ttf" />
+    <Font Include="JetBrainsMono-Regular.ttf" />
+    <Font Include="JetBrainsMono-SemiBold.ttf" />
+    <Font Include="JetBrainsMono-SemiBoldItalic.ttf" />
+    <Font Include="JetBrainsMono-Thin.ttf" />
+    <Font Include="JetBrainsMono-ThinItalic.ttf" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
     <Import Project="$(QtMsBuild)\qt.targets" />

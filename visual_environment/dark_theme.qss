@@ -4,7 +4,7 @@
 QMainWindow, QDialog, QWidget {
     background-color: #262730;
     color: #dedede;
-    font-family: Consolas, "Segoe UI", Arial, sans-serif;
+    font-family: "JetBrains Mono", monospace;
     font-size: 11pt;
 }
 

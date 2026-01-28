@@ -7,6 +7,7 @@
 #include <QObject>
 #include <QTextStream>
 #include <QStyleFactory>
+#include <QtLogging>
 #include <QtWidgets/QApplication>
 
 #include "main_window.h"
@@ -23,7 +24,12 @@
 //       It might be possible to implement some mechanism which will automatically catch exceptions and push them to event queue, and then process them (show message box, etc.) in the main event loop.
 
 int main(int argc, char *argv[]) {
-    constexpr const char applicationBaseStyle[]{ "Fusion" };
+    constexpr char applicationBaseStyle[]{ "Fusion" };
+    constexpr char fontsRootDirectory[]{ ":/fonts" };
+
+    // Similar message pattern to "module_mediator".
+    qSetMessagePattern("[%{type}] [TIME: %{time process}] " \
+        "[FILE: %{file}, FILE LINE: %{line}, FUNCTION NAME: %{function}] %{message}");
 
     // Setup application's main scope: QApplication, windows, services, main components, etc.
     QApplication application(argc, argv);
@@ -31,11 +37,15 @@ int main(int argc, char *argv[]) {
         QApplication::setStyle(QStyleFactory::create(applicationBaseStyle));
     }
 
+    // Set up style component first, so that if other components want to create widgets 
+    // during their initialization, they will have the correct style applied.
+    Components::ApplicationStyle::ApplicationStylesManager applicationStyle(
+        Components::ApplicationStyle::ApplicationStylesManager::Style::Dark,
+        fontsRootDirectory
+    );
+
     Components::Internationalization::InterfaceTranslator i18n;
     Utility::BackgroundService<Components::FSITools::FSIToolsAdapter> languageService;
-    Components::ApplicationStyle::ApplicationStylesManager applicationStyle(
-        Components::ApplicationStyle::ApplicationStylesManager::Style::Dark
-    );
 
     Windows::AboutApplicationWindow aboutWindow;
     Windows::MainWindow mainWindow(&aboutWindow, &languageService, &i18n, &applicationStyle);

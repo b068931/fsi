@@ -1,7 +1,12 @@
 #include <QTextStream>
 #include <QFile>
-#include <array>
+#include <QSet>
+#include <QDirIterator>
 #include <QApplication>
+#include <QFontDatabase>
+#include <QStringList>
+#include <array>
+
 #include "application_styles_manager.h"
 
 constexpr const char* g_AvailableStylesMappings[] = {
@@ -10,9 +15,14 @@ constexpr const char* g_AvailableStylesMappings[] = {
 };
 
 namespace Components::ApplicationStyle {
-    ApplicationStylesManager::ApplicationStylesManager(Style preselectedStyle, QObject* parent)
+    ApplicationStylesManager::ApplicationStylesManager(
+        Style preselectedStyle,
+        const QString& fontsRoot,
+        QObject* parent
+    )
         : QObject(parent), currentStyle(Style::NoStyle)
     {
+        ApplicationStylesManager::loadCustomFonts(fontsRoot);
         this->setStyle(preselectedStyle);
     }
 
@@ -67,4 +77,46 @@ namespace Components::ApplicationStyle {
         return false;
     }
 
+    void ApplicationStylesManager::loadCustomFonts(const QString& fontsRoot) {
+        if (fontsRoot.isEmpty()) {
+            qDebug() << "ApplicationStylesManager::loadCustomFonts: No fonts root directory specified.";
+            return;
+        }
+
+        QDirIterator fontsIterator{ fontsRoot, QDirIterator::Subdirectories };
+        QSet<QString> loadedFontFamilies;
+
+        while (fontsIterator.hasNext()) {
+            QFile fontFile{ fontsIterator.next() };
+            if (fontFile.open(QFile::ReadOnly)) {
+                int fontId = QFontDatabase::addApplicationFontFromData(fontFile.readAll());
+                if (fontId != -1) {
+                    QStringList fontFamilies = QFontDatabase::applicationFontFamilies(fontId);
+                    for (const QString& family : fontFamilies) {
+                        loadedFontFamilies.insert(family);
+                    }
+                }
+                else {
+                    qWarning() << "ApplicationStylesManager::loadCustomFonts: Failed to load font from file:" << fontFile.fileName();
+                }
+
+                fontFile.close();
+            }
+            else {
+                qWarning() << "ApplicationStylesManager::loadCustomFonts: Unable to open font file:" << fontFile.fileName();
+            }
+        }
+
+        if (loadedFontFamilies.empty()) {
+            qDebug() << "No custom fonts were loaded from the specified directory:" << fontsRoot;
+        }
+        else {
+            QStringList fontFamilies;
+            for (const QString& fontFamily : loadedFontFamilies) {
+                fontFamilies += fontFamily;
+            }
+
+            qDebug() << "Loaded custom fonts:" << fontFamilies.join(", ");
+        }
+    }
 }

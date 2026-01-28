@@ -10,6 +10,7 @@ namespace Components::Internationalization {
     /// <summary>
     /// Component which manages application translation.
     /// Automatically emits the retranslateUI() signal when the language is changed.
+    /// When constructed, it probes the system locales to set the initial application language.
     /// </summary>
     class InterfaceTranslator final : public QObject {
         Q_OBJECT

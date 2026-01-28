@@ -93,6 +93,12 @@
     <Filter Include="Resource Files\Menu Icons">
       <UniqueIdentifier>{4734d34c-d785-4239-a170-5c2364652468}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Font Files">
+      <UniqueIdentifier>{dc74dc4f-e17e-4ed9-8543-16ec4ddeef47}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Font Files\JetBrains Mono">
+      <UniqueIdentifier>{e0400ee3-9014-468e-8474-985f51e256e2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="main_window.ui">
@@ -314,5 +320,55 @@
     <Image Include="executable_icon.ico">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="JetBrainsMono-Bold.ttf">
+      <Filter>Resource Files\Font Files\JetBrains Mono</Filter>
+    </Font>
+    <Font Include="JetBrainsMono-BoldItalic.ttf">
+      <Filter>Resource Files\Font Files\JetBrains Mono</Filter>
+    </Font>
+    <Font Include="JetBrainsMono-ExtraBold.ttf">
+      <Filter>Resource Files\Font Files\JetBrains Mono</Filter>
+    </Font>
+    <Font Include="JetBrainsMono-ExtraBoldItalic.ttf">
+      <Filter>Resource Files\Font Files\JetBrains Mono</Filter>
+    </Font>
+    <Font Include="JetBrainsMono-ExtraLight.ttf">
+      <Filter>Resource Files\Font Files\JetBrains Mono</Filter>
+    </Font>
+    <Font Include="JetBrainsMono-ExtraLightItalic.ttf">
+      <Filter>Resource Files\Font Files\JetBrains Mono</Filter>
+    </Font>
+    <Font Include="JetBrainsMono-Italic.ttf">
+      <Filter>Resource Files\Font Files\JetBrains Mono</Filter>
+    </Font>
+    <Font Include="JetBrainsMono-Light.ttf">
+      <Filter>Resource Files\Font Files\JetBrains Mono</Filter>
+    </Font>
+    <Font Include="JetBrainsMono-LightItalic.ttf">
+      <Filter>Resource Files\Font Files\JetBrains Mono</Filter>
+    </Font>
+    <Font Include="JetBrainsMono-Medium.ttf">
+      <Filter>Resource Files\Font Files\JetBrains Mono</Filter>
+    </Font>
+    <Font Include="JetBrainsMono-MediumItalic.ttf">
+      <Filter>Resource Files\Font Files\JetBrains Mono</Filter>
+    </Font>
+    <Font Include="JetBrainsMono-Regular.ttf">
+      <Filter>Resource Files\Font Files\JetBrains Mono</Filter>
+    </Font>
+    <Font Include="JetBrainsMono-SemiBold.ttf">
+      <Filter>Resource Files\Font Files\JetBrains Mono</Filter>
+    </Font>
+    <Font Include="JetBrainsMono-SemiBoldItalic.ttf">
+      <Filter>Resource Files\Font Files\JetBrains Mono</Filter>
+    </Font>
+    <Font Include="JetBrainsMono-Thin.ttf">
+      <Filter>Resource Files\Font Files\JetBrains Mono</Filter>
+    </Font>
+    <Font Include="JetBrainsMono-ThinItalic.ttf">
+      <Filter>Resource Files\Font Files\JetBrains Mono</Filter>
+    </Font>
   </ItemGroup>
 </Project>
