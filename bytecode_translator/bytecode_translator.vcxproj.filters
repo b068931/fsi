@@ -317,4 +317,9 @@
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\examples\use-after-free.tfsi">
+      <Filter>Examples</Filter>
+    </None>
+  </ItemGroup>
 </Project>

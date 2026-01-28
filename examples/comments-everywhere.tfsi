@@ -3,7 +3,7 @@
 from prts import </*test*/io.log.info,/*test*/>
 
 $define-string message ''''Hello World! In order to allow comments in these places I had to make so many questionable decisions.''''
-
+function throwaway0();
 function throwaway(
 /*test*/    one-byte/*fs*/ nothing-one,/*test*/
     /*test*/one-byte /*fs*/ nothing-two,   /*test*/one-byte nothing-three/*test*/
@@ -17,7 +17,7 @@ function throwaway(
     $declare memory message-storage;
     $declare memory null;
     
-    /*test*/throwaway(/*test*/);
+    /*test*/throwaway0(/*test*/);
     /*test*/message-storage/*sdf*/:/*sdf*/ prts->memory.allocate/*sdf*/(/*test*/size-of eight-bytes message/*test*/)
     /*test*/copy-string /*test*/ 
         variable memory message-storage/*test*/, /*test*/

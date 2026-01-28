@@ -1,0 +1,27 @@
+$stack-size d100;
+from prts import <memory.allocate, memory.deallocate>
+
+function free(memory pointer) {
+    pointer: prts->memory.deallocate()
+}
+
+/* this code demonstrates a use-after-free vulnerability */
+/* at the moment the language does not have any protections against this */
+/* however, runtime tries to catch this by setting freed memory descriptor to 0xff pattern */
+/* if that memory was not reused by the allocator, the process will crash trying to access the 0xffff... pattern */
+
+function main() {
+    $main-function main;
+    $expose-function main;
+
+    $declare memory storage;
+    $declare one-byte value;
+    $declare eight-bytes index;
+
+    storage: prts->memory.allocate(immediate eight-bytes d1)
+    free(variable memory storage)
+
+    
+    move variable eight-bytes index, immediate eight-bytes d0;
+    move variable one-byte value, dereference one-byte storage[index];
+}

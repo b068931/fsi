@@ -152,6 +152,7 @@ state_settings& configure_instruction_arguments(states_builder_type& builder) {
 	)
 		.set_error_message("Unexpected token inside instruction. You were expected to introduce a keyword for another argument.")
 		.add_handle_token(source_file_token::expression_end)
+        .add_handle_token(source_file_token::function_arguments_end)
 		.set_redirection_for_tokens(
 			{
 				source_file_token::expression_end, source_file_token::function_arguments_end

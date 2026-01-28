@@ -153,6 +153,13 @@ namespace backend {
             interoperation::thread_group_deallocate(thread_group_id, base);
         }
 
+        // Clear the allocation descriptor to avoid dangling pointers.
+        // This is not guaranteed to work, as allocator may have reused the memory already.
+        // But at least this increases the chances that the application will crash instead of silently corrupting data.
+        // Windows kills all process that try to access upper or lower ~16kb of the address space, so this should crash
+        // immediately.
+        std::memset(address, 0xff, sizeof(std::uint64_t) * 3);
+
         // Deallocate the memory descriptor for the thread.
         interoperation::thread_deallocate(thread_id, address);
     }
