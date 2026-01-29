@@ -4,7 +4,6 @@
 #include "instruction_builder.h"
 
 class load_builder : public instruction_builder {
-private:
 	void check_saved_variable_type(std::uint8_t type) {
 		this->write_bytes('\x41'); //cmp byte ptr [r9 + 8], type
 		this->write_bytes('\x80');

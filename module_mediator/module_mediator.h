@@ -39,10 +39,8 @@ namespace module_mediator::exceptions {
 
 namespace module_mediator {
 	class engine_module_mediator {
-	private:
-		class module_part_implementation : public module_part {
-		private:
-			engine_module_mediator* mediator;
+        class module_part_implementation : public module_part {
+            engine_module_mediator* mediator;
 
 		public:
 			module_part_implementation(engine_module_mediator* module_mediator)

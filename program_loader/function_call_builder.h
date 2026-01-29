@@ -5,7 +5,6 @@
 #include "general_function_call_bulider.h"
 
 class function_call_builder : public general_function_call_builder {
-private:
     std::int32_t stack_address;
     std::uint32_t stack_allocation_size;
 

@@ -5,7 +5,6 @@
 #include "variable_with_id.h"
 
 class generic_variable : public variable_with_id {
-private:
 	std::uint8_t real_type;
 	std::uint8_t active_type;
 

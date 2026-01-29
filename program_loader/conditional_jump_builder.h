@@ -5,7 +5,6 @@
 #include "machine_codes_instruction_builder.h"
 
 class conditional_jump_builder : public machine_codes_instruction_builder {
-private:
 	const std::uint32_t jump_rel32 = 7;
 
 public:

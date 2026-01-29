@@ -10,7 +10,6 @@
 /// </summary>
 template<typename value_type, typename priority_type>
 class priority_list {
-private:
     // A questionable design choice, but I see no other way to ensure ordering based on keys,
     // while still allowing modification of the value_type.
     struct priority_node {
@@ -34,7 +33,6 @@ private:
 
 public:
     class proxy {
-    private:
         using iterator_type = std::multiset<priority_node, priority_comparator>::iterator;
         proxy(iterator_type elem)
             :associated_element{ new iterator_type{ std::move(elem) }}

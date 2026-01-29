@@ -11,7 +11,6 @@ namespace generic_parser {
     //this class is used to reduce amount of calls to std::ifstream
     template<file_position_type block_size>
     class block_reader {
-    private:
         file_position_type current_loaded_block;
         char* block;
 

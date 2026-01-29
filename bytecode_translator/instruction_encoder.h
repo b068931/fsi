@@ -8,7 +8,6 @@
 #include "source_file_token.h"
 
 class instruction_encoder : public structure_builder::variable_visitor {
-private:
     std::vector<unsigned char> instruction_symbols;
     std::size_t position_in_type_bytes{2};
 

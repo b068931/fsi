@@ -12,7 +12,6 @@
 #include "program_compilation_error.h"
 
 class instruction_builder {
-private:
 	std::uint8_t current_variable_type;
 	std::uint8_t argument_index;
 

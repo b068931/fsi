@@ -14,7 +14,6 @@ public:
 
 template<typename filter_type>
 class generic_instruction_check : public instruction_check {
-private:
     std::vector<source_file_token> instruction_list;
     filter_type filter;
 

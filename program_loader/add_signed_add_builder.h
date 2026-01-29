@@ -5,7 +5,6 @@
 #include "arithmetic_instruction_builder.h"
 
 class add_signed_add_builder : public arithmetic_instruction_builder {
-private:
 	void add_r8_to_rax() {
 		std::uint8_t rex = '\x44';
 

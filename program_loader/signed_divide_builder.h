@@ -5,7 +5,6 @@
 #include "complex_arithmetic_instruction_builder.h"
 
 class signed_divide_builder : public complex_arithmetic_instruction_builder {
-private:
 	void load_sign_extended_value() {
 		this->zero_rax();
 

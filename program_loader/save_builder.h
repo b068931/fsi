@@ -4,7 +4,6 @@
 #include "instruction_builder.h"
 
 class save_builder : public instruction_builder {
-private:
 	std::uint8_t used_variable_type{};
 
 	template<typename T>

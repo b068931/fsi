@@ -5,7 +5,6 @@
 #include "machine_codes_instruction_builder.h"
 
 class arithmetic_instruction_builder : public machine_codes_instruction_builder { //implements visits for immediate values and saves them in r8
-private:
 	std::uint8_t active_type;
 
 	template<typename T>

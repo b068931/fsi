@@ -4,7 +4,7 @@
 #include "pch.h"
 #include "resource_container.h"
 
-struct thread_structure : public resource_container {
+struct thread_structure : resource_container {
 	std::size_t program_container{};
 
 	thread_structure() = default;

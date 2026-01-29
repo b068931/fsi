@@ -9,13 +9,12 @@
 #include "../module_mediator/local_crash_handle_setup.h"
 
 class thread_manager {
-private:
     /*
-    * it should be noted that scheduler works ONLY with unique ids,
+    * It should be noted that scheduler works ONLY with unique ids,
     * and resource_module may reuse id after object with specific id was deleted.
-    * this means that we must delete an object in this order:
-    * 1. delete from scheduler
-    * 2. delete from resource_manager
+    * This means that we must delete an object in this order:
+    * 1. Delete from scheduler.
+    * 2. Delete from resource_manager.
     */
 
     scheduler scheduler;
@@ -62,7 +61,8 @@ private:
                 break;
             }
 
-            this->active_threads_counter.fetch_add(1, std::memory_order_relaxed); //all other modifications are synchronized with mutexes. this is one just needs atomicity
+            // All other modifications are synchronized with mutexes. This is one just needs atomicity.
+            this->active_threads_counter.fetch_add(1, std::memory_order_relaxed);
             CONTROL_CODE_TEMPLATE_LOAD_PROGRAM(
                 thread_structure->execution_thread_state, 
                 currently_running_thread_information->thread_state,

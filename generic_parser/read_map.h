@@ -28,7 +28,6 @@ namespace generic_parser {
 
     template<typename parameters_enumeration_type>
     class parameters_container {
-    private:
         std::unordered_map<parameters_enumeration_type, std::any> parameters;
         bool contains_parameter(parameters_enumeration_type key) {
             return this->parameters.count(key) == 1;
@@ -77,7 +76,6 @@ namespace generic_parser {
 
     template<typename token_type, typename context_key_type, typename objects_type, typename parameters_object_type, typename parameters_enumeration_type>
     class state_base {
-    private:
         template<typename my_parameters_object>
         struct get_function_signature {
             using value = bool(parameters_container<parameters_enumeration_type>&, my_parameters_object&);
@@ -153,7 +151,6 @@ namespace generic_parser {
 
     template<typename token_type, typename context_key_type, typename objects, typename parameters_object_type, typename parameters_enumeration_type>
     class state : public state_base<token_type, context_key_type, objects, parameters_object_type, parameters_enumeration_type> {
-    private:
         using base = state_base<token_type, context_key_type, objects, parameters_object_type, parameters_enumeration_type>;
 
     public:
@@ -174,7 +171,6 @@ namespace generic_parser {
 
     template<typename token_type, typename context_key_type, typename objects_type, typename parameters_enumeration_type>
     class state<token_type, context_key_type, objects_type, void, parameters_enumeration_type> : public state_base<token_type, context_key_type, objects_type, void, parameters_enumeration_type> {
-    private:
         using base = state_base<token_type, context_key_type, objects_type, void, parameters_enumeration_type>;
 
     public:
@@ -401,7 +397,6 @@ namespace generic_parser {
 
     template<typename token_type, typename context_key_type, typename objects_type, typename parameters_object_type, typename parameters_enumeration_type>
     class read_map : public read_map_base<token_type, context_key_type, objects_type, parameters_object_type, parameters_enumeration_type> {
-    private:
         using base = read_map_base<token_type, context_key_type, objects_type, parameters_object_type, parameters_enumeration_type>;
 
     public:
@@ -425,7 +420,6 @@ namespace generic_parser {
 
     template<typename token_type, typename context_key_type, typename objects_type, typename parameters_enumeration_type>
     class read_map<token_type, context_key_type, objects_type, void, parameters_enumeration_type> : public read_map_base<token_type, context_key_type, objects_type, void, parameters_enumeration_type> {
-    private:
         using base = read_map_base<token_type, context_key_type, objects_type, void, parameters_enumeration_type>;
 
     public:
@@ -449,7 +443,6 @@ namespace generic_parser {
 
     template<typename token_type, typename context_key_type, typename objects, typename parameters_object_type, typename parameters_enumeration_type>
     class states_builder {
-    private:
         template<typename my_parameters_object>
         struct get_function_signature {
             using value = void(objects&, parameters_object_type&, read_map<token_type, context_key_type, objects, my_parameters_object, parameters_enumeration_type>&);
@@ -480,7 +473,6 @@ namespace generic_parser {
 
         template<typename parameters_object, typename function_signature>
         class anonymous_state : public state_type {
-        private:
             std::function<function_signature> lambda_function;
 
         public:
@@ -500,7 +492,6 @@ namespace generic_parser {
 
         template<typename function_signature>
         class anonymous_state<void, function_signature> : public state_type {
-        private:
             std::function<function_signature> lambda_function;
 
         public:
@@ -554,7 +545,6 @@ namespace generic_parser {
 
     template<typename token_type, typename context_key_type, typename objects_type, typename parameters_object_type, typename parameters_enumeration_type>
     class state_settings {
-    private:
         using states_builder_type =
             states_builder<token_type, context_key_type, objects_type, parameters_object_type, parameters_enumeration_type>;
 

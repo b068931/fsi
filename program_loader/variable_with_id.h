@@ -7,7 +7,6 @@
 using entity_id = std::uint64_t;
 
 class variable_with_id : public variable {
-private:
 	entity_id id;
 
 public:

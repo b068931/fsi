@@ -5,7 +5,6 @@
 #include "variable_with_id.h"
 
 class program_compilation_error : public std::logic_error {
-private:
 	entity_id id_associated_with_error{};
 
 public:

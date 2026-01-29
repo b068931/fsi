@@ -7,7 +7,6 @@
 #include "variable_with_id.h" //entity_id
 
 class jump_table_builder {
-private:
 	std::vector<std::pair<entity_id, std::uint64_t>> function_addresses;
 	std::vector<std::tuple<entity_id, std::uint32_t, std::uint32_t, std::uint64_t>> jump_addresses;
 

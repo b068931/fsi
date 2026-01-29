@@ -6,7 +6,6 @@
 #include "run_reader.h"
 
 struct runs_container {
-public:
 	struct engine_module {
 		std::size_t module_id{};
 		std::map<entity_id, std::size_t> module_functions;

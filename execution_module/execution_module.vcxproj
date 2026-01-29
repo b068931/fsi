@@ -32,7 +32,7 @@
     <ClInclude Include="thread_manager.h" />
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="asm_functions.asm">
+    <MASM Include="control_code_templates.asm">
       <FileType>Document</FileType>
     </MASM>
   </ItemGroup>

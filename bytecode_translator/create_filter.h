@@ -18,7 +18,7 @@ private:
     };
 
     template<template<typename...> class wrapper, typename filter, typename... other>
-    struct filter_wrapper<wrapper<filter, other...>> : public filter_wrapper<wrapper<other...>> {
+    struct filter_wrapper<wrapper<filter, other...>> : filter_wrapper<wrapper<other...>> {
         using base_class = filter_wrapper<typename_array_primitives::typename_array<other...>>;
         bool check(const structure_builder::instruction& instruction) {
             if (this->base_class::check(instruction)) { //at first we use base class filters

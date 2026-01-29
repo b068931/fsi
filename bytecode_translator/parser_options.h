@@ -9,7 +9,6 @@
 #include "../generic_parser/token_generator.h"
 
 class parser_options {
-private:
 	static const generic_parser::token_generator<
 		source_file_token,
 		structure_builder::context_key

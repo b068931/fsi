@@ -13,7 +13,6 @@ namespace compression_algorithms {
     /// with references to earlier occurrences, reducing overall size.
     /// </summary>
     class sequence_reduction {
-    private:
         /// <summary>
         /// Internal buffer used to store processed data during compression and decompression.
         /// </summary>

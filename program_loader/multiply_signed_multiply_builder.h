@@ -5,7 +5,6 @@
 #include "complex_arithmetic_instruction_builder.h"
 
 class multiply_signed_multiply_builder : public complex_arithmetic_instruction_builder {
-private:
 	void multiply_rax_using_r8() {
 		this->use_r8_on_reg_with_two_opcodes(this->get_code_front(), this->get_code(1), false, this->get_active_type(), false, this->get_code_back());
 	}

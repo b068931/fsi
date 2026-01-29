@@ -5,7 +5,6 @@
 
 template<typename T>
 class variable_imm : public variable {
-private:
 	T value;
 
 public:

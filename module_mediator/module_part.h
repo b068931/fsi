@@ -59,7 +59,6 @@ namespace module_mediator {
     };
 
     class arguments_string_builder {
-    private:
         template<typename... types>
         struct enumerate_type_sizes {
             static constexpr std::size_t sizes[]{ sizeof(types)... };

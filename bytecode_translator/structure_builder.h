@@ -71,7 +71,7 @@ public:
         virtual ~variable() = default;
     };
 
-    struct immediate_variable : public variable {
+    struct immediate_variable : variable {
         immediate_type imm_val;
         source_file_token type;
 
@@ -92,7 +92,7 @@ public:
         }
     };
 
-    struct regular_variable : public variable, public entity {
+    struct regular_variable : variable, entity {
         source_file_token type;
         std::string name;
 
@@ -107,7 +107,7 @@ public:
         }
     };
 
-    struct function_address : public variable {
+    struct function_address : variable {
         function* func;
 
         function_address()
@@ -120,7 +120,7 @@ public:
         }
     };
 
-    struct pointer_dereference : public variable {
+    struct pointer_dereference : variable {
         regular_variable* pointer_variable;
         std::vector<regular_variable*> derefernce_indexes;
 
@@ -134,7 +134,7 @@ public:
         }
     };
 
-    struct jump_point_variable : public variable {
+    struct jump_point_variable : variable {
         jump_point* point;
 
         jump_point_variable(jump_point* jump_point)
@@ -147,7 +147,7 @@ public:
         }
     };
 
-    struct module_variable : public variable {
+    struct module_variable : variable {
         engine_module* mod;
 
         module_variable(engine_module* module_pointer)
@@ -160,7 +160,7 @@ public:
         }
     };
 
-    struct module_function_variable : public variable {
+    struct module_function_variable : variable {
         module_function* func;
 
         module_function_variable(module_function* mod_func)
@@ -173,7 +173,7 @@ public:
         }
     };
 
-    struct string_constant : public variable {
+    struct string_constant : variable {
         string* value;
         string_constant(string* string_value)
             :value{ string_value }
@@ -202,7 +202,7 @@ public:
         {}
     };
 
-    struct jump_point : public entity {
+    struct jump_point : entity {
         std::uint32_t index;
         std::string name;
 
@@ -219,7 +219,7 @@ public:
         {}
     };
 
-    struct function : public entity {
+    struct function : entity {
         std::list<regular_variable> arguments;
         std::list<regular_variable> locals; //You can't use variables BEFORE their declaration, but in byte code used variables will be known at compile time. Also decl is not an actual instruction, that's why there is a "source_file_token::special_instruction" before it.
 
@@ -252,7 +252,7 @@ public:
         {}
     };
 
-    struct string : public entity {
+    struct string : entity {
         std::string value;
         string(entity_id object_id)
             :entity{ object_id },

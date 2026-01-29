@@ -14,7 +14,6 @@
 namespace module_mediator::parser::components {
     using module_callable_function_type = return_value(*)(arguments_string_type);
     class function {
-    private:
         std::string name; //this function's name. used to identify its index
         arguments_string_type arguments_symbols; //a sequence of bytes that represent this function's arguments
 
@@ -102,7 +101,6 @@ namespace module_mediator::parser::components {
     };
 
     class engine_module {
-    private:
         std::string name; //used to find engine_module's index
         HMODULE loaded_module;
 

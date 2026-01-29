@@ -5,7 +5,6 @@
 #include "instruction_builder.h"
 
 class machine_codes_instruction_builder : public instruction_builder {
-private:
 	const std::vector<char>* machine_codes;
 
 protected:

@@ -12,7 +12,6 @@ class module_function_call_builder : public general_function_call_builder {
 	1. collect information about variables, calculate needed stack size,
 	allocate it and fill in first part of the args string
 	2. fill in second part of the args string*/
-private:
 	std::uint32_t stack_allocation_size;
 
 	const runs_container::engine_module* associated_module;

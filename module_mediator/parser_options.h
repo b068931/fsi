@@ -11,8 +11,7 @@
 
 namespace module_mediator::parser {
 	class parser_options {
-	private:
-		static const generic_parser::token_generator<
+        static const generic_parser::token_generator<
 			components::engine_module_builder::file_tokens,
 			components::engine_module_builder::context_keys
 		>::symbols_pair main_context;

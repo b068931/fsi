@@ -4,7 +4,6 @@
 #include "apply_right_hand_bits_on_left_hand_binary.h"
 
 class bits_shift_builder : public apply_right_hand_bits_on_left_hand_binary {
-private:
 	void move_r8_to_rcx() {
 		this->write_bytes('\x4c');
 		this->write_bytes('\x89');

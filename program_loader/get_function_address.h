@@ -4,7 +4,6 @@
 #include "instruction_builder.h"
 
 class get_function_address : public instruction_builder {
-private:
 	std::uint32_t function_displacement;
 
 public:

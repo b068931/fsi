@@ -5,7 +5,6 @@
 #include "machine_codes_instruction_builder.h"
 
 class compare_builder : public machine_codes_instruction_builder {
-private:
 	std::uint8_t argument_index; //first argument will be placed in rax, while second one will be placed in r8
 
 	template<typename T>

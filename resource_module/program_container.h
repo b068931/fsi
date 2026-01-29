@@ -5,7 +5,7 @@
 #include "resource_container.h"
 #include "program_context.h"
 
-struct program_container : public resource_container {
+struct program_container : resource_container {
 	std::size_t threads_count{ 0 };
 	program_context* context{};
 

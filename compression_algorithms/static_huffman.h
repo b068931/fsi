@@ -21,7 +21,6 @@ namespace compression_algorithms {
     /// <typeparam name="char_type">Type used for individual characters/symbols.</typeparam>
     template<typename size_type, typename char_type>
     class static_huffman {
-    private:
         /// <summary>
         /// Structure representing a node in the Huffman encoding tree.
         /// </summary>
@@ -70,7 +69,6 @@ namespace compression_algorithms {
         /// Ensures proper cleanup of all objects at destruction time.
         /// </summary>
         class multi_unique_pointer {
-        private:
             /// <summary>Collection of pointers to managed objects.</summary>
             std::vector<void*> objects{};
 

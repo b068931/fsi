@@ -12,8 +12,7 @@
 namespace generic_parser {
 	template<typename token_type, typename context_key_type, typename builder_type>
 	class parser_facade {
-	private:
-		//values are initialized in the order they appear in class, so generator and builder will both get valid pointers to this class
+        //values are initialized in the order they appear in class, so generator and builder will both get valid pointers to this class
 		std::vector<std::pair<std::string, token_type>> names_stack; //this field will be passed as parameter to both builder and token_generator, builder will use names_stack to get tokens instead of names
 		token_type end_of_file;
 

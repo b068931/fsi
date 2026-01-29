@@ -5,7 +5,6 @@
 #include "variable_with_id.h"
 
 class dereferenced_pointer : public variable_with_id {
-private:
 	std::uint8_t active_type;
 	std::vector<entity_id> dereference_indexes;
 

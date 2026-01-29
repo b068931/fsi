@@ -10,7 +10,6 @@ template<typename container>
 class run_reader {
 public:
     class run { //used to access bytes ONLY from specific run
-    private:
         generic_parser::file_position_type run_start;
         generic_parser::file_position_type run_position;
         generic_parser::file_position_type run_size;
