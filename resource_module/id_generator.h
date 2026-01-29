@@ -20,7 +20,7 @@ private:
 public:
     static id_type get_id() {
 #ifndef NDEBUG
-        std::lock_guard scope{ id_generator::lock };
+        std::lock_guard scope{ lock };
         if (!free_ids.empty()) {
             id_type id = free_ids.top();
             free_ids.pop();
@@ -35,7 +35,7 @@ public:
     }
     static void free_id(id_type id) {
 #ifndef NDEBUG
-        std::lock_guard scope{ id_generator::lock };
+        std::lock_guard scope{ lock };
         free_ids.push(id);
         assert(id != 0);
 #else

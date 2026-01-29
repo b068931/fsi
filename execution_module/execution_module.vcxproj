@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="assembly_functions.h" />
+    <ClInclude Include="control_code_templates.h" />
     <ClInclude Include="clock_list.h" />
     <ClInclude Include="executions_backend_functions.h" />
     <ClInclude Include="execution_module.h" />

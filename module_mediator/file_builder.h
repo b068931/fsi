@@ -17,7 +17,7 @@ namespace module_mediator::parser::components {
 	class engine_module_builder {
 	public:
 		struct builder_parameters {
-			module_mediator::module_part* module_part{};
+			module_part* module_part{};
 			std::vector<std::string> arguments{
 			    "signed-one-byte",
 			    "one-byte",
@@ -81,8 +81,8 @@ namespace module_mediator::parser::components {
 
 	public:
 		engine_module_builder(
-			std::vector<std::pair<std::string, engine_module_builder::file_tokens>>*,
-			generic_parser::token_generator<engine_module_builder::file_tokens, context_keys>* token_generator,
+			std::vector<std::pair<std::string, file_tokens>>*,
+			generic_parser::token_generator<file_tokens, context_keys>* token_generator,
 			engine_module_mediator* module_mediator
 		) //"mediator" will be used to initialize engine_module objects
 			:mediator{ module_mediator },
@@ -93,7 +93,7 @@ namespace module_mediator::parser::components {
 
 		const std::string& error() { return this->parse_map.error(); }
 		bool is_working() { return this->parse_map.is_working(); }
-		void handle_token(engine_module_builder::file_tokens token) {
+		void handle_token(file_tokens token) {
 			this->parse_map.handle_token(&this->modules, token, &this->parameters);
 		}
 		result_type get_value() { return std::move(this->modules); }

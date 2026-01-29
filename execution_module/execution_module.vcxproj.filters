@@ -53,7 +53,7 @@
     <ClInclude Include="executions_backend_functions.h">
       <Filter>Header Files\Program Threads Management</Filter>
     </ClInclude>
-    <ClInclude Include="assembly_functions.h">
+    <ClInclude Include="control_code_templates.h">
       <Filter>Header Files\Executors Management</Filter>
     </ClInclude>
     <ClInclude Include="module_interoperation.h">

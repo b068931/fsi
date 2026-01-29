@@ -20,7 +20,7 @@ protected:
 		this->write_bytes('\x00');
 
 		this->write_bytes('\x75');
-		this->write_bytes(static_cast<std::uint8_t>(::program_termination_code_size));
+		this->write_bytes(static_cast<std::uint8_t>(program_termination_code_size));
 
 		this->generate_program_termination_code(termination_codes::division_by_zero);
 	}

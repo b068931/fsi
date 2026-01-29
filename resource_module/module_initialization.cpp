@@ -10,10 +10,10 @@ namespace {
 
 namespace interoperation {
 	module_mediator::module_part* get_module_part() {
-		return ::part;
+		return part;
 	}
 }
 
 void initialize_m(module_mediator::module_part* module_part) {
-	::part = module_part;
+	part = module_part;
 }

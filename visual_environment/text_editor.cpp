@@ -24,7 +24,7 @@
 namespace CustomWidgets {
     QString TextEditor::OpenedFile::getNormalizedName() const {
         if (this->filePath.isEmpty()) {
-            return tr(g_Messages[MessageKeys::g_TemporaryFileName]);
+            return tr(g_Messages[g_TemporaryFileName]);
         }
 
         return this->filePath;
@@ -103,7 +103,7 @@ namespace CustomWidgets {
         this->workingDirectory->setContextMenuPolicy(Qt::CustomContextMenu);
 
         this->workingDirectory->setStatusTip(
-            tr(g_Messages[MessageKeys::g_TooltipWorkingDirectoryView])
+            tr(g_Messages[g_TooltipWorkingDirectoryView])
         );
     }
 
@@ -112,12 +112,12 @@ namespace CustomWidgets {
 
         // Setup the context menu for the working directory
         this->workingDirectoryContextMenu = new QMenu(this);
-        this->openAction = this->workingDirectoryContextMenu->addAction(tr(g_Messages[MessageKeys::g_ContextMenuOpen]));
+        this->openAction = this->workingDirectoryContextMenu->addAction(tr(g_Messages[g_ContextMenuOpen]));
         this->workingDirectoryContextMenu->addSeparator();
-        this->newFileAction = this->workingDirectoryContextMenu->addAction(tr(g_Messages[MessageKeys::g_ContextMenuNewFile]));
-        this->newDirectoryAction = this->workingDirectoryContextMenu->addAction(tr(g_Messages[MessageKeys::g_ContextMenuNewDirectory]));
+        this->newFileAction = this->workingDirectoryContextMenu->addAction(tr(g_Messages[g_ContextMenuNewFile]));
+        this->newDirectoryAction = this->workingDirectoryContextMenu->addAction(tr(g_Messages[g_ContextMenuNewDirectory]));
         this->workingDirectoryContextMenu->addSeparator();
-        this->removeAction = this->workingDirectoryContextMenu->addAction(tr(g_Messages[MessageKeys::g_ContextMenuRemove]));
+        this->removeAction = this->workingDirectoryContextMenu->addAction(tr(g_Messages[g_ContextMenuRemove]));
     }
 
     void TextEditor::setDefaultSplitterRatio() {
@@ -169,7 +169,7 @@ namespace CustomWidgets {
         try {
             QFileInfo fileInfo(filePath);
             if (!fileInfo.isFile()) {
-                throw tr(g_Messages[MessageKeys::g_MessageBoxFileOpenErrorMessage]).arg(filePath);
+                throw tr(g_Messages[g_MessageBoxFileOpenErrorMessage]).arg(filePath);
             }
 
             QString absoluteFilePath = fileInfo.absoluteFilePath();
@@ -182,11 +182,11 @@ namespace CustomWidgets {
 
             QFile file(filePath);
             if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-                throw tr(g_Messages[MessageKeys::g_MessageBoxFileOpenErrorMessage]).arg(filePath);
+                throw tr(g_Messages[g_MessageBoxFileOpenErrorMessage]).arg(filePath);
             }
 
             if (!this->fileWatcher->addPath(absoluteFilePath)) {
-                throw tr(g_Messages[MessageKeys::g_MessageBoxFileOpenErrorMessage]).arg(filePath);
+                throw tr(g_Messages[g_MessageBoxFileOpenErrorMessage]).arg(filePath);
             }
 
             QPlainTextEdit* fileEditor = new QPlainTextEdit(this);
@@ -197,7 +197,7 @@ namespace CustomWidgets {
 
             if (file.error() != QFile::NoError) {
                 fileEditor->deleteLater();
-                throw tr(g_Messages[MessageKeys::g_MessageBoxFileReadErrorMessage]).arg(filePath);
+                throw tr(g_Messages[g_MessageBoxFileReadErrorMessage]).arg(filePath);
             }
 
             this->openFiles.append(
@@ -221,7 +221,7 @@ namespace CustomWidgets {
 
             QMessageBox::warning(
                 this,
-                tr(g_Messages[MessageKeys::g_MessageBoxFileOpenErrorTitle]),
+                tr(g_Messages[g_MessageBoxFileOpenErrorTitle]),
                 message
             );
 
@@ -244,9 +244,9 @@ namespace CustomWidgets {
             }
         );
 
-        const int newTabIndex = this->fileTabs->addTab(fileEditor, tr(g_Messages[MessageKeys::g_TemporaryFileName]));
+        const int newTabIndex = this->fileTabs->addTab(fileEditor, tr(g_Messages[g_TemporaryFileName]));
         this->fileTabs->setCurrentIndex(newTabIndex);
-        this->fileTabs->setTabToolTip(newTabIndex, tr(g_Messages[MessageKeys::g_TemporaryFileName]));
+        this->fileTabs->setTabToolTip(newTabIndex, tr(g_Messages[g_TemporaryFileName]));
     }
 
     const QString& TextEditor::getCurrentFilePath() const noexcept {
@@ -317,8 +317,8 @@ namespace CustomWidgets {
         if (fileEditor->document()->isModified()) {
             QMessageBox::StandardButton result = QMessageBox::question(
                 this,
-                tr(g_Messages[MessageKeys::g_MessageBoxFileCloseConfirmationTitle]),
-                tr(g_Messages[MessageKeys::g_MessageBoxFileCloseConfirmationMessage]).arg(
+                tr(g_Messages[g_MessageBoxFileCloseConfirmationTitle]),
+                tr(g_Messages[g_MessageBoxFileCloseConfirmationMessage]).arg(
                     openFile.getNormalizedName()
                 ),
                 QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
@@ -383,8 +383,8 @@ namespace CustomWidgets {
                     fileEditor->document()->setModified(true);
                     QMessageBox::warning(
                         this,
-                        tr(g_Messages[MessageKeys::g_MessageBoxFileWriteErrorTitle]),
-                        tr(g_Messages[MessageKeys::g_MessageBoxFileWriteErrorMessage]).arg(
+                        tr(g_Messages[g_MessageBoxFileWriteErrorTitle]),
+                        tr(g_Messages[g_MessageBoxFileWriteErrorMessage]).arg(
                             openFile.getNormalizedName()
                         )
                     );
@@ -401,8 +401,8 @@ namespace CustomWidgets {
 
                 QMessageBox::warning(
                     this,
-                    tr(g_Messages[MessageKeys::g_MessageBoxFileSaveErrorTitle]),
-                    tr(g_Messages[MessageKeys::g_MessageBoxFileSaveErrorMessage]).arg(
+                    tr(g_Messages[g_MessageBoxFileSaveErrorTitle]),
+                    tr(g_Messages[g_MessageBoxFileSaveErrorMessage]).arg(
                         openFile.getNormalizedName()
                     )
                 );
@@ -417,9 +417,9 @@ namespace CustomWidgets {
 
             QString filePath = QFileDialog::getSaveFileName(
                 this,
-                tr(g_Messages[MessageKeys::g_SaveFileDialogTitle]),
+                tr(g_Messages[g_SaveFileDialogTitle]),
                 openFile.filePath.isEmpty() ? this->getWorkingDirectoryPath() : openFile.filePath,
-                tr(g_Messages[MessageKeys::g_SaveFileDialogFilter])
+                tr(g_Messages[g_SaveFileDialogFilter])
             );
 
             if (!filePath.isEmpty()) {
@@ -442,8 +442,8 @@ namespace CustomWidgets {
 
                         QMessageBox::warning(
                             this,
-                            tr(g_Messages[MessageKeys::g_MessageBoxFileWriteErrorTitle]),
-                            tr(g_Messages[MessageKeys::g_MessageBoxFileWriteErrorMessage]).arg(
+                            tr(g_Messages[g_MessageBoxFileWriteErrorTitle]),
+                            tr(g_Messages[g_MessageBoxFileWriteErrorMessage]).arg(
                                 fileInfo.absoluteFilePath()
                             )
                         );
@@ -463,8 +463,8 @@ namespace CustomWidgets {
                 else {
                     QMessageBox::warning(
                         this,
-                        tr(g_Messages[MessageKeys::g_MessageBoxFileSaveErrorTitle]),
-                        tr(g_Messages[MessageKeys::g_MessageBoxFileSaveErrorMessage]).arg(
+                        tr(g_Messages[g_MessageBoxFileSaveErrorTitle]),
+                        tr(g_Messages[g_MessageBoxFileSaveErrorMessage]).arg(
                             openFile.getNormalizedName()
                         )
                     );

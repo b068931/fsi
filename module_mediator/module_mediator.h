@@ -55,7 +55,7 @@ namespace module_mediator {
 					return this->mediator->find_function_index(module_index, name);
 				}
 				catch (const std::out_of_range&) {
-					return module_part::function_not_found;
+					return function_not_found;
 				}
 			}
 			virtual std::size_t find_module_index(const char* name) const override {

@@ -42,7 +42,7 @@ namespace {
 		synchronized_logger << ']';
 	}
 	void log_message(message_type type, const char* file_name, std::size_t file_line, const char* function_name, const char* message) {
-		auto timestamp = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - ::starting_time).count();
+		auto timestamp = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - starting_time).count();
 		std::osyncstream synchronized_logger{ std::cerr };
 
 		std::string result_message = std::format(

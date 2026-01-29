@@ -42,10 +42,10 @@ state_settings& configure_function_declaration(states_builder_type& builder, sta
 
 	state_settings& function_argument_type = builder.create_state<function_argument_type_state>()
 		.set_error_message("Unexpected type for a function argument.")
-		.set_handle_tokens(std::vector<source_file_token>{ parser_options::all_types })
+		.set_handle_tokens(std::vector{ parser_options::all_types })
 		.add_handle_token(source_file_token::function_arguments_end)
 		.set_redirection_for_tokens(
-			std::vector<source_file_token>{ parser_options::all_types },
+			std::vector{ parser_options::all_types },
 			generic_parser::state_action::change_top,
 			function_argument_name
 		)

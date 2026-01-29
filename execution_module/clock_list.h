@@ -51,7 +51,7 @@ public:
 			return &this->associated_element->object;
 		}
 
-		friend class clock_list<T>;
+		friend class clock_list;
 	};
 
 public:

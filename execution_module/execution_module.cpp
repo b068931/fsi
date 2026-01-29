@@ -22,7 +22,7 @@ module_mediator::return_value on_thread_creation(module_mediator::arguments_stri
     char* thread_stack_end = thread_stack_memory + preferred_stack_size - (sizeof(module_mediator::one_byte) + sizeof(std::uint64_t));
 
     //get program jump table from resm
-    void* program_jump_table = reinterpret_cast<void*>(
+    void* program_jump_table = std::bit_cast<void*>(
         module_mediator::fast_call<module_mediator::return_value>(
             interoperation::get_module_part(),
             interoperation::index_getter::resource_module(),
@@ -194,8 +194,8 @@ module_mediator::return_value dynamic_call(module_mediator::arguments_string_typ
     );
 
     std::uintptr_t new_current_stack_position = backend::apply_initializer_on_thread_stack(
-        reinterpret_cast<char*>(state_manager.get_current_stack_position()),
-        reinterpret_cast<char*>(state_manager.get_stack_end()),
+        std::bit_cast<char*>(state_manager.get_current_stack_position()),
+        std::bit_cast<char*>(state_manager.get_stack_end()),
         function_arguments,
         get_thread_local_structure()->currently_running_thread_information.thread_id
     );

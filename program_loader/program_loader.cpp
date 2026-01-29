@@ -33,8 +33,8 @@ std::unordered_map<
 namespace {
     std::mutex exposed_functions_mutex{};
     void merge_exposed_functions(std::unordered_map<std::uintptr_t, std::pair<std::unique_ptr<module_mediator::arguments_string_element[]>, std::string>>& new_exposed_functions) {
-        std::lock_guard<std::mutex> lock{ ::exposed_functions_mutex };
-        ::exposed_functions->merge(new_exposed_functions);
+        std::scoped_lock lock{ exposed_functions_mutex };
+        exposed_functions->merge(new_exposed_functions);
     }
 }
 
@@ -182,7 +182,7 @@ namespace {
         std::uint32_t instruction_index = 0;
         std::uint64_t translated_address = 0;
         while (function_run.get_run_position() != function_run.get_run_size()) {
-            std::pair<std::unique_ptr<instruction_builder>, std::string> builder_info{
+            std::pair builder_info{
                 create_builder(
                     function_run,
                     merged_layouts,
@@ -453,7 +453,7 @@ module_mediator::return_value load_program_to_memory(module_mediator::arguments_
         );
 
         // janky use of constructor for its side effects, I don't care about refactoring this 
-        run_reader<runs_container>(program_name, &container,
+        run_reader(program_name, &container,
             {
                 {0, &runs_container::modules_reader},
                 {1, &runs_container::jump_points_reader},
@@ -465,12 +465,10 @@ module_mediator::return_value load_program_to_memory(module_mediator::arguments_
             }
         );
 
-        std::vector<
-            std::pair<memory_layouts_builder::memory_addresses, memory_layouts_builder::memory_addresses>
-        > memory_layouts{ construct_memory_layout(container) };
+        std::vector memory_layouts{ construct_memory_layout(container) };
 
         jump_table_builder jump_table{ construct_jump_table(container) };
-        std::map<std::uint8_t, std::vector<char>> machine_codes{ get_machine_codes() };
+        std::map machine_codes{ get_machine_codes() };
 
         compiled_program result = compile(
             container,
@@ -590,10 +588,10 @@ module_mediator::return_value free_program(module_mediator::arguments_string_typ
         >(bundle);
 
     {
-        std::lock_guard<std::mutex> lock{ ::exposed_functions_mutex };
+        std::scoped_lock lock{ exposed_functions_mutex };
         for (std::uint32_t counter = 0; counter < exposed_functions_count; ++counter) {
             if (static_cast<void**>(exposed_functions_addresses)[counter] != nullptr) {
-                ::exposed_functions->erase(
+                exposed_functions->erase(
                     reinterpret_cast<std::uintptr_t>(static_cast<void**>(exposed_functions_addresses)[counter])
                 );
             }
@@ -623,9 +621,9 @@ module_mediator::return_value check_function_arguments(module_mediator::argument
     //std::unordered_map does not invalidate references and pointers to its objects unless they were erased
     module_mediator::arguments_string_type found_signature_string{};
     {
-        std::lock_guard<std::mutex> lock{ ::exposed_functions_mutex };
-        auto found_exposed_function_information = ::exposed_functions->find(function_address);
-        if (found_exposed_function_information != ::exposed_functions->end()) {
+        std::scoped_lock lock{ exposed_functions_mutex };
+        auto found_exposed_function_information = exposed_functions->find(function_address);
+        if (found_exposed_function_information != exposed_functions->end()) {
             found_signature_string = found_exposed_function_information->second.first.get();
         }
     }
@@ -649,9 +647,9 @@ module_mediator::return_value get_function_name(module_mediator::arguments_strin
 
     char* found_name = nullptr;
     {
-        std::lock_guard<std::mutex> lock{ ::exposed_functions_mutex };
-        auto found_exposed_function_information = ::exposed_functions->find(function_address);
-        if (found_exposed_function_information != ::exposed_functions->end()) {
+        std::scoped_lock lock{ exposed_functions_mutex };
+        auto found_exposed_function_information = exposed_functions->find(function_address);
+        if (found_exposed_function_information != exposed_functions->end()) {
             found_name = found_exposed_function_information->second.second.data();
         }
     }

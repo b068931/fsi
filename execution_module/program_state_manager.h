@@ -6,7 +6,7 @@
 
 class program_state_manager {
 public:
-	static constexpr std::size_t thread_state_size = 144;
+	static constexpr std::size_t thread_state_size = 72;
 
 private:
 	char* program_state;
@@ -18,6 +18,8 @@ private:
 	static constexpr std::size_t current_stack_position_displacement = 32;
 	static constexpr std::size_t stack_end_displacement = 40;
 	static constexpr std::size_t program_control_functions_displacement = 48;
+	static constexpr std::size_t executor_frame_stack_top_displacement = 56;
+	static constexpr std::size_t executor_frame_register_value_displacement = 64;
 
 	template<typename type>
 	type generic_read_state_entry(std::size_t displacement) {

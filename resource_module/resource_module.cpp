@@ -36,7 +36,7 @@ namespace {
         * nothing will happen until the lock to an object is released or object.end() will be returned
         */
 
-        std::lock_guard lock{ mutex };
+        std::scoped_lock lock{ mutex };
 
         auto iterator = object.find(id);
         if (iterator != object.end()) {
@@ -274,7 +274,7 @@ namespace {
         program_container new_container{};
         new_container.context = context;
 
-        std::lock_guard lock{ containers_mutex };
+        std::scoped_lock lock{ containers_mutex };
         containers[id] = std::move(new_container);
     }
     module_mediator::return_value notify_execution_module_new_container(
@@ -439,7 +439,7 @@ module_mediator::return_value create_new_thread(module_mediator::arguments_strin
             assert(iterator->first == container_id && "unexpected container id");
 
             {
-                std::lock_guard threads_lock{ thread_structures_mutex };
+                std::scoped_lock threads_lock{ thread_structures_mutex };
                 thread_structures[id] = thread_structure{ iterator->first };
             }
 

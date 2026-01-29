@@ -4,6 +4,7 @@
 #include "pch.h"
 #include "clock_list.h"
 #include "priority_list.h"
+
 #include "../module_mediator/module_part.h"
 
 class scheduler {
@@ -154,11 +155,11 @@ private:
     using thread_proxy = priority_list<executable_thread, module_mediator::return_value>::proxy;
 
     thread_group_proxy& get_thread_group_using_hash_table(module_mediator::return_value id) {
-        std::lock_guard<std::mutex> thread_group_hash_table_lock{ this->thread_groups_hash_table_mutex };
+        std::scoped_lock thread_group_hash_table_lock{ this->thread_groups_hash_table_mutex };
         return this->thread_groups_hash_table[id];
     }
     void remove_thread_group_from_hash_table(module_mediator::return_value thread_group_id) {
-        std::lock_guard<std::mutex> thread_groups_hash_table_lock{ this->thread_groups_hash_table_mutex };
+        std::scoped_lock thread_groups_hash_table_lock{ this->thread_groups_hash_table_mutex };
 
         auto found_thread_group = this->thread_groups_hash_table.find(thread_group_id);
         assert(
@@ -170,12 +171,12 @@ private:
     }
     
     thread_proxy& get_thread_using_hash_table(module_mediator::return_value id) {
-        std::lock_guard<std::recursive_mutex> threads_hash_table_lock{ this->threads_hash_table_mutex };
+        std::scoped_lock threads_hash_table_lock{ this->threads_hash_table_mutex };
         return this->threads_hash_table[id];
     }
     void notify_runnable() {
         {
-            std::lock_guard<std::mutex> clock_list_lock{ this->clock_list_mutex };
+            std::scoped_lock clock_list_lock{ this->clock_list_mutex };
             ++this->runnable_threads_count;
         }
 
@@ -207,7 +208,7 @@ public:
     * a runnable thread because we reserved one thread by decrementing a runnable thread count.
     */
     bool choose(schedule_information* destination) {
-        std::unique_lock<std::mutex> clock_list_lock{ this->clock_list_mutex };
+        std::unique_lock clock_list_lock{ this->clock_list_mutex };
 
         while (true) {
             if (this->runnable_threads_count == 0) {
@@ -227,7 +228,7 @@ public:
                     thread_group* current_thread_group = this->thread_groups.get_current();
                     this->thread_groups.make_step(); //move to the next thread group
 
-                    std::unique_lock<std::mutex> thread_group_lock{ current_thread_group->lock };
+                    std::unique_lock thread_group_lock{ current_thread_group->lock };
                     clock_list_lock.unlock();
 
                     std::pair<executable_thread*, module_mediator::return_value> thread = current_thread_group->threads.find(
@@ -297,11 +298,11 @@ public:
         thread_group_proxy proxy;
         
         {
-            std::lock_guard<std::mutex> clock_list_lock{ this->clock_list_mutex };
+            std::scoped_lock clock_list_lock{ this->clock_list_mutex };
             proxy = this->thread_groups.push_after(id, preferred_stack_size);
         }
 
-        std::lock_guard<std::mutex> thread_groups_hash_table_lock{ this->thread_groups_hash_table_mutex };
+        std::scoped_lock thread_groups_hash_table_lock{ this->thread_groups_hash_table_mutex };
         this->thread_groups_hash_table[id] = std::move(proxy);
     }
 
@@ -333,13 +334,13 @@ public:
             // This is to because it is possible that a new thread will start and complete before we finish adding it to the hash table.
             thread_group_proxy& thread_group_proxy = this->get_thread_group_using_hash_table(thread_group_id);
 
-            std::lock_guard<std::mutex> thread_group_lock{ thread_group_proxy->lock };
+            std::scoped_lock thread_group_lock{ thread_group_proxy->lock };
             thread_proxy thread_proxy = thread_group_proxy->threads.push(
                 priority,
                 thread_id, thread_states::startup, thread_state, jump_table
             );
-        
-            std::lock_guard<std::recursive_mutex> thread_hash_table_lock{ this->threads_hash_table_mutex };
+
+            std::scoped_lock thread_hash_table_lock{ this->threads_hash_table_mutex };
             this->threads_hash_table[thread_id] = std::move(thread_proxy);
         }
 
@@ -360,7 +361,7 @@ public:
     void forget_thread_group(module_mediator::return_value thread_group_id) {
         //see FORGET above
         thread_group_proxy& thread_group_proxy = this->get_thread_group_using_hash_table(thread_group_id);
-        std::lock_guard<std::mutex> clock_list_lock{ this->clock_list_mutex };
+        std::scoped_lock clock_list_lock{ this->clock_list_mutex };
 
         thread_group_proxy->lock.lock(); //here we make sure that no other threads are reading this structure
         assert(thread_group_proxy->threads.count() == 0 && "'forget' can be used only with empty thread_group");
@@ -407,7 +408,7 @@ public:
         thread_proxy thread_proxy{};
 
         {
-            std::lock_guard<std::recursive_mutex> threads_hash_table_lock{ this->threads_hash_table_mutex };
+            std::scoped_lock threads_hash_table_lock{ this->threads_hash_table_mutex };
             
             auto found_thread = this->threads_hash_table.find(thread_id);
             assert(found_thread != this->threads_hash_table.end() && "invalid thread id when deleting a thread");
@@ -417,7 +418,7 @@ public:
         }
 
         {
-            std::unique_lock<std::mutex> thread_group_lock{ thread_group_proxy->lock };
+            std::unique_lock thread_group_lock{ thread_group_proxy->lock };
 
             thread_proxy->lock.unlock();
             thread_group_proxy->threads.remove(std::move(thread_proxy));
@@ -426,7 +427,7 @@ public:
                 thread_group_lock.unlock(); //to avoid deadlock
 
                 {
-                    std::lock_guard<std::mutex> clock_list_lock{ this->clock_list_mutex };
+                    std::scoped_lock clock_list_lock{ this->clock_list_mutex };
                     thread_group_lock.lock();
 
                     //we lock and instantly unlock this mutex to ensure that no other threads are reading this structure
@@ -478,7 +479,7 @@ public:
         // Because if it is, then it is possible that it'll be removed just before we acquire the lock.
         // This, in turn, will lead to an undefined behavior.
 
-        std::unique_lock<std::recursive_mutex> threads_hash_table_lock{ this->threads_hash_table_mutex };
+        std::unique_lock threads_hash_table_lock{ this->threads_hash_table_mutex };
         thread_proxy& thread_proxy = this->get_thread_using_hash_table(thread_id);
 
         // This is even worse than terrible, because this means that we are trying to make a non-existent thread runnable.
@@ -491,7 +492,7 @@ public:
 
         {
             if (thread_proxy->lock.try_lock()) {
-                std::unique_lock<std::mutex> thread_lock{thread_proxy->lock, std::adopt_lock};
+                std::unique_lock thread_lock{thread_proxy->lock, std::adopt_lock};
 
                 // We don't need this anymore, if we acquired the lock, then this means that the thread is either blocked or runnable.
                 threads_hash_table_lock.unlock();
@@ -542,13 +543,13 @@ public:
     }
 
     bool has_available_jobs() {
-        std::lock_guard<std::mutex> thread_groups_hash_table_lock{ this->thread_groups_hash_table_mutex };
+        std::scoped_lock thread_groups_hash_table_lock{ this->thread_groups_hash_table_mutex };
         return !this->thread_groups_hash_table.empty();
     }
 
     void initiate_shutdown() { 
         //locking on this mutex is required in order to ensure that all executors are either already waiting on a condition variable or are yet to enter the "choose" function.
-        std::lock_guard<std::mutex> clock_list_lock{ this->clock_list_mutex };
+        std::scoped_lock clock_list_lock{ this->clock_list_mutex };
         if (!this->threads_hash_table.empty() || !this->thread_groups_hash_table.empty()) {
             // Make a panic shutdown if hash tables got out of sync
             std::terminate();

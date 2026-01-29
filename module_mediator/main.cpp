@@ -142,7 +142,7 @@ namespace {
         compressed_bytecode.resize(static_cast<std::size_t>(compressed_size));
         compressed_stream.read(
             reinterpret_cast<char*>(compressed_bytecode.data()), 
-            static_cast<std::streamsize>(compressed_size)
+            compressed_size
         );
 
         return compressed_bytecode;
@@ -153,7 +153,7 @@ namespace {
         if (dwCtrlType == CTRL_C_EVENT) {
             std::osyncstream standard_error{ std::cerr };
             standard_error << "*** Terminating the fsi-mediator with Ctrl-C is unsafe. " \
-                "Premature termination can lead to unsaved data." << std::endl;
+                "Premature termination can lead to unsaved data." << '\n';
         }
 
         // Will kill the process either way, no need to "return TRUE"
@@ -189,13 +189,15 @@ namespace {
 
 int main(int argc, char** argv) {
     if (argc != 4) {
-        std::cerr << "You need to provide three arguments: text file with the modules descriptions, executors count and a compiled file." << std::endl;
+        std::cerr << "You need to provide three arguments: text file with the modules descriptions, executors count and a compiled file." <<
+            '\n';
         return EXIT_FAILURE;
     }
 
     try {
         if (!SetConsoleCtrlHandler(CtrlHandler, TRUE)) {
-            std::cerr << "Failed to set control handler. This may degrade user experience in fsi-visual-environment." << std::endl;
+            std::cerr << "Failed to set control handler. This may degrade user experience in fsi-visual-environment." <<
+                '\n';
         }
 
         // Funnily enough, CRT maintains std::set_terminate function on a per-thread basis
@@ -203,7 +205,7 @@ int main(int argc, char** argv) {
         module_mediator::crash_handling::install_crash_handlers();
         if (!InstallGlobalCrashHandler()) {
            std::cerr << "Failed to install global crash handler." \
-            " This may slightly impede reporting some types of fatal errors." << std::endl;
+            " This may slightly impede reporting some types of fatal errors." << '\n';
         }
 
         std::filesystem::path modules_descriptor_file{ std::filesystem::canonical(argv[1]) };
@@ -266,13 +268,14 @@ int main(int argc, char** argv) {
             );
         }
         else {
-            std::cout << "Could not correctly parse " << modules_descriptor_file.generic_string() << ": " << error_message << std::endl;
+            std::cout << "Could not correctly parse " << modules_descriptor_file.generic_string() << ": " << error_message <<
+                '\n';
         }
 
         return EXIT_SUCCESS;
     }
     catch (const std::exception& exc) {
-        std::cout << "Was unable to start the engine: " << exc.what() << std::endl;
+        std::cout << "Was unable to start the engine: " << exc.what() << '\n';
     }
 
     return EXIT_FAILURE;

@@ -29,8 +29,8 @@ namespace Components::Internationalization {
         if (index == -1) {
             this->loadTranslator(nullptr);
         }
-        else if (index >= 0 && index < InterfaceTranslator::supportedLocales.size()) {
-            this->loadTranslator(&InterfaceTranslator::supportedLocales.at(index));
+        else if (index >= 0 && index < supportedLocales.size()) {
+            this->loadTranslator(&supportedLocales.at(index));
         }
         else {
             qWarning() << "Unsupported language index:" << index;
@@ -87,7 +87,7 @@ namespace Components::Internationalization {
     void InterfaceTranslator::startupProbeLocales() {
         // If not supported, the application will run in English (default).
         QLocale systemLocale = QLocale::system();
-        for (const QLocale& supportedLocale : InterfaceTranslator::supportedLocales) {
+        for (const QLocale& supportedLocale : supportedLocales) {
             if (supportedLocale.language() == systemLocale.language()) {
                 this->loadTranslator(&supportedLocale);
                 return;

@@ -99,9 +99,9 @@ state_settings& configure_special_instructions(states_builder_type& builder) {
 
     state_settings& declare_type = builder.create_state<declare_type_state>()
         .set_error_message("Unexpected type.")
-        .set_handle_tokens(std::vector<source_file_token>{ parser_options::all_types })
+        .set_handle_tokens(std::vector{ parser_options::all_types })
         .set_redirection_for_tokens(
-            std::vector<source_file_token>{ parser_options::all_types },
+            std::vector{ parser_options::all_types },
             generic_parser::state_action::change_top,
             declare_name
         );

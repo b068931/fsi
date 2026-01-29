@@ -30,5 +30,6 @@
 #include <map>
 #include <ranges>
 #include <limits>
+#include <bit>
 
 #endif //PCH_H

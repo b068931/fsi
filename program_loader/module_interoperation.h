@@ -21,7 +21,7 @@ namespace interoperation {
 		}
 
 		static std::size_t resource_module_create_new_program_container() {
-			static std::size_t index = get_module_part()->find_function_index(index_getter::resource_module(), "create_new_program_container");
+			static std::size_t index = get_module_part()->find_function_index(resource_module(), "create_new_program_container");
 			return index;
 		}
 	};

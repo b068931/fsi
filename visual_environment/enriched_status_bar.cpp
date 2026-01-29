@@ -86,7 +86,7 @@ namespace CustomWidgets {
         );
     }
 
-    void EnrichedStatusBar::setVisualHintForLabel(QLabel* label, CustomWidgets::EnrichedStatusBar::ColorHint hint) {
+    void EnrichedStatusBar::setVisualHintForLabel(QLabel* label, ColorHint hint) {
         Q_ASSERT(label && "Label is expected to be non-null.");
         constexpr const char successColor[]{ "#38ff38" };
         constexpr const char failureColor[]{ "#ff3838" };
@@ -99,15 +99,15 @@ namespace CustomWidgets {
         );
 
         switch (hint) {
-        case CustomWidgets::EnrichedStatusBar::ColorHint::success: {
+        case ColorHint::success: {
             styleSheetTemplate = styleSheetTemplate.arg(successColor);
             break;
         }
-        case CustomWidgets::EnrichedStatusBar::ColorHint::neutral: {
+        case ColorHint::neutral: {
             styleSheetTemplate = styleSheetTemplate.arg(neutralColor);
             break;
         }
-        case CustomWidgets::EnrichedStatusBar::ColorHint::failure: {
+        case ColorHint::failure: {
             styleSheetTemplate = styleSheetTemplate.arg(failureColor);
             break;
         }
@@ -167,19 +167,19 @@ namespace CustomWidgets {
         Q_ASSERT(this->translatorResultLabel && "The translator result label has not been set up.");
 
         this->statusToolTipLabel->setToolTip(
-            tr(g_Messages[MessageKeys::g_TooltipTooltips])
+            tr(g_Messages[g_TooltipTooltips])
         );
 
         this->workingDirectoryLabel->setToolTip(
-            tr(g_Messages[MessageKeys::g_TooltipWorkingDirectory])
+            tr(g_Messages[g_TooltipWorkingDirectory])
         );
 
         this->translatorResultLabel->setToolTip(
-            tr(g_Messages[MessageKeys::g_TooltipTranslatorResult])
+            tr(g_Messages[g_TooltipTranslatorResult])
         );
 
         this->environmentStateLabel->setToolTip(
-            tr(g_Messages[MessageKeys::g_TooltipExecutionEnvironmentState])
+            tr(g_Messages[g_TooltipExecutionEnvironmentState])
         );
     }
 }

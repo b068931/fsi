@@ -7,7 +7,7 @@ namespace {
 
 namespace interoperation {
     module_mediator::module_part* get_module_part() {
-        return ::part;
+        return part;
     }
 
     module_mediator::return_value verify_thread_memory(
@@ -93,5 +93,5 @@ namespace interoperation {
 }
 
 PROGRAMRUNTIMESERVICES_API void initialize_m(module_mediator::module_part* module_part) {
-    ::part = module_part;
+    part = module_part;
 }

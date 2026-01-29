@@ -3,7 +3,7 @@
 
 #include "scheduler.h"
 #include "module_interoperation.h"
-#include "assembly_functions.h"
+#include "control_code_templates.h"
 
 #include "../logger_module/logging.h"
 #include "../module_mediator/local_crash_handle_setup.h"
@@ -63,14 +63,14 @@ private:
             }
 
             this->active_threads_counter.fetch_add(1, std::memory_order_relaxed); //all other modifications are synchronized with mutexes. this is one just needs atomicity
-            load_program(
+            CONTROL_CODE_TEMPLATE_LOAD_PROGRAM(
                 thread_structure->execution_thread_state, 
                 currently_running_thread_information->thread_state,
                 currently_running_thread_information->state == scheduler::thread_states::startup
                     ? 1 : 0
             );
 
-            size_t previous_active_threads_count = this->active_threads_counter.fetch_sub(1, std::memory_order_relaxed);
+            std::size_t previous_active_threads_count = this->active_threads_counter.fetch_sub(1, std::memory_order_relaxed);
             if (currently_running_thread_information->put_back_structure) {
                 this->scheduler.put_back(currently_running_thread_information->put_back_structure);
                 for (const auto& deferred_callback : get_thread_local_structure()->deferred_callbacks) {

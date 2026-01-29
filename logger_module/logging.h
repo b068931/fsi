@@ -35,7 +35,7 @@ namespace logger_module {
 
 		static std::size_t logger = part->find_module_index("logger");
 		if (logger == module_mediator::module_part::module_not_found) {
-			std::cerr << "One of the modules uses logging. 'logger' was not found. Terminating the process." << std::endl;
+			std::cerr << "One of the modules uses logging. 'logger' was not found. Terminating the process." << '\n';
 			std::terminate();
 		}
 
@@ -54,7 +54,7 @@ namespace logger_module {
 
 		std::size_t log_type = logger_indexes[message_type];
 		if (log_type == module_mediator::module_part::function_not_found) {
-			std::cerr << "One of the required logging functions was not found. Terminating the process." << std::endl;
+			std::cerr << "One of the required logging functions was not found. Terminating the process." << '\n';
 			std::terminate();
 		}
 

@@ -9,11 +9,11 @@ namespace {
 }
 
 module_mediator::module_part* get_module_part() {
-	return ::part;
+	return part;
 }
 
 extern std::chrono::steady_clock::time_point starting_time;
 void initialize_m(module_mediator::module_part* module_part) {
-	::part = module_part;
-	::starting_time = std::chrono::steady_clock::now();
+	part = module_part;
+	starting_time = std::chrono::steady_clock::now();
 }

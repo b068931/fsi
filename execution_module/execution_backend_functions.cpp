@@ -2,7 +2,7 @@
 #include "thread_local_structure.h"
 #include "module_interoperation.h"
 #include "thread_manager.h"
-#include "assembly_functions.h"
+#include "control_code_templates.h"
 #include "program_state_manager.h"
 #include "executions_backend_functions.h"
 
@@ -46,7 +46,7 @@ namespace backend {
             interoperation::index_getter::resource_module(),
             interoperation::index_getter::resource_module_deallocate_thread_memory(),
             thread_id,
-            reinterpret_cast<void*>(program_state_manager.get_stack_start(preferred_stack_size))
+            std::bit_cast<void*>(program_state_manager.get_stack_start(preferred_stack_size))
         );
 
         module_mediator::fast_call<module_mediator::return_value, module_mediator::memory>(
@@ -101,7 +101,7 @@ namespace backend {
 #pragma clang diagnostic pop
 
         thread_terminate();
-        load_execution_thread(get_thread_local_structure()->execution_thread_state);
+        CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD(get_thread_local_structure()->execution_thread_state);
     }
 
     [[noreturn]] void call_module(std::uint64_t module_id, std::uint64_t function_id, module_mediator::arguments_string_type args_string) {
@@ -116,22 +116,22 @@ namespace backend {
         {
         case module_mediator::execution_result_continue:
             program_resume();
-            resume_program_execution(get_thread_local_structure()->currently_running_thread_information.thread_state);
+            CONTROL_CODE_TEMPLATE_RESUME_PROGRAM_EXECUTION(get_thread_local_structure()->currently_running_thread_information.thread_state);
 
         case module_mediator::execution_result_switch:
-            load_execution_thread(get_thread_local_structure()->execution_thread_state);
+            CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD(get_thread_local_structure()->execution_thread_state);
 
         case module_mediator::execution_result_terminate:
             LOG_PROGRAM_INFO(interoperation::get_module_part(), "Requested thread termination.");
 
             thread_terminate();
-            load_execution_thread(get_thread_local_structure()->execution_thread_state);
+            CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD(get_thread_local_structure()->execution_thread_state);
 
         case module_mediator::execution_result_block:
             LOG_PROGRAM_INFO(interoperation::get_module_part(), "Was blocked.");
 
             get_thread_manager().block(get_thread_local_structure()->currently_running_thread_information.thread_id);
-            load_execution_thread(get_thread_local_structure()->execution_thread_state);
+            CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD(get_thread_local_structure()->execution_thread_state);
 
         default:
             LOG_PROGRAM_FATAL(interoperation::get_module_part(), "Incorrect return code. Process will be aborted.");
@@ -219,7 +219,7 @@ namespace backend {
     }
 
     char* allocate_thread_memory(module_mediator::return_value thread_id, std::uint64_t size) {
-        return reinterpret_cast<char*>(
+        return std::bit_cast<char*>(
             module_mediator::fast_call<module_mediator::return_value, module_mediator::eight_bytes>(
                 interoperation::get_module_part(),
                 interoperation::index_getter::resource_module(),
@@ -255,7 +255,7 @@ namespace backend {
         );
 
         std::string function_name{ "[UNKNOWN_FUNCTION_NAME]" };
-        char* function_symbols = reinterpret_cast<char*>(functions_symbols_address);
+        char* function_symbols = std::bit_cast<char*>(functions_symbols_address);
         if (function_symbols != nullptr) {
             function_name = function_symbols;
         }

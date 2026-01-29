@@ -218,7 +218,7 @@ namespace module_mediator {
             for (arguments_string_element counter = 0; counter < arguments_count; ++counter) {
                 arguments_array.emplace_back(*types, values);
 
-                values += arguments_string_builder::get_type_size_by_index(*types);
+                values += get_type_size_by_index(*types);
                 ++types;
             }
 
@@ -231,7 +231,7 @@ namespace module_mediator {
             auto saved_begin = begin;
             std::size_t size_to_allocate = 1;
             while (begin != end) {
-                size_to_allocate += 1 + arguments_string_builder::get_type_size_by_index(begin->first);
+                size_to_allocate += 1 + get_type_size_by_index(begin->first);
                 ++begin;
             }
 
@@ -245,11 +245,11 @@ namespace module_mediator {
                 std::memcpy(
                     arguments_string_values,
                     saved_begin->second,
-                    arguments_string_builder::get_type_size_by_index(saved_begin->first)
+                    get_type_size_by_index(saved_begin->first)
                 );
 
                 ++arguments_string_types;
-                arguments_string_values += arguments_string_builder::get_type_size_by_index(saved_begin->first);
+                arguments_string_values += get_type_size_by_index(saved_begin->first);
 
                 ++saved_begin;
             }
@@ -263,7 +263,7 @@ namespace module_mediator {
             std::size_t index,
             const arguments_array_type& arguments_array
         ) {
-            constexpr auto type_index = arguments_string_builder::get_type_index<destination_type>;
+            constexpr auto type_index = get_type_index<destination_type>;
             static_assert(type_index != typename_array_primitives::npos);
 
             if (index < arguments_array.size()) {

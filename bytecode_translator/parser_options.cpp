@@ -152,18 +152,18 @@ const std::map<
 > parser_options::contexts{
     {
         structure_builder::context_key::main_context,
-        parser_options::main_context
+        main_context
     },
     {
         structure_builder::context_key::inside_string,
-        parser_options::inside_string
+        inside_string
     },
     {
         structure_builder::context_key::inside_include,
-        parser_options::inside_include
+        inside_include
     },
     {
         structure_builder::context_key::inside_comment,
-        parser_options::inside_comment
+        inside_comment
     }
 };

@@ -166,7 +166,7 @@ inline instruction_builder* generate_builder(
 }
 
 inline std::string decode_builder_name(std::uint8_t instruction_operation_code) {
-	std::map<std::uint8_t, std::string> builders_names{ get_builders_names() };
+	std::map builders_names{ get_builders_names() };
 	auto found_name = builders_names.find(instruction_operation_code);
 	if (found_name != builders_names.end()) {
 		return found_name->second;

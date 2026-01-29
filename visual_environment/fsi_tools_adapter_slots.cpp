@@ -98,13 +98,13 @@ namespace Components::FSITools {
         this->translatorWindowTitle =
             QCoreApplication::translate(
                 g_Context,
-                g_Messages[MessageKeys::g_TranslatorConsoleWindowTitle]
+                g_Messages[g_TranslatorConsoleWindowTitle]
             ).toStdWString();
 
         this->executionEnvironmentWindowTitle =
             QCoreApplication::translate(
                 g_Context,
-                g_Messages[MessageKeys::g_EEConsoleWindowTitle]
+                g_Messages[g_EEConsoleWindowTitle]
             ).toStdWString();
     }
 }

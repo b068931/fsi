@@ -78,7 +78,7 @@ public:
             this->fnc_signature = &found_signature->second;
         }
         else {
-            variable_imm<std::uint64_t> immediate_function_displacement{
+            variable_imm immediate_function_displacement{
                 (this->get_function_table_index(fnc->get_id()))
             };
 

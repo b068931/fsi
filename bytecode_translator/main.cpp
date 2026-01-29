@@ -31,33 +31,37 @@
 
 namespace {
     bool verify_program(const structure_builder::file& parser_value) {
-        std::vector<std::string> empty_functions{ check_functions_bodies(parser_value) };
+        std::vector empty_functions{ check_functions_bodies(parser_value) };
         for (const std::string& name : empty_functions) {
-            std::cout << "PROGRAM LOGIC WARNING: function with name '" + name + "' has empty body." << std::endl;
+            std::cout << "PROGRAM LOGIC WARNING: function with name '" + name + "' has empty body." << '\n';
         }
 
-        std::cout << "Chosen stack size: " << parser_value.stack_size << " bytes." << std::endl;
+        std::cout << "Chosen stack size: " << parser_value.stack_size << " bytes." << '\n';
         if (parser_value.stack_size == 0) {
-            std::cout << "PROGRAM LOGIC ERROR: You must explicitly specify the stack size that your program will use." << std::endl;
+            std::cout << "PROGRAM LOGIC ERROR: You must explicitly specify the stack size that your program will use." <<
+                '\n';
         }
 
         if (parser_value.main_function == nullptr) {
-            std::cout << "SYNTAX ERROR: You must specify the starting function for your program." << std::endl;
+            std::cout << "SYNTAX ERROR: You must specify the starting function for your program." << '\n';
             return false;
         }
 
         if (!check_instructions_arguments(parser_value)) {
-            std::cout << "SYNTAX ERROR: each instruction can have no more than " << max_instruction_arguments_count << " arguments." << std::endl;
+            std::cout << "SYNTAX ERROR: each instruction can have no more than " << max_instruction_arguments_count << " arguments." <<
+                '\n';
             return false;
         }
 
         if (!check_functions_count(parser_value)) {
-            std::cout << "SYNTAX ERROR: you can have no more than " << max_functions_count << " functions in one file." << std::endl;
+            std::cout << "SYNTAX ERROR: you can have no more than " << max_functions_count << " functions in one file." <<
+                '\n';
             return false;
         }
 
         if (!check_functions_size(parser_value)) {
-            std::cout << "SYNTAX ERROR: you can have no more than " << max_instructions_count << " instructions in each function." << std::endl;
+            std::cout << "SYNTAX ERROR: you can have no more than " << max_instructions_count << " instructions in each function." <<
+                '\n';
             return false;
         }
 
@@ -83,7 +87,7 @@ namespace {
             std::cout << "PROGRAM LOGIC ERROR: ";
             translate_error(err, std::cout);
 
-            std::cout << std::endl;
+            std::cout << '\n';
         }
 
         return { std::move(result), !translator.errors().empty() };
@@ -169,13 +173,15 @@ namespace {
 int main(int argc, char** argv) {
     auto start_time = std::chrono::high_resolution_clock::now();
     if (argc != 4) {
-        std::cout << "Provide the name of the file to compile and its output destination. And add 'include-debug' or 'no-debug' at the end. It is only three arguments." << std::endl;
+        std::cout << "Provide the name of the file to compile and its output destination. And add 'include-debug' or 'no-debug' at the end. It is only three arguments." <<
+            '\n';
         return EXIT_FAILURE;
     }
 
     try {
         if (!SetConsoleCtrlHandler(CtrlHandler, TRUE)) {
-            std::cout << "Failed to set control handler. This may impede user experience in fsi-visual-environment." << std::endl;
+            std::cout << "Failed to set control handler. This may impede user experience in fsi-visual-environment." <<
+                '\n';
         }
 
         generic_parser::parser_facade<
@@ -192,17 +198,17 @@ int main(int argc, char** argv) {
         };
 
         std::filesystem::path main_program_file{ std::filesystem::canonical(argv[1]) };
-        std::cout << "Now parsing: " << main_program_file.generic_string() << std::endl;
+        std::cout << "Now parsing: " << main_program_file.generic_string() << '\n';
 
         include_file_state::active_parsing_files.push_back(main_program_file);
         parser.start(main_program_file);
 
-        std::pair<structure_builder::line_type, std::string> error{ parser.error() };
+        std::pair error{ parser.error() };
         structure_builder::file parser_value{ parser.get_builder_value() };
         if (!error.second.empty()) {
             std::cout << "SYNTAX ERROR:	"
                 << error.second.c_str()
-                << " NEAR LINE " << error.first << std::endl;
+                << " NEAR LINE " << error.first << '\n';
 
             return EXIT_FAILURE;
         }
@@ -212,13 +218,13 @@ int main(int argc, char** argv) {
             return EXIT_FAILURE;
         }
 
-        std::cout << "Now translating the program to bytecode..." << std::endl;
+        std::cout << "Now translating the program to bytecode..." << '\n';
         auto [translated_program, has_logic_errors] = produce_bytecode(&parser_value, argv[3]);
 
         translated_program.seekg(0, std::ios::end);
         std::streamoff bytecode_size = translated_program.tellg();
 
-        std::cout << "Now compressing the bytecode..." << std::endl;
+        std::cout << "Now compressing the bytecode..." << '\n';
         translated_program.seekg(0, std::ios::beg);
         std::vector<unsigned char> compressed_bytecode = compress_bytecode(
             std::move(translated_program)
@@ -227,7 +233,7 @@ int main(int argc, char** argv) {
         std::cout << "Compression ratio: "
             << static_cast<double>(compressed_bytecode.size()) / static_cast<double>(bytecode_size)
             << '.'
-            << std::endl;
+            << '\n';
 
         std::ofstream file_stream{ argv[2], std::ios::binary | std::ios::out };
         file_stream.write(
@@ -239,7 +245,7 @@ int main(int argc, char** argv) {
         std::cout << "Estimated time: "
             << std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count()
             << " microseconds."
-            << std::endl;
+            << '\n';
 
         if (has_logic_errors) {
             return EXIT_FAILURE;
@@ -248,7 +254,7 @@ int main(int argc, char** argv) {
         return EXIT_SUCCESS;
     }
     catch (const std::exception& exc) {
-        std::cout << "Unable to process the file: " << exc.what() << std::endl;
+        std::cout << "Unable to process the file: " << exc.what() << '\n';
     }
 
     return EXIT_FAILURE;

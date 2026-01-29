@@ -19,12 +19,12 @@ namespace {
 
 namespace interoperation {
 	module_mediator::module_part* get_module_part() {
-		return ::part;
+		return part;
 	}
 }
 
 void* get_default_function_address() {
-	return ::default_function_address;
+	return default_function_address;
 }
 
 void initialize_m(module_mediator::module_part* module_part) {
@@ -42,8 +42,8 @@ void initialize_m(module_mediator::module_part* module_part) {
 			std::string>
         >{};
 
-	::part = module_part;
-	::default_function_address = create_executable_function(default_function_symbols);
+	part = module_part;
+	default_function_address = create_executable_function(default_function_symbols);
 }
 
 void free_m() {

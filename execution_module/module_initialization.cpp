@@ -2,7 +2,7 @@
 #include "module_interoperation.h"
 #include "execution_module.h"
 #include "thread_manager.h"
-#include "assembly_functions.h"
+#include "control_code_templates.h"
 #include "executions_backend_functions.h"
 
 #include "../logger_module/logging.h"
@@ -56,12 +56,12 @@ namespace {
         show_error(error_code);
 
         backend::thread_terminate();
-        load_execution_thread(get_thread_local_structure()->execution_thread_state);
+        CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD(get_thread_local_structure()->execution_thread_state);
     }
 
     [[noreturn]] void end_program() {
         backend::thread_terminate();
-        load_execution_thread(get_thread_local_structure()->execution_thread_state);
+        CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD(get_thread_local_structure()->execution_thread_state);
     }
 }
 
@@ -79,30 +79,35 @@ thread_manager& get_thread_manager() {
 }
 
 void initialize_m(module_mediator::module_part* module_part) {
+    constexpr std::uint64_t call_module_trampoline_index = 0;
+    constexpr std::uint64_t backend_call_module_index = 1;
+    constexpr std::uint64_t inner_terminate_index = 2;
+    constexpr std::uint64_t end_program_trap_index = 3;
+
     ::part = module_part;
     ::program_control_functions_addresses = new char[4 * sizeof(std::uint64_t)] {};
     ::manager = new thread_manager{};
 
     backend::fill_in_register_array_entry(
-        0,
+        call_module_trampoline_index,
         ::program_control_functions_addresses,
-        reinterpret_cast<std::uintptr_t>(&special_call_module)
+        reinterpret_cast<std::uintptr_t>(&CONTROL_CODE_TEMPLATE_CALL_MODULE_TRAMPOLINE)
     );
 
     backend::fill_in_register_array_entry(
-        1,
+        backend_call_module_index,
         ::program_control_functions_addresses,
         reinterpret_cast<std::uintptr_t>(&backend::call_module)
     );
 
     backend::fill_in_register_array_entry(
-        2,
+        inner_terminate_index,
         ::program_control_functions_addresses,
         reinterpret_cast<std::uintptr_t>(&inner_terminate)
     );
 
     backend::fill_in_register_array_entry(
-        3,
+        end_program_trap_index,
         ::program_control_functions_addresses,
         reinterpret_cast<std::uintptr_t>(&end_program)
     );

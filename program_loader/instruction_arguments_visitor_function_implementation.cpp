@@ -4,22 +4,22 @@
 
 template<>
 void variable_imm<std::uint8_t>::visit(instruction_builder* builder) {
-	builder->visit(std::unique_ptr<variable_imm<std::uint8_t>>{ this });
+	builder->visit(std::unique_ptr<variable_imm>{ this });
 }
 
 template<>
 void variable_imm<std::uint16_t>::visit(instruction_builder* builder) {
-	builder->visit(std::unique_ptr<variable_imm<std::uint16_t>>{ this });
+	builder->visit(std::unique_ptr<variable_imm>{ this });
 }
 
 template<>
 void variable_imm<std::uint32_t>::visit(instruction_builder* builder) {
-	builder->visit(std::unique_ptr<variable_imm<std::uint32_t>>{ this });
+	builder->visit(std::unique_ptr<variable_imm>{ this });
 }
 
 template<>
 void variable_imm<std::uint64_t>::visit(instruction_builder* builder) {
-	builder->visit(std::unique_ptr<variable_imm<std::uint64_t>>{ this });
+	builder->visit(std::unique_ptr<variable_imm>{ this });
 }
 
 void function::visit(instruction_builder* builder) { builder->visit(std::unique_ptr<function>{ this }); }

@@ -69,14 +69,14 @@ namespace Windows {
             this->enrichedStatusBar->toolTip(
                 Components::Internationalization::StaticTranslatableString::wrap(
                     g_Context,
-                    g_Messages[MessageKeys::g_StatusTipStartup]
+                    g_Messages[g_StatusTipStartup]
                 )
             );
 
             this->enrichedStatusBar->environmentState(
                 Components::Internationalization::StaticTranslatableString::wrap(
                     g_Context,
-                    g_Messages[MessageKeys::g_StatusBarDefaultEnvironmentState]
+                    g_Messages[g_StatusBarDefaultEnvironmentState]
                 ),
                 CustomWidgets::EnrichedStatusBar::ColorHint::neutral
             );
@@ -84,7 +84,7 @@ namespace Windows {
             this->enrichedStatusBar->translatorResult(
                 Components::Internationalization::StaticTranslatableString::wrap(
                     g_Context,
-                    g_Messages[MessageKeys::g_StatusBarDefaultTranslatorState]
+                    g_Messages[g_StatusBarDefaultTranslatorState]
                 ),
                 CustomWidgets::EnrichedStatusBar::ColorHint::neutral
             );
@@ -345,20 +345,20 @@ namespace Windows {
             this->enrichedStatusBar->toolTip(
                 Components::Internationalization::StaticTranslatableString::wrap(
                     g_Context,
-                    g_Messages[MessageKeys::g_StatusTipFileSavedBeforeTranslation]
+                    g_Messages[g_StatusTipFileSavedBeforeTranslation]
                 )
             );
         }
 
         QString selectedFile = this->editor->getCurrentFilePath();
         QString translationResult = QDir(this->editor->getWorkingDirectoryPath())
-            .filePath(g_Messages[MessageKeys::g_TranslationResultFileName]);
+            .filePath(g_Messages[g_TranslationResultFileName]);
 
         if (selectedFile.isEmpty()) {
             QMessageBox::warning(
                 this,
-                tr(g_Messages[MessageKeys::g_DialogTitleUnsavedTemporary]),
-                tr(g_Messages[MessageKeys::g_DialogMessageUnsavedTemporary])
+                tr(g_Messages[g_DialogTitleUnsavedTemporary]),
+                tr(g_Messages[g_DialogMessageUnsavedTemporary])
             );
 
             return;
@@ -382,7 +382,7 @@ namespace Windows {
             this->enrichedStatusBar->translatorResult(
                 Components::Internationalization::StaticTranslatableString::wrap(
                     g_Context,
-                    g_Messages[MessageKeys::g_StatusTipProgramTranslationCancelled]
+                    g_Messages[g_StatusTipProgramTranslationCancelled]
                 ),
                 CustomWidgets::EnrichedStatusBar::ColorHint::neutral
             );
@@ -394,10 +394,10 @@ namespace Windows {
         Q_ASSERT(this->enrichedStatusBar && "The status bar has not been set up.");
 
         QString logFilePath = QDir(this->editor->getWorkingDirectoryPath())
-            .filePath(g_Messages[MessageKeys::g_EELogFileName]);
+            .filePath(g_Messages[g_EELogFileName]);
 
         QString translationResult = QDir(this->editor->getWorkingDirectoryPath())
-            .filePath(g_Messages[MessageKeys::g_TranslationResultFileName]);
+            .filePath(g_Messages[g_TranslationResultFileName]);
 
         std::optional<QString> configurationFilePath =
             Components::FSITools::ConfigurationOptions::getExecutionEnvironmentConfiguration(this);
@@ -419,7 +419,7 @@ namespace Windows {
             this->enrichedStatusBar->environmentState(
                 Components::Internationalization::StaticTranslatableString::wrap(
                     g_Context,
-                    g_Messages[MessageKeys::g_StatusTipProgramExecutionCancelled]
+                    g_Messages[g_StatusTipProgramExecutionCancelled]
                 ),
                 CustomWidgets::EnrichedStatusBar::ColorHint::neutral
             );
@@ -435,7 +435,7 @@ namespace Windows {
         Q_ASSERT(this->editor && "The text editor has not been set up.");
 
         QString logFilePath = QDir(this->editor->getWorkingDirectoryPath())
-            .filePath(g_Messages[MessageKeys::g_EELogFileName]);
+            .filePath(g_Messages[g_EELogFileName]);
 
         // Editor will automatically produce an error message if the file does not exist.
         this->editor->openNewFile(logFilePath);
@@ -447,7 +447,7 @@ namespace Windows {
         this->enrichedStatusBar->translatorResult(
             Components::Internationalization::StaticTranslatableString::wrap(
                 g_Context,
-                g_Messages[MessageKeys::g_StatusTipTranslatorStarted]
+                g_Messages[g_StatusTipTranslatorStarted]
             ),
             CustomWidgets::EnrichedStatusBar::ColorHint::neutral
         );
@@ -471,7 +471,7 @@ namespace Windows {
                 this->enrichedStatusBar->translatorResult(
                     Components::Internationalization::StaticTranslatableString::wrap(
                         g_Context,
-                        g_Messages[MessageKeys::g_StatusTipTranslatorProgramHasErrors]
+                        g_Messages[g_StatusTipTranslatorProgramHasErrors]
                     ),
                     CustomWidgets::EnrichedStatusBar::ColorHint::failure
                 );
@@ -480,7 +480,7 @@ namespace Windows {
                 this->enrichedStatusBar->translatorResult(
                     Components::Internationalization::StaticTranslatableString::wrap(
                         g_Context,
-                        g_Messages[MessageKeys::g_StatusTipTranslatorSuccess]
+                        g_Messages[g_StatusTipTranslatorSuccess]
                     ),
                     CustomWidgets::EnrichedStatusBar::ColorHint::success
                 );
@@ -497,7 +497,7 @@ namespace Windows {
             this->enrichedStatusBar->translatorResult(
                 Components::Internationalization::StaticTranslatableString::wrap(
                     g_Context,
-                    g_Messages[MessageKeys::g_StatusTipTranslatorFailedToStart]
+                    g_Messages[g_StatusTipTranslatorFailedToStart]
                 ),
                 CustomWidgets::EnrichedStatusBar::ColorHint::failure
             );
@@ -509,15 +509,15 @@ namespace Windows {
             this->enrichedStatusBar->translatorResult(
                 Components::Internationalization::StaticTranslatableString::wrap(
                     g_Context,
-                    g_Messages[MessageKeys::g_StatusTipTranslatorCrashed]
+                    g_Messages[g_StatusTipTranslatorCrashed]
                 ),
                 CustomWidgets::EnrichedStatusBar::ColorHint::failure
             );
 
             QMessageBox::warning(
             this,
-                tr(g_Messages[MessageKeys::g_DialogTitleTranslatorCrashed]),
-                tr(g_Messages[MessageKeys::g_DialogMessageTranslatorCrashed])
+                tr(g_Messages[g_DialogTitleTranslatorCrashed]),
+                tr(g_Messages[g_DialogMessageTranslatorCrashed])
             );
 
             break;
@@ -527,7 +527,7 @@ namespace Windows {
             this->enrichedStatusBar->translatorResult(
                 Components::Internationalization::StaticTranslatableString::wrap(
                     g_Context,
-                    g_Messages[MessageKeys::g_StatusTipTranslatorAlreadyRunning]
+                    g_Messages[g_StatusTipTranslatorAlreadyRunning]
                 ),
                 CustomWidgets::EnrichedStatusBar::ColorHint::failure
             );
@@ -546,8 +546,8 @@ namespace Windows {
 
             QMessageBox::warning(
                 this,
-                tr(g_Messages[MessageKeys::g_DialogTitleTranslatorAlreadyRunning]),
-                tr(g_Messages[MessageKeys::g_DialogMessageTranslatorAlreadyRunning])
+                tr(g_Messages[g_DialogTitleTranslatorAlreadyRunning]),
+                tr(g_Messages[g_DialogMessageTranslatorAlreadyRunning])
                     .arg(lastTranslationTarget)
                     .arg(lastTranslationResult)
             );
@@ -559,7 +559,7 @@ namespace Windows {
             this->enrichedStatusBar->translatorResult(
                 Components::Internationalization::StaticTranslatableString::wrap(
                     g_Context,
-                    g_Messages[MessageKeys::g_StatusTipInstanceKilledByUser]
+                    g_Messages[g_StatusTipInstanceKilledByUser]
                 ),
                 CustomWidgets::EnrichedStatusBar::ColorHint::neutral
             );
@@ -570,8 +570,8 @@ namespace Windows {
         case Components::FSITools::FSIToolsAdapter::ChildResult::unknownError: {
             QMessageBox::warning(
                 this,
-                tr(g_Messages[MessageKeys::g_DialogTitleUnknownResult]),
-                tr(g_Messages[MessageKeys::g_DialogMessageUnknownResult])
+                tr(g_Messages[g_DialogTitleUnknownResult]),
+                tr(g_Messages[g_DialogMessageUnknownResult])
             );
 
             break;
@@ -585,7 +585,7 @@ namespace Windows {
         this->enrichedStatusBar->environmentState(
             Components::Internationalization::StaticTranslatableString::wrap(
                 g_Context,
-                g_Messages[MessageKeys::g_StatusTipTranslatorStarted]
+                g_Messages[g_StatusTipTranslatorStarted]
             ),
             CustomWidgets::EnrichedStatusBar::ColorHint::neutral
         );
@@ -604,7 +604,7 @@ namespace Windows {
                 this->enrichedStatusBar->environmentState(
                     Components::Internationalization::StaticTranslatableString::wrap(
                         g_Context,
-                        g_Messages[MessageKeys::g_StatusTipExecutionEnvironmentProgramHasErrors]
+                        g_Messages[g_StatusTipExecutionEnvironmentProgramHasErrors]
                     ),
                     CustomWidgets::EnrichedStatusBar::ColorHint::failure
                 );
@@ -613,7 +613,7 @@ namespace Windows {
                 this->enrichedStatusBar->environmentState(
                     Components::Internationalization::StaticTranslatableString::wrap(
                         g_Context,
-                        g_Messages[MessageKeys::g_StatusTipExecutionEnvironmentSuccess]
+                        g_Messages[g_StatusTipExecutionEnvironmentSuccess]
                     ),
                     CustomWidgets::EnrichedStatusBar::ColorHint::success
                 );
@@ -626,7 +626,7 @@ namespace Windows {
             this->enrichedStatusBar->environmentState(
                 Components::Internationalization::StaticTranslatableString::wrap(
                     g_Context,
-                    g_Messages[MessageKeys::g_StatusTipExecutionEnvironmentFailedToStart]
+                    g_Messages[g_StatusTipExecutionEnvironmentFailedToStart]
                 ),
                 CustomWidgets::EnrichedStatusBar::ColorHint::failure
             );
@@ -638,15 +638,15 @@ namespace Windows {
             this->enrichedStatusBar->environmentState(
                 Components::Internationalization::StaticTranslatableString::wrap(
                     g_Context,
-                    g_Messages[MessageKeys::g_StatusTipExecutionEnvironmentCrashed]
+                    g_Messages[g_StatusTipExecutionEnvironmentCrashed]
                 ),
                 CustomWidgets::EnrichedStatusBar::ColorHint::failure
             );
 
             QMessageBox::warning(
                 this,
-                tr(g_Messages[MessageKeys::g_DialogTitleExecutionEnvironmentCrashed]),
-                tr(g_Messages[MessageKeys::g_DialogMessageExecutionEnvironmentCrashed])
+                tr(g_Messages[g_DialogTitleExecutionEnvironmentCrashed]),
+                tr(g_Messages[g_DialogMessageExecutionEnvironmentCrashed])
             );
 
             break;
@@ -656,7 +656,7 @@ namespace Windows {
             this->enrichedStatusBar->environmentState(
                 Components::Internationalization::StaticTranslatableString::wrap(
                     g_Context,
-                    g_Messages[MessageKeys::g_StatusTipExecutionEnvironmentAlreadyRunning]
+                    g_Messages[g_StatusTipExecutionEnvironmentAlreadyRunning]
                 ),
                 CustomWidgets::EnrichedStatusBar::ColorHint::failure
             );
@@ -675,8 +675,8 @@ namespace Windows {
 
             QMessageBox::warning(
                 this,
-                tr(g_Messages[MessageKeys::g_DialogTitleExecutionEnvironmentAlreadyRunning]),
-                tr(g_Messages[MessageKeys::g_DialogMessageExecutionEnvironmentAlreadyRunning])
+                tr(g_Messages[g_DialogTitleExecutionEnvironmentAlreadyRunning]),
+                tr(g_Messages[g_DialogMessageExecutionEnvironmentAlreadyRunning])
                     .arg(lastExecutionEnvironmentProgram)
                     .arg(lastExecutionEnvironmentConfiguration)
             );
@@ -688,7 +688,7 @@ namespace Windows {
             this->enrichedStatusBar->environmentState(
                 Components::Internationalization::StaticTranslatableString::wrap(
                     g_Context,
-                    g_Messages[MessageKeys::g_StatusTipInstanceKilledByUser]
+                    g_Messages[g_StatusTipInstanceKilledByUser]
                 ),
                 CustomWidgets::EnrichedStatusBar::ColorHint::neutral
             );
@@ -699,8 +699,8 @@ namespace Windows {
         case Components::FSITools::FSIToolsAdapter::ChildResult::unknownError: {
             QMessageBox::warning(
                 this,
-                tr(g_Messages[MessageKeys::g_DialogTitleUnknownResult]),
-                tr(g_Messages[MessageKeys::g_DialogMessageUnknownResult])
+                tr(g_Messages[g_DialogTitleUnknownResult]),
+                tr(g_Messages[g_DialogMessageUnknownResult])
             );
 
             break;

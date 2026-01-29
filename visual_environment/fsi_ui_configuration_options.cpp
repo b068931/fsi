@@ -26,8 +26,8 @@ namespace Components::FSITools {
 
         QString result = QInputDialog::getItem(
             parent,
-            QCoreApplication::translate(g_Context, g_Messages[MessageKeys::g_DebugOptionDialogTitle]),
-            QCoreApplication::translate(g_Context, g_Messages[MessageKeys::g_DebugOptionDialogMessage]),
+            QCoreApplication::translate(g_Context, g_Messages[g_DebugOptionDialogTitle]),
+            QCoreApplication::translate(g_Context, g_Messages[g_DebugOptionDialogMessage]),
             options,
             defaultOption,
             isEditable,
@@ -67,8 +67,8 @@ namespace Components::FSITools {
         bool successful = false;
         QString result = QInputDialog::getItem(
             parent,
-            QCoreApplication::translate(g_Context, g_Messages[MessageKeys::g_EEConfigurationFileDialogTitle]),
-            QCoreApplication::translate(g_Context, g_Messages[MessageKeys::g_EEConfigurationFileDialogMessage]),
+            QCoreApplication::translate(g_Context, g_Messages[g_EEConfigurationFileDialogTitle]),
+            QCoreApplication::translate(g_Context, g_Messages[g_EEConfigurationFileDialogMessage]),
             foundConfigurations,
             defaultOption,
             isEditable,

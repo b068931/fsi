@@ -82,8 +82,8 @@ namespace CustomWidgets {
                 QPlainTextEdit* fileEditor = this->getEditorAtIndex(index);
                 if (!fileInfo.exists()) {
                     QMessageBox messageBox(this);
-                    messageBox.setWindowTitle(tr(g_Messages[MessageKeys::g_MessageBoxFileRemovedTitle]));
-                    messageBox.setText(tr(g_Messages[MessageKeys::g_MessageBoxFileRemovedMessage]).arg(path));
+                    messageBox.setWindowTitle(tr(g_Messages[g_MessageBoxFileRemovedTitle]));
+                    messageBox.setText(tr(g_Messages[g_MessageBoxFileRemovedMessage]).arg(path));
                     messageBox.setIcon(QMessageBox::Question);
                     
                     QPushButton* yesButton = messageBox.addButton(QMessageBox::Yes);
@@ -92,7 +92,7 @@ namespace CustomWidgets {
                     QPushButton* tryAgainButton = nullptr;
                     if (depth < maximumFileExistenceRetries) {
                         tryAgainButton = messageBox.addButton(
-                            tr(g_Messages[MessageKeys::g_CheckAgainFileRemovedButton]),
+                            tr(g_Messages[g_CheckAgainFileRemovedButton]),
                             QMessageBox::ActionRole
                         );
 
@@ -124,8 +124,8 @@ namespace CustomWidgets {
                     if (!newFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
                         QMessageBox::warning(
                         this,
-                            tr(g_Messages[MessageKeys::g_MessageBoxFileChangedOutsideErrorTitle]),
-                            tr(g_Messages[MessageKeys::g_MessageBoxFileChangedOutsideErrorMessage]).arg(path)
+                            tr(g_Messages[g_MessageBoxFileChangedOutsideErrorTitle]),
+                            tr(g_Messages[g_MessageBoxFileChangedOutsideErrorMessage]).arg(path)
                         );
 
                         fileEditor->document()->setModified(true);
@@ -146,16 +146,16 @@ namespace CustomWidgets {
                             if (newFile.error() != QFile::NoError) {
                                 QMessageBox::warning(
                                     this,
-                                    tr(g_Messages[MessageKeys::g_MessageBoxFileReadErrorTitle]),
-                                    tr(g_Messages[MessageKeys::g_MessageBoxFileReadErrorMessage]).arg(path)
+                                    tr(g_Messages[g_MessageBoxFileReadErrorTitle]),
+                                    tr(g_Messages[g_MessageBoxFileReadErrorMessage]).arg(path)
                                 );
                             }
                         }
                         else {
                             QMessageBox::StandardButton result = QMessageBox::question(
                                 this,
-                                tr(g_Messages[MessageKeys::g_MessageBoxFileChangedOutsideTitle]),
-                                tr(g_Messages[MessageKeys::g_MessageBoxFileChangedOutsideMessage]).arg(path),
+                                tr(g_Messages[g_MessageBoxFileChangedOutsideTitle]),
+                                tr(g_Messages[g_MessageBoxFileChangedOutsideMessage]).arg(path),
                                 QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
                                 QMessageBox::No
                             );
@@ -167,8 +167,8 @@ namespace CustomWidgets {
                                 if (newFile.error() != QFile::NoError) {
                                     QMessageBox::warning(
                                         this,
-                                        tr(g_Messages[MessageKeys::g_MessageBoxFileReadErrorTitle]),
-                                        tr(g_Messages[MessageKeys::g_MessageBoxFileReadErrorMessage]).arg(path)
+                                        tr(g_Messages[g_MessageBoxFileReadErrorTitle]),
+                                        tr(g_Messages[g_MessageBoxFileReadErrorMessage]).arg(path)
                                     );
                                 }
                             }
@@ -215,13 +215,13 @@ namespace CustomWidgets {
         Q_ASSERT(this->removeAction && "The remove action has not been set up.");
 
         this->workingDirectory->setStatusTip(
-            tr(g_Messages[MessageKeys::g_TooltipWorkingDirectoryView])
+            tr(g_Messages[g_TooltipWorkingDirectoryView])
         );
 
-        this->openAction->setText(tr(g_Messages[MessageKeys::g_ContextMenuOpen]));
-        this->newFileAction->setText(tr(g_Messages[MessageKeys::g_ContextMenuNewFile]));
-        this->newDirectoryAction->setText(tr(g_Messages[MessageKeys::g_ContextMenuNewDirectory]));
-        this->removeAction->setText(tr(g_Messages[MessageKeys::g_ContextMenuRemove]));
+        this->openAction->setText(tr(g_Messages[g_ContextMenuOpen]));
+        this->newFileAction->setText(tr(g_Messages[g_ContextMenuNewFile]));
+        this->newDirectoryAction->setText(tr(g_Messages[g_ContextMenuNewDirectory]));
+        this->removeAction->setText(tr(g_Messages[g_ContextMenuRemove]));
     }
 
     void TextEditor::onWorkingDirectoryContextMenu(const QPoint& position) noexcept {
@@ -293,8 +293,8 @@ namespace CustomWidgets {
             bool ok;
             QString fileName = QInputDialog::getText(
                 this,
-                tr(g_Messages[MessageKeys::g_InputDialogNewFileTitle]),
-                tr(g_Messages[MessageKeys::g_InputDialogNewFileLabel]),
+                tr(g_Messages[g_InputDialogNewFileTitle]),
+                tr(g_Messages[g_InputDialogNewFileLabel]),
                 QLineEdit::Normal,
                 QString(),
                 &ok
@@ -311,8 +311,8 @@ namespace CustomWidgets {
                 else {
                     QMessageBox::warning(
                         this,
-                        tr(g_Messages[MessageKeys::g_ErrorFileSystemTitle]),
-                        tr(g_Messages[MessageKeys::g_ErrorFileCreationMessage]).arg(newFilePath)
+                        tr(g_Messages[g_ErrorFileSystemTitle]),
+                        tr(g_Messages[g_ErrorFileCreationMessage]).arg(newFilePath)
                     );
                 }
             }
@@ -334,8 +334,8 @@ namespace CustomWidgets {
             bool ok;
             QString directoryName = QInputDialog::getText(
                 this,
-                tr(g_Messages[MessageKeys::g_InputDialogNewDirectoryTitle]),
-                tr(g_Messages[MessageKeys::g_InputDialogNewDirectoryLabel]),
+                tr(g_Messages[g_InputDialogNewDirectoryTitle]),
+                tr(g_Messages[g_InputDialogNewDirectoryLabel]),
                 QLineEdit::Normal,
                 QString(),
                 &ok
@@ -348,8 +348,8 @@ namespace CustomWidgets {
                 if (!directory.mkpath(newDirectoryPath)) {
                     QMessageBox::warning(
                         this,
-                        tr(g_Messages[MessageKeys::g_ErrorFileSystemTitle]),
-                        tr(g_Messages[MessageKeys::g_ErrorDirectoryCreationMessage]).arg(newDirectoryPath)
+                        tr(g_Messages[g_ErrorFileSystemTitle]),
+                        tr(g_Messages[g_ErrorDirectoryCreationMessage]).arg(newDirectoryPath)
                     );
                 }
             }
@@ -357,15 +357,15 @@ namespace CustomWidgets {
         else if (selectedAction == this->removeAction) {
             QString confirmMessage;
             if (isDirectory) {
-                confirmMessage = tr(g_Messages[MessageKeys::g_ConfirmRemovalDirectoryMessage]).arg(clickedPath);
+                confirmMessage = tr(g_Messages[g_ConfirmRemovalDirectoryMessage]).arg(clickedPath);
             }
             else {
-                confirmMessage = tr(g_Messages[MessageKeys::g_ConfirmRemovalFileMessage]).arg(clickedPath);
+                confirmMessage = tr(g_Messages[g_ConfirmRemovalFileMessage]).arg(clickedPath);
             }
 
             QMessageBox::StandardButton reply = QMessageBox::question(
                 this,
-                tr(g_Messages[MessageKeys::g_ConfirmRemovalTitle]),
+                tr(g_Messages[g_ConfirmRemovalTitle]),
                 confirmMessage,
                 QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
                 QMessageBox::No
@@ -386,8 +386,8 @@ namespace CustomWidgets {
                 if (!success) {
                     QMessageBox::warning(
                         this,
-                        tr(g_Messages[MessageKeys::g_ErrorFileSystemTitle]),
-                        tr(g_Messages[MessageKeys::g_ErrorRemovalMessage]).arg(clickedPath)
+                        tr(g_Messages[g_ErrorFileSystemTitle]),
+                        tr(g_Messages[g_ErrorRemovalMessage]).arg(clickedPath)
                     );
                 }
             }

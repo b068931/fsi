@@ -76,7 +76,7 @@ private:
     }
 public:
     virtual void visit(source_file_token active_type, const structure_builder::pointer_dereference* variable, bool) override {
-        this->encode_active_type(instruction_encoder::convert_type_to_uint8(active_type), 0b10);
+        this->encode_active_type(convert_type_to_uint8(active_type), 0b10);
         this->write_id(variable->pointer_variable->id);
 
         this->instruction_symbols.push_back(static_cast<unsigned char>(variable->derefernce_indexes.size()));
@@ -86,7 +86,7 @@ public:
     }
     virtual void visit(source_file_token active_type, const structure_builder::regular_variable* variable, bool is_signed) override {
         if (is_signed) {
-            this->encode_active_type(instruction_encoder::convert_type_to_uint8(active_type), 0b00);
+            this->encode_active_type(convert_type_to_uint8(active_type), 0b00);
         }
         else {
             if (active_type == source_file_token::no_return_module_call_keyword) {
@@ -96,7 +96,7 @@ public:
                 this->encode_active_type(0b11, 0b11);
             }
             else {
-                this->encode_active_type(instruction_encoder::convert_type_to_uint8(active_type), 0b10);
+                this->encode_active_type(convert_type_to_uint8(active_type), 0b10);
             }
         }
 
@@ -108,7 +108,7 @@ public:
 #pragma clang diagnostic ignored "-Wswitch-enum"
 #pragma clang diagnostic ignored "-Wswitch-default"
 
-        this->encode_active_type(instruction_encoder::convert_type_to_uint8(active_type), 0b01);
+        this->encode_active_type(convert_type_to_uint8(active_type), 0b01);
         // ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
         // ReSharper disable once CppIncompleteSwitchStatement
         switch (variable->type) {

@@ -9,39 +9,39 @@
 
 struct resource_container {
 private:
-	struct memory_comparator {
-		bool operator() (const void* left, const void* right) const noexcept {
-			// C++ standard deems pointer comparison to be UB if pointers do not belong to the same array, etc.
-			return reinterpret_cast<std::uintptr_t>(left) < reinterpret_cast<std::uintptr_t>(right);
-		}
+    struct memory_comparator {
+        bool operator() (const void* left, const void* right) const noexcept {
+            // C++ standard deems pointer comparison to be UB if pointers do not belong to the same array, etc.
+            return reinterpret_cast<std::uintptr_t>(left) < reinterpret_cast<std::uintptr_t>(right);
+        }
     };
 
 public:
-	std::vector<module_mediator::callback_bundle*> destroy_callbacks{};
-	std::set<void*, memory_comparator> allocated_memory{ memory_comparator{} };
+    std::vector<module_mediator::callback_bundle*> destroy_callbacks{};
+    std::set<void*, memory_comparator> allocated_memory{ memory_comparator{} };
 
-	std::recursive_mutex* lock{ new std::recursive_mutex{} };
+    std::recursive_mutex* lock{ new std::recursive_mutex{} };
 
-	resource_container() = default;
-	void move_resource_container_to_this(resource_container&& object) {  // NOLINT(cppcoreguidelines-rvalue-reference-param-not-moved)
-		this->allocated_memory = std::move(object.allocated_memory);
-	}
+    resource_container() = default;
+    void move_resource_container_to_this(resource_container&& object) {  // NOLINT(cppcoreguidelines-rvalue-reference-param-not-moved)
+        this->allocated_memory = std::move(object.allocated_memory);
+    }
 
     resource_container(const resource_container& object) = delete;
     resource_container& operator= (const resource_container& object) = delete;
 
-	resource_container(resource_container&& object) noexcept
-		:allocated_memory{ std::move(object.allocated_memory) }
-	{}
-	resource_container& operator= (resource_container&& object) noexcept {
-		this->move_resource_container_to_this(std::move(object));
-		return *this;
-	}
+    resource_container(resource_container&& object) noexcept
+        :allocated_memory{ std::move(object.allocated_memory) }
+    {}
+    resource_container& operator= (resource_container&& object) noexcept {
+        this->move_resource_container_to_this(std::move(object));
+        return *this;
+    }
 
-	virtual ~resource_container() noexcept {
-		// Calls to destroy callbacks must precede the deallocation of memory
-		for (auto& destroy_callback : this->destroy_callbacks) {
-		    std::size_t module_index = interoperation::get_module_part()->find_module_index(destroy_callback->module_name);
+    virtual ~resource_container() noexcept {
+        // Calls to destroy callbacks must precede the deallocation of memory
+        for (auto& destroy_callback : this->destroy_callbacks) {
+            std::size_t module_index = interoperation::get_module_part()->find_module_index(destroy_callback->module_name);
             if (module_index == module_mediator::module_part::module_not_found) {
                 LOG_WARNING(
                     interoperation::get_module_part(),
@@ -89,22 +89,22 @@ public:
                     )
                 );
             }
-		}
+        }
 
-		if (!this->allocated_memory.empty()) {
+        if (!this->allocated_memory.empty()) {
             LOG_PROGRAM_WARNING(
                 interoperation::get_module_part(), 
-				std::format("Destroyed resource container had {} dangling memory block(s).", this->allocated_memory.size())
-			);
-		}
+                std::format("Destroyed resource container had {} dangling memory block(s).", this->allocated_memory.size())
+            );
+        }
 
-		for (void* memory : this->allocated_memory) {
+        for (void* memory : this->allocated_memory) {
             // It is guaranteed that the memory is allocated as a char array
-			delete[] static_cast<char*>(memory);
-		}
+            delete[] static_cast<char*>(memory);
+        }
 
-		delete this->lock;
-	}
+        delete this->lock;
+    }
 };
 
 #endif

@@ -63,7 +63,7 @@ namespace backend {
         if (value_pointer_data == null_pointer) {
             interoperation::thread_group_deallocate(
                 thread_group_id,
-                reinterpret_cast<module_mediator::memory>(allocated_memory)
+                std::bit_cast<module_mediator::memory>(allocated_memory)
             );
 
             return nullptr;
@@ -77,18 +77,18 @@ namespace backend {
         if (cross_thread_sharing == null_pointer) {
             interoperation::thread_group_deallocate(
                 thread_group_id,
-                reinterpret_cast<module_mediator::memory>(allocated_memory)
+                std::bit_cast<module_mediator::memory>(allocated_memory)
             );
 
             interoperation::thread_deallocate(
                 thread_id, 
-                reinterpret_cast<module_mediator::memory>(value_pointer_data)
+                std::bit_cast<module_mediator::memory>(value_pointer_data)
             );
 
             return nullptr;
         }
 
-        char* pointer_data = reinterpret_cast<char*>(value_pointer_data);
+        char* pointer_data = std::bit_cast<char*>(value_pointer_data);
 
         //fill in memory size
         std::memcpy(pointer_data, &size, sizeof(std::uint64_t));
@@ -102,7 +102,7 @@ namespace backend {
         //initialize cross-thread sharing counter
         std::uint64_t thread_counter_initialization = 1;
         std::memcpy(
-            reinterpret_cast<void*>(cross_thread_sharing),
+            std::bit_cast<void*>(cross_thread_sharing),
             &thread_counter_initialization,
             sizeof(std::uint64_t)
         );

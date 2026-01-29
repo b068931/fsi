@@ -26,7 +26,7 @@ namespace generic_parser {
 		};
 
 	private:
-		generic_parser::block_reader<1024> reader;
+		block_reader<1024> reader;
 		token_type name_token; //this token will be returned whenever name is found. names are symbols between separators and hard_symbols
 		token_type end_token; //this token will be returned whenever end of file is encountered
 		token_type additional_token; //additional token is created when hard symbol is encountered and it generated name from names_stack

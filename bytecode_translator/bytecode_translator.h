@@ -363,7 +363,7 @@ private:
 
             this->write_1_byte(static_cast<std::uint8_t>(function_arguments_count));
             for (const structure_builder::regular_variable& var: fnc.arguments) {
-                this->write_1_byte(bytecode_translator::convert_type_to_uint8(var.type));
+                this->write_1_byte(convert_type_to_uint8(var.type));
                 this->write_8_bytes(var.id);
 
                 run_size += 9;
@@ -382,14 +382,14 @@ private:
         this->write_4_bytes(static_cast<std::uint32_t>(func.locals.size()));
 
         for (const structure_builder::regular_variable& var : func.locals) {
-            this->write_1_byte(bytecode_translator::convert_type_to_uint8(var.type));
+            this->write_1_byte(convert_type_to_uint8(var.type));
             this->write_8_bytes(var.id);
 
             run_size += 9;
         }
 
-        std::map<source_file_token, std::uint8_t> operation_codes{ this->get_operation_codes() };
-        std::vector<instruction_check*> filters_list{ this->get_instruction_filters() };
+        std::map operation_codes{ this->get_operation_codes() };
+        std::vector filters_list{ this->get_instruction_filters() };
         for (const structure_builder::instruction& current_instruction : func.body) {
             this->check_logic_errors(filters_list, current_instruction);
 

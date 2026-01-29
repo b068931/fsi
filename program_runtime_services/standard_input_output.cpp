@@ -22,7 +22,7 @@ namespace {
     //PRTS expects that it is the only entity that can write to stdout and stdin to work correctly.
     bool is_stdio_attached = false;
     bool check_stdio_attached() {
-        std::shared_lock<std::shared_mutex> lock(io_synchronizer);
+        std::shared_lock lock(io_synchronizer);
         return is_stdio_attached;
     }
 }
@@ -939,7 +939,7 @@ namespace {
 
         while (check_stdio_attached()) {
             std::queue<thread_input_descriptor> local_input_queue{};
-            std::unique_lock<std::mutex> lock(input_queue::lock);
+            std::unique_lock lock(input_queue::lock);
 
             input_queue::signaling.wait(lock, [] {
                 return !check_stdio_attached() || !input_queue::input_queue.empty();
@@ -1051,7 +1051,7 @@ namespace {
 
         bool output_shutdown = false;
         while (check_stdio_attached()) {
-            std::unique_lock<std::mutex> lock(output_queue::lock);
+            std::unique_lock lock(output_queue::lock);
             output_queue::signaling.wait(lock, [] {
                 return  !check_stdio_attached() || !output_queue::output_queue.empty();
             });
@@ -1093,7 +1093,7 @@ namespace {
 }
 
 module_mediator::return_value attach_to_stdio(module_mediator::arguments_string_type) {
-    std::lock_guard<std::shared_mutex> lock{ io_synchronizer };
+    std::scoped_lock lock{ io_synchronizer };
     if (is_stdio_attached) {
         return module_mediator::module_success;
     }
@@ -1176,9 +1176,9 @@ module_mediator::return_value detach_from_stdio(module_mediator::arguments_strin
     }
 
     {
-        std::unique_lock<std::shared_mutex> io_lock(io_synchronizer, std::defer_lock);
-        std::unique_lock<std::mutex> input_lock(input_queue::lock, std::defer_lock);
-        std::unique_lock<std::mutex> output_lock(output_queue::lock, std::defer_lock);
+        std::unique_lock io_lock(io_synchronizer, std::defer_lock);
+        std::unique_lock input_lock(input_queue::lock, std::defer_lock);
+        std::unique_lock output_lock(output_queue::lock, std::defer_lock);
 
         //We must ensure that workers are either already waiting on their respective condition variables or
         //are yet to acquire their locks. This avoids a potential deadlock when they check whether we are
@@ -1285,7 +1285,7 @@ module_mediator::return_value callback_register_output(module_mediator::argument
     auto [thread_id, buffer_address, buffer_size] = 
         module_mediator::respond_callback<module_mediator::return_value, module_mediator::memory, module_mediator::eight_bytes>::unpack(bundle);
 
-    std::unique_lock<std::mutex> lock(output_queue::lock);
+    std::unique_lock lock(output_queue::lock);
     if (!check_stdio_attached()) { //This should not ever lead to a deadlock because we are using a shared lock.
         LOG_WARNING(
             interoperation::get_module_part(),
@@ -1342,7 +1342,7 @@ module_mediator::return_value out(module_mediator::arguments_string_type bundle)
         return module_mediator::execution_result_terminate;
     }
 
-    std::shared_lock<std::shared_mutex> lock(io_synchronizer);
+    std::shared_lock lock(io_synchronizer);
     if (!is_stdio_attached) {
         LOG_PROGRAM_ERROR(
             interoperation::get_module_part(),
@@ -1380,7 +1380,7 @@ module_mediator::return_value callback_register_input(module_mediator::arguments
             module_mediator::eight_bytes
         >::unpack(bundle);
 
-    std::unique_lock<std::mutex> lock(input_queue::lock);
+    std::unique_lock lock(input_queue::lock);
     if (!check_stdio_attached()) { //This should not ever lead to a deadlock because we are using a shared lock.
         LOG_WARNING(
             interoperation::get_module_part(),
@@ -1455,7 +1455,7 @@ module_mediator::return_value in(module_mediator::arguments_string_type bundle) 
         return module_mediator::execution_result_terminate;
     }
 
-    std::shared_lock<std::shared_mutex> lock(io_synchronizer);
+    std::shared_lock lock(io_synchronizer);
     if (!is_stdio_attached) {
         LOG_PROGRAM_ERROR(
             interoperation::get_module_part(),

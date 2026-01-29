@@ -22,7 +22,7 @@ namespace Components::ApplicationStyle {
     )
         : QObject(parent), currentStyle(Style::NoStyle)
     {
-        ApplicationStylesManager::loadCustomFonts(fontsRoot);
+        loadCustomFonts(fontsRoot);
         this->setStyle(preselectedStyle);
     }
 
@@ -40,7 +40,7 @@ namespace Components::ApplicationStyle {
             int newStyleIndex = static_cast<int>(newStyle);
             if (newStyleIndex >= 0 && std::isless(newStyleIndex, std::size(g_AvailableStylesMappings))) {
                 const QString styleFilePath = g_AvailableStylesMappings[static_cast<int>(newStyle)];
-                if (ApplicationStylesManager::loadStyleFromFile(styleFilePath)) {
+                if (loadStyleFromFile(styleFilePath)) {
                     this->currentStyle = newStyle;
                     return true;
                 }

@@ -47,10 +47,10 @@ public:
 	}
 
 	using memory_addresses = std::map<entity_id, std::pair<std::int32_t, std::uint8_t>>;
-	static memory_layouts_builder::memory_addresses merge_memory_layouts(
-		std::pair<memory_layouts_builder::memory_addresses, memory_layouts_builder::memory_addresses>& arguments_locals_pair
+	static memory_addresses merge_memory_layouts(
+		std::pair<memory_addresses, memory_addresses>& arguments_locals_pair
 	) {
-		memory_layouts_builder::memory_addresses temp{};
+		memory_addresses temp{};
 
 		temp.merge(arguments_locals_pair.first);
 		temp.merge(arguments_locals_pair.second);
