@@ -40,12 +40,14 @@ namespace {
 		}
 
 		cleanse_string(message_pointer, message_pointer_size);
-		if (file_name_pointer != nullptr)
-			cleanse_string(file_name_pointer, file_name_pointer_size);
-		if (function_name_pointer != nullptr)
-			cleanse_string(function_name_pointer, function_name_pointer_size);
+		if (file_name_pointer != nullptr) {
+            cleanse_string(file_name_pointer, file_name_pointer_size);
+        }
+        if (function_name_pointer != nullptr) {
+            cleanse_string(function_name_pointer, function_name_pointer_size);
+        }
 
-		module_mediator::fast_call<module_mediator::memory>(
+        module_mediator::fast_call<module_mediator::memory>(
 			interoperation::get_module_part(),
 			interoperation::index_getter::logger(),
 			log_endpoints[static_cast<std::uint8_t>(log)],

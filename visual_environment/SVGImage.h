@@ -24,8 +24,8 @@ namespace CustomWidgets {
         void setImageSize(const QSize& size);
 
     protected:
-        virtual void paintEvent(QPaintEvent* event) override;
-        virtual QSize sizeHint() const override;
+        void paintEvent(QPaintEvent* event) override;
+        QSize sizeHint() const override;
 
     private:
         QSvgRenderer svgRenderer;

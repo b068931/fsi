@@ -6,11 +6,11 @@
 
 class signed_variable : public generic_variable {
 public:
-	signed_variable(std::uint8_t real_type, std::uint8_t active_type, entity_id id)
-		:generic_variable{ real_type, active_type, id }
-	{}
+    signed_variable(std::uint8_t real_type, std::uint8_t active_type, entity_id id)
+        :generic_variable{ real_type, active_type, id }
+    {}
 
-	virtual void visit(instruction_builder* builder) override;
+    void visit(instruction_builder* builder) override;
 };
 
 #endif // !SIGNED_VARIABLE_H

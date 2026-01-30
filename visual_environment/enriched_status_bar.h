@@ -77,7 +77,7 @@ namespace CustomWidgets {
         void onRetranslateUI() noexcept;
 
     protected:
-        virtual bool event(QEvent* event) override;
+        bool event(QEvent* event) override;
 
     private:
         using ITranslatableString = Components::Internationalization::ITranslatableString;

@@ -43,20 +43,20 @@ namespace Components::Internationalization {
         /// Returns a pointer to a null-terminated string representing the context information.
         /// </summary>
         /// <returns>A pointer to a constant null-terminated string containing the context information.</returns>
-        virtual const char* context() const noexcept override;
+        const char* context() const noexcept override;
 
         /// <summary>
         /// Returns a pointer to a null-terminated string with an original message that can be translated.
         /// </summary>
         /// <returns>A pointer to a null-terminated character string with the original message.</returns>
-        virtual const char* message() const noexcept override;
+        const char* message() const noexcept override;
 
         /// <summary>
         /// Returns a string representation of the object's frozen state.
         /// That is, a QString that will not change even if the language setting changes.
         /// </summary>
         /// <returns>A QString representing the frozen message of the object.</returns>
-        virtual QString freeze() const override;
+        QString freeze() const override;
 
     private:
         const char* savedContext;

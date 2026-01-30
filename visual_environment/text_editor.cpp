@@ -260,8 +260,9 @@ namespace CustomWidgets {
     bool TextEditor::saveCurrentFile() {
         Q_ASSERT(this->fileTabs != nullptr && "The file tabs have not been set up.");
 
-        if (this->fileTabs->currentIndex() == -1) 
+        if (this->fileTabs->currentIndex() == -1) {
             return false;
+        }
 
         return this->saveFileAtIndex(
             this->fileTabs->currentIndex()
@@ -271,8 +272,9 @@ namespace CustomWidgets {
     bool TextEditor::saveCurrentFileAs() {
         Q_ASSERT(this->fileTabs != nullptr && "The file tabs have not been set up.");
 
-        if (this->fileTabs->currentIndex() == -1) 
+        if (this->fileTabs->currentIndex() == -1) {
             return false;
+        }
 
         int currentIndex = this->fileTabs->currentIndex();
         OpenedFile& openFile = this->openFiles[currentIndex];
@@ -299,8 +301,9 @@ namespace CustomWidgets {
     bool TextEditor::closeCurrentFile() {
         Q_ASSERT(this->fileTabs != nullptr && "The file tabs have not been set up.");
 
-        if (this->fileTabs->currentIndex() == -1) 
+        if (this->fileTabs->currentIndex() == -1) {
             return false;
+        }
 
         return this->closeFileAtIndex(
             this->fileTabs->currentIndex()

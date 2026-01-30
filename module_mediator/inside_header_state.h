@@ -6,7 +6,7 @@
 namespace module_mediator::parser::states {
     class inside_header_state : public state_type {
     public:
-        virtual void handle_token(
+        void handle_token(
             components::engine_module_builder::result_type& modules,
             components::engine_module_builder::builder_parameters& parameters,
             components::engine_module_builder::read_map_type& read_map

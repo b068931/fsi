@@ -6,12 +6,12 @@
 
 class expose_function_state : public state_type {
 public:
-	virtual void handle_token(
-		structure_builder::file& output_file_structure,
-		structure_builder::builder_parameters& helper,
-		structure_builder::read_map_type& read_map
-	) override {
-	    std::string function_name = helper.name_translations.translate_name(read_map.get_token_generator_name());
+    void handle_token(
+        structure_builder::file& output_file_structure,
+        structure_builder::builder_parameters& helper,
+        structure_builder::read_map_type& read_map
+    ) override {
+        std::string function_name = helper.name_translations.translate_name(read_map.get_token_generator_name());
         auto found_exposed_function = std::ranges::find_if(output_file_structure.exposed_functions, 
                                                            [&function_name](const auto& func) {
                                                                return func->name == function_name;
@@ -33,7 +33,7 @@ public:
                 );
             }
         }
-	}
+    }
 };
 
 

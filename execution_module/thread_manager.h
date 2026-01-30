@@ -10,7 +10,7 @@
 
 class thread_manager {
     /*
-    * It should be noted that scheduler works ONLY with unique ids,
+    * It should be noted that scheduler works ONLY with unique IDs,
     * and resource_module may reuse id after object with specific id was deleted.
     * This means that we must delete an object in this order:
     * 1. Delete from scheduler.
@@ -138,6 +138,7 @@ public:
     void add_thread_group(module_mediator::return_value id, std::uint64_t preferred_stack_size) {
         this->scheduler.add_thread_group(id, preferred_stack_size);
     }
+
     void add_thread(
         module_mediator::return_value thread_group_id,
         module_mediator::return_value thread_id,
@@ -147,21 +148,26 @@ public:
     ) {
         this->scheduler.add_thread(thread_group_id, thread_id, priority, thread_state, jump_table);
     }
+
     void forget_thread_group(module_mediator::return_value thread_group_id) {
         this->scheduler.forget_thread_group(thread_group_id);
     }
+
     bool delete_thread(module_mediator::return_value thread_group_id, module_mediator::return_value thread_id) {
         return this->scheduler.delete_thread(thread_group_id, thread_id);
     }
+
     void block(module_mediator::return_value thread_id) {
         assert(get_thread_local_structure()->currently_running_thread_information.thread_id == thread_id &&
             "Thread manager can only block the currently running thread.");
 
         this->scheduler.block(thread_id);
     }
+
     bool make_runnable(module_mediator::return_value thread_id) {
         return this->scheduler.make_runnable(thread_id);
     }
+
     void startup(std::uint16_t thread_count) {
         if(!this->scheduler.has_available_jobs()) {
             LOG_WARNING(interoperation::get_module_part(), "No available jobs found. Executors won't start.");

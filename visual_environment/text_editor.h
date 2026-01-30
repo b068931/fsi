@@ -109,8 +109,8 @@ namespace CustomWidgets {
         bool hasSelectedFile() const noexcept;
 
     protected:
-        virtual void showEvent(QShowEvent* event) override;
-        virtual bool event(QEvent* event) override;
+        void showEvent(QShowEvent* event) override;
+        bool event(QEvent* event) override;
 
     private slots:
         void onWorkingDirectoryContextMenu(const QPoint& position) noexcept;

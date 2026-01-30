@@ -110,7 +110,7 @@ namespace module_mediator {
 
         template<typename type>
         static void write_value(arguments_string_element** arguments_string_copy, type value) {
-			std::memcpy(*arguments_string_copy, &value, sizeof(value));
+            std::memcpy(*arguments_string_copy, &value, sizeof(value));
             *arguments_string_copy += sizeof(value);
         }
 
@@ -239,7 +239,7 @@ namespace module_mediator {
 
             arguments_string_type arguments_string_types = arguments_string + 1;
             arguments_string_type arguments_string_values = arguments_string + arguments_string[0] + 1;
-            while (saved_begin != end) {
+            while (saved_begin != end && size_to_allocate > 1) {
                 *arguments_string_types = saved_begin->first;
                 std::memcpy(
                     arguments_string_values,
@@ -359,9 +359,8 @@ namespace module_mediator {
         std::size_t function_index,
         args... arguments
     ) {
-        std::unique_ptr<arguments_string_element[]> args_string{
-            arguments_string_builder::pack(arguments...)
-        };
+        auto args_string = std::make_unique<arguments_string_element[]>(
+            arguments_string_builder::pack(arguments...));
 
         return part->call_module(
             module_index,

@@ -57,7 +57,9 @@ module_mediator::return_value deallocate_memory(module_mediator::arguments_strin
 
     module_mediator::memory address{};
     std::memcpy(&address, return_address, sizeof(module_mediator::memory));
-    if (address == nullptr) return module_mediator::execution_result_continue;
+    if (address == nullptr) {
+        return module_mediator::execution_result_continue;
+    }
 
     if (interoperation::verify_thread_memory(interoperation::get_current_thread_id(), address) == module_mediator::module_failure) {
         LOG_PROGRAM_ERROR(

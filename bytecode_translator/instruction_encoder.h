@@ -58,9 +58,11 @@ class instruction_encoder : public structure_builder::variable_visitor {
             this->instruction_symbols.push_back(bytes[counter]);
         }
     }
+
     void write_id(structure_builder::entity_id id) {
         this->write_bytes<std::uint64_t>(id);
     }
+
     void encode_active_type(std::uint8_t active_type, std::uint8_t type_mod) {
         std::uint8_t type_bits =
             static_cast<std::uint8_t>((type_mod & 0b11) << 2 | 0b11 & active_type);
@@ -73,8 +75,9 @@ class instruction_encoder : public structure_builder::variable_visitor {
         ++this->position_in_type_bytes;
         this->instruction_symbols[byte_index] |= type_bits;
     }
+
 public:
-    virtual void visit(source_file_token active_type, const structure_builder::pointer_dereference* variable, bool) override {
+    void visit(source_file_token active_type, const structure_builder::pointer_dereference* variable, bool) override {
         this->encode_active_type(convert_type_to_uint8(active_type), 0b10);
         this->write_id(variable->pointer_variable->id);
 
@@ -83,7 +86,8 @@ public:
             this->write_id(var->id);
         }
     }
-    virtual void visit(source_file_token active_type, const structure_builder::regular_variable* variable, bool is_signed) override {
+
+    void visit(source_file_token active_type, const structure_builder::regular_variable* variable, bool is_signed) override {
         if (is_signed) {
             this->encode_active_type(convert_type_to_uint8(active_type), 0b00);
         }
@@ -101,7 +105,8 @@ public:
 
         this->write_id(variable->id);
     }
-    virtual void visit(source_file_token active_type, const structure_builder::immediate_variable* variable, bool) override {
+
+    void visit(source_file_token active_type, const structure_builder::immediate_variable* variable, bool) override {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wswitch"
 #pragma clang diagnostic ignored "-Wswitch-enum"
@@ -132,27 +137,27 @@ public:
 #pragma clang diagnostic pop
     }
 
-    virtual void visit(source_file_token, const structure_builder::function_address* variable, bool) override {
+    void visit(source_file_token, const structure_builder::function_address* variable, bool) override {
         this->encode_active_type(2, 0b11);
         this->write_id(variable->func->id);
     }
 
-    virtual void visit(source_file_token, const structure_builder::module_variable* variable, bool) override {
+    void visit(source_file_token, const structure_builder::module_variable* variable, bool) override {
         this->encode_active_type(0, 0b11);
         this->write_id(variable->mod->id);
     }
 
-    virtual void visit(source_file_token, const structure_builder::module_function_variable* variable, bool) override {
+    void visit(source_file_token, const structure_builder::module_function_variable* variable, bool) override {
         this->encode_active_type(2, 0b11);
         this->write_id(variable->func->id);
     }
 
-    virtual void visit(source_file_token, const structure_builder::jump_point_variable* variable, bool) override {
+    void visit(source_file_token, const structure_builder::jump_point_variable* variable, bool) override {
         this->encode_active_type(1, 0b11);
         this->write_id(variable->point->id);
     }
 
-    virtual void visit(source_file_token, const structure_builder::string_constant* variable, bool) override {
+    void visit(source_file_token, const structure_builder::string_constant* variable, bool) override {
         this->encode_active_type(1, 0b11);
         this->write_id(variable->value->id);
     }

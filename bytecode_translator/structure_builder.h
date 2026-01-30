@@ -87,7 +87,7 @@ public:
             type{ variable_type }
         {}
 
-        virtual void visit(source_file_token active_type, variable_visitor* visitor, bool is_signed) override {
+        void visit(source_file_token active_type, variable_visitor* visitor, bool is_signed) override {
             visitor->visit(active_type, this, is_signed);
         }
     };
@@ -102,7 +102,7 @@ public:
             type{ variable_type }
         {}
 
-        virtual void visit(source_file_token active_type, variable_visitor* visitor, bool is_signed) override {
+        void visit(source_file_token active_type, variable_visitor* visitor, bool is_signed) override {
             visitor->visit(active_type, this, is_signed);
         }
     };
@@ -115,7 +115,7 @@ public:
             func{nullptr}
         {}
 
-        virtual void visit(source_file_token active_type, variable_visitor* visitor, bool is_signed) override {
+        void visit(source_file_token active_type, variable_visitor* visitor, bool is_signed) override {
             visitor->visit(active_type, this, is_signed);
         }
     };
@@ -129,7 +129,7 @@ public:
             pointer_variable{nullptr}
         {}
 
-        virtual void visit(source_file_token active_type, variable_visitor* visitor, bool is_signed) override {
+        void visit(source_file_token active_type, variable_visitor* visitor, bool is_signed) override {
             visitor->visit(active_type, this, is_signed);
         }
     };
@@ -142,7 +142,7 @@ public:
             point{ jump_point }
         {}
 
-        virtual void visit(source_file_token active_type, variable_visitor* visitor, bool is_signed) override {
+        void visit(source_file_token active_type, variable_visitor* visitor, bool is_signed) override {
             visitor->visit(active_type, this, is_signed);
         }
     };
@@ -155,7 +155,7 @@ public:
             mod{ module_pointer }
         {}
 
-        virtual void visit(source_file_token active_type, variable_visitor* visitor, bool is_signed) override {
+        void visit(source_file_token active_type, variable_visitor* visitor, bool is_signed) override {
             visitor->visit(active_type, this, is_signed);
         }
     };
@@ -168,7 +168,7 @@ public:
             func{mod_func}
         {}
 
-        virtual void visit(source_file_token active_type, variable_visitor* visitor, bool is_signed) override {
+        void visit(source_file_token active_type, variable_visitor* visitor, bool is_signed) override {
             visitor->visit(active_type, this, is_signed);
         }
     };
@@ -179,7 +179,7 @@ public:
             :value{ string_value }
         {}
 
-        virtual void visit(source_file_token active_type, variable_visitor* visitor, bool is_signed) override {
+        void visit(source_file_token active_type, variable_visitor* visitor, bool is_signed) override {
             visitor->visit(active_type, this, is_signed);
         }
     };

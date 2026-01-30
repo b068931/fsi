@@ -15,7 +15,8 @@
 class include_file_state : public state_type {
 public:
     inline static std::vector<std::filesystem::path> active_parsing_files{};
-    virtual void handle_token(
+
+    void handle_token(
         structure_builder::file& output_file_structure,
         structure_builder::builder_parameters& helper,
         structure_builder::read_map_type& read_map

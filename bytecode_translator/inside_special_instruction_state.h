@@ -5,15 +5,15 @@
 
 class inside_special_instruction_state : public state_type {
 public:
-	virtual void handle_token(
-		structure_builder::file&,
-		structure_builder::builder_parameters&,
-		structure_builder::read_map_type& read_map
-	) override {
-		if (read_map.get_current_token() == source_file_token::include_keyword) {
-			read_map.switch_context(structure_builder::context_key::inside_include);
-		}
-	}
+    void handle_token(
+        structure_builder::file&,
+        structure_builder::builder_parameters&,
+        structure_builder::read_map_type& read_map
+    ) override {
+        if (read_map.get_current_token() == source_file_token::include_keyword) {
+            read_map.switch_context(structure_builder::context_key::inside_include);
+        }
+    }
 };
 
 #endif

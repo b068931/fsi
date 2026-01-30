@@ -481,7 +481,7 @@ namespace generic_parser {
             {
             }
 
-            virtual void handle_token(
+            void handle_token(
                 objects& file_objects,
                 parameters_object& params,
                 read_map<token_type, context_key_type, objects, parameters_object, parameters_enumeration_type>& read_map
@@ -500,7 +500,7 @@ namespace generic_parser {
             {
             }
 
-            virtual void handle_token(
+            void handle_token(
                 objects& file_objects,
                 read_map<token_type, context_key_type, objects, parameters_object_type, parameters_enumeration_type>& read_map
             ) override {

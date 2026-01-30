@@ -45,6 +45,7 @@ class function_call_builder : public general_function_call_builder {
         this->prologue();
         this->general_function_call_builder::place_immediate(value, this->stack_address, 0b101);
     }
+
     void move_value_from_reg000_to_stack(std::uint8_t active_type, bool is_R) {
         this->move_value_from_reg000_to_memory(active_type, is_R, this->stack_address, 0b101);
     }
@@ -62,7 +63,7 @@ public:
         fnc_signature{ nullptr }
     {}
 
-    virtual void visit(std::unique_ptr<function> fnc) override {
+    void visit(std::unique_ptr<function> fnc) override {
         if (!this->fnc_signature) {
             this->function_jump_table_index = static_cast<std::uint32_t>(this->get_function_table_index(fnc->get_id()));
 
@@ -84,25 +85,31 @@ public:
             this->place_immediate(&immediate_function_displacement);
         }
     }
-    virtual void visit(std::unique_ptr<variable_imm<std::uint8_t>> value) override {
+
+    void visit(std::unique_ptr<variable_imm<std::uint8_t>> value) override {
         this->place_immediate(value.get());
     }
-    virtual void visit(std::unique_ptr<variable_imm<std::uint16_t>> value) override {
+
+    void visit(std::unique_ptr<variable_imm<std::uint16_t>> value) override {
         this->place_immediate(value.get());
     }
-    virtual void visit(std::unique_ptr<variable_imm<std::uint32_t>> value) override {
+
+    void visit(std::unique_ptr<variable_imm<std::uint32_t>> value) override {
         this->place_immediate(value.get());
     }
-    virtual void visit(std::unique_ptr<variable_imm<std::uint64_t>> value) override {
+
+    void visit(std::unique_ptr<variable_imm<std::uint64_t>> value) override {
         this->place_immediate(value.get());
     }
-    virtual void visit(std::unique_ptr<regular_variable> variable) override {
+
+    void visit(std::unique_ptr<regular_variable> variable) override {
         this->prologue();
 
         this->create_variable_instruction_with_two_opcodes('\x8a', '\x8b', false, variable.get(), 0, this->stack_allocation_size);
         this->move_value_from_reg000_to_stack(variable->get_active_type(), false);
     }
-    virtual void visit(std::unique_ptr<pointer> pointer) override {
+
+    void visit(std::unique_ptr<pointer> pointer) override {
         this->prologue();
         this->load_pointer_info(
             this->get_variable_info(pointer->get_id()), 
@@ -115,7 +122,8 @@ public:
 
         this->move_value_from_reg000_to_stack(0b11, false);
     }
-    virtual void visit(std::unique_ptr<dereferenced_pointer> pointer) override {
+
+    void visit(std::unique_ptr<dereferenced_pointer> pointer) override {
         this->prologue();
 
         this->accumulate_pointer_offset(pointer.get(), this->stack_allocation_size);
@@ -125,7 +133,7 @@ public:
         this->move_value_from_reg000_to_stack(pointer->get_active_type(), false);
     }
 
-    virtual void build() override {
+    void build() override {
         this->self_call_by_type(0b1110);
         std::uint32_t stack_to_allocate = 0;
         for (const auto& fnc_argument : this->fnc_signature->argument_types) {

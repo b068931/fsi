@@ -20,6 +20,10 @@ USER_PROGRAM_PROGRAM_CONTROL_FUNCTIONS_DISPLACEMENT     EQU 48
 USER_PROGRAM_EXECUTOR_FRAME_STACK_TOP_DISPLACEMENT      EQU 56
 USER_PROGRAM_EXECUTOR_FRAME_REGISTER_VALUE_DISPLACEMENT EQU 64
 
+FRAME_POINTER_DISPLACEMENT EQU 0h
+FRAME_POINTER_REGISTER     EQU r13
+FRAME_SHADOW_SPACE_SIZE    EQU 40
+
 .data
 
 CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD_SIZE      DQ (LOAD_EXECUTION_THREAD_ENDP - CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD)
@@ -39,7 +43,7 @@ CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD PROC
     ; Unwind the stack back to the frame set up by the "LOAD_PROGRAM" function.
     ; Remove shadow space.
     mov rsp, [rcx]
-    add rsp, 020h
+    add rsp, FRAME_SHADOW_SPACE_SIZE
 
     ; Restore all non-volatile registers from stack.
     pop r15
@@ -67,7 +71,7 @@ CONTROL_CODE_TEMPLATE_LOAD_PROGRAM PROC FRAME
     ; This frame will be used by the debugger and exception handling.
     ; Setting up a frame will also allow us to arbitrarily change RSP,
     ; as long as we properly set up dynamic functions to also specify 
-    ; that they use RBX as a frame pointer.
+    ; that they use FRAME_POINTER_REGISTER as a frame pointer.
 
     ; Stack aligned on 16-byte boundary here.
     push rbx
@@ -102,13 +106,13 @@ CONTROL_CODE_TEMPLATE_LOAD_PROGRAM PROC FRAME
     .pushreg r15
 
     ; Stack is misaligned, so use 40 bytes for shadow space.
-    sub rsp, 40
-    .allocstack 40
+    sub rsp,    FRAME_SHADOW_SPACE_SIZE
+    .allocstack FRAME_SHADOW_SPACE_SIZE
 
-    ; Use RBX as frame pointer. We must ensure to never modify it.
+    ; Use FRAME_POINTER_REGISTER as frame pointer. We must ensure to never modify it.
     ; Otherwise, SEH and the debugger stack view will break.
-    mov rbx, rsp
-    .setframe rbx, 0h
+    mov       FRAME_POINTER_REGISTER, rsp
+    .setframe FRAME_POINTER_REGISTER, FRAME_POINTER_DISPLACEMENT
     .endprolog
 
     ; Save stack pointer to executor state memory.
@@ -120,14 +124,14 @@ CONTROL_CODE_TEMPLATE_LOAD_PROGRAM PROC FRAME
     ; We additionally save RSP to use it when resuming the program execution,
     ; that is to guard against the possiblity that compiler won't use "CALL" for
     ; [noreturn] functions. I am not sure whether standard even specifies this behavior.
-    ; We also save RBX, as it is used as frame pointer, and we must restore it when resuming the program.
+    ; We also save FRAME_POINTER_REGISTER, as it is used as frame pointer, and we must restore it when resuming the program.
     mov r11, [rdx + USER_PROGRAM_JUMP_TABLE_DISPLACEMENT]
     mov rcx, [rdx + USER_PROGRAM_MY_STATE_ADDRESS_DISPLACEMENT]
     mov rbp, [rdx + USER_PROGRAM_CURRENT_STACK_POSITION_DISPLACEMENT]
     mov r9,  [rdx + USER_PROGRAM_STACK_END_DISPLACEMENT]
     mov r10, [rdx + USER_PROGRAM_PROGRAM_CONTROL_FUNCTIONS_DISPLACEMENT]
     mov [rdx + USER_PROGRAM_EXECUTOR_FRAME_STACK_TOP_DISPLACEMENT],      rsp
-    mov [rdx + USER_PROGRAM_EXECUTOR_FRAME_REGISTER_VALUE_DISPLACEMENT], rbx
+    mov [rdx + USER_PROGRAM_EXECUTOR_FRAME_REGISTER_VALUE_DISPLACEMENT], FRAME_POINTER_REGISTER
 
     ; TEST only sets the RFLAGS. We use it to check whether third argument is zero or not.
     ; If it is zero, FALSE was passed, meaning no additional setup is required.
@@ -174,10 +178,10 @@ CONTROL_CODE_TEMPLATE_RESUME_PROGRAM_EXECUTION PROC
     ; whether compiler is still required to use calling convention properly.
     mov rsp, [rcx + USER_PROGRAM_EXECUTOR_FRAME_STACK_TOP_DISPLACEMENT] 
 
-    ; Restore RBX, as it is used as a frame pointer. Dynamically generated
+    ; Restore FRAME_POINTER_REGISTER, as it is used as a frame pointer. Dynamically generated
     ; functions' chained UNWIND_INFO point to "LOAD_PROGRAM"'s RUNTIME_FUNCTION,
-    ; and that uses RBX as frame pointer.
-    mov rbx, [rcx + USER_PROGRAM_EXECUTOR_FRAME_REGISTER_VALUE_DISPLACEMENT]
+    ; and that uses FRAME_POINTER_REGISTER as frame pointer.
+    mov FRAME_POINTER_REGISTER, [rcx + USER_PROGRAM_EXECUTOR_FRAME_REGISTER_VALUE_DISPLACEMENT]
 
     ; Now restore the rest of the program state.
     mov r11, [rcx + USER_PROGRAM_JUMP_TABLE_DISPLACEMENT]
@@ -189,5 +193,9 @@ CONTROL_CODE_TEMPLATE_RESUME_PROGRAM_EXECUTION PROC
     jmp qword ptr [rcx + USER_PROGRAM_RETURN_ADDRESS_DISPLACEMENT]
 CONTROL_CODE_TEMPLATE_RESUME_PROGRAM_EXECUTION ENDP
 RESUME_PROGRAM_EXECUTION_ENDP LABEL BYTE
+
+CONTROL_CODE_TEMPLATE_PROGRAM_END_TRAP PROC
+CONTROL_CODE_TEMPLATE_PROGRAM_END_TRAP ENDP
+PROGRAM_END_TRAP_ENDP LABEL BYTE
 
 END

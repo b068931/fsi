@@ -33,19 +33,19 @@ namespace Components::Internationalization {
         /// For this object, it returns NULL as there is no specific context.
         /// </summary>
         /// <returns>A pointer to a null-terminated string containing the context information.</returns>
-        virtual const char* context() const noexcept override;
+        const char* context() const noexcept override;
 
         /// <summary>
         /// For this object, this function returns NULL.
         /// </summary>
         /// <returns>NULL pointer.</returns>
-        virtual const char* message() const noexcept override;
+        const char* message() const noexcept override;
 
         /// <summary>
         /// Returns the copy of the internal QString.
         /// </summary>
         /// <returns>A copy of the internal QString.</returns>
-        virtual QString freeze() const override;
+        QString freeze() const override;
 
     private:
         QString string;

@@ -124,15 +124,17 @@ namespace Components::FSITools {
                 remaining -= blockSize;
             }
 
-            if (coreCount < 1)
+            if (coreCount < 1) {
                 throw std::runtime_error("No processor cores found.");
+            }
 
             return coreCount;
         }
         catch (const std::exception& exception) {
             qWarning() << "Error retrieving processor information:" << exception.what();
-            if (std::thread::hardware_concurrency() > 0)
+            if (std::thread::hardware_concurrency() > 0) {
                 return static_cast<int>(std::thread::hardware_concurrency());
+            }
 
             return 1;
         }

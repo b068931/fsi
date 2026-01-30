@@ -30,8 +30,9 @@ namespace CustomWidgets {
         Q_ASSERT(this->workingDirectory != nullptr && "The working directory has not been set up.");
 
         QFileSystemModel* fileModel = qobject_cast<QFileSystemModel*>(this->workingDirectory->model());
-        if (!fileModel)
+        if (!fileModel) {
             return;
+        }
 
         QString filePath = fileModel->filePath(index);
         QFileInfo fileInfo(filePath);

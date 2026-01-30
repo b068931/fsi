@@ -205,15 +205,15 @@ namespace module_mediator::parser::components {
 
         bool add_function(const std::string& other_name, std::string&& export_name, arguments_string_type arguments_string, bool is_visible) {
             FARPROC loaded_function = GetProcAddress(this->loaded_module, other_name.c_str());
-            if (loaded_function == nullptr)
+            if (loaded_function == nullptr) {
                 return false;
+            }
 
             this->functions.emplace_back(
                 std::move(export_name),
                     std::bit_cast<module_callable_function_type>(loaded_function),  // NOLINT(bugprone-bitwise-pointer-cast)
                     arguments_string,
                     is_visible
-
             );
 
             return true;

@@ -6,31 +6,31 @@
 
 class functions_import_state : public state_type {
 public:
-	virtual void handle_token(
-		structure_builder::file&,
-		structure_builder::builder_parameters& helper,
-		structure_builder::read_map_type& read_map
-	) override {
-		std::string module_function_name = helper.name_translations.translate_name(read_map.get_token_generator_name());
-		if (module_function_name.empty()) {
-			if (read_map.get_current_token() != source_file_token::import_end
-				&& read_map.get_current_token() != source_file_token::comment_start) {
-				read_map.exit_with_error("Name of the module function was expected, got empty string instead.");
-			}
+    void handle_token(
+        structure_builder::file&,
+        structure_builder::builder_parameters& helper,
+        structure_builder::read_map_type& read_map
+    ) override {
+        std::string module_function_name = helper.name_translations.translate_name(read_map.get_token_generator_name());
+        if (module_function_name.empty()) {
+            if (read_map.get_current_token() != source_file_token::import_end
+                && read_map.get_current_token() != source_file_token::comment_start) {
+                read_map.exit_with_error("Name of the module function was expected, got empty string instead.");
+            }
 
-			return;
-		}
+            return;
+        }
 
-		auto found_module_function = std::ranges::find_if(helper.current_module->functions_names,
+        auto found_module_function = std::ranges::find_if(helper.current_module->functions_names,
                                                           [&module_function_name](const structure_builder::module_function& fnc) -> bool {
                                                               return fnc.name == module_function_name;
                                                           });
 
-		if (found_module_function == helper.current_module->functions_names.end()) {
-			helper.current_module->functions_names
-				.emplace_back(helper.get_id(), std::move(module_function_name));
-		}
-	}
+        if (found_module_function == helper.current_module->functions_names.end()) {
+            helper.current_module->functions_names
+                .emplace_back(helper.get_id(), std::move(module_function_name));
+        }
+    }
 };
 
 #endif

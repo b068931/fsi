@@ -285,6 +285,7 @@ private:
         this->write_8_bytes(0);
         return saved_position;
     }
+
     void write_run_footer(const std::streampos& saved_position, std::uint64_t run_size) {
         this->out_stream->seekp(saved_position); //go back and write this run's size
         this->write_8_bytes(run_size);
@@ -326,6 +327,7 @@ private:
 
         this->write_run_footer(saved_position, run_size);
     }
+
     void create_jump_points_run() { //4 bytes: function index, 4 bytes instruction index, 8 bytes: entity_id
         std::uint64_t run_size = 0;
         auto saved_position = this->write_run_header(jump_points_run);
@@ -349,6 +351,7 @@ private:
 
         this->write_run_footer(saved_position, run_size);
     }
+
     void create_function_signatures_run() { //4 bytes: signatures count, 8 bytes: entity_id, 1 byte: number of arguments, 1 byte: argument's type, 8 bytes: entity_id. 0 - byte, 1 - two_bytes, 2 - four_bytes, 3 - eight_bytes, 4 - pointer
         std::uint64_t run_size = sizeof(std::uint32_t);
         auto saved_position = this->write_run_header(function_signatures_run);
@@ -374,6 +377,7 @@ private:
 
         this->write_run_footer(saved_position, run_size);
     }
+
     void create_function_body_run(const structure_builder::function& func) { //8 bytes: signature's entity_id, 4 bytes: number of local variables, 1 byte: local variable_type, 8 bytes: local variable entity_id
         std::uint64_t run_size = 12; //8 bytes: signature's entity_id, 4 bytes: number of local variables
         auto saved_position = this->write_run_header(function_body_run);
@@ -406,6 +410,7 @@ private:
 
         this->write_run_footer(saved_position, run_size);
     }
+
     void create_exposed_functions_run() { //8 bytes: preferred stack size, 8 bytes: starting function, 8 bytes: exposed functions count, 8 bytes: exposed function's entity_id, 1 byte: exposed function name size, exposed function name
         std::uint64_t run_size = 24;
         auto saved_position = this->write_run_header(program_exposed_functions_run);
@@ -432,6 +437,7 @@ private:
 
         this->write_run_footer(saved_position, run_size);
     }
+
     void create_program_strings_run() { //8 bytes - amount of strings, 8 bytes - string id, 8 bytes - string size, string itself
         std::uint64_t run_size = 8;
         auto saved_position = this->write_run_header(program_strings_run);
@@ -536,6 +542,7 @@ public:
     void reset_file_structure(structure_builder::file* file) {
         this->file_structure = file;
     }
+
     void reset_out_stream(std::ostream* stream) {
         this->out_stream = stream;
     }

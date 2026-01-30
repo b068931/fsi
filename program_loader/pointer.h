@@ -5,11 +5,11 @@
 
 class pointer : public variable_with_id {
 public:
-	pointer(entity_id id)
-		:variable_with_id{ id }
-	{}
+    pointer(entity_id id)
+        :variable_with_id{ id }
+    {}
 
-	virtual void visit(instruction_builder* builder) override;
+    void visit(instruction_builder* builder) override;
 };
 
 #endif // !ARGUMENT_POINTER_H

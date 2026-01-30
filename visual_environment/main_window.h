@@ -92,9 +92,9 @@ namespace Windows {
         ) noexcept;
 
     protected:
-        virtual bool event(QEvent* event) override;
-        virtual void closeEvent(QCloseEvent* event) override;
-        virtual void showEvent(QShowEvent* event) override;
+        bool event(QEvent* event) override;
+        void closeEvent(QCloseEvent* event) override;
+        void showEvent(QShowEvent* event) override;
 
     private:
         using LanguageService = Utility::BackgroundService<Components::FSITools::FSIToolsAdapter>;

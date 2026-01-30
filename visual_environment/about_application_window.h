@@ -29,7 +29,7 @@ namespace Windows {
         void onRetranslateUI() noexcept;
 
     protected:
-        virtual bool event(QEvent* event) override;
+        bool event(QEvent* event) override;
 
     private:
         Ui::AboutApplicationWindow ui;

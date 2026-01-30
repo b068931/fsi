@@ -40,7 +40,7 @@ public:
 		this->assert_statement(this->get_arguments_count() >= 2, "Instruction must have at least two arguments.");
 	}
 
-	virtual void visit(std::unique_ptr<regular_variable> variable) override {
+	void visit(std::unique_ptr<regular_variable> variable) override {
 		this->assert_statement(variable->is_valid_active_type(), "Variable has an incorrect active type.", variable->get_id());
 		if (this->get_argument_index() == 0) {
 			this->load_variable_address(variable->get_id());
@@ -50,7 +50,8 @@ public:
 			this->create_variable_instruction_with_two_opcodes('\x8a', '\x8b', true, variable.get());
 		}
 	}
-	virtual void visit(std::unique_ptr<dereferenced_pointer> pointer) override {
+
+	void visit(std::unique_ptr<dereferenced_pointer> pointer) override {
 		this->accumulate_pointer_offset(pointer.get());
 		this->add_base_address_to_pointer_dereference(pointer.get());
 
@@ -63,7 +64,7 @@ public:
 		}
 	}
 
-	virtual void build() override {
+	void build() override {
 		while (this->get_arguments_count() != 0) {
 			std::uint8_t current_argument_index = this->get_argument_index();
 			this->self_call_next();

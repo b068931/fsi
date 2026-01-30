@@ -5,16 +5,16 @@
 
 template<typename T>
 class variable_imm : public variable {
-	T value;
+    T value;
 
 public:
-	variable_imm(T immediate_value)
-		:variable{},
-		value{ immediate_value }
-	{}
+    variable_imm(T immediate_value)
+        :variable{},
+        value{ immediate_value }
+    {}
 
-	T get_value() const { return this->value; }
-	virtual void visit(instruction_builder* builder) override;
+    T get_value() const { return this->value; }
+    void visit(instruction_builder* builder) override;
 };
 
 // Create declarations for specific types.

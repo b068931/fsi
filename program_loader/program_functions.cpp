@@ -32,9 +32,11 @@ void generate_program_termination_code(std::vector<char>& destination, terminati
 	destination.push_back('\x10');
 }
 void generate_stack_allocation_code(std::vector<char>& destination, std::uint32_t size) {
-	if (size == 0) return;
+	if (size == 0) {
+        return;
+    }
 
-	destination.push_back('\x48'); //add rbp, size
+    destination.push_back('\x48'); //add rbp, size
 	destination.push_back('\x81');
 	destination.push_back('\xc5');
 
@@ -52,9 +54,11 @@ void generate_stack_allocation_code(std::vector<char>& destination, std::uint32_
 	//:end
 }
 void generate_stack_deallocation_code(std::vector<char>& destination, std::uint32_t size) {
-	if (size == 0) return;
+	if (size == 0) {
+        return;
+    }
 
-	destination.push_back('\x48'); //sub rbp, size
+    destination.push_back('\x48'); //sub rbp, size
 	destination.push_back('\x81');
 	destination.push_back('\xed');
 

@@ -41,8 +41,9 @@ namespace {
     DWORD dwSavedConsoleState;
 
     bool InitializeConsoleInput(HANDLE hStdin, DWORD& dwOutOriginalMode) {
-        if (!GetConsoleMode(hStdin, &dwOutOriginalMode))
+        if (!GetConsoleMode(hStdin, &dwOutOriginalMode)) {
             return false;
+        }
 
         //Keep only line input, echo, processed input; disable mouse/window events.
         //Enable ASCII control characters processing with wrapping at EOL.
@@ -51,8 +52,9 @@ namespace {
                    | ENABLE_PROCESSED_INPUT
                    | ENABLE_PROCESSED_OUTPUT
                    | ENABLE_WRAP_AT_EOL_OUTPUT;  // NOLINT(misc-redundant-expression)
-        if (!SetConsoleMode(hStdin, mode))
+        if (!SetConsoleMode(hStdin, mode)) {
             return false;
+        }
 
         //Discard any pending input events (mouse, focus, etc.)
         return FlushConsoleInputBuffer(hStdin) != FALSE;
@@ -532,7 +534,9 @@ namespace {
         module_mediator::memory output_buffer,
         module_mediator::eight_bytes buffer_size
     ) {
-        if (buffer_size == 0) return false;
+        if (buffer_size == 0) {
+            return false;
+        }
         if (buffer_size > std::numeric_limits<DWORD>::max()) {
             LOG_WARNING(
                 interoperation::get_module_part(),
@@ -592,7 +596,9 @@ namespace {
         constexpr bool is_pipe = file_type == FILE_TYPE_PIPE;
         HANDLE waitHandles[]{ hStdOut, hCancelIO };
 
-        if (buffer_size == 0) return false;
+        if (buffer_size == 0) {
+            return false;
+        }
         if (buffer_size > std::numeric_limits<DWORD>::max()) {
             LOG_WARNING(
                 interoperation::get_module_part(),

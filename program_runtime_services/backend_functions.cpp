@@ -5,8 +5,9 @@
 
 namespace backend {
     std::pair<void*, std::uint64_t> decay_pointer(module_mediator::memory value) {
-        if (value == nullptr)
+        if (value == nullptr) {
             return { nullptr, 0 };
+        }
 
         if (interoperation::verify_thread_memory(interoperation::get_current_thread_id(), value) == module_mediator::module_failure) {
             LOG_PROGRAM_WARNING(

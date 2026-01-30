@@ -11,12 +11,16 @@ namespace {
     LPTOP_LEVEL_EXCEPTION_FILTER g_pPreviousFilter = nullptr;
 
     void SafeAppend(char* sBuffer, std::size_t szBufferSize, std::size_t* szBufferPosition, const char* sAppend) {
-        if (!sBuffer || !sAppend) return;
-        while (*sAppend && *szBufferPosition + 1 < szBufferSize)
+        if (!sBuffer || !sAppend) {
+            return;
+        }
+        while (*sAppend && *szBufferPosition + 1 < szBufferSize) {
             sBuffer[(*szBufferPosition)++] = *sAppend++;
+        }
 
-        if (szBufferSize)
+        if (szBufferSize) {
             sBuffer[*szBufferPosition < szBufferSize ? *szBufferPosition : szBufferSize - 1] = '\0';
+        }
     }
 
     // write "0x" + hex digits (uppercase)
@@ -41,14 +45,17 @@ namespace {
         }
 
         for (int iIndex = iDigitIndex - 1; iIndex >= 0; --iIndex) {
-            if (*szBufferPosition + 1 < szBufferSize)
+            if (*szBufferPosition + 1 < szBufferSize) {
                 sBuffer[(*szBufferPosition)++] = sTemporary[iIndex];
-            else
+            }
+            else {
                 break;
+            }
         }
 
-        if (szBufferSize)
+        if (szBufferSize) {
             sBuffer[*szBufferPosition < szBufferSize ? *szBufferPosition : szBufferSize - 1] = '\0';
+        }
     }
 
     void AppendDecU32(char* sBuffer, std::size_t szBufferSize, std::size_t* szBufferPosition, std::uint32_t u32Value) {
@@ -67,14 +74,17 @@ namespace {
         }
 
         for (int iIndex = iDigitIndex - 1; iIndex >= 0; --iIndex) {
-            if (*szBufferPosition + 1 < szBufferSize)
+            if (*szBufferPosition + 1 < szBufferSize) {
                 sBuffer[(*szBufferPosition)++] = sTemporary[iIndex];
-            else
+            }
+            else {
                 break;
+            }
         }
 
-        if (szBufferSize)
+        if (szBufferSize) {
             sBuffer[*szBufferPosition < szBufferSize ? *szBufferPosition : szBufferSize - 1] = '\0';
+        }
     }
 
     // best-effort full write to a handle
