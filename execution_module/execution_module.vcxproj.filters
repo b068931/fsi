@@ -62,6 +62,9 @@
     <ClInclude Include="runtime_traps.h">
       <Filter>Header Files\Program Threads Management</Filter>
     </ClInclude>
+    <ClInclude Include="unwind_info.h">
+      <Filter>Header Files\Program Threads Management</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="execution_module.cpp">

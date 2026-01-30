@@ -31,6 +31,7 @@
     <ClInclude Include="scheduler.h" />
     <ClInclude Include="thread_local_structure.h" />
     <ClInclude Include="thread_manager.h" />
+    <ClInclude Include="unwind_info.h" />
   </ItemGroup>
   <ItemGroup>
     <MASM Include="control_code_templates.asm">

@@ -5,6 +5,7 @@
 #include "control_code_templates.h"
 #include "execution_backend_functions.h"
 #include "runtime_traps.h"
+#include "unwind_info.h"
 
 namespace {
     module_mediator::module_part* part = nullptr;
@@ -13,7 +14,7 @@ namespace {
 
     std::optional<std::string> verify_control_code_pdata_xdata_setup() {
         DWORD64 dw64LoadProgramBase = 0;
-        PRUNTIME_FUNCTION prfLoadProgram= RtlLookupFunctionEntry(
+        PRUNTIME_FUNCTION prfLoadProgram = RtlLookupFunctionEntry(
             reinterpret_cast<DWORD64>(&CONTROL_CODE_TEMPLATE_LOAD_PROGRAM),
             &dw64LoadProgramBase,
             nullptr
@@ -65,21 +66,6 @@ namespace {
             return "Incorrect size recorded for CONTROL_CODE_TEMPLATE_PROGRAM_END_TRAMPOLINE.";
         }
         
-        using UBYTE = unsigned char;
-        struct UNWIND_INFO_HEADER {
-            UBYTE Version : 3;
-            UBYTE Flags : 5;
-            UBYTE SizeOfProlog;
-            UBYTE CountOfCodes;
-            UBYTE FrameRegister : 4;
-            UBYTE FrameOffset : 4;
-        };
-
-        struct CHAINED_UNWIND_INFO {
-            UNWIND_INFO_HEADER Header;
-            RUNTIME_FUNCTION ChainedFunction;
-        };
-
         UNWIND_INFO_HEADER* loadProgramUnwindInfo = std::bit_cast<UNWIND_INFO_HEADER*>(
             dw64LoadProgramBase + prfLoadProgram->UnwindData);
 
@@ -89,14 +75,18 @@ namespace {
         CHAINED_UNWIND_INFO* programEndTrampolineChainedInfo = std::bit_cast<CHAINED_UNWIND_INFO*>(
             dw64ProgramEndTrampolineBase + prfProgramEndTrampoline->UnwindData);
 
-        if (std::memcmp(prfLoadProgram, &callModuleTrampolineChainedInfo->ChainedFunction,
-            sizeof(RUNTIME_FUNCTION)) != 0) {
+        auto compare_runtime_functions = [](const RUNTIME_FUNCTION& a, const RUNTIME_FUNCTION& b) {
+            return a.BeginAddress == b.BeginAddress &&
+                   a.EndAddress == b.EndAddress &&
+                   a.UnwindData == b.UnwindData;
+            };
+
+        if (!compare_runtime_functions(*prfLoadProgram, callModuleTrampolineChainedInfo->ChainedFunction)) {
             return "CONTROL_CODE_TEMPLATE_CALL_MODULE_TRAMPOLINE unwind info is not chained to "
                    "CONTROL_CODE_TEMPLATE_LOAD_PROGRAM.";
         }
 
-        if (std::memcmp(prfLoadProgram, &programEndTrampolineChainedInfo->ChainedFunction,
-            sizeof(RUNTIME_FUNCTION)) != 0) {
+        if (!compare_runtime_functions(*prfLoadProgram, programEndTrampolineChainedInfo->ChainedFunction)) {
             return "CONTROL_CODE_TEMPLATE_CALL_PROGRAM_END_TRAMPOLINE unwind info is not chained to "
                    "CONTROL_CODE_TEMPLATE_LOAD_PROGRAM.";
         }

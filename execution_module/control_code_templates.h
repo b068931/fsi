@@ -4,10 +4,15 @@
 #include <cstdint>
 
 /// <summary>
-/// CONTROL_CODE_TEMPLATE_LOAD_PROGRAM only saves the value of the RSP register
-/// just before loading user program state.
+/// CONTROL_CODE_TEMPLATE_LOAD_PROGRAM saves the value of both the stack top register and
+/// the stack frame pointer register into this structure. Saving frame pointer allows for a
+/// complete continuity of stack frames across context switches. Low-level functions use 
+/// this data to change context on a per-instruction basis.
 /// </summary>
-using saved_thread_state_type = std::uint64_t;
+struct saved_executor_thread_state {
+    std::uint64_t stack_top{};
+    std::uint64_t stack_frame_pointer{};
+};
 
 extern "C" {
     extern const std::uint64_t CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD_SIZE;

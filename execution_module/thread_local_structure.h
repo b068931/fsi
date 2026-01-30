@@ -21,7 +21,7 @@ struct thread_local_structure {
     };
 
     // State of the execution thread before switching to the program state.
-    saved_thread_state_type execution_thread_state{};
+    saved_executor_thread_state execution_thread_state{};
 
     // Information about the currently running program thread, as acquired from the scheduler.
     scheduler::schedule_information currently_running_thread_information{};

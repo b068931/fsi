@@ -36,6 +36,9 @@ CONTROL_FUNCTIONS_RUNTIME_MODULE_CALL_DISPLACEMENT            EQU 8
 CONTROL_FUNCTIONS_PROGRAM_END_TRAMPOLINE_DISPLACEMENT         EQU 16
 CONTROL_FUNCTIONS_PROGRAM_TERMINATION_DISPLACEMENT            EQU 24
 
+EXECUTOR_THREAD_STATE_STACK_TOP_DISPLACEMENT            EQU 0
+EXECUTOR_THREAD_STATE_FRAME_REGISTER_DISPLACEMENT EQU 8
+
 ; Must be aligned on 4-byte boundary for UNWIND_INFO.
 xdata SEGMENT DWORD READ ALIAS(".xdata")
 SHARED_CHAINED_UNWIND_INFO DB 21h ; Version 1, UNW_FLAG_CHAININFO.
@@ -48,18 +51,32 @@ SHARED_CHAINED_UNWIND_INFO DB 21h ; Version 1, UNW_FLAG_CHAININFO.
                            DD (IMAGEREL LOAD_PROGRAM_ENDP)
 
                            ; Worth noting that "$xdayasym" is an undocumented feature, I found it by inspecting compiler-generated unwind info.
-                           DD (IMAGEREL $xdatasym)                          ; Pointer to the beginning of xdata segment.
+                           DD (IMAGEREL $xdatasym)                          ; Pointer to the beginning of xdata segment for a different function table.
 xdata ENDS                                                                  ; There lies the unwind info for LOAD_PROGRAM.
 
 ; Must be aligned on 4-byte boundary for RUNTIME_FUNCTION.
+; This provides the information as to where the unwind information for each function is located.
+; This is critical for SEH and debugger support (stack walking).
 pdata SEGMENT DWORD READ ALIAS(".pdata")
-PDATA_SEGMENT_START DD (IMAGEREL CONTROL_CODE_TEMPLATE_CALL_MODULE_TRAMPOLINE)
-                    DD (IMAGEREL CALL_MODULE_TRAMPOLINE_ENDP)
-                    DD (IMAGEREL SHARED_CHAINED_UNWIND_INFO)
+    ; Trampoline functions are fully covered by unwind info which is chained to LOAD_PROGRAM's unwind info.
+    DD (IMAGEREL CONTROL_CODE_TEMPLATE_CALL_MODULE_TRAMPOLINE)
+    DD (IMAGEREL CALL_MODULE_TRAMPOLINE_ENDP)
+    DD (IMAGEREL SHARED_CHAINED_UNWIND_INFO)
+    
+    DD (IMAGEREL CONTROL_CODE_TEMPLATE_PROGRAM_END_TRAMPOLINE)
+    DD (IMAGEREL PROGRAM_END_TRAMPOLINE_ENDP)
+    DD (IMAGEREL SHARED_CHAINED_UNWIND_INFO)
 
-                    DD (IMAGEREL CONTROL_CODE_TEMPLATE_PROGRAM_END_TRAMPOLINE)
-                    DD (IMAGEREL PROGRAM_END_TRAMPOLINE_ENDP)
-                    DD (IMAGEREL SHARED_CHAINED_UNWIND_INFO)
+    ; While functions that act like context switch points have RUNTIME_FUNCTION set up
+    ; in the middle of their code. These functions may look kind of trippy because it is as if
+    ; they can remove stack frames in the middle of the stack.
+    DD (IMAGEREL CONTROL_CODE_TEMPLATE_RESUME_PROGRAM_EXECUTION_CONTEXT_SWITCH_POINT)
+    DD (IMAGEREL RESUME_PROGRAM_EXECUTION_ENDP)
+    DD (IMAGEREL SHARED_CHAINED_UNWIND_INFO)
+
+    DD (IMAGEREL CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD_CONTEXT_SWITCH_POINT)
+    DD (IMAGEREL LOAD_EXECUTION_THREAD_ENDP)
+    DD (IMAGEREL SHARED_CHAINED_UNWIND_INFO)
 pdata ENDS
 
 .data
@@ -79,9 +96,19 @@ CONTROL_CODE_TEMPLATE_PROGRAM_END_TRAMPOLINE_SIZE     DQ (PROGRAM_END_TRAMPOLINE
 ; As both "LOAD_EXECUTION_THREAD" and "LOAD_PROGRAM" can only be used from the same thread, 
 ; from the point of view of the "LOAD_PROGRAM" function caller this will look like a normal function return.
 CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD PROC
+    ; First restore the frame pointer to prepare for the context switch.
+    ; Note that the order of restoring registers here is important. RSP can be modified
+    ; arbitrarily if we have a frame pointer. This behavior is documented and required by
+    ; some of the functions which allocate memory on stack in dynamic fashion.
+    mov FRAME_POINTER_REGISTER, [rcx + EXECUTOR_THREAD_STATE_FRAME_REGISTER_DISPLACEMENT]
+
+    ; Set the point where the context switch happens. From this point onward,
+    ; SEH and debugger will see our RUNTIME_FUNCTION with stack frame set up by "LOAD_PROGRAM".
+    CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD_CONTEXT_SWITCH_POINT LABEL PTR
+
     ; Unwind the stack back to the frame set up by the "LOAD_PROGRAM" function.
     ; Remove shadow space.
-    mov rsp, [rcx]
+    mov rsp, [rcx + EXECUTOR_THREAD_STATE_STACK_TOP_DISPLACEMENT]
     add rsp, FRAME_SHADOW_SPACE_SIZE
 
     ; Restore all non-volatile registers from stack.
@@ -97,13 +124,15 @@ CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD PROC
     ; Finally, continue execution of the function which has called "LOAD_PROGRAM".
     ret
 CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD ENDP
-LOAD_EXECUTION_THREAD_ENDP LABEL BYTE
+LOAD_EXECUTION_THREAD_ENDP LABEL PTR
 
 ; Saves the state of the executor thread and loads the state of a program, 
 ; third argument is used to determine whether this thread needs additional 
 ; configuration for startup or not.
-; Dynamically generated functions have their UNWIND_INFO chained to this
-; function's RUNTIME_FUNCTION. This is an (ab)use of the chaining feature of unwind info.
+; Dynamically generated functions have their UNWIND_INFO copied from this function's
+; UNWIND_INFO data. We can't use chaining because dynamic functions may reside in arbitrary
+; memory locations. That is, we are not guaranteed that their location lies within 2GB of this function.
+; This is an (ab)use of the chaining feature of unwind info.
 ; This allows us to have proper stack unwinding for SEH and proper stack debugging support.
 CONTROL_CODE_TEMPLATE_LOAD_PROGRAM PROC FRAME
     ; Save all non-volatile registers on stack, then set up a frame.
@@ -154,10 +183,11 @@ CONTROL_CODE_TEMPLATE_LOAD_PROGRAM PROC FRAME
     .setframe FRAME_POINTER_REGISTER, FRAME_POINTER_DISPLACEMENT
     .endprolog
 
-    ; Save stack pointer to executor state memory.
-    ; Other than that, nothing else needs to be saved, as all other registers
-    ; were already saved on the stack. Moreover, that saved frame is used by SEH.
-    mov [rcx], rsp
+    ; Save stack pointer and fram pointer to executor state memory.
+    ; Saving both of them enables us to switch stack frames mid-procedures.
+    ; Look for *_CONTEXT_SWITCH_POINT labels to see it in action.
+    mov [rcx + EXECUTOR_THREAD_STATE_STACK_TOP_DISPLACEMENT],      rsp
+    mov [rcx + EXECUTOR_THREAD_STATE_FRAME_REGISTER_DISPLACEMENT], FRAME_POINTER_REGISTER
     
     ; Now we load the state of the dynamic function to be executed.
     ; We additionally save RSP to use it when resuming the program execution,
@@ -184,11 +214,11 @@ CONTROL_CODE_TEMPLATE_LOAD_PROGRAM PROC FRAME
     skip_end_trap_setup:
     jmp qword ptr [rdx + USER_PROGRAM_RETURN_ADDRESS_DISPLACEMENT]
 CONTROL_CODE_TEMPLATE_LOAD_PROGRAM ENDP
-LOAD_PROGRAM_ENDP LABEL BYTE
+LOAD_PROGRAM_ENDP LABEL PTR
 
 ; Used to call into a module from a dynamically generated function.
 ; Treat this as an adapter which saves necessary state for the dynamically generated function,
-; then calls into the module's "call_module" function (defined in C++).
+; then calls into the module's "call_module" trap (defined in C++).
 CONTROL_CODE_TEMPLATE_CALL_MODULE_TRAMPOLINE PROC
     ; Save program state. Save return address without popping it from stack.
     ; This ensures rsp % 16 == 8, which C++ code expects on function entry.
@@ -206,7 +236,7 @@ CONTROL_CODE_TEMPLATE_CALL_MODULE_TRAMPOLINE PROC
 
     jmp qword ptr [r10 + CONTROL_FUNCTIONS_RUNTIME_MODULE_CALL_DISPLACEMENT]
 CONTROL_CODE_TEMPLATE_CALL_MODULE_TRAMPOLINE ENDP
-CALL_MODULE_TRAMPOLINE_ENDP LABEL BYTE
+CALL_MODULE_TRAMPOLINE_ENDP LABEL PTR
 
 ; Used to continue an execution of a program after a module has done its work.
 ; This function is marked as [noreturn] in C++. It must not be called from functions
@@ -215,14 +245,19 @@ CALL_MODULE_TRAMPOLINE_ENDP LABEL BYTE
 ; destructible objects.
 ; Unwinds the stack and sets up the frame for a dynamic function to continue.
 CONTROL_CODE_TEMPLATE_RESUME_PROGRAM_EXECUTION PROC
+    ; Restore FRAME_POINTER_REGISTER, as it is used as a frame pointer. Dynamically generated
+    ; functions' chained UNWIND_INFO have identical unwind info to "LOAD_PROGRAM"'s RUNTIME_FUNCTION,
+    ; and that uses FRAME_POINTER_REGISTER as frame pointer.
+    mov FRAME_POINTER_REGISTER, [rcx + USER_PROGRAM_EXECUTOR_FRAME_REGISTER_VALUE_DISPLACEMENT]
+
+    ; In order to maintain the continuity of stack frames for the debugger and SEH,
+    ; the code after this label up to the end of the function will be put as a RUNTIME_FUNCTION,
+    ; which has its unwind info chained to "LOAD_PROGRAM"'s RUNTIME_FUNCTION.
+    CONTROL_CODE_TEMPLATE_RESUME_PROGRAM_EXECUTION_CONTEXT_SWITCH_POINT LABEL PTR
+
     ; In C++ this function is marked as [noreturn], I have no idea 
     ; whether compiler is still required to use calling convention properly.
     mov rsp, [rcx + USER_PROGRAM_EXECUTOR_FRAME_STACK_TOP_DISPLACEMENT] 
-
-    ; Restore FRAME_POINTER_REGISTER, as it is used as a frame pointer. Dynamically generated
-    ; functions' chained UNWIND_INFO point to "LOAD_PROGRAM"'s RUNTIME_FUNCTION,
-    ; and that uses FRAME_POINTER_REGISTER as frame pointer.
-    mov FRAME_POINTER_REGISTER, [rcx + USER_PROGRAM_EXECUTOR_FRAME_REGISTER_VALUE_DISPLACEMENT]
 
     ; Now restore the rest of the program state.
     mov r11, [rcx + USER_PROGRAM_JUMP_TABLE_DISPLACEMENT]
@@ -233,7 +268,7 @@ CONTROL_CODE_TEMPLATE_RESUME_PROGRAM_EXECUTION PROC
 
     jmp qword ptr [rcx + USER_PROGRAM_RETURN_ADDRESS_DISPLACEMENT]
 CONTROL_CODE_TEMPLATE_RESUME_PROGRAM_EXECUTION ENDP
-RESUME_PROGRAM_EXECUTION_ENDP LABEL BYTE
+RESUME_PROGRAM_EXECUTION_ENDP LABEL PTR
 
 ; This trampoline, just like the runtime module call trampoline, ensures that
 ; the stack is set up properly before entering C++ code (trap function).
@@ -248,6 +283,6 @@ CONTROL_CODE_TEMPLATE_PROGRAM_END_TRAMPOLINE PROC
     ; Called trap function must not return control flow to the trampoline.
     int 3
 CONTROL_CODE_TEMPLATE_PROGRAM_END_TRAMPOLINE ENDP
-PROGRAM_END_TRAMPOLINE_ENDP LABEL BYTE
+PROGRAM_END_TRAMPOLINE_ENDP LABEL PTR
 
 END
