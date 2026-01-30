@@ -2,9 +2,8 @@
 #include "thread_local_structure.h"
 #include "module_interoperation.h"
 #include "thread_manager.h"
-#include "control_code_templates.h"
 #include "program_state_manager.h"
-#include "executions_backend_functions.h"
+#include "execution_backend_functions.h"
 
 #include "../logger_module/logging.h"
 #include "../module_mediator/module_part.h"
@@ -76,67 +75,6 @@ namespace backend {
 
         get_thread_local_structure()->currently_running_thread_information.put_back_structure = nullptr;
         delete_running_thread();
-    }
-
-    [[noreturn]] void call_module_error(module_mediator::module_part::call_error error) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wswitch-default"
-
-        switch (error) {
-        case module_mediator::module_part::call_error::function_is_not_visible:
-            LOG_PROGRAM_ERROR(interoperation::get_module_part(), "Called module function is not visible. Thread terminated.");
-            break;
-
-        case module_mediator::module_part::call_error::invalid_arguments_string:
-            LOG_PROGRAM_ERROR(interoperation::get_module_part(), "Incorrect arguments were used for the module function call. Thread terminated.");
-            break;
-
-        case module_mediator::module_part::call_error::unknown_index:
-            LOG_PROGRAM_ERROR(interoperation::get_module_part(), "Module function does not exist. Thread terminated.");
-            break;
-
-        case module_mediator::module_part::call_error::no_error: break;
-        }
-
-#pragma clang diagnostic pop
-
-        thread_terminate();
-        CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD(get_thread_local_structure()->execution_thread_state);
-    }
-
-    [[noreturn]] void call_module(std::uint64_t module_id, std::uint64_t function_id, module_mediator::arguments_string_type args_string) {
-        module_mediator::return_value action_code = interoperation::get_module_part()->call_module_visible_only(
-            module_id,
-            function_id,
-            args_string, &call_module_error
-        );
-
-        //all these functions are declared as [[noreturn]]
-        switch (action_code)
-        {
-        case module_mediator::execution_result_continue:
-            program_resume();
-            CONTROL_CODE_TEMPLATE_RESUME_PROGRAM_EXECUTION(get_thread_local_structure()->currently_running_thread_information.thread_state);
-
-        case module_mediator::execution_result_switch:
-            CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD(get_thread_local_structure()->execution_thread_state);
-
-        case module_mediator::execution_result_terminate:
-            LOG_PROGRAM_INFO(interoperation::get_module_part(), "Requested thread termination.");
-
-            thread_terminate();
-            CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD(get_thread_local_structure()->execution_thread_state);
-
-        case module_mediator::execution_result_block:
-            LOG_PROGRAM_INFO(interoperation::get_module_part(), "Was blocked.");
-
-            get_thread_manager().block(get_thread_local_structure()->currently_running_thread_information.thread_id);
-            CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD(get_thread_local_structure()->execution_thread_state);
-
-        default:
-            LOG_PROGRAM_FATAL(interoperation::get_module_part(), "Incorrect return code. Process will be aborted.");
-            std::terminate();
-        }
     }
 
     module_mediator::return_value self_duplicate(void* main_function, module_mediator::arguments_string_type initializer) {
@@ -281,7 +219,7 @@ namespace backend {
                 get_thread_local_structure()->currently_running_thread_information.thread_id != thread_id &&
                 argument_type == module_mediator::arguments_string_builder::get_type_index<module_mediator::memory>
             ) {
-                // Memory size, base address, and cross-thread sharing pointer
+                // Memory size, base address, and cross-thread sharing pointer.
                 constexpr std::size_t memory_descriptor_size = sizeof(std::uint64_t) * 3;
 
                 module_mediator::memory old_descriptor_address{};

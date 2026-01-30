@@ -2,8 +2,9 @@
 #include "module_interoperation.h"
 #include "execution_module.h"
 #include "program_state_manager.h"
-#include "executions_backend_functions.h"
+#include "execution_backend_functions.h"
 #include "thread_local_structure.h"
+#include "thread_manager.h"
 
 #include "../module_mediator/fsi_types.h"
 #include "../module_mediator/module_part.h"
@@ -14,14 +15,14 @@ module_mediator::return_value on_thread_creation(module_mediator::arguments_stri
     auto [container_id, thread_id, preferred_stack_size] =
         module_mediator::arguments_string_builder::unpack<module_mediator::return_value, module_mediator::return_value, std::uint64_t>(bundle);
 
-    thread_local_structure* thread_structure = get_thread_local_structure();
+    thread_local_structure* thread_structure = backend::get_thread_local_structure();
 
     char* thread_state_memory = backend::allocate_thread_memory(thread_id, program_state_manager::thread_state_size);
     char* thread_stack_memory = backend::allocate_thread_memory(thread_id, preferred_stack_size);
     
+    // One byte + eight bytes are reserved to be used with "save" and "load" instructions.
     char* thread_stack_end = thread_stack_memory + preferred_stack_size - (sizeof(module_mediator::one_byte) + sizeof(std::uint64_t));
 
-    //get program jump table from resm
     void* program_jump_table = std::bit_cast<void*>(
         module_mediator::fast_call<module_mediator::return_value>(
             interoperation::get_module_part(),
@@ -31,20 +32,23 @@ module_mediator::return_value on_thread_creation(module_mediator::arguments_stri
         )
     );
 
-    //fill in state_buffer - start
-    backend::fill_in_register_array_entry( //function address
+    // Fill in state_buffer - start.
+    // Fill in program main function address.
+    backend::fill_in_register_array_entry( 
         1, 
         thread_state_memory, 
         reinterpret_cast<std::uintptr_t>(thread_structure->program_function_address)
     );
 
-    backend::fill_in_register_array_entry( //jump table
+    // Fill in jump table address.
+    backend::fill_in_register_array_entry(
         2,
         thread_state_memory,
         reinterpret_cast<std::uintptr_t>(program_jump_table)
     );
 
-    backend::fill_in_register_array_entry( //thread state
+    // Fill in thread state address. I don't quite remember what purpose this serves.
+    backend::fill_in_register_array_entry(
         3,
         thread_state_memory,
         reinterpret_cast<std::uintptr_t>(thread_state_memory)
@@ -78,33 +82,38 @@ module_mediator::return_value on_thread_creation(module_mediator::arguments_stri
 
         module_mediator::return_value result_container_id = backend::deallocate_thread(thread_id);
         if (backend::get_container_running_threads_count(result_container_id) == 0) {
-            get_thread_manager().forget_thread_group(result_container_id);
+            backend::get_thread_manager().forget_thread_group(result_container_id);
             backend::deallocate_program_container(result_container_id);
         }
 
         return module_mediator::module_failure;
     }
 
-    backend::fill_in_register_array_entry( //stack current position
+    // Fill in current stack position with value obtained from stack initializer.
+    backend::fill_in_register_array_entry(
         4,
         thread_state_memory,
         result
     );
 
-    backend::fill_in_register_array_entry( //stack end
+    // Fill in stack end address. Notice that it had to account for the space that 
+    // will be used to save the state of one variable between function calls.
+    backend::fill_in_register_array_entry(
         5,
         thread_state_memory,
-        reinterpret_cast<std::uintptr_t>(thread_stack_end) //account for the space that will be used to save the state of one variable between function calls
+        reinterpret_cast<std::uintptr_t>(thread_stack_end)
     );
 
-    backend::fill_in_register_array_entry( //program control functions
+    // Fill in runtime trap table address. This is mostly a limitation of the current design,
+    // as "program_loader" is a separate module, and it can't directly access "execution_module" data.
+    backend::fill_in_register_array_entry(
         6,
         thread_state_memory,
-        reinterpret_cast<std::uintptr_t>(get_program_control_functions_addresses())
+        reinterpret_cast<std::uintptr_t>(backend::get_runtime_trap_table())
     );
-    //fill in thread state - end
+    // Fill in thread state - end.
 
-    get_thread_manager().add_thread(
+    backend::get_thread_manager().add_thread(
         container_id,
         thread_id,
         thread_structure->priority,
@@ -120,7 +129,7 @@ module_mediator::return_value on_container_creation(module_mediator::arguments_s
     auto [container_id, program_main, preferred_stack_size] = 
         module_mediator::arguments_string_builder::unpack<module_mediator::return_value, void*, std::uint64_t>(bundle);
 
-    get_thread_manager().add_thread_group(container_id, preferred_stack_size);
+    backend::get_thread_manager().add_thread_group(container_id, preferred_stack_size);
     LOG_PROGRAM_INFO(interoperation::get_module_part(), "New thread group has been successfully created.");
 
     return backend::create_thread(container_id, 0, program_main);
@@ -131,7 +140,7 @@ module_mediator::return_value register_deferred_callback(module_mediator::argume
         module_mediator::arguments_string_builder::unpack<module_mediator::memory>(bundle);
 
     module_mediator::callback_bundle* callback = static_cast<module_mediator::callback_bundle*>(callback_info);
-    get_thread_local_structure()->deferred_callbacks.push_back(callback);
+    backend::get_thread_local_structure()->deferred_callbacks.push_back(callback);
 
     return module_mediator::module_success;
 }
@@ -147,11 +156,11 @@ module_mediator::return_value self_duplicate(module_mediator::arguments_string_t
 }
 
 module_mediator::return_value self_priority(module_mediator::arguments_string_type) {
-    return get_thread_local_structure()->currently_running_thread_information.priority;
+    return backend::get_thread_local_structure()->currently_running_thread_information.priority;
 }
 
 module_mediator::return_value get_thread_saved_variable(module_mediator::arguments_string_type) {
-    char* thread_state = static_cast<char*>(get_thread_local_structure()->currently_running_thread_information.thread_state) + 40;
+    char* thread_state = static_cast<char*>(backend::get_thread_local_structure()->currently_running_thread_information.thread_state) + 40;
     module_mediator::memory thread_stack_end{};
 
     std::memcpy(&thread_stack_end, thread_state, sizeof(module_mediator::memory));
@@ -175,7 +184,7 @@ module_mediator::return_value dynamic_call(module_mediator::arguments_string_typ
     }
 
     program_state_manager state_manager{ 
-        static_cast<char*>(get_thread_local_structure()->currently_running_thread_information.thread_state) 
+        static_cast<char*>(backend::get_thread_local_structure()->currently_running_thread_information.thread_state) 
     };
 
     std::uintptr_t program_return_address = state_manager.get_return_address();
@@ -197,7 +206,7 @@ module_mediator::return_value dynamic_call(module_mediator::arguments_string_typ
         std::bit_cast<char*>(state_manager.get_current_stack_position()),
         std::bit_cast<char*>(state_manager.get_stack_end()),
         function_arguments,
-        get_thread_local_structure()->currently_running_thread_information.thread_id
+        backend::get_thread_local_structure()->currently_running_thread_information.thread_id
     );
 
     if (new_current_stack_position == reinterpret_cast<std::uintptr_t>(nullptr)) {
@@ -219,18 +228,18 @@ module_mediator::return_value dynamic_call(module_mediator::arguments_string_typ
 }
 
 module_mediator::return_value get_current_thread_id(module_mediator::arguments_string_type) {
-    return get_thread_local_structure()->currently_running_thread_information.thread_id;
+    return backend::get_thread_local_structure()->currently_running_thread_information.thread_id;
 }
 
 module_mediator::return_value get_current_thread_group_id(module_mediator::arguments_string_type) {
-    return get_thread_local_structure()->currently_running_thread_information.thread_group_id;
+    return backend::get_thread_local_structure()->currently_running_thread_information.thread_group_id;
 }
 
 module_mediator::return_value make_runnable(module_mediator::arguments_string_type bundle) {
     auto [thread_id] = 
         module_mediator::arguments_string_builder::unpack<module_mediator::return_value>(bundle);
 
-    if (get_thread_manager().make_runnable(thread_id)) {
+    if (backend::get_thread_manager().make_runnable(thread_id)) {
         LOG_PROGRAM_INFO(interoperation::get_module_part(), "Made a thread with id '" + std::to_string(thread_id) + "' runnable again.");
     }
     else {
@@ -257,7 +266,7 @@ module_mediator::return_value start(module_mediator::arguments_string_type bundl
         "Creating execution daemons. Count: " + std::to_string(thread_count)
     );
 
-    get_thread_manager().startup(thread_count);
+    backend::get_thread_manager().startup(thread_count);
     return module_mediator::module_success;
 }
 

@@ -50,7 +50,7 @@
     <ClInclude Include="execution_module.h">
       <Filter>Header Files\Module Mediator</Filter>
     </ClInclude>
-    <ClInclude Include="executions_backend_functions.h">
+    <ClInclude Include="execution_backend_functions.h">
       <Filter>Header Files\Program Threads Management</Filter>
     </ClInclude>
     <ClInclude Include="control_code_templates.h">
@@ -58,6 +58,9 @@
     </ClInclude>
     <ClInclude Include="module_interoperation.h">
       <Filter>Header Files\Module Mediator</Filter>
+    </ClInclude>
+    <ClInclude Include="runtime_traps.h">
+      <Filter>Header Files\Program Threads Management</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -75,6 +78,9 @@
     </ClCompile>
     <ClCompile Include="module_initialization.cpp">
       <Filter>Source Files\Maintenance</Filter>
+    </ClCompile>
+    <ClCompile Include="runtime_traps.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

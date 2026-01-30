@@ -4,6 +4,7 @@
 #include "scheduler.h"
 #include "module_interoperation.h"
 #include "control_code_templates.h"
+#include "execution_backend_functions.h"
 
 #include "../logger_module/logging.h"
 #include "../module_mediator/local_crash_handle_setup.h"
@@ -46,7 +47,7 @@ class thread_manager {
             );
         }
 
-        thread_local_structure* thread_structure = get_thread_local_structure();
+        thread_local_structure* thread_structure = backend::get_thread_local_structure();
         scheduler::schedule_information* currently_running_thread_information = 
             &thread_structure->currently_running_thread_information;
 
@@ -64,16 +65,15 @@ class thread_manager {
             // All other modifications are synchronized with mutexes. This is one just needs atomicity.
             this->active_threads_counter.fetch_add(1, std::memory_order_relaxed);
             CONTROL_CODE_TEMPLATE_LOAD_PROGRAM(
-                thread_structure->execution_thread_state, 
+                &thread_structure->execution_thread_state, 
                 currently_running_thread_information->thread_state,
                 currently_running_thread_information->state == scheduler::thread_states::startup
-                    ? 1 : 0
             );
 
             std::size_t previous_active_threads_count = this->active_threads_counter.fetch_sub(1, std::memory_order_relaxed);
             if (currently_running_thread_information->put_back_structure) {
                 this->scheduler.put_back(currently_running_thread_information->put_back_structure);
-                for (const auto& deferred_callback : get_thread_local_structure()->deferred_callbacks) {
+                for (const auto& deferred_callback : backend::get_thread_local_structure()->deferred_callbacks) {
                     std::size_t module_index = interoperation::get_module_part()->find_module_index(deferred_callback->module_name);
                     if (module_index == module_mediator::module_part::module_not_found) {
                         LOG_WARNING(
@@ -123,7 +123,7 @@ class thread_manager {
                     }
                 }
 
-                get_thread_local_structure()->deferred_callbacks.clear();
+                backend::get_thread_local_structure()->deferred_callbacks.clear();
             }
             else {
                 if (previous_active_threads_count == 1 && !this->scheduler.has_available_jobs()) {
@@ -158,7 +158,7 @@ public:
     }
 
     void block(module_mediator::return_value thread_id) {
-        assert(get_thread_local_structure()->currently_running_thread_information.thread_id == thread_id &&
+        assert(backend::get_thread_local_structure()->currently_running_thread_information.thread_id == thread_id &&
             "Thread manager can only block the currently running thread.");
 
         this->scheduler.block(thread_id);

@@ -3,66 +3,117 @@
 #include "execution_module.h"
 #include "thread_manager.h"
 #include "control_code_templates.h"
-#include "executions_backend_functions.h"
-
-#include "../logger_module/logging.h"
-#include "../program_loader/program_functions.h"
+#include "execution_backend_functions.h"
+#include "runtime_traps.h"
 
 namespace {
     module_mediator::module_part* part = nullptr;
-    char* program_control_functions_addresses = nullptr;
     thread_manager* manager = nullptr;
+    char* runtime_trap_table = nullptr;
 
-    void show_error(std::uint64_t error_code) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wcovered-switch-default"
+    std::optional<std::string> verify_control_code_pdata_xdata_setup() {
+        DWORD64 dw64LoadProgramBase = 0;
+        PRUNTIME_FUNCTION prfLoadProgram= RtlLookupFunctionEntry(
+            reinterpret_cast<DWORD64>(&CONTROL_CODE_TEMPLATE_LOAD_PROGRAM),
+            &dw64LoadProgramBase,
+            nullptr
+        );
 
-        switch (static_cast<termination_codes>(error_code)) {
-        case termination_codes::stack_overflow:
-            LOG_PROGRAM_ERROR(::part, "Stack overflow. This can happen during function call, module function call, function prologue.");
-            break;
-
-        case termination_codes::nullptr_dereference:
-            LOG_PROGRAM_ERROR(::part, "Uninitialized pointer dereference.");
-            break;
-
-        case termination_codes::pointer_out_of_bounds:
-            LOG_PROGRAM_ERROR(::part, "Pointer index is out of bounds.");
-            break;
-
-        case termination_codes::undefined_function_call:
-            LOG_PROGRAM_ERROR(::part, "Undefined function call. Called function has its own signature but it does not have a body.");
-            break;
-
-        case termination_codes::incorrect_saved_variable_type:
-            LOG_PROGRAM_ERROR(::part, "Saved variable has different type.");
-            break;
-
-        case termination_codes::division_by_zero:
-            LOG_PROGRAM_ERROR(::part, "Division by zero.");
-            break;
-
-        default:  // NOLINT(clang-diagnostic-covered-switch-default)
-            LOG_PROGRAM_FATAL(::part, "Unknown termination code. The process will be terminated.");
-            std::terminate();
+        if (prfLoadProgram == nullptr) {
+            return "Failed to lookup function entry for CONTROL_CODE_TEMPLATE_LOAD_PROGRAM.";
         }
 
-#pragma clang diagnostic pop
+        DWORD64 dw64CallModuleTrampolineBase = 0;
+        PRUNTIME_FUNCTION prfCallModuleTrampoline = RtlLookupFunctionEntry(
+            reinterpret_cast<DWORD64>(&CONTROL_CODE_TEMPLATE_CALL_MODULE_TRAMPOLINE),
+            &dw64CallModuleTrampolineBase,
+            nullptr
+        );
 
-        LOG_PROGRAM_ERROR(::part, "Program execution error. Thread terminated.");
-    }
+        if (prfCallModuleTrampoline == nullptr) {
+            return "Failed to lookup function entry for CONTROL_CODE_TEMPLATE_CALL_MODULE_TRAMPOLINE.";
+        }
 
-    [[noreturn]] void inner_terminate(std::uint64_t error_code) {
-        show_error(error_code);
+        DWORD64 dw64ProgramEndTrampolineBase = 0;
+        PRUNTIME_FUNCTION prfProgramEndTrampoline = RtlLookupFunctionEntry(
+            reinterpret_cast<DWORD64>(&CONTROL_CODE_TEMPLATE_PROGRAM_END_TRAMPOLINE),
+            &dw64ProgramEndTrampolineBase,
+            nullptr
+        );
 
-        backend::thread_terminate();
-        CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD(get_thread_local_structure()->execution_thread_state);
-    }
+        if (prfProgramEndTrampoline == nullptr) {
+            return "Failed to lookup function entry for CONTROL_CODE_TEMPLATE_PROGRAM_END_TRAMPOLINE.";
+        }
 
-    // TODO: fix unaligned stack here on user program termination.
-    [[noreturn]] void end_program() {
-        backend::thread_terminate();
-        CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD(get_thread_local_structure()->execution_thread_state);
+        if (dw64LoadProgramBase != dw64CallModuleTrampolineBase ||
+            dw64LoadProgramBase != dw64ProgramEndTrampolineBase) {
+            return "CONTROL_CODE_TEMPLATE functions are registered in different function tables.";
+        }
+
+        if (prfLoadProgram->EndAddress - prfLoadProgram->BeginAddress != 
+            CONTROL_CODE_TEMPLATE_LOAD_PROGRAM_SIZE) {
+            return "Incorrect size recorded for CONTROL_CODE_TEMPLATE_LOAD_PROGRAM.";
+        }
+
+        if (prfCallModuleTrampoline->EndAddress - prfCallModuleTrampoline->BeginAddress != 
+            CONTROL_CODE_TEMPLATE_CALL_MODULE_TRAMPOLINE_SIZE) {
+            return "Incorrect size recorded for CONTROL_CODE_TEMPLATE_CALL_MODULE_TRAMPOLINE.";
+        }
+
+        if (prfProgramEndTrampoline->EndAddress - prfProgramEndTrampoline->BeginAddress != 
+            CONTROL_CODE_TEMPLATE_PROGRAM_END_TRAMPOLINE_SIZE) {
+            return "Incorrect size recorded for CONTROL_CODE_TEMPLATE_PROGRAM_END_TRAMPOLINE.";
+        }
+        
+        using UBYTE = unsigned char;
+        struct UNWIND_INFO_HEADER {
+            UBYTE Version : 3;
+            UBYTE Flags : 5;
+            UBYTE SizeOfProlog;
+            UBYTE CountOfCodes;
+            UBYTE FrameRegister : 4;
+            UBYTE FrameOffset : 4;
+        };
+
+        struct CHAINED_UNWIND_INFO {
+            UNWIND_INFO_HEADER Header;
+            RUNTIME_FUNCTION ChainedFunction;
+        };
+
+        UNWIND_INFO_HEADER* loadProgramUnwindInfo = std::bit_cast<UNWIND_INFO_HEADER*>(
+            dw64LoadProgramBase + prfLoadProgram->UnwindData);
+
+        CHAINED_UNWIND_INFO* callModuleTrampolineChainedInfo = std::bit_cast<CHAINED_UNWIND_INFO*>(
+            dw64CallModuleTrampolineBase + prfCallModuleTrampoline->UnwindData);
+
+        CHAINED_UNWIND_INFO* programEndTrampolineChainedInfo = std::bit_cast<CHAINED_UNWIND_INFO*>(
+            dw64ProgramEndTrampolineBase + prfProgramEndTrampoline->UnwindData);
+
+        if (std::memcmp(prfLoadProgram, &callModuleTrampolineChainedInfo->ChainedFunction,
+            sizeof(RUNTIME_FUNCTION)) != 0) {
+            return "CONTROL_CODE_TEMPLATE_CALL_MODULE_TRAMPOLINE unwind info is not chained to "
+                   "CONTROL_CODE_TEMPLATE_LOAD_PROGRAM.";
+        }
+
+        if (std::memcmp(prfLoadProgram, &programEndTrampolineChainedInfo->ChainedFunction,
+            sizeof(RUNTIME_FUNCTION)) != 0) {
+            return "CONTROL_CODE_TEMPLATE_CALL_PROGRAM_END_TRAMPOLINE unwind info is not chained to "
+                   "CONTROL_CODE_TEMPLATE_LOAD_PROGRAM.";
+        }
+
+        if (loadProgramUnwindInfo->SizeOfProlog == 0 ||
+            loadProgramUnwindInfo->CountOfCodes == 0 ||
+            loadProgramUnwindInfo->FrameRegister == 0) {
+            return "CONTROL_CODE_TEMPLATE_LOAD_PROGRAM does not have stack frame set up.";
+        }
+
+        if (callModuleTrampolineChainedInfo->Header.Flags != UNW_FLAG_CHAININFO ||
+            programEndTrampolineChainedInfo->Header.Flags != UNW_FLAG_CHAININFO) {
+            return "Chained unwind info for CONTROL_CODE_TEMPLATE_CALL_MODULE_TRAMPOLINE or "
+                   "CONTROL_CODE_TEMPLATE_PROGRAM_END_TRAMPOLINE does not have CHAININFO flag set.";
+        }
+
+        return {};
     }
 }
 
@@ -72,50 +123,67 @@ namespace interoperation {
     }
 }
 
-char* get_program_control_functions_addresses() {
-    return program_control_functions_addresses;
-}
+namespace backend {
+    thread_manager& get_thread_manager() {
+        return *manager;
+    }
 
-thread_manager& get_thread_manager() {
-    return *manager;
+    char* get_runtime_trap_table() {
+        return runtime_trap_table;
+    }
 }
 
 void initialize_m(module_mediator::module_part* module_part) {
-    constexpr std::uint64_t call_module_trampoline_index = 0;
-    constexpr std::uint64_t backend_call_module_index = 1;
-    constexpr std::uint64_t inner_terminate_index = 2;
-    constexpr std::uint64_t end_program_trap_index = 3;
+    constexpr std::uint64_t runtime_trap_table_size = 4;
+    constexpr std::uint64_t runtime_module_call_trampoline_index = 0;
+    constexpr std::uint64_t runtime_module_call_trap_index = 1;
+    constexpr std::uint64_t program_termination_trampoline_index = 2;
+    constexpr std::uint64_t program_termination_trap_index = 3;
 
     part = module_part;
-    program_control_functions_addresses = new char[4 * sizeof(std::uint64_t)] {};
     manager = new thread_manager{};
 
+    // Allocate and initialize runtime trap table. I intentionally don't use linking between
+    // this object file and the assembly one to allow for the machine code in that file to 
+    // reside in a different part of process memory.
+    runtime_trap_table = new char[runtime_trap_table_size * sizeof(std::uint64_t)] {};
+
     backend::fill_in_register_array_entry(
-        call_module_trampoline_index,
-        program_control_functions_addresses,
+        runtime_module_call_trampoline_index,
+        runtime_trap_table,
         reinterpret_cast<std::uintptr_t>(&CONTROL_CODE_TEMPLATE_CALL_MODULE_TRAMPOLINE)
     );
 
     backend::fill_in_register_array_entry(
-        backend_call_module_index,
-        program_control_functions_addresses,
-        reinterpret_cast<std::uintptr_t>(&backend::call_module)
+        runtime_module_call_trap_index,
+        runtime_trap_table,
+        reinterpret_cast<std::uintptr_t>(&runtime_traps::runtime_module_call)
     );
 
     backend::fill_in_register_array_entry(
-        inner_terminate_index,
-        program_control_functions_addresses,
-        reinterpret_cast<std::uintptr_t>(&inner_terminate)
+        program_termination_trampoline_index,
+        runtime_trap_table,
+        reinterpret_cast<std::uintptr_t>(&CONTROL_CODE_TEMPLATE_PROGRAM_END_TRAMPOLINE)
     );
 
     backend::fill_in_register_array_entry(
-        end_program_trap_index,
-        program_control_functions_addresses,
-        reinterpret_cast<std::uintptr_t>(&end_program)
+        program_termination_trap_index,
+        runtime_trap_table,
+        reinterpret_cast<std::uintptr_t>(&runtime_traps::program_termination_request)
     );
+
+    auto runtime_verification_result = verify_control_code_pdata_xdata_setup();
+    if (runtime_verification_result.has_value()) {
+        std::cerr << std::format(
+            "*** RUNTIME VERIFICATION FAILED: {}\n",
+            runtime_verification_result.value());
+
+        // There isn't much we can do if this fails.
+        std::terminate();
+    }
 }
 
 void free_m() {
-    delete[] program_control_functions_addresses;
+    delete[] runtime_trap_table;
     delete manager;
 }

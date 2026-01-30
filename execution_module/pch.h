@@ -31,5 +31,7 @@
 #include <ranges>
 #include <limits>
 #include <bit>
+#include <winnt.h>
+#include <optional>
 
 #endif //PCH_H

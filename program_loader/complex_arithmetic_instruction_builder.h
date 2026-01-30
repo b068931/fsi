@@ -22,7 +22,7 @@ protected:
 		this->write_bytes('\x75');
 		this->write_bytes(static_cast<std::uint8_t>(program_termination_code_size));
 
-		this->generate_program_termination_code(termination_codes::division_by_zero);
+		this->generate_program_termination_code(program_loader::termination_codes::division_by_zero);
 	}
 
 	void move_r8_to_rbx() {

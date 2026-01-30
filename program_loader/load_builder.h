@@ -14,7 +14,7 @@ class load_builder : public instruction_builder {
         this->write_bytes('\x74'); //je end
         this->write_bytes(static_cast<std::uint8_t>(program_termination_code_size));
 
-        this->generate_program_termination_code(termination_codes::incorrect_saved_variable_type);
+        this->generate_program_termination_code(program_loader::termination_codes::incorrect_saved_variable_type);
         //:end
     }
     void move_saved_variable_value_to_rax() {

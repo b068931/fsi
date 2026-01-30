@@ -1,21 +1,17 @@
 #ifndef EXECUTION_MODULE_EXECUTIONS_BACKEND_FUNCTIONS_H
 #define EXECUTION_MODULE_EXECUTIONS_BACKEND_FUNCTIONS_H
 
-#include "thread_manager.h"
+#include "thread_local_structure.h"
 #include "../module_mediator/module_part.h"
 
-thread_manager& get_thread_manager();
+class thread_manager;
 
 namespace backend {
-    [[noreturn]] void call_module_error(
-        module_mediator::module_part::call_error error
-    );
+    thread_manager& get_thread_manager();
 
-    [[noreturn]] void call_module(
-        std::uint64_t module_id, 
-        std::uint64_t function_id, 
-        module_mediator::arguments_string_type args_string
-    );
+    char* get_runtime_trap_table();
+
+    thread_local_structure* get_thread_local_structure();
 
     [[maybe_unused]] std::string get_exposed_function_name(
         void* function_address

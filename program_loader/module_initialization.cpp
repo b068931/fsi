@@ -34,7 +34,7 @@ void initialize_m(module_mediator::module_part* module_part) {
 	default_function_symbols.push_back('\xc4');
 	default_function_symbols.push_back('\x08');
 
-	generate_program_termination_code(default_function_symbols, termination_codes::undefined_function_call);
+	generate_program_termination_code(default_function_symbols, program_loader::termination_codes::undefined_function_call);
 	exposed_functions = new std::unordered_map<
 		std::uintptr_t,
 		std::pair<

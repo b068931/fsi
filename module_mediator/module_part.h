@@ -359,7 +359,7 @@ namespace module_mediator {
         std::size_t function_index,
         args... arguments
     ) {
-        auto args_string = std::make_unique<arguments_string_element[]>(
+        auto args_string = std::unique_ptr<arguments_string_element[]>(
             arguments_string_builder::pack(arguments...));
 
         return part->call_module(

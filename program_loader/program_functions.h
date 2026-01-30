@@ -3,15 +3,7 @@
 
 #include "pch.h"
 #include "memory_layouts_builder.h"
-
-enum class termination_codes : std::int32_t {
-	stack_overflow = 1,
-	nullptr_dereference,
-	pointer_out_of_bounds,
-	undefined_function_call,
-	incorrect_saved_variable_type,
-	division_by_zero
-};
+#include "program_termination_codes.h"
 
 constexpr std::uint32_t program_termination_code_size = 11;
 constexpr std::uint32_t stack_allocation_code_size = 12 + program_termination_code_size;
@@ -25,7 +17,7 @@ void write_bytes(T value, std::vector<char>& destination) {
 	}
 }
 
-void generate_program_termination_code(std::vector<char>& destination,  termination_codes error_code);
+void generate_program_termination_code(std::vector<char>& destination, program_loader::termination_codes error_code);
 void generate_stack_allocation_code(std::vector<char>& destination, std::uint32_t size);
 void generate_stack_deallocation_code(std::vector<char>& destination, std::uint32_t size);
 std::uint32_t generate_function_prologue(std::vector<char>& destination, std::uint32_t allocation_size, const memory_layouts_builder::memory_addresses& locals);

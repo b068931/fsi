@@ -42,6 +42,9 @@
     <Filter Include="Header Files\Module Mediator">
       <UniqueIdentifier>{4b8bc538-8b20-4be9-9ab6-9e04a9dd4c28}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Module Mediator\Export">
+      <UniqueIdentifier>{18b1b8bb-e035-4774-b3bc-fa435b362d03}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="instruction_arguments_classes.h">
@@ -178,6 +181,9 @@
     </ClInclude>
     <ClInclude Include="program_loader.h">
       <Filter>Header Files\Module Mediator</Filter>
+    </ClInclude>
+    <ClInclude Include="program_termination_codes.h">
+      <Filter>Header Files\Module Mediator\Export</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

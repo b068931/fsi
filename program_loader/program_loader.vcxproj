@@ -54,6 +54,7 @@
     <ClInclude Include="program_compilation_error.h" />
     <ClInclude Include="program_loader.h" />
     <ClInclude Include="move_pointer_builder.h" />
+    <ClInclude Include="program_termination_codes.h" />
     <ClInclude Include="regular_variable.h" />
     <ClInclude Include="run_container.h" />
     <ClInclude Include="run_reader.h" />

@@ -3,8 +3,7 @@
 
 #include "pch.h"
 #include "scheduler.h"
-
-inline constexpr std::size_t execution_thread_state_length = 136;
+#include "control_code_templates.h"
 
 struct thread_local_structure {
     // Contains data that will be passed to the main function in thread.
@@ -22,7 +21,7 @@ struct thread_local_structure {
     };
 
     // State of the execution thread before switching to the program state.
-    char* execution_thread_state{ new char[execution_thread_state_length] {} };
+    saved_thread_state_type execution_thread_state{};
 
     // Information about the currently running program thread, as acquired from the scheduler.
     scheduler::schedule_information currently_running_thread_information{};

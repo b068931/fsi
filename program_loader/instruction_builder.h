@@ -174,7 +174,7 @@ protected:
         ::generate_stack_deallocation_code(this->translated_instruction_symbols, size);
     }
 
-    void generate_program_termination_code(termination_codes error_code) {
+    void generate_program_termination_code(program_loader::termination_codes error_code) {
         ::generate_program_termination_code(this->translated_instruction_symbols, error_code);
     }
 
@@ -345,7 +345,7 @@ protected:
         this->translated_instruction_symbols.push_back('\x75'); //jne nullptr_check
         this->write_bytes<char>(program_termination_code_size);
 
-        ::generate_program_termination_code(this->translated_instruction_symbols, termination_codes::nullptr_dereference);
+        ::generate_program_termination_code(this->translated_instruction_symbols, program_loader::termination_codes::nullptr_dereference);
         //:nullptr_check
 
         this->translated_instruction_symbols.push_back('\x4d'); //cmp r8, [r15]
@@ -355,7 +355,7 @@ protected:
         this->translated_instruction_symbols.push_back('\x72'); //jb end
         this->write_bytes<char>(program_termination_code_size);
 
-        ::generate_program_termination_code(this->translated_instruction_symbols, termination_codes::pointer_out_of_bounds);
+        ::generate_program_termination_code(this->translated_instruction_symbols, program_loader::termination_codes::pointer_out_of_bounds);
         //:end
     }
 
