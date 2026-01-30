@@ -107,19 +107,22 @@ CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD PROC
     CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD_CONTEXT_SWITCH_POINT LABEL PTR
 
     ; Unwind the stack back to the frame set up by the "LOAD_PROGRAM" function.
-    ; Remove shadow space.
-    mov rsp, [rcx + EXECUTOR_THREAD_STATE_STACK_TOP_DISPLACEMENT]
-    add rsp, FRAME_SHADOW_SPACE_SIZE
+    ; Remove shadow space and possibly all other allocated memory.
+    lea rsp, [FRAME_POINTER_REGISTER + FRAME_SHADOW_SPACE_SIZE]
 
+    ; Start stack unwinding.
     ; Restore all non-volatile registers from stack.
     pop r15
     pop r14
-    pop r13
     pop r12
     pop rsi
     pop rdi
     pop rbp
     pop rbx
+
+    ; Notice that FRAME_POINTER_REGISTER is restored last.
+    ; This specific order seems to be important. Yet, documentation doesn't mention it.
+    pop r13
 
     ; Finally, continue execution of the function which has called "LOAD_PROGRAM".
     ret
@@ -142,28 +145,34 @@ CONTROL_CODE_TEMPLATE_LOAD_PROGRAM PROC FRAME
     ; that they use FRAME_POINTER_REGISTER as a frame pointer.
 
     ; Stack aligned on 16-byte boundary here.
+    ; Notice that FRAME_POINTER_REGISTER is r13. We must push
+    ; it first before setting up the frame. I don't think that this behaviour is documented.
+    ; I inferred it by observing debugger and SEH behavior.
+    ; In fact, if you push this register later, Visual Studio's debugger will try
+    ; to skip the entire epilogue in "LOAD_EXECUTION_THREAD" function, leading to strange behavior.
+    ; The debugger will behave as if you pressed "Continue" button.
+    push r13
+    .pushreg r13
+
+    ; Stack is misaligned here.
     push rbx
     .pushreg rbx
 
-    ; Stack is misaligned here.
+    ; Stack aligned on 16-byte boundary here.
     push rbp
     .pushreg rbp
 
-    ; Stack aligned on 16-byte boundary here.
+    ; Stack is misaligned here.
     push rdi
     .pushreg rdi
 
-    ; Stack is misaligned here.
+    ; Stack aligned on 16-byte boundary here.
     push rsi
     .pushreg rsi
 
-    ; Stack aligned on 16-byte boundary here.
+    ; Stack is misaligned here.
     push r12
     .pushreg r12
-
-    ; Stack is misaligned here.
-    push r13
-    .pushreg r13
 
     ; Stack aligned on 16-byte boundary here.
     push r14

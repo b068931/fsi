@@ -12,6 +12,7 @@ namespace {
     thread_manager* manager = nullptr;
     char* runtime_trap_table = nullptr;
 
+    // TODO: Additionally check CONTEXT_SWITCH_POINTS for correct entries.
     std::optional<std::string> verify_control_code_pdata_xdata_setup() {
         DWORD64 dw64LoadProgramBase = 0;
         PRUNTIME_FUNCTION prfLoadProgram = RtlLookupFunctionEntry(
