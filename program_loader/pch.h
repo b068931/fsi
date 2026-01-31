@@ -30,6 +30,8 @@
 #include <algorithm>
 #include <ranges>
 #include <bit>
+#include <span>
+#include <shared_mutex>
 
 #endif
 

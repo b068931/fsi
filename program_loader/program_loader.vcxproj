@@ -28,6 +28,7 @@
     <ClInclude Include="compiled_program.h" />
     <ClInclude Include="complex_arithmetic_instruction_builder.h" />
     <ClInclude Include="copy_string_builder.h" />
+    <ClInclude Include="exposed_functions_management.h" />
     <ClInclude Include="get_function_address.h" />
     <ClInclude Include="module_interoperation.h" />
     <ClInclude Include="dereferenced_pointer.h" />
@@ -67,6 +68,7 @@
     <ClInclude Include="variable_with_id.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="exposed_functions_management.cpp" />
     <ClCompile Include="module_initialization.cpp" />
     <ClCompile Include="program_functions.cpp" />
     <ClCompile Include="instruction_arguments_visitor_function_implementation.cpp" />

@@ -185,6 +185,9 @@
     <ClInclude Include="program_termination_codes.h">
       <Filter>Header Files\Module Mediator\Export</Filter>
     </ClInclude>
+    <ClInclude Include="exposed_functions_management.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="program_loader.cpp">
@@ -204,6 +207,9 @@
     </ClCompile>
     <ClCompile Include="runs_container_readers.cpp">
       <Filter>Source Files\Reading Bytecode File And Machine Code Generation</Filter>
+    </ClCompile>
+    <ClCompile Include="exposed_functions_management.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

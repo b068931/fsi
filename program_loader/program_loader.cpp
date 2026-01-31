@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "program_loader.h"
+#include "exposed_functions_management.h"
 
 #include "run_reader.h"
 #include "run_container.h"
@@ -14,29 +15,6 @@
 
 #include "../logger_module/logging.h"
 #include "../module_mediator/fsi_types.h"
-
-// Make it public so that it can be accessed from module initialization code.
-extern std::unordered_map<
-    std::uintptr_t,
-    std::pair<
-        std::unique_ptr<module_mediator::arguments_string_element[]>,
-        std::string>
-    >* exposed_functions;
-
-std::unordered_map<
-    std::uintptr_t,
-    std::pair<
-        std::unique_ptr<module_mediator::arguments_string_element[]>,
-        std::string>
-    >* exposed_functions{};
-
-namespace {
-    std::mutex exposed_functions_mutex{};
-    void merge_exposed_functions(std::unordered_map<std::uintptr_t, std::pair<std::unique_ptr<module_mediator::arguments_string_element[]>, std::string>>& new_exposed_functions) {
-        std::scoped_lock lock{ exposed_functions_mutex };
-        exposed_functions->merge(new_exposed_functions);
-    }
-}
 
 namespace {
     module_mediator::return_value add_program(
@@ -88,6 +66,7 @@ namespace {
 
         return memory_builder.get_memory_layouts();
     }
+
     jump_table_builder construct_jump_table(const runs_container& container) {
         jump_table_builder jump_table{}; //create jump_table builder and initialize it
         for (const auto& fnc : container.function_bodies) {
@@ -147,6 +126,7 @@ namespace {
 
         return stack_space;
     }
+
     std::uint32_t calculate_function_arguments_stack_space(const memory_layouts_builder::memory_addresses& function_arguments_information) {
         std::uint32_t function_arguments_size = 0;
         for (const auto& variable_data : function_arguments_information | std::views::values) {
@@ -320,7 +300,9 @@ namespace {
         return { create_executable_function(compiled_function), prologue_size };
     }
 
-    module_mediator::arguments_string_type create_function_signature(const runs_container::function_signature& function_signature) {
+    std::unique_ptr<module_mediator::arguments_string_element[]> create_function_signature(
+        const runs_container::function_signature& function_signature
+    ) {
         module_mediator::arguments_string_type signature_string = new module_mediator::arguments_string_element[function_signature.argument_types.size() + 2];
         signature_string[0] = static_cast<module_mediator::arguments_string_element>(function_signature.argument_types.size());
 
@@ -332,7 +314,7 @@ namespace {
             ++signature_string_index;
         }
 
-        return signature_string;
+        return std::unique_ptr<module_mediator::arguments_string_element[]>{ signature_string };
     }
 
     void free_resources_on_fail(std::size_t loaded_functions_size, void** loaded_functions, void** exposed_functions_addresses) {
@@ -375,7 +357,7 @@ namespace {
 
         std::uint32_t main_function_index = functions_count;
         try {
-            std::unordered_map<std::uintptr_t, std::pair<std::unique_ptr<module_mediator::arguments_string_element[]>, std::string>> loaded_exposed_functions{};
+            std::unordered_map<std::uintptr_t, exposed_function_data> loaded_exposed_functions{};
             for (std::uint32_t function_index = 0; function_index < functions_count; ++function_index) {
                 runs_container::function& current_function = container.function_bodies[function_index];
                 if (current_function.function_signature == container.main_function_id) {
@@ -395,9 +377,10 @@ namespace {
                 if (found_exposed_function_information != container.exposed_functions.end()) {
                     exposed_functions_addresses[loaded_exposed_functions.size()] = loaded_function;
                     loaded_exposed_functions[reinterpret_cast<std::uintptr_t>(loaded_function)] =
-                        std::pair<std::unique_ptr<module_mediator::arguments_string_element[]>, std::string>{
-                            create_function_signature(container.function_signatures[current_function.function_signature]),
-                            std::move(found_exposed_function_information->second)
+                        exposed_function_data {
+                            .function_name = std::move(found_exposed_function_information->second),
+                            .function_signature = create_function_signature(
+                                container.function_signatures[current_function.function_signature])
                     };
                 }
 
@@ -577,6 +560,7 @@ module_mediator::return_value load_program_to_memory(module_mediator::arguments_
 
     return module_mediator::module_failure;
 }
+
 module_mediator::return_value free_program(module_mediator::arguments_string_type bundle) {
     auto [compiled_functions, compiled_functions_count, 
           exposed_functions_addresses, exposed_functions_count, jump_table, 
@@ -587,16 +571,10 @@ module_mediator::return_value free_program(module_mediator::arguments_string_typ
             void*, void*, std::uint64_t
         >(bundle);
 
-    {
-        std::scoped_lock lock{ exposed_functions_mutex };
-        for (std::uint32_t counter = 0; counter < exposed_functions_count; ++counter) {
-            if (static_cast<void**>(exposed_functions_addresses)[counter] != nullptr) {
-                exposed_functions->erase(
-                    reinterpret_cast<std::uintptr_t>(static_cast<void**>(exposed_functions_addresses)[counter])
-                );
-            }
-        }
-    }
+    remove_exposed_functions({ 
+        static_cast<void**>(exposed_functions_addresses), 
+        exposed_functions_count 
+    });
 
     for (std::uint64_t counter = 0; counter < program_strings_count; ++counter) {
         delete[] static_cast<char**>(program_strings)[counter];
@@ -614,45 +592,3 @@ module_mediator::return_value free_program(module_mediator::arguments_string_typ
     return module_mediator::module_success;
 }
 
-module_mediator::return_value check_function_arguments(module_mediator::arguments_string_type bundle) {
-    auto [signature_string, function_address] =
-        module_mediator::arguments_string_builder::unpack<void*, unsigned long long>(bundle);
-
-    //std::unordered_map does not invalidate references and pointers to its objects unless they were erased
-    module_mediator::arguments_string_type found_signature_string{};
-    {
-        std::scoped_lock lock{ exposed_functions_mutex };
-        auto found_exposed_function_information = exposed_functions->find(function_address);
-        if (found_exposed_function_information != exposed_functions->end()) {
-            found_signature_string = found_exposed_function_information->second.first.get();
-        }
-    }
-
-    if (found_signature_string == module_mediator::arguments_string_type{}) {
-        return module_mediator::module_failure; //"function was not found"
-    }
-
-    if (module_mediator::arguments_string_builder::check_if_arguments_strings_match(
-        static_cast<module_mediator::arguments_string_type>(signature_string), 
-        found_signature_string)
-        ) {
-        return module_mediator::module_success; //"signatures match"
-    }
-
-    return module_mediator::module_failure; //"signatures do not match"
-}
-module_mediator::return_value get_function_name(module_mediator::arguments_string_type bundle) {
-    auto [function_address] = 
-        module_mediator::arguments_string_builder::unpack<std::uintptr_t>(bundle);
-
-    char* found_name = nullptr;
-    {
-        std::scoped_lock lock{ exposed_functions_mutex };
-        auto found_exposed_function_information = exposed_functions->find(function_address);
-        if (found_exposed_function_information != exposed_functions->end()) {
-            found_name = found_exposed_function_information->second.second.data();
-        }
-    }
-
-    return reinterpret_cast<std::uintptr_t>(found_name);
-}
