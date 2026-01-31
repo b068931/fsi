@@ -1,3 +1,7 @@
+#ifdef APPLICATION_RELEASE
+#define STARTUP_COMPONENTS_HIDE_APPLICATION_CONSOLE
+#endif
+
 #ifndef NDEBUG
 //#include <vld.h>
 #endif
@@ -17,13 +21,13 @@
 #include "application_styles_manager.h"
 #include "background_service.h"
 
-// TODO: Consider adding command line arguments for opening specific files at startup.
-// TODO: Consider implementing some mechanism to use exceptions for error handling.
-//       Qt has very poor support for exceptions, but it might be possible to implement something.
-//       For example, you are not allowed to throw exceptions from slots, but you can catch them before they leave the slot.
-//       It might be possible to implement some mechanism which will automatically catch exceptions and push them to event queue, and then process them (show message box, etc.) in the main event loop.
+#include "../startup_components/startup_definitions.h"
 
-int main(int argc, char *argv[]) {
+// TODO: Consider adding command line arguments for opening specific files at startup.
+
+APPLICATION_ENTRYPOINT("VISUAL ENVIRONMENT", PROJECT_VERSION, argc, argv) {
+    assert(argc > 0 && "Must contain at least one argument.");
+
     constexpr char applicationBaseStyle[]{ "Fusion" };
     constexpr char fontsRootDirectory[]{ ":/fonts" };
 

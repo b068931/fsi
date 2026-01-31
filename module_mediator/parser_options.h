@@ -10,22 +10,22 @@
 #include "../generic_parser/token_generator.h"
 
 namespace module_mediator::parser {
-	class parser_options {
+    class parser_options {
         static const generic_parser::token_generator<
-			components::engine_module_builder::file_tokens,
-			components::engine_module_builder::context_keys
-		>::symbols_pair main_context;
+            components::engine_module_builder::file_tokens,
+            components::engine_module_builder::context_keys
+        >::symbols_pair main_context;
 
-	public:
-		static const std::vector<std::pair<std::string, components::engine_module_builder::file_tokens>> keywords;
-		static const std::map<
-			components::engine_module_builder::context_keys,
-			generic_parser::token_generator<
-				components::engine_module_builder::file_tokens,
-				components::engine_module_builder::context_keys
-			>::symbols_pair
-		> contexts;
-	};
+    public:
+        static const std::vector<std::pair<std::string, components::engine_module_builder::file_tokens>> keywords;
+        static const std::map<
+            components::engine_module_builder::context_keys,
+            generic_parser::token_generator<
+                components::engine_module_builder::file_tokens,
+                components::engine_module_builder::context_keys
+            >::symbols_pair
+        > contexts;
+    };
 }
 
 #endif

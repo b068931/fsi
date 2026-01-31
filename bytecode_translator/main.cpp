@@ -28,6 +28,7 @@
 #include "../generic_parser/parser_facade.h"
 #include "../compression_algorithms/static_huffman.h"
 #include "../compression_algorithms/sequence_reduction.h"
+#include "../startup_components/startup_definitions.h"
 
 namespace {
     bool verify_program(const structure_builder::file& parser_value) {
@@ -168,9 +169,7 @@ namespace {
     }
 }
 
-// TODO: Use a wmain instead of a regular main to support Unicode file paths on Windows.
-
-int main(int argc, char** argv) {
+APPLICATION_ENTRYPOINT("BYTECODE TRANSLATOR", PROJECT_VERSION, argc, argv) {
     auto start_time = std::chrono::high_resolution_clock::now();
     if (argc != 4) {
         std::cout << "Provide the name of the file to compile and its output destination. And add 'include-debug' or 'no-debug' at the end. It is only three arguments." <<

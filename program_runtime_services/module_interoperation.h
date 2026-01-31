@@ -11,6 +11,7 @@
 #endif
 
 PROGRAMRUNTIMESERVICES_API void initialize_m(module_mediator::module_part* part);
+PROGRAMRUNTIMESERVICES_API void free_m();
 
 namespace interoperation {
     module_mediator::module_part* get_module_part();

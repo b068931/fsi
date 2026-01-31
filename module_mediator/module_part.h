@@ -28,9 +28,8 @@ namespace module_mediator {
         arguments_string_type arguments_string;
     };
 
-    //this class will be passed to modules so that they can call functions in other modules
-    class module_part {
-    public:
+    // This class will be passed to modules so that they can call functions in other modules.
+    struct module_part {
         enum class call_error {
             function_is_not_visible,
             unknown_index,
@@ -38,25 +37,19 @@ namespace module_mediator {
             no_error
         };
 
-        module_part() = default;
-
-        module_part(const module_part&) = delete;
-        module_part& operator= (const module_part&) = delete;
-
-        module_part(module_part&&) noexcept = delete;
-        module_part& operator= (module_part&&) noexcept = delete;
-
         static constexpr std::size_t function_not_found = std::numeric_limits<std::size_t>::max();
         static constexpr std::size_t module_not_found = std::numeric_limits<std::size_t>::max();
 
-        virtual std::size_t find_function_index(std::size_t module_index, const char* name) const = 0;
-        virtual std::size_t find_module_index(const char* name) const = 0;
+        std::size_t (*const find_function_index)(std::size_t module_index, const char* name);
+        std::size_t (*const find_module_index)(const char* name);
 
-        virtual return_value call_module(std::size_t module_index, std::size_t function_index, arguments_string_type arguments_string) = 0;
-        virtual return_value call_module_visible_only(std::size_t module_index, std::size_t function_index, arguments_string_type arguments_string, void(*error_callback)(call_error)) = 0;
-
-        virtual ~module_part() = default;
+        return_value (*const call_module)(std::size_t module_index, std::size_t function_index, arguments_string_type arguments_string);
+        return_value (*const call_module_visible_only)(std::size_t module_index, std::size_t function_index, arguments_string_type arguments_string, void(*error_callback)(call_error));
     };
+
+    static_assert(std::is_standard_layout_v<module_part>, "Module part must have a standard layout.");
+    static_assert(std::is_trivially_copyable_v<module_part>, "Module part must be trivially copyable.");
+    static_assert(std::is_trivially_destructible_v<module_part>, "Module part must be trivially destructible.");
 
     class arguments_string_builder {
         template<typename... types>

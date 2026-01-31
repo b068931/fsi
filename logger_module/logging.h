@@ -15,6 +15,7 @@
 
 #include <string>
 #include <iostream>
+#include <atomic>
 
 #include "../module_mediator/fsi_types.h"
 #include "../module_mediator/module_part.h"
@@ -22,6 +23,24 @@
 #define ONLY_FILE_NAME strrchr("\\" __FILE__, '\\') + 1 
 
 namespace logger_module {
+    class global_logging_instance {
+        static inline std::atomic_flag logging_enabled = ATOMIC_FLAG_INIT;
+
+    public:
+        static bool is_logging_enabled() {
+            return logging_enabled.test();
+        }
+
+        static void set_logging_enabled(bool enabled) {
+            if (enabled) {
+                logging_enabled.test_and_set();
+            }
+            else {
+                logging_enabled.clear();
+            }
+        }
+    };
+
     inline void generic_log_message(
         module_mediator::module_part* part,
         std::size_t message_type,
@@ -33,8 +52,13 @@ namespace logger_module {
 #endif
         std::string message
     ) {
-        assert(part != nullptr && "Null module part");
-        assert(!message.empty() && "Empty log message");
+        assert(function_name != "DllMain" && "Do not use this during DLL initialization.");
+        assert(part != nullptr && "Null module part.");
+        assert(!message.empty() && "Empty log message.");
+
+        if (!global_logging_instance::is_logging_enabled()) {
+            return;
+        }
 
         static std::size_t logger = part->find_module_index("logger");
         if (logger == module_mediator::module_part::module_not_found) {

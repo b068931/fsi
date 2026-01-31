@@ -26,6 +26,7 @@
 #include "../logger_module/logging.h"
 #include "../compression_algorithms/static_huffman.h"
 #include "../compression_algorithms/sequence_reduction.h"
+#include "../startup_components/startup_definitions.h"
 
 namespace {
     // Decompresses the bytecode from memory and stores that in a temporary file.
@@ -184,12 +185,7 @@ namespace {
 //       Maybe this pattern should be applied in all modules where global objects are used?
 //       Must also document this pattern somewhere.
 
-// TODO: Null all memory descriptors before deallocating them, so that if a program references one, it gets
-//       a null pointer exception instead of random memory access. I am not sure if this will work though.
-
-// TODO: Use a wmain instead of a regular main to support Unicode file paths on Windows.
-
-int main(int argc, char** argv) {
+APPLICATION_ENTRYPOINT(LOGGER_MODULE_EMITTER_MODULE_NAME, PROJECT_VERSION, argc, argv) {
     if (argc != 4) {
         std::cerr << "You need to provide three arguments: text file with the modules descriptions, executors count and a compiled file." <<
             '\n';
@@ -198,12 +194,12 @@ int main(int argc, char** argv) {
 
     try {
         if (!SetConsoleCtrlHandler(CtrlHandler, TRUE)) {
-            std::cerr << "Failed to set control handler. This may degrade user experience in fsi-visual-environment." <<
-                '\n';
+            std::cerr << "Failed to set control handler. "
+                         "This may degrade user experience in fsi-visual-environment.\n";
         }
 
-        // Funnily enough, CRT maintains std::set_terminate function on a per-thread basis
-        // So we need to call this in each thread that the program uses
+        // Funnily enough, CRT maintains std::set_terminate function on a per-thread basis.
+        // So we need to call this in each thread that the program uses.
         module_mediator::crash_handling::install_crash_handlers();
         if (!InstallGlobalCrashHandler()) {
            std::cerr << "Failed to install global crash handler." \
@@ -218,6 +214,7 @@ int main(int argc, char** argv) {
 
         global_module_part = module_mediator.get_module_part();
         if (error_message.empty()) {
+            logger_module::global_logging_instance::set_logging_enabled(true);
             LOG_PROGRAM_INFO(
                 global_module_part,
                 "All modules were loaded successfully."

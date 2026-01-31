@@ -38,5 +38,6 @@ RESOURCEMODULE_API module_mediator::return_value verify_thread_memory(module_med
 RESOURCEMODULE_API module_mediator::return_value verify_program_memory(module_mediator::arguments_string_type bundle);
 
 RESOURCEMODULE_API void initialize_m(module_mediator::module_part*);
+RESOURCEMODULE_API void free_m();
 
 #endif // !RESOURCE_MODULE

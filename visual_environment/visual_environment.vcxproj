@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug Sanitaizer|x64">
-      <Configuration>Debug Sanitaizer</Configuration>
+    <ProjectConfiguration Include="Debug Sanitizer|x64">
+      <Configuration>Debug Sanitizer</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|x64">
@@ -22,7 +22,7 @@
     <ProjectGuid>{F7DFB6D8-8221-4968-B0E5-5EE791492681}</ProjectGuid>
     <Keyword>QtVS_v304</Keyword>
     <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">10.0</WindowsTargetPlatformVersion>
-    <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)'=='Debug Sanitizer|x64'">10.0</WindowsTargetPlatformVersion>
     <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">10.0</WindowsTargetPlatformVersion>
     <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)'=='Release (Installer)|x64'">10.0</WindowsTargetPlatformVersion>
     <QtMsBuild Condition="'$(QtMsBuild)'=='' OR !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
@@ -34,7 +34,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Sanitizer|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v145</PlatformToolset>
     <UseDebugLibraries>true</UseDebugLibraries>
@@ -64,10 +64,12 @@
     <QtModules>core;gui;widgets;svg</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'" Label="QtSettings">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Sanitizer|x64'" Label="QtSettings">
     <QtInstall>6.10.1_msvc2022_64</QtInstall>
     <QtModules>core;gui;widgets;svg</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
+    <QtDeploy>true</QtDeploy>
+    <QtDeployDebugRelease>debug</QtDeployDebugRelease>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
     <QtInstall>6.10.1_msvc2022_64</QtInstall>
@@ -91,7 +93,7 @@
     <Import Project="$(QtMsBuild)\Qt.props" />
     <Import Project="..\BuildProperties.props" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Sanitizer|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(QtMsBuild)\Qt.props" />
     <Import Project="..\BuildProperties.props" />
@@ -111,7 +113,7 @@
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\bin\</OutDir>
     <TargetName>fsi-visual-environment</TargetName>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Sanitizer|x64'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\bin\</OutDir>
     <TargetName>fsi-visual-environment</TargetName>
   </PropertyGroup>
@@ -132,13 +134,15 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(VisualLeakDetectorDir)\lib\Win64;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(SolutionDir)$(Platform)\$(Configuration)\staging\startup_components.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ProgramDatabaseFile>$(SolutionDir)$(Platform)\$(Configuration)\staging\$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
     <QtTranslation>
       <BuildAction>lupdate_lrelease</BuildAction>
       <NoObsolete>true</NoObsolete>
     </QtTranslation>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Sanitizer|x64'">
     <ClCompile>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(QtIncludeDirectory)</AdditionalIncludeDirectories>
@@ -149,6 +153,10 @@
       <BuildAction>lupdate_lrelease</BuildAction>
       <NoObsolete>true</NoObsolete>
     </QtTranslation>
+    <Link>
+      <AdditionalDependencies>$(SolutionDir)$(Platform)\$(Configuration)\staging\startup_components.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ProgramDatabaseFile>$(SolutionDir)$(Platform)\$(Configuration)\staging\$(TargetName).pdb</ProgramDatabaseFile>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -161,6 +169,10 @@
       <BuildAction>lupdate_lrelease</BuildAction>
       <NoObsolete>true</NoObsolete>
     </QtTranslation>
+    <Link>
+      <AdditionalDependencies>$(SolutionDir)$(Platform)\$(Configuration)\staging\startup_components.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ProgramDatabaseFile>$(SolutionDir)$(Platform)\$(Configuration)\staging\$(TargetName).pdb</ProgramDatabaseFile>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release (Installer)|x64'">
     <ClCompile>
@@ -168,11 +180,16 @@
       <AdditionalIncludeDirectories>$(QtIncludeDirectory)</AdditionalIncludeDirectories>
       <TreatWarningAsError>false</TreatWarningAsError>
       <AdditionalOptions>-Wno-unused-command-line-argument -Wno-nonportable-include-path %(AdditionalOptions)</AdditionalOptions>
+      <PreprocessorDefinitions>APPLICATION_RELEASE;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <QtTranslation>
       <BuildAction>lupdate_lrelease</BuildAction>
       <NoObsolete>true</NoObsolete>
     </QtTranslation>
+    <Link>
+      <AdditionalDependencies>$(SolutionDir)$(Platform)\$(Configuration)\staging\startup_components.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ProgramDatabaseFile>$(SolutionDir)$(Platform)\$(Configuration)\staging\$(TargetName).pdb</ProgramDatabaseFile>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
     <ClCompile>
@@ -183,10 +200,10 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'" Label="Configuration">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Sanitizer|x64'" Label="Configuration">
     <ClCompile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <WarningLevel>Level3</WarningLevel>
@@ -195,7 +212,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="Configuration">
@@ -209,7 +226,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -224,8 +241,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -262,27 +279,27 @@
   <ItemGroup>
     <QtTranslation Include="translation_visual_environment_en_GB.ts">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Sanitizer|x64'">false</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug Sanitizer|x64'">true</DeploymentContent>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release (Installer)|x64'">false</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release (Installer)|x64'">true</DeploymentContent>
       <QmOutputDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)</QmOutputDir>
-      <QmOutputDir Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">$(ProjectDir)</QmOutputDir>
+      <QmOutputDir Condition="'$(Configuration)|$(Platform)'=='Debug Sanitizer|x64'">$(ProjectDir)</QmOutputDir>
       <QmOutputDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)</QmOutputDir>
       <QmOutputDir Condition="'$(Configuration)|$(Platform)'=='Release (Installer)|x64'">$(ProjectDir)</QmOutputDir>
     </QtTranslation>
     <QtTranslation Include="translation_visual_environment_uk_UA.ts">
       <QmOutputDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)</QmOutputDir>
-      <QmOutputDir Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">$(ProjectDir)</QmOutputDir>
+      <QmOutputDir Condition="'$(Configuration)|$(Platform)'=='Debug Sanitizer|x64'">$(ProjectDir)</QmOutputDir>
       <QmOutputDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)</QmOutputDir>
       <QmOutputDir Condition="'$(Configuration)|$(Platform)'=='Release (Installer)|x64'">$(ProjectDir)</QmOutputDir>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Sanitizer|x64'">false</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug Sanitizer|x64'">true</DeploymentContent>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release (Installer)|x64'">false</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
@@ -319,14 +336,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
       <FileType>Document</FileType>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">false</ExcludedFromBuild>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Sanitizer|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug Sanitizer|x64'">true</DeploymentContent>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release (Installer)|x64'">false</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release (Installer)|x64'">true</DeploymentContent>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)$(Platform)\$(Configuration)\bin\</DestinationFolders>
-      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">$(SolutionDir)$(Platform)\$(Configuration)\bin\</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug Sanitizer|x64'">$(SolutionDir)$(Platform)\$(Configuration)\bin\</DestinationFolders>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)$(Platform)\$(Configuration)\bin\</DestinationFolders>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release (Installer)|x64'">$(SolutionDir)$(Platform)\$(Configuration)\bin\</DestinationFolders>
     </CopyFileToFolders>
@@ -334,14 +351,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
       <FileType>Document</FileType>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">false</ExcludedFromBuild>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Sanitizer|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug Sanitizer|x64'">true</DeploymentContent>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release (Installer)|x64'">false</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release (Installer)|x64'">true</DeploymentContent>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)$(Platform)\$(Configuration)\bin\</DestinationFolders>
-      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug Sanitaizer|x64'">$(SolutionDir)$(Platform)\$(Configuration)\bin\</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug Sanitizer|x64'">$(SolutionDir)$(Platform)\$(Configuration)\bin\</DestinationFolders>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)$(Platform)\$(Configuration)\bin\</DestinationFolders>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release (Installer)|x64'">$(SolutionDir)$(Platform)\$(Configuration)\bin\</DestinationFolders>
     </CopyFileToFolders>
@@ -384,6 +401,14 @@
     <Font Include="JetBrainsMono-SemiBoldItalic.ttf" />
     <Font Include="JetBrainsMono-Thin.ttf" />
     <Font Include="JetBrainsMono-ThinItalic.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\bytecode_translator\bytecode_translator.vcxproj">
+      <Project>{e3eea055-1fcf-456d-96d9-0297f9866563}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\module_mediator\module_mediator.vcxproj">
+      <Project>{18c883cb-68ce-4787-8017-76d8bbea5f71}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

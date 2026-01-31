@@ -4,7 +4,6 @@
 #define NOMINMAX 
 #include <Windows.h>
 #include <cassert>
-#include <tuple>
 #include <string_view>
 #include <stdexcept>
 #include <filesystem>
@@ -38,65 +37,88 @@ namespace module_mediator::exceptions {
 }
 
 namespace module_mediator {
+    /// <summary>
+    /// Mediates access to engine modules, managing their lifecycle and providing a safe interface for module function calls. 
+    /// This class implements the mediator pattern to coordinate interactions between different engine modules loaded from 
+    /// configuration files. Only a single instance may ever exist at any moment.
+    /// </summary>
     class engine_module_mediator {
-        class module_part_implementation : public module_part {
-            engine_module_mediator* mediator;
+        class module_part_implementation {
+            static inline std::atomic<engine_module_mediator*> mediator{ nullptr };
 
         public:
-            module_part_implementation(engine_module_mediator* module_mediator)
-                :mediator{ module_mediator }
-            {
+            static void initialize(engine_module_mediator* mediator_instance) {
+                assert(mediator.load(std::memory_order_relaxed) == nullptr && "Instance already initialized.");
+                mediator.store(mediator_instance, std::memory_order_relaxed);
             }
 
-            std::size_t find_function_index(std::size_t module_index, const char* name) const override {
+            static void reset() {
+                assert(mediator.load(std::memory_order_relaxed) != nullptr && "Instance never initialized.");
+                mediator.store(nullptr, std::memory_order_relaxed);
+            }
+
+            static std::size_t find_function_index(std::size_t module_index, const char* name) {
                 try {
-                    return this->mediator->find_function_index(module_index, name);
+                    return mediator.load(std::memory_order_relaxed)->find_function_index(
+                        module_index, name);
                 }
                 catch (const std::out_of_range&) {
-                    return function_not_found;
+                    return module_part::function_not_found;
                 }
             }
 
-            std::size_t find_module_index(const char* name) const override {
-                return this->mediator->find_module_index(name);
+            static std::size_t find_module_index(const char* name) {
+                return mediator.load(std::memory_order_relaxed)->find_module_index(name);
             }
 
-            return_value call_module(std::size_t module_index, std::size_t function_index, arguments_string_type arguments_string) override {
+            static return_value call_module(
+                std::size_t module_index, 
+                std::size_t function_index, 
+                arguments_string_type arguments_string
+            ) {
                 try {
-                    return this->mediator->call_module(module_index, function_index, arguments_string);
+                    return mediator.load(std::memory_order_relaxed)->call_module(
+                        module_index, function_index, arguments_string);
                 }
                 catch ([[maybe_unused]] const std::exception& exc) {
-                    LOG_ERROR(this, exc.what());
-                    LOG_FATAL(this, "call_module has failed. The process will be terminated.");
+                    std::cerr << std::format(
+                        "*** CALL_MODULE FAILED. ERROR:\n{}", 
+                        exc.what()) << '\n';
 
                     std::terminate();
                 }
             }
 
-            return_value call_module_visible_only(std::size_t module_index, std::size_t function_index, arguments_string_type arguments_string, void(*error_callback)(call_error)) override {
-            // ReSharper disable once CppInitializedValueIsAlwaysRewritten
-            call_error error{ call_error::no_error };
+            static return_value call_module_visible_only(
+                std::size_t module_index, 
+                std::size_t function_index, 
+                arguments_string_type arguments_string, 
+                void(*error_callback)(module_part::call_error)
+            ) {
+                // ReSharper disable once CppInitializedValueIsAlwaysRewritten
+                module_part::call_error error{ module_part::call_error::no_error };
 
-            try {
-                return this->mediator->call_module_visible_only(module_index, function_index, arguments_string);
-            }
-            catch (const exceptions::function_not_visible&) {
-                error = call_error::function_is_not_visible;
-            }
-            catch (const std::out_of_range&) {
-                error = call_error::unknown_index;
-            }
-            catch (const exceptions::invalid_arguments_string&) {
-                error = call_error::invalid_arguments_string;
-            }
+                try {
+                    return mediator.load(std::memory_order_relaxed)->call_module_visible_only(
+                        module_index, function_index, arguments_string);
+                }
+                catch (const exceptions::function_not_visible&) {
+                    error = module_part::call_error::function_is_not_visible;
+                }
+                catch (const std::out_of_range&) {
+                    error = module_part::call_error::unknown_index;
+                }
+                catch (const exceptions::invalid_arguments_string&) {
+                    error = module_part::call_error::invalid_arguments_string;
+                }
 
-            error_callback(error);
-            return 0;
-        }
-    };
+                error_callback(error);
+                return 0;
+            }
+        };
 
         std::vector<parser::components::engine_module> loaded_modules;
-        module_part_implementation* part_implementation;
+        module_part* part_implementation{};
 
         const parser::components::engine_module& get_module(std::size_t module_index) const {
             return this->loaded_modules.at(module_index);
@@ -111,6 +133,7 @@ namespace module_mediator {
 
             return module_part::module_not_found;
         }
+
         std::size_t find_function_index(std::size_t module_index, std::string_view name) const {
             return this->get_module(module_index).find_function_index(name);
         }
@@ -122,6 +145,7 @@ namespace module_mediator {
 
             throw exceptions::invalid_arguments_string{ "Invalid arguments string used." };
         }
+
         return_value call_module_visible_only(std::size_t module_index, std::size_t function_index, arguments_string_type arguments_string) {
             if (this->get_module(module_index).get_function(function_index).is_visible()) {
                 return this->call_module(module_index, function_index, arguments_string);
@@ -129,11 +153,24 @@ namespace module_mediator {
 
             throw exceptions::function_not_visible{ "This function is not visible." };
         }
+
     public:
         engine_module_mediator()
-            :part_implementation{ new module_part_implementation{ this } }
         {
+            module_part_implementation::initialize(this);
+            this->part_implementation = new module_part{
+                .find_function_index = &module_part_implementation::find_function_index,
+                .find_module_index = &module_part_implementation::find_module_index,
+                .call_module = &module_part_implementation::call_module,
+                .call_module_visible_only = &module_part_implementation::call_module_visible_only
+            };
         }
+
+        engine_module_mediator(const engine_module_mediator&) = delete;
+        engine_module_mediator& operator= (const engine_module_mediator&) = delete;
+
+        engine_module_mediator(engine_module_mediator&&) = delete;
+        engine_module_mediator& operator= (engine_module_mediator&&) = delete;
 
         std::string load_modules(const std::filesystem::path& file_name) {
             generic_parser::parser_facade<
@@ -159,12 +196,17 @@ namespace module_mediator {
             this->loaded_modules = parser.get_builder_value();
             return parser.error();
         }
+
         module_part* get_module_part() {
+            assert(this->part_implementation != nullptr && "Module part implementation is null.");
             return this->part_implementation;
         }
 
         ~engine_module_mediator() {
+            assert(this->part_implementation != nullptr && "Module part implementation is null.");
+
             delete this->part_implementation;
+            module_part_implementation::reset();
         }
     };
 }

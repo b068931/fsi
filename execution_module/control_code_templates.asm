@@ -61,15 +61,17 @@ xdata ENDS                                                                  ; Th
 ; This provides the information as to where the unwind information for each function is located.
 ; This is critical for SEH and debugger support (stack walking).
 pdata SEGMENT DWORD READ ALIAS(".pdata")
+    ; Microsoft's LINK.EXE seems to require that RUNTIME_FUNCTION entries are sorted by starting address.
+    ; Thus, we order them by their starting addresses. Notice that clang's LLD linker doesn't have this requirement.
+    DD (IMAGEREL CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD_CONTEXT_SWITCH_POINT)
+    DD (IMAGEREL LOAD_EXECUTION_THREAD_ENDP)
+    DD (IMAGEREL SHARED_CHAINED_UNWIND_INFO)
+
     ; Trampoline functions are fully covered by unwind info which is chained to LOAD_PROGRAM's unwind info.
     DD (IMAGEREL CONTROL_CODE_TEMPLATE_CALL_MODULE_TRAMPOLINE)
     DD (IMAGEREL CALL_MODULE_TRAMPOLINE_ENDP)
     DD (IMAGEREL SHARED_CHAINED_UNWIND_INFO)
     
-    DD (IMAGEREL CONTROL_CODE_TEMPLATE_PROGRAM_END_TRAMPOLINE)
-    DD (IMAGEREL PROGRAM_END_TRAMPOLINE_ENDP)
-    DD (IMAGEREL SHARED_CHAINED_UNWIND_INFO)
-
     ; While functions that act like context switch points have RUNTIME_FUNCTION set up
     ; in the middle of their code. These functions may look kind of trippy because it is as if
     ; they can remove stack frames in the middle of the stack.
@@ -77,8 +79,8 @@ pdata SEGMENT DWORD READ ALIAS(".pdata")
     DD (IMAGEREL RESUME_PROGRAM_EXECUTION_ENDP)
     DD (IMAGEREL SHARED_CHAINED_UNWIND_INFO)
 
-    DD (IMAGEREL CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD_CONTEXT_SWITCH_POINT)
-    DD (IMAGEREL LOAD_EXECUTION_THREAD_ENDP)
+    DD (IMAGEREL CONTROL_CODE_TEMPLATE_PROGRAM_END_TRAMPOLINE)
+    DD (IMAGEREL PROGRAM_END_TRAMPOLINE_ENDP)
     DD (IMAGEREL SHARED_CHAINED_UNWIND_INFO)
 pdata ENDS
 

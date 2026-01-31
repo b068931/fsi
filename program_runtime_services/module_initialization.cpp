@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "module_interoperation.h"
 #include "standard_input_output.h"
+#include "../logger_module/logging.h"
 
 namespace {
     module_mediator::module_part* part = nullptr;
@@ -95,5 +96,10 @@ namespace interoperation {
 
 void initialize_m(module_mediator::module_part* module_part) {
     part = module_part;
+    logger_module::global_logging_instance::set_logging_enabled(true);
+}
+
+void free_m() {
+    logger_module::global_logging_instance::set_logging_enabled(false);
 }
 

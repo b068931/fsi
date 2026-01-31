@@ -217,9 +217,13 @@ void initialize_m(module_mediator::module_part* module_part) {
         // There isn't much we can do if this fails.
         std::terminate();
     }
+
+    logger_module::global_logging_instance::set_logging_enabled(true);
 }
 
 void free_m() {
+    logger_module::global_logging_instance::set_logging_enabled(false);
+
     delete[] runtime_trap_table;
     delete manager;
 }
