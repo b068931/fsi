@@ -1,6 +1,8 @@
 #ifndef PCH_H
 #define PCH_H
 
+#define LOGGER_MODULE_EMITTER_MODULE_NAME "RESOURCE MODULE (CORE)"
+
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 

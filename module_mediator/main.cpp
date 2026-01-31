@@ -2,6 +2,8 @@
 //#include <vld.h>
 #endif
 
+#define LOGGER_MODULE_EMITTER_MODULE_NAME "MODULE MEDIATOR"
+
 #ifndef _MSC_VER
 #error "Currently only MSVC is supported for the module mediator."
 #endif

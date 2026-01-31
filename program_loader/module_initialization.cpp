@@ -27,7 +27,7 @@ void* get_default_function_address() {
 
 void initialize_m(module_mediator::module_part* module_part) {
     // add rsp, 8 - remove return address
-    std::vector<char> default_function_symbols{ '\x48', '\x83', '\xc4', '\x08' };
+    std::vector default_function_symbols{ '\x48', '\x83', '\xc4', '\x08' };
     generate_program_termination_code(
         default_function_symbols, 
         program_loader::termination_codes::undefined_function_call

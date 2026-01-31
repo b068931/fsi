@@ -5,21 +5,25 @@
 #include "../logger_module/logging.h"
 #include "../module_mediator/local_crash_handle_setup.h"
 
-//This file describes IO logic for the FSI programs through PRTS (Program RunTime Services) module.
-//I use global variables because they are isolated to this cpp file, they cannot be accessed elsewhere.
-//You should view PRTS as an assortment of "classes" or "objects" that are isolated in their own cpp files.
+// This file describes IO logic for the FSI programs through PRTS (Program RunTime Services) module.
+// I use global variables because they are isolated to this cpp file, they cannot be accessed elsewhere.
+// You should view PRTS as an assortment of "classes" or "objects" that are isolated in their own cpp files.
 
-//Global synchronization primitives to ensure that IO can always be cancelled or processed correctly.
+// Global synchronization primitives to ensure that IO can always be cancelled or processed correctly.
 namespace {
-    //Readers: input or output operations for stdin/stdout.
-    //Writers: functions that attach or detach PRTS from stdio.
+    // Ensures that you can't start attach operation for PRTS while detach is in progress, and vice versa.
+    std::mutex stdio_control_synchronizer;
+
+    // Readers: input or output operations for stdin/stdout.
+    // Writers: functions that attach or detach PRTS from stdio.
+    // Ensures that all pending operations are completed before attach/detach occurs.
     std::shared_mutex io_synchronizer;
 
-    //Mostly bear a cosmetic effect.
-    //3: input_worker, output_worker, whatever thread calls detach or attach.
+    // Mostly bear a cosmetic effect.
+    // 3: input_worker, output_worker, whatever thread calls detach or attach.
     std::barrier phase_coordination{ 3 };
 
-    //PRTS expects that it is the only entity that can write to stdout and stdin to work correctly.
+    // PRTS expects that it is the only entity that can write to stdout and stdin to work correctly.
     bool is_stdio_attached = false;
     bool check_stdio_attached() {
         std::shared_lock lock(io_synchronizer);
@@ -27,17 +31,17 @@ namespace {
     }
 }
 
-//WinAPI thingies for console input/output management.
+// WinAPI thingies for console input/output management.
 namespace {
-    //Available only if attached.
+    // Available only if attached.
     HANDLE hCapturedStdOut;
     HANDLE hCapturedStdIn;
 
-    //The handle to the worker thread that is responsible for reading from stdin.
-    //Allows to exit the thread gracefully when PRTS is detached from stdin.
+    // The handle to the worker thread that is responsible for reading from stdin.
+    // Allows to exit the thread gracefully when PRTS is detached from stdin.
     HANDLE hIOCancellationSignal;
 
-    //The state of the console before PRTS attached to it.
+    // The state of the console before PRTS attached to it.
     DWORD dwSavedConsoleState;
 
     bool InitializeConsoleInput(HANDLE hStdin, DWORD& dwOutOriginalMode) {
@@ -45,8 +49,8 @@ namespace {
             return false;
         }
 
-        //Keep only line input, echo, processed input; disable mouse/window events.
-        //Enable ASCII control characters processing with wrapping at EOL.
+        // Keep only line input, echo, processed input; disable mouse/window events.
+        // Enable ASCII control characters processing with wrapping at EOL.
         DWORD mode = ENABLE_LINE_INPUT
                    | ENABLE_ECHO_INPUT
                    | ENABLE_PROCESSED_INPUT
@@ -56,7 +60,7 @@ namespace {
             return false;
         }
 
-        //Discard any pending input events (mouse, focus, etc.)
+        // Discard any pending input events (mouse, focus, etc.)
         return FlushConsoleInputBuffer(hStdin) != FALSE;
     } 
 
@@ -91,7 +95,7 @@ namespace {
         while (std::ranges::find(result, '\n') == result.end()) {
             DWORD dwConsoleWaitResult = WaitForMultipleObjects(std::size(haWaitingHandles), haWaitingHandles, FALSE, INFINITE);
             if (dwConsoleWaitResult == WAIT_OBJECT_0 + 1) {
-                return { {}, true }; //We received shutdown signal while waiting.
+                return { {}, true }; // We received shutdown signal while waiting.
             }
 
             if (dwConsoleWaitResult == WAIT_OBJECT_0) {
@@ -209,9 +213,9 @@ namespace {
         return { result, false };
     }
 
-    //This function is unified for both file and pipe input.
-    //The absolute monster that handles both files and pipes. (Refactoring likely needed)
-    //With all possible edge cases and fallback to synchronous IO if overlapped IO fails.
+    // This function is unified for both file and pipe input.
+    // The absolute monster that handles both files and pipes. (Refactoring likely needed)
+    // With all possible edge cases and fallback to synchronous IO if overlapped IO fails.
     template<auto file_type>
     std::pair<std::vector<char>, bool> ConsumeAsynchronous(
         HANDLE hStdIn, 
@@ -260,7 +264,7 @@ namespace {
             PeekNamedPipe(hStdIn, nullptr, 0, nullptr, &dwBufferSize, &dwMessageLeft);
 
             dwBufferSize = std::max(dwBufferSize, dwMessageLeft);
-            if (dwBufferSize == 0) { //If we still don't have any idea about what the buffer size should be.
+            if (dwBufferSize == 0) { // If we still don't have any idea about what the buffer size should be.
                 dwBufferSize = dwDefaultBufferSize;
             }
         }
@@ -279,7 +283,7 @@ namespace {
             &overlapped
         );
         
-        if (!bReadResult) { //This is just how ridiculously complicated overlapped I/O is in Windows.
+        if (!bReadResult) { // This is just how ridiculously complicated overlapped I/O is in Windows.
             if (GetLastError() == ERROR_IO_PENDING) {
                 DWORD waitResult = WaitForMultipleObjects(
                     std::size(haWaitHandles),
@@ -418,7 +422,7 @@ namespace {
                     return { {}, true };
                 }
 
-                //This also means that EOF was reached. Applies to files only.
+                // This also means that EOF was reached. Applies to files only.
                 if (bSynchronousReadResult && dwBytesRead == 0) {
                     CloseHandleReport(overlapped.hEvent, "overlapped.HEvent");
                     return { {}, false };
@@ -470,7 +474,7 @@ namespace {
             }
         }
 
-        //Files must have their offsets updated after a successful read.
+        // Files must have their offsets updated after a successful read.
         if constexpr (!is_pipe) {
             ULARGE_INTEGER newPosition;
             newPosition.LowPart = dwOffset;
@@ -485,7 +489,7 @@ namespace {
         return { { buffer.get(), buffer.get() + dwBytesRead }, false};
     }
 
-    //Dispatches the input reading operation based on the type of the input handle.
+    // Dispatches the input reading operation based on the type of the input handle.
     std::pair<std::vector<char>, bool> ConsumeStdIn(
         HANDLE hStdIn, 
         HANDLE hCancelIO, 
@@ -497,8 +501,8 @@ namespace {
                 return ConsumeConsoleInput(hStdIn, hCancelIO);
             }
             case FILE_TYPE_DISK: {
-                //For files and pipes, we are looking for a newline character to determine the end of input.
-                //All other input goes into the buffer.
+                // For files and pipes, we are looking for a newline character to determine the end of input.
+                // All other input goes into the buffer.
                 return ConsumeAsynchronous<FILE_TYPE_DISK>(
                     hStdIn,
                     hCancelIO,
@@ -582,8 +586,8 @@ namespace {
         return false;
     }
 
-    //Similarly to ConsumeAsynchronous, this function handles both files and pipes.
-    //It uses overlapped IO for files and pipes, and falls back to synchronous IO if necessary.
+    // Similarly to ConsumeAsynchronous, this function handles both files and pipes.
+    // It uses overlapped IO for files and pipes, and falls back to synchronous IO if necessary.
     template<auto file_type>
     bool PushAsynchronous(
         HANDLE hStdOut, 
@@ -771,7 +775,7 @@ namespace {
             }
         }
 
-        //Files must have their offsets updated after a successful write.
+        // Files must have their offsets updated after a successful write.
         CloseHandleReport(overlapped.hEvent, "overlapped.HEvent");
         if constexpr (!is_pipe) {
             ULARGE_INTEGER newPosition;
@@ -834,7 +838,7 @@ namespace {
     }
 }
 
-//Define IO queues for asynchronous input/output operations.
+// Define IO queues for asynchronous input/output operations.
 namespace {
     struct thread_input_descriptor {
         module_mediator::return_value thread_id;
@@ -851,7 +855,7 @@ namespace {
         module_mediator::eight_bytes buffer_size;
     };
 
-    //Both are used by their respective worker threads to ensure that all IO is asynchronous.
+    // Both are used by their respective worker threads to ensure that all IO is asynchronous.
     namespace input_queue {
         std::mutex lock;
         std::condition_variable signaling;
@@ -870,7 +874,7 @@ namespace {
             thread_input_descriptor descriptor = std::move(input_queue::input_queue.front());
             input_queue::input_queue.pop();
 
-            //So as not to trick the thread into reading or writing to a buffer that is not initialized.
+            // So as not to trick the thread into reading or writing to a buffer that is not initialized.
             module_mediator::eight_bytes input_size{ 0 };
             std::memcpy(descriptor.input_buffer, &input_size, sizeof(module_mediator::eight_bytes));
 
@@ -910,7 +914,7 @@ namespace {
     }
 }
 
-//IO worker threads.
+// IO worker threads.
 namespace {
     std::thread input_worker_thread{};
     void input_worker(HANDLE hStdIn, HANDLE hCancelIO) {
@@ -951,7 +955,7 @@ namespace {
                 return !check_stdio_attached() || !input_queue::input_queue.empty();
             });
 
-            //Exit prematurely if PRTS is detached from stdio.
+            // Exit prematurely if PRTS is detached from stdio.
             if (!check_stdio_attached()) {
                 break;
             }
@@ -961,7 +965,7 @@ namespace {
                 input_queue::input_queue.pop();
             }
 
-            lock.unlock(); //It is critical that we do not hold the lock while processing input.
+            lock.unlock(); // It is critical that we do not hold the lock while processing input.
             while (!local_input_queue.empty()) {
                 thread_input_descriptor descriptor = std::move(local_input_queue.front());
                 std::vector<char> input_portion{};
@@ -1069,7 +1073,7 @@ namespace {
             thread_output_descriptor descriptor = std::move(output_queue::output_queue.front());
             output_queue::output_queue.pop();
 
-            lock.unlock(); //It is critical that we do not hold the lock while processing output.
+            lock.unlock(); // It is critical that we do not hold the lock while processing output.
 
             if (!output_shutdown) {
                 output_shutdown = PushStdOut(
@@ -1099,7 +1103,9 @@ namespace {
 }
 
 module_mediator::return_value attach_to_stdio(module_mediator::arguments_string_type) {
+    std::scoped_lock stdio_control_lock{ stdio_control_synchronizer };
     std::scoped_lock lock{ io_synchronizer };
+
     if (is_stdio_attached) {
         return module_mediator::module_success;
     }
@@ -1163,34 +1169,26 @@ module_mediator::return_value attach_to_stdio(module_mediator::arguments_string_
 }
 
 module_mediator::return_value detach_from_stdio(module_mediator::arguments_string_type) {
-    // Start by setting IO cancellation event so that worker threads can exit overlapped IO, and console IO operations.
-    BOOL signalIOEnd = SetEvent(hIOCancellationSignal);
-    if (!signalIOEnd) {
-        LOG_WARNING(
-            interoperation::get_module_part(),
-            std::format(
-                "Failed to set event for I/O cancellation with error code {}. " \
-                "This will lead to resource leaks. Detaching worker threads as a last-ditch effort.",
-                GetLastError()
-            )
-        );
-
-        input_worker_thread.detach();
-        output_worker_thread.detach();
-
-        return module_mediator::module_failure;
-    }
+    // Detach operation will stop holding io_synchronizer lock after it sets is_stdio_attached to false,
+    // and detects that both worker threads are either waiting on their condition variables or are yet to acquire their locks.
+    // However, it still has some cleanup to do, and while doing so it must ensure that it won't run into data race with
+    // attach_to_stdio. Thus, we need to hold stdio_control_synchronizer for the entire duration of this function.
+    // This lock is used only by attach_to_stdio and detach_from_stdio, and they always try to acquire it first,
+    // before acquiring io_synchronizer, so this should not lead to a deadlock.
+    std::scoped_lock stdio_control_lock{ stdio_control_synchronizer };
 
     {
         std::unique_lock io_lock(io_synchronizer, std::defer_lock);
         std::unique_lock input_lock(input_queue::lock, std::defer_lock);
         std::unique_lock output_lock(output_queue::lock, std::defer_lock);
 
-        //We must ensure that workers are either already waiting on their respective condition variables or
-        //are yet to acquire their locks. This avoids a potential deadlock when they check whether we are
-        //attached to stdio, and we instantly detach from it.
-        //Notice that we must use custom backoff algorithm here to avoid another possible deadlock. Simply acquiring mutexes
-        //in some specific order won't cut it here.
+        // We must ensure that workers are either already waiting on their respective condition variables or
+        // are yet to acquire their locks. This avoids a potential deadlock when they check whether we are
+        // attached to stdio, and we instantly detach from it.
+        // Notice that we must use custom backoff algorithm here to avoid another possible deadlock. Simply acquiring mutexes
+        // in some specific order won't cut it here.
+
+        bool first_io_synchronizer_acquire = true;
         while (true) {
             std::this_thread::yield();
             if (!io_lock.try_lock()) {
@@ -1227,6 +1225,27 @@ module_mediator::return_value detach_from_stdio(module_mediator::arguments_strin
             }
 
             is_stdio_attached = false;
+            if (first_io_synchronizer_acquire && hIOCancellationSignal != nullptr) {
+                // Start by setting IO cancellation event so that worker threads can exit overlapped IO, and console IO operations.
+                BOOL signalIOEnd = SetEvent(hIOCancellationSignal);
+                if (!signalIOEnd) {
+                    LOG_WARNING(
+                        interoperation::get_module_part(),
+                        std::format(
+                            "Failed to set event for I/O cancellation with error code {}. " \
+                            "This will lead to resource leaks. Detaching worker threads as a last-ditch effort.",
+                            GetLastError()
+                        )
+                    );
+
+                    input_worker_thread.detach();
+                    output_worker_thread.detach();
+
+                    return module_mediator::module_failure;
+                }
+            }
+
+            first_io_synchronizer_acquire = false;
             if (!input_lock.try_lock()) {
                 io_lock.unlock();
                 continue;
@@ -1243,17 +1262,22 @@ module_mediator::return_value detach_from_stdio(module_mediator::arguments_strin
 
         if (hCapturedStdIn == nullptr || hCapturedStdOut == nullptr || hIOCancellationSignal == nullptr) {
             assert(hCapturedStdIn == nullptr && hCapturedStdOut == nullptr && hIOCancellationSignal == nullptr);
+            LOG_INFO(
+                interoperation::get_module_part(),
+                "PRTS was not attached to stdio. Nothing to detach."
+            );
+
             return module_mediator::module_success;
         }
     }
 
-    //We already know that both (or at least one) worker threads are either
-    //waiting on their condition variables or are yet to acquire their locks.
-    //In the last case they will read is_stdio_attached false and exit.
+    // We already know that both (or at least one) worker threads are either
+    // waiting on their condition variables or are yet to acquire their locks.
+    // In the last case they will read is_stdio_attached false and exit.
     input_queue::signaling.notify_one();
     output_queue::signaling.notify_one();
 
-    //This will block if the shutdown sequence fails.
+    // This will block if the shutdown sequence fails.
     phase_coordination.arrive_and_wait();
 
     input_worker_thread.join();
@@ -1292,7 +1316,7 @@ module_mediator::return_value callback_register_output(module_mediator::argument
         module_mediator::respond_callback<module_mediator::return_value, module_mediator::memory, module_mediator::eight_bytes>::unpack(bundle);
 
     std::unique_lock lock(output_queue::lock);
-    if (!check_stdio_attached()) { //This should not ever lead to a deadlock because we are using a shared lock.
+    if (!check_stdio_attached()) { // This should not ever lead to a deadlock because we are using a shared lock.
         LOG_WARNING(
             interoperation::get_module_part(),
             std::format(
@@ -1387,7 +1411,7 @@ module_mediator::return_value callback_register_input(module_mediator::arguments
         >::unpack(bundle);
 
     std::unique_lock lock(input_queue::lock);
-    if (!check_stdio_attached()) { //This should not ever lead to a deadlock because we are using a shared lock.
+    if (!check_stdio_attached()) { // This should not ever lead to a deadlock because we are using a shared lock.
         LOG_WARNING(
             interoperation::get_module_part(),
             std::format(

@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "module_interoperation.h"
+#include "standard_input_output.h"
 
 namespace {
     module_mediator::module_part* part = nullptr;
@@ -92,6 +93,7 @@ namespace interoperation {
     }
 }
 
-PROGRAMRUNTIMESERVICES_API void initialize_m(module_mediator::module_part* module_part) {
+void initialize_m(module_mediator::module_part* module_part) {
     part = module_part;
 }
+

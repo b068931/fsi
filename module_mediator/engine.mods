@@ -189,18 +189,18 @@ get_function_name=eight-bytes
 -- Functions provided by this module imbue log messages with additional information, such as file name, line number, etc.
 [logger:logger-module.dll]
 
--- All functions accept file name, line number, function name, and message.
+-- All functions accept file name, line number, function name, module name, and message.
 -- These functions provide log messages without additional information about thread and thread group.
-info=memory eight-bytes memory memory
-warning=memory eight-bytes memory memory
-error=memory eight-bytes memory memory
-fatal=memory eight-bytes memory memory
+info=memory eight-bytes memory memory memory
+warning=memory eight-bytes memory memory memory
+error=memory eight-bytes memory memory memory
+fatal=memory eight-bytes memory memory memory
 
 -- These functions provide log messages with additional information about thread and thread group.
-program_info=memory eight-bytes memory memory
-program_warning=memory eight-bytes memory memory
-program_error=memory eight-bytes memory memory
-program_fatal=memory eight-bytes memory memory
+program_info=memory eight-bytes memory memory memory
+program_warning=memory eight-bytes memory memory memory
+program_error=memory eight-bytes memory memory memory
+program_fatal=memory eight-bytes memory memory memory
 
 -- Provides a running program with access to the runtime environment functions.
 -- Memory management, thread management, logging, etc.
