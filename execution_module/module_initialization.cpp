@@ -12,11 +12,10 @@ namespace {
     thread_manager* manager = nullptr;
     char* runtime_trap_table = nullptr;
 
-    // TODO: Additionally check CONTEXT_SWITCH_POINTS for correct entries.
     std::optional<std::string> verify_control_code_pdata_xdata_setup() {
         DWORD64 dw64LoadProgramBase = 0;
         PRUNTIME_FUNCTION prfLoadProgram = RtlLookupFunctionEntry(
-            reinterpret_cast<DWORD64>(&CONTROL_CODE_TEMPLATE_LOAD_PROGRAM),
+            std::bit_cast<DWORD64>(&CONTROL_CODE_TEMPLATE_LOAD_PROGRAM),
             &dw64LoadProgramBase,
             nullptr
         );
@@ -25,9 +24,23 @@ namespace {
             return "Failed to lookup function entry for CONTROL_CODE_TEMPLATE_LOAD_PROGRAM.";
         }
 
+        if (prfLoadProgram->EndAddress - prfLoadProgram->BeginAddress != 
+            CONTROL_CODE_TEMPLATE_LOAD_PROGRAM_SIZE) {
+            return "Incorrect size recorded for CONTROL_CODE_TEMPLATE_LOAD_PROGRAM.";
+        }
+
+        UNWIND_INFO_HEADER* loadProgramUnwindInfo = std::bit_cast<UNWIND_INFO_HEADER*>(
+            dw64LoadProgramBase + prfLoadProgram->UnwindData);
+
+        if (loadProgramUnwindInfo->SizeOfProlog == 0 ||
+            loadProgramUnwindInfo->CountOfCodes == 0 ||
+            loadProgramUnwindInfo->FrameRegister == 0) {
+            return "CONTROL_CODE_TEMPLATE_LOAD_PROGRAM does not have stack frame set up.";
+        }
+
         DWORD64 dw64CallModuleTrampolineBase = 0;
         PRUNTIME_FUNCTION prfCallModuleTrampoline = RtlLookupFunctionEntry(
-            reinterpret_cast<DWORD64>(&CONTROL_CODE_TEMPLATE_CALL_MODULE_TRAMPOLINE),
+            std::bit_cast<DWORD64>(&CONTROL_CODE_TEMPLATE_CALL_MODULE_TRAMPOLINE),
             &dw64CallModuleTrampolineBase,
             nullptr
         );
@@ -38,7 +51,7 @@ namespace {
 
         DWORD64 dw64ProgramEndTrampolineBase = 0;
         PRUNTIME_FUNCTION prfProgramEndTrampoline = RtlLookupFunctionEntry(
-            reinterpret_cast<DWORD64>(&CONTROL_CODE_TEMPLATE_PROGRAM_END_TRAMPOLINE),
+            std::bit_cast<DWORD64>(&CONTROL_CODE_TEMPLATE_PROGRAM_END_TRAMPOLINE),
             &dw64ProgramEndTrampolineBase,
             nullptr
         );
@@ -47,14 +60,32 @@ namespace {
             return "Failed to lookup function entry for CONTROL_CODE_TEMPLATE_PROGRAM_END_TRAMPOLINE.";
         }
 
-        if (dw64LoadProgramBase != dw64CallModuleTrampolineBase ||
-            dw64LoadProgramBase != dw64ProgramEndTrampolineBase) {
-            return "CONTROL_CODE_TEMPLATE functions are registered in different function tables.";
+        DWORD64 dw64LoadExecutionThreadContextSwitchPointBase = 0;
+        PRUNTIME_FUNCTION prfLoadExecutionThreadContextSwitchPoint = RtlLookupFunctionEntry(
+            std::bit_cast<DWORD64>(&CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD_CONTEXT_SWITCH_POINT),
+            &dw64LoadExecutionThreadContextSwitchPointBase,
+            nullptr
+        );
+
+        if (prfLoadExecutionThreadContextSwitchPoint == nullptr) {
+            return "Failed to lookup function entry for CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD_CONTEXT_SWITCH_POINT.";
         }
 
-        if (prfLoadProgram->EndAddress - prfLoadProgram->BeginAddress != 
-            CONTROL_CODE_TEMPLATE_LOAD_PROGRAM_SIZE) {
-            return "Incorrect size recorded for CONTROL_CODE_TEMPLATE_LOAD_PROGRAM.";
+        DWORD64 dw64ResumeProgramExecutionContextSwitchPointBase = 0;
+        PRUNTIME_FUNCTION prfResumeProgramExecutionContextSwitchPoint = RtlLookupFunctionEntry(
+            std::bit_cast<DWORD64>(&CONTROL_CODE_TEMPLATE_RESUME_PROGRAM_EXECUTION_CONTEXT_SWITCH_POINT),
+            &dw64ResumeProgramExecutionContextSwitchPointBase,
+            nullptr
+        );
+
+        if (prfResumeProgramExecutionContextSwitchPoint == nullptr) {
+            return "Failed to lookup function entry for CONTROL_CODE_TEMPLATE_RESUME_PROGRAM_EXECUTION_CONTEXT_SWITCH_POINT.";
+        }
+        if (dw64LoadProgramBase != dw64CallModuleTrampolineBase ||
+            dw64LoadProgramBase != dw64ProgramEndTrampolineBase ||
+            dw64LoadProgramBase != dw64LoadExecutionThreadContextSwitchPointBase ||
+            dw64LoadProgramBase != dw64ResumeProgramExecutionContextSwitchPointBase) {
+            return "CONTROL_CODE_TEMPLATE functions or context switch points are registered in modules.";
         }
 
         if (prfCallModuleTrampoline->EndAddress - prfCallModuleTrampoline->BeginAddress != 
@@ -67,14 +98,18 @@ namespace {
             return "Incorrect size recorded for CONTROL_CODE_TEMPLATE_PROGRAM_END_TRAMPOLINE.";
         }
         
-        UNWIND_INFO_HEADER* loadProgramUnwindInfo = std::bit_cast<UNWIND_INFO_HEADER*>(
-            dw64LoadProgramBase + prfLoadProgram->UnwindData);
-
         CHAINED_UNWIND_INFO* callModuleTrampolineChainedInfo = std::bit_cast<CHAINED_UNWIND_INFO*>(
             dw64CallModuleTrampolineBase + prfCallModuleTrampoline->UnwindData);
 
         CHAINED_UNWIND_INFO* programEndTrampolineChainedInfo = std::bit_cast<CHAINED_UNWIND_INFO*>(
             dw64ProgramEndTrampolineBase + prfProgramEndTrampoline->UnwindData);
+
+        CHAINED_UNWIND_INFO* loadExecutionThreadContextSwitchPointChainedInfo = std::bit_cast<CHAINED_UNWIND_INFO*>(
+            dw64LoadExecutionThreadContextSwitchPointBase + prfLoadExecutionThreadContextSwitchPoint->UnwindData);
+
+        CHAINED_UNWIND_INFO* resumeProgramExecutionContextSwitchPointChainedInfo = std::bit_cast<CHAINED_UNWIND_INFO*>(
+            dw64ResumeProgramExecutionContextSwitchPointBase + 
+            prfResumeProgramExecutionContextSwitchPoint->UnwindData);
 
         auto compare_runtime_functions = [](const RUNTIME_FUNCTION& a, const RUNTIME_FUNCTION& b) {
             return a.BeginAddress == b.BeginAddress &&
@@ -92,16 +127,26 @@ namespace {
                    "CONTROL_CODE_TEMPLATE_LOAD_PROGRAM.";
         }
 
-        if (loadProgramUnwindInfo->SizeOfProlog == 0 ||
-            loadProgramUnwindInfo->CountOfCodes == 0 ||
-            loadProgramUnwindInfo->FrameRegister == 0) {
-            return "CONTROL_CODE_TEMPLATE_LOAD_PROGRAM does not have stack frame set up.";
+        if (!compare_runtime_functions(*prfLoadProgram, loadExecutionThreadContextSwitchPointChainedInfo->ChainedFunction)) {
+            return "CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD_CONTEXT_SWITCH_POINT unwind info is not chained to "
+                   "CONTROL_CODE_TEMPLATE_LOAD_PROGRAM.";
+        }
+
+        if (!compare_runtime_functions(*prfLoadProgram, resumeProgramExecutionContextSwitchPointChainedInfo->ChainedFunction)) {
+            return "CONTROL_CODE_TEMPLATE_RESUME_PROGRAM_EXECUTION_CONTEXT_SWITCH_POINT unwind info is not chained to "
+                   "CONTROL_CODE_TEMPLATE_LOAD_PROGRAM.";
         }
 
         if (callModuleTrampolineChainedInfo->Header.Flags != UNW_FLAG_CHAININFO ||
             programEndTrampolineChainedInfo->Header.Flags != UNW_FLAG_CHAININFO) {
             return "Chained unwind info for CONTROL_CODE_TEMPLATE_CALL_MODULE_TRAMPOLINE or "
                    "CONTROL_CODE_TEMPLATE_PROGRAM_END_TRAMPOLINE does not have CHAININFO flag set.";
+        }
+
+        if (loadExecutionThreadContextSwitchPointChainedInfo->Header.Flags != UNW_FLAG_CHAININFO ||
+            resumeProgramExecutionContextSwitchPointChainedInfo->Header.Flags != UNW_FLAG_CHAININFO) {
+            return "Chained unwind info for CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD_CONTEXT_SWITCH_POINT or "
+                "CONTROL_CODE_TEMPLATE_RESUME_PROGRAM_EXECUTION_CONTEXT_SWITCH_POINT does not have CHAININFO flag set.";
         }
 
         return {};

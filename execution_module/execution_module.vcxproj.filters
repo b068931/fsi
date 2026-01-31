@@ -24,6 +24,9 @@
     <Filter Include="Header Files\Program Threads Management\Scheduling">
       <UniqueIdentifier>{51888b01-abd7-4207-99dd-12ee1fb5a0ff}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Export">
+      <UniqueIdentifier>{d8eae585-28ac-4b70-8edd-65f0971583b4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="clock_list.h">
@@ -63,7 +66,7 @@
       <Filter>Header Files\Program Threads Management</Filter>
     </ClInclude>
     <ClInclude Include="unwind_info.h">
-      <Filter>Header Files\Program Threads Management</Filter>
+      <Filter>Header Files\Export</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

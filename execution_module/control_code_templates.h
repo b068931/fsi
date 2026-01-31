@@ -21,9 +21,9 @@ extern "C" {
     extern const std::uint64_t CONTROL_CODE_TEMPLATE_RESUME_PROGRAM_EXECUTION_SIZE;
     extern const std::uint64_t CONTROL_CODE_TEMPLATE_PROGRAM_END_TRAMPOLINE_SIZE;
 
-                 void             CONTROL_CODE_TEMPLATE_LOAD_PROGRAM(void*, void*, std::size_t is_startup);
-    [[noreturn]] void             CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD(void*);
-    [[noreturn]] void             CONTROL_CODE_TEMPLATE_RESUME_PROGRAM_EXECUTION(void*);
+                 void CONTROL_CODE_TEMPLATE_LOAD_PROGRAM(void*, void*, std::size_t is_startup);
+    [[noreturn]] void CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD(void*);
+    [[noreturn]] void CONTROL_CODE_TEMPLATE_RESUME_PROGRAM_EXECUTION(void*);
 
     // These trampoline functions are not to be used from the C++ code directly.
     // They are only declared here to allow referencing their addresses.
@@ -31,6 +31,8 @@ extern "C" {
 
     extern char CONTROL_CODE_TEMPLATE_CALL_MODULE_TRAMPOLINE[1];
     extern char CONTROL_CODE_TEMPLATE_PROGRAM_END_TRAMPOLINE[1];
+    extern char CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD_CONTEXT_SWITCH_POINT[1];
+    extern char CONTROL_CODE_TEMPLATE_RESUME_PROGRAM_EXECUTION_CONTEXT_SWITCH_POINT[1];
 }
 
 #endif
