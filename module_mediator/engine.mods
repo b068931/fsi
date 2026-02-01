@@ -255,9 +255,9 @@ program_fatal=memory eight-bytes memory memory memory
 
 -- IO/Logging functions. Pass messages to the logger module.
 -- All functions accept file name, line number, function name, and message.
-!info:io.log.info=memory eight-bytes memory memory
-!warning:io.log.warning=memory eight-bytes memory memory
-!error:io.log.error=memory eight-bytes memory memory
+!info:io.log.info=memory eight-bytes memory memory memory
+!warning:io.log.warning=memory eight-bytes memory memory memory
+!error:io.log.error=memory eight-bytes memory memory memory
 
 -- STDIO management functions. All of them are blocking (even if input is immediately available).
 -- They block the thread until the operation is complete in order to ensure that all IO is done asynchronously.

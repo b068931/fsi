@@ -2,6 +2,7 @@
 #define REDEFINE_STATES_H
 
 #include <format>
+#include <ranges>
 #include "type_definitions.h"
 
 class redefine_name_state : public state_type {
@@ -13,7 +14,11 @@ public:
     ) override {
         std::string redefine_name = read_map.get_token_generator_name();
         if (helper.name_translations.has_remapping(redefine_name)) {
-            read_map.exit_with_error(std::format("Name '{}' has been already redefined. You can use undefine to get rid of it.", redefine_name));
+            read_map.exit_with_error(std::format(
+                "Name '{}' has been already redefined. "
+                "You can use undefine to get rid of it.", 
+                redefine_name));
+
             return;
         }
 
@@ -36,6 +41,17 @@ public:
                 >(structure_builder::parameters_enumeration::names_stack);
 
             std::string new_keyword = std::move(helper.name_translations.back().first);
+            auto already_exists = std::ranges::find_if(*names_stack, 
+                [&new_keyword](const auto& entry) {
+                    return entry.first == new_keyword;
+                });
+
+            if (already_exists != names_stack->end()) {
+                read_map.exit_with_error(std::format(
+                    "Keyword with name '{}' already exists.",
+                    new_keyword));
+            }
+
             names_stack->emplace_back(
                 new_keyword,
                 read_map.get_token_generator_additional_token()

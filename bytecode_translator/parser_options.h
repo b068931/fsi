@@ -9,39 +9,39 @@
 #include "../generic_parser/token_generator.h"
 
 class parser_options {
-	static const generic_parser::token_generator<
-		source_file_token,
-		structure_builder::context_key
-	>::symbols_pair main_context;
+    static const generic_parser::token_generator<
+        source_file_token,
+        structure_builder::context_key
+    >::symbols_pair main_context;
 
-	static const generic_parser::token_generator<
-		source_file_token,
-		structure_builder::context_key
-	>::symbols_pair inside_string;
+    static const generic_parser::token_generator<
+        source_file_token,
+        structure_builder::context_key
+    >::symbols_pair inside_string;
 
-	static const generic_parser::token_generator<
-		source_file_token,
-		structure_builder::context_key
-	>::symbols_pair inside_include;
+    static const generic_parser::token_generator<
+        source_file_token,
+        structure_builder::context_key
+    >::symbols_pair inside_include;
 
-	static const generic_parser::token_generator<
-		source_file_token,
-		structure_builder::context_key
-	>::symbols_pair inside_comment;
+    static const generic_parser::token_generator<
+        source_file_token,
+        structure_builder::context_key
+    >::symbols_pair inside_comment;
 
 public:
     static const std::vector<source_file_token> all_types;
-	static const std::vector<source_file_token> integer_types;
-	static const std::vector<source_file_token> argument_end_tokens;
+    static const std::vector<source_file_token> integer_types;
+    static const std::vector<source_file_token> argument_end_tokens;
 
-	static const std::vector<std::pair<std::string, source_file_token>> keywords;
-	static const std::map<
-		structure_builder::context_key,
-		generic_parser::token_generator<
-			source_file_token,
-			structure_builder::context_key
-		>::symbols_pair
-	> contexts;
+    static const std::vector<std::pair<std::string, source_file_token>> keywords;
+    static const std::map<
+        structure_builder::context_key,
+        generic_parser::token_generator<
+            source_file_token,
+            structure_builder::context_key
+        >::symbols_pair
+    > contexts;
 };
 
 #endif

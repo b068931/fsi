@@ -19,16 +19,17 @@
 #include <iterator>
 #include <vector>
 #include <limits>
+#include <format>
 
 #include "parser_options.h"
 #include "structure_builder.h"
 #include "bytecode_translator.h"
-#include "include_file_state.h"
 
 #include "../generic_parser/parser_facade.h"
 #include "../compression_algorithms/static_huffman.h"
 #include "../compression_algorithms/sequence_reduction.h"
 #include "../startup_components/startup_definitions.h"
+#include "../startup_components/unicode_punning.h"
 
 namespace {
     bool verify_program(const structure_builder::file& parser_value) {
@@ -169,7 +170,7 @@ namespace {
     }
 }
 
-APPLICATION_ENTRYPOINT("BYTECODE TRANSLATOR", PROJECT_VERSION, argc, argv) {
+APPLICATION_ENTRYPOINT("BYTECODE TRANSLATOR", FSI_PROJECT_VERSION, argc, argv) {
     auto start_time = std::chrono::high_resolution_clock::now();
     if (argc != 4) {
         std::cout << "Provide the name of the file to compile and its output destination. And add 'include-debug' or 'no-debug' at the end. It is only three arguments." <<
@@ -183,6 +184,12 @@ APPLICATION_ENTRYPOINT("BYTECODE TRANSLATOR", PROJECT_VERSION, argc, argv) {
                 '\n';
         }
 
+        std::filesystem::path main_program_file{ 
+            std::filesystem::canonical(UTF8_PATH(argv[1])) 
+        };
+
+        std::cout << "Now parsing: " << main_program_file.generic_string() << '\n';
+
         generic_parser::parser_facade<
             source_file_token,
             structure_builder::context_key,
@@ -193,26 +200,22 @@ APPLICATION_ENTRYPOINT("BYTECODE TRANSLATOR", PROJECT_VERSION, argc, argv) {
             parser_options::contexts,
             source_file_token::name,
             source_file_token::end_of_file,
-            structure_builder::context_key::main_context
+            structure_builder::context_key::main_context,
+            std::make_shared<std::vector<std::filesystem::path>>(
+                std::vector{ main_program_file })
         };
 
-        std::filesystem::path main_program_file{ std::filesystem::canonical(argv[1]) };
-        std::cout << "Now parsing: " << main_program_file.generic_string() << '\n';
-
-        include_file_state::active_parsing_files.push_back(main_program_file);
         parser.start(main_program_file);
+        auto [line_number, error_string] = parser.error();
 
-        std::pair error{ parser.error() };
         structure_builder::file parser_value{ parser.get_builder_value() };
-        if (!error.second.empty()) {
-            std::cout << "SYNTAX ERROR:	"
-                << error.second.c_str()
-                << " NEAR LINE " << error.first << '\n';
+        if (!error_string.empty()) {
+            std::cout << std::format("SYNTAX ERROR NEAR LINE {}: {}\n", 
+                line_number, error_string);
 
             return EXIT_FAILURE;
         }
 
-        include_file_state::active_parsing_files.pop_back();
         if (!verify_program(parser_value)) {
             return EXIT_FAILURE;
         }
@@ -234,7 +237,7 @@ APPLICATION_ENTRYPOINT("BYTECODE TRANSLATOR", PROJECT_VERSION, argc, argv) {
             << '.'
             << '\n';
 
-        std::ofstream file_stream{ argv[2], std::ios::binary | std::ios::out };
+        std::ofstream file_stream{ UTF8_PATH(argv[2]), std::ios::binary | std::ios::out };
         file_stream.write(
             reinterpret_cast<const char*>(compressed_bytecode.data()),
             static_cast<std::streamsize>(compressed_bytecode.size())

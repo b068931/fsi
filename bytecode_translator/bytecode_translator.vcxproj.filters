@@ -306,6 +306,15 @@
     <CopyFileToFolders Include="..\examples\transpose-matrix.tfsi">
       <Filter>Examples</Filter>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="..\examples\use-after-free.tfsi">
+      <Filter>Examples</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\examples\вісім-байтів-в-стрічку.tfsi">
+      <Filter>Examples</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\libraries\переклад-українською.tfsi">
+      <Filter>Libraries</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="bytecode_translator.rc">
@@ -316,10 +325,5 @@
     <Image Include="executable_icon.ico">
       <Filter>Resource Files</Filter>
     </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\examples\use-after-free.tfsi">
-      <Filter>Examples</Filter>
-    </None>
   </ItemGroup>
 </Project>

@@ -22,5 +22,8 @@
     <ClInclude Include="startup_definitions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="unicode_punning.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

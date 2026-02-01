@@ -18,12 +18,14 @@ public:
             ++helper.instruction_index; //used with jump points and jump instructions
         }
         else if (token == source_file_token::module_return_value) { //special case for module function call
-            std::string name = helper.name_translations.translate_name(read_map.get_token_generator_name());
-
             helper.active_function.add_new_instruction(source_file_token::module_call);
-            helper.active_function.add_new_operand_to_last_instruction(source_file_token::no_return_module_call_keyword, nullptr, false);
-            if (name != "void") {
-                helper.active_function.map_operand_with_variable(name, &std::get<1>(helper.active_function.get_last_operand()), read_map);
+            helper.active_function.add_new_operand_to_last_instruction(
+                source_file_token::no_return_module_call_keyword, nullptr, false);
+
+            if (read_map.get_token_generator_additional_token() != source_file_token::no_return_module_call_keyword) {
+                helper.active_function.map_operand_with_variable(
+                    helper.name_translations.translate_name(read_map.get_token_generator_name()),
+                    &std::get<1>(helper.active_function.get_last_operand()), read_map);
             }
 
             ++helper.instruction_index;

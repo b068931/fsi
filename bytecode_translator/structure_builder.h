@@ -10,6 +10,9 @@
 #include <stdexcept>
 #include <format>
 #include <cerrno>
+#include <filesystem>
+#include <memory>
+#include <optional>
 
 #include "source_file_token.h"
 
@@ -25,8 +28,10 @@ public:
     enum class parameters_enumeration {
         if_defined_if_not_defined_pop_check,
         inside_comment,
-        names_stack
+        names_stack,
+        active_parsing_files
     };
+
     enum class context_key {
         main_context,
         inside_string,
@@ -283,6 +288,7 @@ public:
             void set_current_function(function* value) {
                 this->current_function_value = value;
             }
+
             function& get_current_function() {
                 assert(current_function_value != nullptr && "oops");
                 return *this->current_function_value;
@@ -291,21 +297,26 @@ public:
             decltype(auto) get_last_instruction() {
                 return this->get_current_function().body.back();
             }
+
             void add_new_operand_to_last_instruction(source_file_token token, variable* var, bool is_signed) {
                 this->get_last_instruction().operands_in_order.emplace_back(token, var, is_signed);
             }
+
             void add_new_instruction(source_file_token token) {
                 this->get_current_function().body.emplace_back(token);
             }
+
             decltype(auto) get_last_operand() {
                 return this->get_last_instruction().operands_in_order.back();
             }
+
             decltype(auto) find_argument_variable_by_name(const std::string& name) {
                 return std::ranges::find_if(this->get_current_function().arguments,
                                             [&name](const regular_variable& var) {
                                                 return var.name == name;
                                             });
             }
+
             decltype(auto) find_local_variable_by_name(const std::string& name) {
                 return std::ranges::find_if(this->get_current_function().locals,
                                             [&name](const regular_variable& var) {
@@ -334,6 +345,7 @@ public:
                 parser.exit_with_error("Name '" + name + "' does not exist.");
             }
         };
+
         struct names_remapping {
         private:
             std::vector<std::pair<std::string, std::string>> remappings; //used with redefine
@@ -347,19 +359,29 @@ public:
             }
 
         public:
-            void merge(names_remapping&& other) {  // NOLINT(cppcoreguidelines-rvalue-reference-param-not-moved)
-                //this is actually diabolical
-                for (auto begin = other.remappings.begin(); begin != other.remappings.end(); ++begin) {
-                    auto found = this->find_remapped_name(begin->first);
-                    if (found == remappings.end()) {
-                        remappings.push_back(std::move(*begin));
+            auto merge(names_remapping& other) {
+                // This is actually diabolical.
+                for (auto& [other_key, other_value] : other.remappings) {
+                    auto found = this->find_remapped_name(other_key);
+                    if (found == this->remappings.end()) {
+                        this->remappings.emplace_back(std::move(other_key), std::move(other_value));
+                    }
+                    else if (!found->second.empty() || !other_value.empty()) {
+                        // Allow repeated redefinitions only if they are empty.
+                        return std::optional{ std::make_tuple(
+                            std::move(other_key), std::move(other_value),
+                            found->first, found->second
+                        ) };
                     }
                 }
+
+                return std::optional<std::tuple<std::string, std::string, std::string, std::string>>{};
             }
 
             void add(std::string what, std::string new_value) {
                 this->remappings.emplace_back(std::move(what), std::move(new_value));
             }
+
             void remove(const std::string& what) {
                 auto found_remapping = this->find_remapped_name(what);
                 if (found_remapping != this->remappings.end()) {
@@ -370,6 +392,7 @@ public:
             std::pair<std::string, std::string>& back() {
                 return this->remappings.back();
             }
+
             bool has_remapping(const std::string& name) const {
                 auto found_remapping = this->find_remapped_name(name);
                 return found_remapping != this->remappings.end();
@@ -410,6 +433,7 @@ public:
                 
                 throw std::invalid_argument{ std::format("Was unable to convert {} to a number.", value) };
             }
+
             std::string translate_name(std::string name) const { //translate redefined name to a normal name
                 std::string generated_name = std::move(name);
                 auto found_name = this->find_remapped_name(generated_name);
@@ -433,6 +457,7 @@ public:
             static entity_id id = 1;
             return id++;
         }
+
         void add_function_address_argument(
             file& file_structure, 
             builder_parameters& helper_parameters, 
@@ -458,6 +483,7 @@ public:
             helper_parameters.active_function.add_new_operand_to_last_instruction(source_file_token::function_address_argument_keyword, function_address, false);
         }
     };
+
     using read_map_type = generic_parser::read_map<source_file_token, context_key, file, builder_parameters, parameters_enumeration>;
 
 private:
@@ -469,20 +495,26 @@ private:
 
     builder_parameters helper{};
     file output_file_structure;
+
 public:
     structure_builder(
         std::vector<std::pair<std::string, source_file_token>>* names_stack, 
-        generic_parser::token_generator<source_file_token, context_key>* token_generator
+        generic_parser::token_generator<source_file_token, context_key>* token_generator,
+        std::shared_ptr<std::vector<std::filesystem::path>> active_parsing_files
     )
         :error_line{ 1 },
         generator{ token_generator },
         parse_map{ source_file_token::end_of_file, source_file_token::name, token_generator }
     {
-        this->parse_map
-            .get_parameters_container()
+        assert(active_parsing_files != nullptr && 
+            !active_parsing_files->empty() && 
+            "At least one active file for parsing must be present.");
+
+        this->parse_map.get_parameters_container()
             .assign_parameter(parameters_enumeration::if_defined_if_not_defined_pop_check, false)
             .assign_parameter(parameters_enumeration::inside_comment, std::pair<bool, std::string>{ false, "" })
-            .assign_parameter(parameters_enumeration::names_stack, names_stack);
+            .assign_parameter(parameters_enumeration::names_stack, names_stack)
+            .assign_parameter(parameters_enumeration::active_parsing_files, active_parsing_files);
 
         this->configure_parse_map();
     }

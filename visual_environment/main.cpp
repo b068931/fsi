@@ -25,7 +25,7 @@
 
 // TODO: Consider adding command line arguments for opening specific files at startup.
 
-APPLICATION_ENTRYPOINT("VISUAL ENVIRONMENT", PROJECT_VERSION, argc, argv) {
+APPLICATION_ENTRYPOINT("VISUAL ENVIRONMENT", FSI_PROJECT_VERSION, argc, argv) {
     assert(argc > 0 && "Must contain at least one argument.");
 
     constexpr char applicationBaseStyle[]{ "Fusion" };

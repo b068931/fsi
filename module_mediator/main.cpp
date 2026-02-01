@@ -27,6 +27,7 @@
 #include "../compression_algorithms/static_huffman.h"
 #include "../compression_algorithms/sequence_reduction.h"
 #include "../startup_components/startup_definitions.h"
+#include "../startup_components/unicode_punning.h"
 
 namespace {
     // Decompresses the bytecode from memory and stores that in a temporary file.
@@ -109,7 +110,9 @@ namespace {
             ).count()
         );
 
-        std::filesystem::path temporary_file_path = std::filesystem::temp_directory_path() / temporary_file_name;
+        std::filesystem::path temporary_file_path = 
+            std::filesystem::temp_directory_path() / UTF8_PATH(temporary_file_name);
+
         std::ofstream temporary_file_stream(temporary_file_path, std::ios::binary | std::ios::out);
         if (!temporary_file_stream) {
             throw std::runtime_error("Failed to create temporary file.");
@@ -131,7 +134,7 @@ namespace {
 
     std::vector<unsigned char> consume_compressed_bytecode(const std::string& file_name) {
         std::vector<unsigned char> compressed_bytecode{};
-        std::ifstream compressed_stream{ file_name, std::ios::binary | std::ios::in };
+        std::ifstream compressed_stream{ UTF8_PATH(file_name), std::ios::binary | std::ios::in };
         if (!compressed_stream) {
             throw std::runtime_error{
                 std::format("Unable to open: {}.", file_name)
@@ -185,7 +188,7 @@ namespace {
 //       Maybe this pattern should be applied in all modules where global objects are used?
 //       Must also document this pattern somewhere.
 
-APPLICATION_ENTRYPOINT(LOGGER_MODULE_EMITTER_MODULE_NAME, PROJECT_VERSION, argc, argv) {
+APPLICATION_ENTRYPOINT(LOGGER_MODULE_EMITTER_MODULE_NAME, FSI_PROJECT_VERSION, argc, argv) {
     if (argc != 4) {
         std::cerr << "You need to provide three arguments: text file with the modules descriptions, executors count and a compiled file." <<
             '\n';
@@ -206,7 +209,10 @@ APPLICATION_ENTRYPOINT(LOGGER_MODULE_EMITTER_MODULE_NAME, PROJECT_VERSION, argc,
             " This may slightly impede reporting some types of fatal errors." << '\n';
         }
 
-        std::filesystem::path modules_descriptor_file{ std::filesystem::canonical(argv[1]) };
+        std::filesystem::path modules_descriptor_file{ 
+            std::filesystem::canonical(UTF8_PATH(argv[1])) 
+        };
+
         std::cerr << "Parsing modules descriptor file: " << modules_descriptor_file.generic_string() << '\n';
 
         module_mediator::engine_module_mediator module_mediator{};
@@ -240,11 +246,12 @@ APPLICATION_ENTRYPOINT(LOGGER_MODULE_EMITTER_MODULE_NAME, PROJECT_VERSION, argc,
             std::string decompressed_bytecode_file_name = decompressed_bytecode.generic_string();
             module_mediator::fast_call<module_mediator::memory>(
                 global_module_part, program_loader, load_program_to_memory,
-                const_cast<char*>(decompressed_bytecode_file_name.c_str()) // May God forgive me for this
+                const_cast<char*>(decompressed_bytecode_file_name.c_str()) // May God forgive me for this.
             );
 
             // Remove the temporary file after loading the program into memory.
-            // Windows may use user's directory as a temporary directory, so we need to be sure that we are not leaving any garbage behind.
+            // Windows may use user's directory as a temporary directory, so we need to be sure 
+            // that we are not leaving any garbage behind.
             std::filesystem::remove(decompressed_bytecode);
 
             // Attach to stdio does not manage stderr. That is done by the logger_module.

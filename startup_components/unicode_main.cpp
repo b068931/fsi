@@ -12,6 +12,7 @@
 #pragma clang diagnostic pop
 #endif
 
+#include <clocale>
 #include <iostream>
 #include <cstdlib>
 #include <new>
@@ -46,17 +47,17 @@ namespace {
         std::wstring buffer(MAX_PATH, L'\0');
 
         while (true) {
-            DWORD size = static_cast<DWORD>(buffer.size());
-            DWORD length = GetModuleFileNameW(nullptr, buffer.data(), size);
+            DWORD dwSize = static_cast<DWORD>(buffer.size());
+            DWORD dwLength = GetModuleFileNameW(nullptr, buffer.data(), dwSize);
 
-            if (length == 0) {
+            if (dwLength == 0) {
                 return std::format(
                     R"*(Function "GetModuleFileNameW" has failed with value {}.)*",
                     GetLastError());
             }
 
-            if (length < size - 1) {
-                buffer.resize(length);
+            if (dwLength < dwSize - 1) {
+                buffer.resize(dwLength);
                 return buffer;
             }
 
@@ -73,8 +74,8 @@ namespace {
             command_line.push_back(L' ');
         }
 
-        bool needsQuotes = std::wcspbrk(argument, L" \t\"") != nullptr;
-        if (!needsQuotes) {
+        bool needs_quotes = std::wcspbrk(argument, L" \t\"") != nullptr;
+        if (!needs_quotes) {
             command_line.append(argument);
             return;
         }
@@ -130,12 +131,14 @@ namespace {
         }, get_current_executable_path());
     }
 
-    char** convert_to_utf8(int argumentCount, wchar_t** arguments) {
+    // Modern C++ support for UTF-8 is still lacking, so we have to do the conversion ourselves.
+    // char8_t is useless without proper standard library support, so we just use char* for UTF-8 strings.
+    char** convert_to_utf8(int arguments_count, wchar_t** arguments) {
         // Store passed arguments in one contiguous block of memory.
-        int totalBytesRequired = 0;
+        int total_bytes_required = 0;
 
-        for (int index = 0; index < argumentCount; ++index) {
-            totalBytesRequired += WideCharToMultiByte(
+        for (int index = 0; index < arguments_count; ++index) {
+            total_bytes_required += WideCharToMultiByte(
                 CP_UTF8, 
                 0, 
                 arguments[index], 
@@ -146,45 +149,45 @@ namespace {
                 nullptr);
         }
 
-        int pointerArraySize = (argumentCount + 1) * static_cast<int>(sizeof(char*));
-        char* memoryBlock = new(std::align_val_t{ alignof(char*) }, std::nothrow) char[
-            static_cast<std::size_t>(totalBytesRequired + pointerArraySize)]{};
+        int pointer_array_size = (arguments_count + 1) * static_cast<int>(sizeof(char*));
+        char* memory_block = new(std::align_val_t{ alignof(char*) }, std::nothrow) char[
+            static_cast<std::size_t>(total_bytes_required + pointer_array_size)]{};
 
-        if (!memoryBlock) {
+        if (!memory_block) {
             return nullptr;
         }
 
-        char* utf8Arguments = memoryBlock;
-        char* stringBuffer = memoryBlock + pointerArraySize;
+        char* utf8_arguments = memory_block;
+        char* string_buffer = memory_block + pointer_array_size;
 
-        for (std::ptrdiff_t index = 0; index < argumentCount; ++index) {
+        for (std::ptrdiff_t index = 0; index < arguments_count; ++index) {
             // Avoid breaking strict aliasing by using placement new to construct
             // objects directly in the allocated memory.
-            new(utf8Arguments + index * static_cast<std::ptrdiff_t>(sizeof(char*))) char* (stringBuffer);
+            new(utf8_arguments + index * static_cast<std::ptrdiff_t>(sizeof(char*))) char* (string_buffer);
             static_assert(sizeof(char*) == alignof(char*), 
                 "Unexpected alignment of char* is not equal to its size.");
 
-            int bytesConverted = WideCharToMultiByte(
+            int bytes_converted = WideCharToMultiByte(
                 CP_UTF8, 
                 0, 
                 arguments[index], 
                 -1, 
-                stringBuffer, 
-                totalBytesRequired, 
+                string_buffer, 
+                total_bytes_required, 
                 nullptr, 
                 nullptr);
 
-            if (bytesConverted == 0) {
+            if (bytes_converted == 0) {
                 std::cerr << "Error encountered while translating the character stream.\n";
                 std::quick_exit(EXIT_FAILURE);
             }
 
-            stringBuffer += bytesConverted;
+            string_buffer += bytes_converted;
         }
 
         // Use std::launder because we abandoned values returned by placement new.
         // Acquire pointer to the array of objects "char*".
-        return std::launder(reinterpret_cast<char**>(utf8Arguments));
+        return std::launder(reinterpret_cast<char**>(utf8_arguments));
     }
 }
 
@@ -192,6 +195,15 @@ namespace {
 // However, working with wide characters is a pain, so we convert the wide character
 // array to UTF-8 and call u8main instead.
 int wmain(int arguments_count, wchar_t** arguments) {
+    // Notify UCRT that we are going to use UTF-8 encoding for string functions.
+    const char* locale_information = std::setlocale(LC_ALL, ".UTF-8");
+    if (locale_information == nullptr) {
+        std::cerr << "Failed to set UCRT locale to UTF-8. "
+            "Can't start the application without UTF-8 support.";
+
+        return EXIT_FAILURE;
+    }
+
     if (STARTUP_COMPONENTS_SHOW_APPLICATION_CONSOLE == std::string("HIDE")) {
         // First try to hide the console window if it exists.
         // This will minimize it into the taskbar for a brief moment,
@@ -218,21 +230,21 @@ int wmain(int arguments_count, wchar_t** arguments) {
                     STARTUPINFOW startupInfo{};
                     startupInfo.cb = sizeof(startupInfo);
                     PROCESS_INFORMATION processInfo{};
-                    DWORD creationFlags = DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP;
+                    DWORD dwCreationFlags = DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP;
 
-                    BOOL created = CreateProcessW(
+                    BOOL bCreated = CreateProcessW(
                         nullptr,
                         command_line.data(),
                         nullptr,
                         nullptr,
                         FALSE,
-                        creationFlags,
+                        dwCreationFlags,
                         nullptr,
                         nullptr,
                         &startupInfo,
                         &processInfo);
 
-                    if (!created) {
+                    if (!bCreated) {
                         std::cerr << "Failed to relaunch the application without a console window. "
                             "Error code: " << GetLastError() << ". Exiting...\n";
 
@@ -254,6 +266,12 @@ int wmain(int arguments_count, wchar_t** arguments) {
         }
     }
     else {
+        if (STARTUP_COMPONENTS_SHOW_APPLICATION_CONSOLE != std::string("SHOW")) {
+            std::cerr << "Invalid value for STARTUP_COMPONENTS_SHOW_APPLICATION_CONSOLE: '"
+                << STARTUP_COMPONENTS_SHOW_APPLICATION_CONSOLE
+                << "'. Expected values are 'SHOW' or 'HIDE'. Continuing with 'SHOW' behavior.\n";
+        }
+
         if (!IsValidCodePage(CP_UTF8)) {
             std::cerr << "The system does not support UTF-8 code page. "
                 "Can't start the application without UTF-8 support.";
@@ -274,8 +292,8 @@ int wmain(int arguments_count, wchar_t** arguments) {
         }
     }
 
-    char** utf8Arguments = convert_to_utf8(arguments_count, arguments);
-    if (!utf8Arguments) {
+    char** utf8_arguments = convert_to_utf8(arguments_count, arguments);
+    if (!utf8_arguments) {
         std::cerr << "Failed to allocate memory for UTF-8 arguments. "
                      "Can't start the application without conversion.";
 
@@ -283,9 +301,9 @@ int wmain(int arguments_count, wchar_t** arguments) {
     }
 
     std::cerr << startup_components::dump_build_information();
-    int exitCode = startup_components::u8main(arguments_count, utf8Arguments);
+    int exit_code = startup_components::u8main(arguments_count, utf8_arguments);
 
     // All objects are trivially destructible, so we can just deallocate the memory block.
-    operator delete[](utf8Arguments, std::align_val_t{ alignof(char*) });
-    return exitCode;
+    operator delete[](utf8_arguments, std::align_val_t{ alignof(char*) });
+    return exit_code;
 }

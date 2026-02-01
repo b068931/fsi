@@ -3,8 +3,10 @@
 
 #include "pch.h"
 #include "module_interoperation.h"
+
 #include "../generic_parser/block_reader.h"
 #include "../logger_module/logging.h"
+#include "../startup_components/unicode_punning.h"
 
 template<typename container>
 class run_reader {
@@ -61,7 +63,7 @@ public:
     run_reader(const std::string& file_name, container* cont, std::map<char, container_run_initialize_function> run_initializers) {
         std::shared_ptr<generic_parser::block_reader<1024>> reader{
             new generic_parser::block_reader<1024>{
-                new std::ifstream{file_name, std::ios::binary},
+                new std::ifstream{ UTF8_PATH(file_name), std::ios::binary },
                 std::filesystem::file_size(file_name)
             }
         };
