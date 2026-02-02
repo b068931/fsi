@@ -13,7 +13,8 @@ function hello-world(memory the-message
 $expose-function hello-world;
 $expose-function hello-world; /* noop if done twice */
     $declare memory null;
-    void: prts->io.log.info(variable memory null, immediate eight-bytes d0, variable memory null, variable memory the-message,)
+    void: prts->io.log.info(variable memory null, immediate eight-bytes d0, 
+variable memory null, variable memory null, variable memory the-message,)
     the-message: prts->memory.deallocate()
 }
 

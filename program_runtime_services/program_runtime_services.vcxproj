@@ -131,6 +131,8 @@
       <AdditionalIncludeDirectories>$(VisualLeakDetectorDir)\include</AdditionalIncludeDirectories>
       <AdditionalOptions>-Wno-c++20-compat -Wno-pre-c++20-compat -Wno-pre-c++20-compat-pedantic -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-unsafe-buffer-usage -Wno-ctad-maybe-unsupported -Wno-exit-time-destructors -Wno-global-constructors %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <AssemblerListingLocation>$(SolutionDir)$(Platform)\$(Configuration)\assembly\$(TargetName).asm</AssemblerListingLocation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -145,14 +147,16 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;PROGRAMRUNTIMESERVICES_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ADDRESS_SANITIZER_ENABLED;_DEBUG;PROGRAMRUNTIMESERVICES_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalOptions>
-      </AdditionalOptions>
+      <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
       <TreatWarningAsError>false</TreatWarningAsError>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <AssemblerListingLocation>$(SolutionDir)$(Platform)\$(Configuration)\assembly\$(TargetName).asm</AssemblerListingLocation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -175,6 +179,8 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>-Wno-c++20-compat -Wno-pre-c++20-compat -Wno-pre-c++20-compat-pedantic -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-unsafe-buffer-usage -Wno-ctad-maybe-unsupported -Wno-exit-time-destructors -Wno-global-constructors %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <AssemblerListingLocation>$(SolutionDir)$(Platform)\$(Configuration)\assembly\$(TargetName).asm</AssemblerListingLocation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -199,6 +205,8 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>-Wno-c++20-compat -Wno-pre-c++20-compat -Wno-pre-c++20-compat-pedantic -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-unsafe-buffer-usage -Wno-ctad-maybe-unsupported -Wno-exit-time-destructors -Wno-global-constructors %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <AssemblerListingLocation>$(SolutionDir)$(Platform)\$(Configuration)\assembly\$(TargetName).asm</AssemblerListingLocation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

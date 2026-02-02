@@ -1,1 +1,1 @@
-$include ./examples/cyclic2.tfsi;
+$include ../examples/cyclic1.tfsi;

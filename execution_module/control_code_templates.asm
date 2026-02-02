@@ -5,6 +5,15 @@
 ; This can also be considered a manual implementation of the setjmp/longjmp functionality.
 ; The difference is that this implementation specifically accomodates the needs of dynamically generated functions.
 
+IFDEF ADDRESS_SANITIZER_ENABLED
+
+; Will be used to poison memory region of the stack where executor thread's state is stored.
+; That region will be unpoisoned when loading back the executor thread's state.
+EXTERN __asan_poison_memory_region:PROC
+EXTERN __asan_unpoison_memory_region:PROC
+
+ENDIF
+
 PUBLIC CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD
 PUBLIC CONTROL_CODE_TEMPLATE_LOAD_PROGRAM
 PUBLIC CONTROL_CODE_TEMPLATE_CALL_MODULE_TRAMPOLINE
@@ -39,7 +48,7 @@ CONTROL_FUNCTIONS_RUNTIME_MODULE_CALL_DISPLACEMENT            EQU 8
 CONTROL_FUNCTIONS_PROGRAM_END_TRAMPOLINE_DISPLACEMENT         EQU 16
 CONTROL_FUNCTIONS_PROGRAM_TERMINATION_DISPLACEMENT            EQU 24
 
-EXECUTOR_THREAD_STATE_STACK_TOP_DISPLACEMENT            EQU 0
+EXECUTOR_THREAD_STATE_STACK_TOP_DISPLACEMENT      EQU 0
 EXECUTOR_THREAD_STATE_FRAME_REGISTER_DISPLACEMENT EQU 8
 
 ; Must be aligned on 4-byte boundary for UNWIND_INFO.
@@ -63,6 +72,10 @@ xdata ENDS                                                                  ; Th
 pdata SEGMENT DWORD READ ALIAS(".pdata")
     ; Microsoft's LINK.EXE seems to require that RUNTIME_FUNCTION entries are sorted by starting address.
     ; Thus, we order them by their starting addresses. Notice that clang's LLD linker doesn't have this requirement.
+    ; Moreover, Microsoft's LINK.EXE won't load pdata properly if the functions themselves are not sorted properly.
+    ; This way, due to the fact that LOAD_PROGRAM has FRAME defined and the assembler will generate pdata, xdata for it
+    ; at the beginning of the respective segments, we must ensure that LOAD_PROGRAM is defined first. Otherwise, RUNTIME_FUNCTIONs
+    ; won't be loaded for other functions. This will lead to a runtime verification fail in execution module.
     DD (IMAGEREL CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD_CONTEXT_SWITCH_POINT)
     DD (IMAGEREL LOAD_EXECUTION_THREAD_ENDP)
     DD (IMAGEREL SHARED_CHAINED_UNWIND_INFO)
@@ -75,6 +88,8 @@ pdata SEGMENT DWORD READ ALIAS(".pdata")
     ; While functions that act like context switch points have RUNTIME_FUNCTION set up
     ; in the middle of their code. These functions may look kind of trippy because it is as if
     ; they can remove stack frames in the middle of the stack.
+    ; This trick works because before context switch point is reached, the function behaves like a leaf function (has no RUNTIME_FUNCTION defined),
+    ; and after context switch point is reached, the function behaves like a normal function with a frame (set up by LOAD_PROGRAM).
     DD (IMAGEREL CONTROL_CODE_TEMPLATE_RESUME_PROGRAM_EXECUTION_CONTEXT_SWITCH_POINT)
     DD (IMAGEREL RESUME_PROGRAM_EXECUTION_ENDP)
     DD (IMAGEREL SHARED_CHAINED_UNWIND_INFO)
@@ -93,46 +108,6 @@ CONTROL_CODE_TEMPLATE_RESUME_PROGRAM_EXECUTION_SIZE   DQ (RESUME_PROGRAM_EXECUTI
 CONTROL_CODE_TEMPLATE_PROGRAM_END_TRAMPOLINE_SIZE     DQ (PROGRAM_END_TRAMPOLINE_ENDP - CONTROL_CODE_TEMPLATE_PROGRAM_END_TRAMPOLINE)
 
 .code
-
-; Loads the initial state of a thread that switched to a user program. This one is also
-; marked as [noreturn] in C++. The same restriction of using only trivially destructible objects,
-; as with "RESUME_PROGRAM_EXECUTION", applies here as well. 
-; Here we essentially just unwind the stack to the frame that was set up by "LOAD_PROGRAM".
-; As both "LOAD_EXECUTION_THREAD" and "LOAD_PROGRAM" can only be used from the same thread, 
-; from the point of view of the "LOAD_PROGRAM" function caller this will look like a normal function return.
-CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD PROC
-    ; First restore the frame pointer to prepare for the context switch.
-    ; Note that the order of restoring registers here is important. RSP can be modified
-    ; arbitrarily if we have a frame pointer. This behavior is documented and required by
-    ; some of the functions which allocate memory on stack in dynamic fashion.
-    mov FRAME_POINTER_REGISTER, [rcx + EXECUTOR_THREAD_STATE_FRAME_REGISTER_DISPLACEMENT]
-
-    ; Set the point where the context switch happens. From this point onward,
-    ; SEH and debugger will see our RUNTIME_FUNCTION with stack frame set up by "LOAD_PROGRAM".
-    CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD_CONTEXT_SWITCH_POINT LABEL PTR
-
-    ; Unwind the stack back to the frame set up by the "LOAD_PROGRAM" function.
-    ; Remove shadow space and possibly all other allocated memory.
-    lea rsp, [FRAME_POINTER_REGISTER + FRAME_SHADOW_SPACE_SIZE]
-
-    ; Start stack unwinding.
-    ; Restore all non-volatile registers from stack.
-    pop r15
-    pop r14
-    pop r12
-    pop rsi
-    pop rdi
-    pop rbp
-    pop rbx
-
-    ; Notice that FRAME_POINTER_REGISTER is restored last.
-    ; This specific order seems to be important. Yet, documentation doesn't mention it.
-    pop r13
-
-    ; Finally, continue execution of the function which has called "LOAD_PROGRAM".
-    ret
-CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD ENDP
-LOAD_EXECUTION_THREAD_ENDP LABEL PTR
 
 ; Saves the state of the executor thread and loads the state of a program, 
 ; third argument is used to determine whether this thread needs additional 
@@ -197,12 +172,36 @@ CONTROL_CODE_TEMPLATE_LOAD_PROGRAM PROC FRAME
     .setframe FRAME_POINTER_REGISTER, FRAME_POINTER_DISPLACEMENT
     .endprolog
 
-    ; Save stack pointer and fram pointer to executor state memory.
+    ; Save stack pointer and frame pointer to executor state memory.
     ; Saving both of them enables us to switch stack frames mid-procedures.
     ; Look for *_CONTEXT_SWITCH_POINT labels to see it in action.
     mov [rcx + EXECUTOR_THREAD_STATE_STACK_TOP_DISPLACEMENT],      rsp
     mov [rcx + EXECUTOR_THREAD_STATE_FRAME_REGISTER_DISPLACEMENT], FRAME_POINTER_REGISTER
-    
+
+; Poison the information about memory region where executor thread's state is stored.
+IFDEF ADDRESS_SANITIZER_ENABLED
+
+    ; Temporarily store the arguments in rcx, rdx, r8 in their home addresses.
+    ; FRAME_SHADOW_SPACE_SIZE + COUNT_OF_NONVOLATILE_REGISTERS * REGISTER_SIZE + SIZE_OF_RETURN_ADDRESS
+    mov [rsp + FRAME_SHADOW_SPACE_SIZE + 8 * 8 + 8 + 8 * 0], rcx
+    mov [rsp + FRAME_SHADOW_SPACE_SIZE + 8 * 8 + 8 + 8 * 1], rdx
+    mov [rsp + FRAME_SHADOW_SPACE_SIZE + 8 * 8 + 8 + 8 * 2], r8
+
+    ; Poison the frame information.
+    ; This ensures that modules won't accidentally modify that.
+    ; RCX already holds the right address.
+    ; Frame information stores RSP and FRAME_POINTER_REGISTER, each of size 8.
+    ; REGISTER_SIZE * 2
+    mov rdx, 8 * 2
+    call __asan_poison_memory_region
+
+    ; Restore the arguments from their home addresses.
+    mov r8,  [rsp + FRAME_SHADOW_SPACE_SIZE + 8 * 8 + 8 + 8 * 2];
+    mov rdx, [rsp + FRAME_SHADOW_SPACE_SIZE + 8 * 8 + 8 + 8 * 1];
+    mov rcx, [rsp + FRAME_SHADOW_SPACE_SIZE + 8 * 8 + 8 + 8 * 0];
+
+ENDIF
+
     ; Now we load the state of the dynamic function to be executed.
     ; We additionally save RSP to use it when resuming the program execution,
     ; that is to guard against the possiblity that compiler won't use "CALL" for
@@ -230,6 +229,84 @@ CONTROL_CODE_TEMPLATE_LOAD_PROGRAM PROC FRAME
 CONTROL_CODE_TEMPLATE_LOAD_PROGRAM ENDP
 LOAD_PROGRAM_ENDP LABEL PTR
 
+; Loads the initial state of a thread that switched to a user program. This one is also
+; marked as [noreturn] in C++. The same restriction of using only trivially destructible objects,
+; as with "RESUME_PROGRAM_EXECUTION", applies here as well. 
+; Here we essentially just unwind the stack to the frame that was set up by "LOAD_PROGRAM".
+; As both "LOAD_EXECUTION_THREAD" and "LOAD_PROGRAM" can only be used from the same thread, 
+; from the point of view of the "LOAD_PROGRAM" function caller this will look like a normal function return.
+CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD PROC
+    ; First restore the frame pointer to prepare for the context switch.
+    ; Note that the order of restoring registers here is important. RSP can be modified
+    ; arbitrarily if we have a frame pointer. This behavior is documented and required by
+    ; some of the functions which allocate memory on stack in dynamic fashion.
+    mov FRAME_POINTER_REGISTER, [rcx + EXECUTOR_THREAD_STATE_FRAME_REGISTER_DISPLACEMENT]
+
+    ; Set the point where the context switch happens. From this point onward,
+    ; SEH and debugger will see our RUNTIME_FUNCTION with stack frame set up by "LOAD_PROGRAM".
+    CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD_CONTEXT_SWITCH_POINT LABEL PTR
+
+; Unpoison the information about memory region where executor thread's state is stored.
+; Notice that epilogue code can change depending on whether ASan is enabled or not.
+IFDEF ADDRESS_SANITIZER_ENABLED
+
+    ; Partially restore RSP so that we can access the frame properly.
+    ; This is not an epilogue start yet.
+    lea rsp, [FRAME_POINTER_REGISTER]
+
+    ; Temporarily store the argument in its home address.
+    ; FRAME_SHADOW_SPACE_SIZE + COUNT_OF_NONVOLATILE_REGISTERS * REGISTER_SIZE + SIZE_OF_RETURN_ADDRESS
+    mov [rsp + FRAME_SHADOW_SPACE_SIZE + 8 * 8 + 8 + 8 * 0], rcx
+
+    ; Now unpoison the frame information.
+    ; This poisoning won't affect this code, because it is not instrumented by ASan,
+    ; but it does affect C++ code in modules.
+    ; RCX already holds the right address.
+    ; REGISTER_SIZE * 2, as we stored RSP and FRAME_POINTER_REGISTER.
+    mov rdx, 8 * 2
+    call __asan_unpoison_memory_region
+
+    ; Restore the argument from its home address.
+    mov rcx, [rsp + FRAME_SHADOW_SPACE_SIZE + 8 * 8 + 8 + 8 * 0];
+
+    ; Now we can start the actual epilogue code.
+    ; Remove shadow space and start popping registers.
+    add rsp, FRAME_SHADOW_SPACE_SIZE
+
+; https://learn.microsoft.com/en-us/cpp/build/prolog-and-epilog?view=msvc-170#epilog-code
+; We must adapt our epilogue code slightly because Windows has very strict rules as to what
+; counts as epilogue code. In fact, there are only two ways to restore stack frame properly:
+; 1. In two steps with lea rsp, [frame_pointer + offset], then add rsp, imm32; where part with
+;    add rsp, imm32 is considered the start of actual epilogue code.
+; 2. In one step with lea rsp, [frame_pointer + offset + imm32]; in this case, the whole lea 
+;    instruction is considered the start of actual epilogue code.
+ELSE
+
+    ; Unwind the stack back to the frame set up by the "LOAD_PROGRAM" function.
+    ; Remove shadow space and possibly all other allocated memory.
+    lea rsp, [FRAME_POINTER_REGISTER + FRAME_SHADOW_SPACE_SIZE]
+
+ENDIF
+
+    ; Start stack unwinding.
+    ; Restore all non-volatile registers from stack.
+    pop r15
+    pop r14
+    pop r12
+    pop rsi
+    pop rdi
+    pop rbp
+    pop rbx
+
+    ; Notice that FRAME_POINTER_REGISTER is restored last.
+    ; This specific order seems to be important. Yet, documentation doesn't mention it.
+    pop r13
+
+    ; Finally, continue execution of the function which has called "LOAD_PROGRAM".
+    ret
+CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD ENDP
+LOAD_EXECUTION_THREAD_ENDP LABEL PTR
+
 ; Used to call into a module from a dynamically generated function.
 ; Treat this as an adapter which saves necessary state for the dynamically generated function,
 ; then calls into the module's "call_module" trap (defined in C++).
@@ -242,6 +319,14 @@ CONTROL_CODE_TEMPLATE_CALL_MODULE_TRAMPOLINE PROC
     mov [rcx + USER_PROGRAM_CURRENT_STACK_POSITION_DISPLACEMENT], rbp 
     mov [rcx + USER_PROGRAM_STACK_END_DISPLACEMENT],              r9 
 
+    ; Prepare address for the fake frame to be used when calling into "call_module".
+    lea r14, [CONTROL_CODE_TEMPLATE_CALL_MODULE_TRAMPOLINE_FAKE_FRAME]
+
+    ; Set fake return address to this trampoline's return address.
+    ; This ensures that: 1. the function can't return control flow to the trampoline;
+    ;                    2. SEH and debugger have a valid return address to work with.
+    mov [rsp], r14
+
     ; Call into "call_module" with x64 calling convention.
     ; Shadow space was already set up by the "LOAD_PROGRAM" function.
     mov rcx, rax
@@ -249,6 +334,12 @@ CONTROL_CODE_TEMPLATE_CALL_MODULE_TRAMPOLINE PROC
     mov r8, r15
 
     jmp qword ptr [r10 + CONTROL_FUNCTIONS_RUNTIME_MODULE_CALL_DISPLACEMENT]
+
+    ; Used to replace return address put on stack by the dynamic function.
+    CONTROL_CODE_TEMPLATE_CALL_MODULE_TRAMPOLINE_FAKE_FRAME LABEL PTR
+    
+    ; Called trap function must not return control flow to the trampoline.
+    int 3
 CONTROL_CODE_TEMPLATE_CALL_MODULE_TRAMPOLINE ENDP
 CALL_MODULE_TRAMPOLINE_ENDP LABEL PTR
 

@@ -14,6 +14,10 @@
 #error "Currently only MSVC is supported for the execution module."
 #endif
 
+#ifdef ADDRESS_SANITIZER_ENABLED
+#include <sanitizer/asan_interface.h>
+#endif
+
 #include <Windows.h>
 #include <cassert>
 #include <new>

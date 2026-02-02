@@ -21,9 +21,39 @@ extern "C" {
     extern const std::uint64_t CONTROL_CODE_TEMPLATE_RESUME_PROGRAM_EXECUTION_SIZE;
     extern const std::uint64_t CONTROL_CODE_TEMPLATE_PROGRAM_END_TRAMPOLINE_SIZE;
 
-                 void CONTROL_CODE_TEMPLATE_LOAD_PROGRAM(void*, void*, std::size_t is_startup);
+     void CONTROL_CODE_TEMPLATE_LOAD_PROGRAM(void*, void*, std::size_t is_startup);
     [[noreturn]] void CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD(void*);
     [[noreturn]] void CONTROL_CODE_TEMPLATE_RESUME_PROGRAM_EXECUTION(void*);
+
+    // It is imperative that we include this functions to handle shadow stack cleanup.
+    // Otherwise, this leaves inconsistent shadow memory state and can lead to incredibly hard
+    // to debug issues.
+
+#ifdef ADDRESS_SANITIZER_ENABLED
+
+#define CONTROL_CODE_LOAD_PROGRAM(execution_thread_state, program_thread_state, startup_required) \
+    CONTROL_CODE_TEMPLATE_LOAD_PROGRAM(execution_thread_state, program_thread_state, startup_required)
+
+#define CONTROL_CODE_LOAD_EXECUTION_THREAD(thread_state_pointer) \
+    __asan_handle_no_return(); \
+    CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD(thread_state_pointer)
+
+#define CONTROL_CODE_RESUME_PROGRAM_EXECUTION(thread_state_pointer) \
+    __asan_handle_no_return(); \
+    CONTROL_CODE_TEMPLATE_RESUME_PROGRAM_EXECUTION(thread_state_pointer)
+
+#else
+
+#define CONTROL_CODE_LOAD_PROGRAM(execution_thread_state, program_thread_state, startup_required) \
+    CONTROL_CODE_TEMPLATE_LOAD_PROGRAM(execution_thread_state, program_thread_state, startup_required)
+
+#define CONTROL_CODE_LOAD_EXECUTION_THREAD(thread_state_pointer) \
+    CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD(thread_state_pointer)
+
+#define CONTROL_CODE_RESUME_PROGRAM_EXECUTION(thread_state_pointer) \
+    CONTROL_CODE_TEMPLATE_RESUME_PROGRAM_EXECUTION(thread_state_pointer)
+
+#endif
 
     // These trampoline functions are not to be used from the C++ code directly.
     // They are only declared here to allow referencing their addresses.

@@ -87,6 +87,6 @@ function main() {
     ebyte-to-string(immediate eight-bytes d22082023)
     load-value variable memory message;
 
-    void: prts->io.log.info(variable memory null, immediate eight-bytes d0, variable memory null, variable memory message)
+    void: prts->io.log.info(variable memory null, immediate eight-bytes d0, variable memory null, variable memory null, variable memory message)
     message: prts->memory.deallocate()
 }

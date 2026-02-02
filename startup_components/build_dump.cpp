@@ -9,6 +9,9 @@ extern const char* STARTUP_COMPONENTS_COMPONENT_BUILD_TIME;
 // Must be defined by the application that consumes this library.
 extern const long STARTUP_COMPONENTS_CPLUSPLUS_VERSION;
 
+// Useful to know because it affects some modules.
+extern const char* STARTUP_COMPONENTS_ADDRESS_SANITIZER_ACTIVE;
+
 // Must be defined by the application that consumes this library.
 // Describes the name of the component. E.g. "VISUAL ENVIRONMENT", "MODULE MEDIATOR", etc.
 extern const char* STARTUP_COMPONENTS_COMPONENT_NAME;
@@ -76,7 +79,8 @@ namespace startup_components {
         output.push_back('\n');
 
         std::string build_information = std::string(STARTUP_COMPONENTS_COMPONENT_NAME) + " " +
-            STARTUP_COMPONENTS_BUILD_VERSION + " " + STARTUP_COMPONENTS_BUILD_TYPE;
+            STARTUP_COMPONENTS_BUILD_VERSION + " " + STARTUP_COMPONENTS_BUILD_TYPE + " | " + 
+            STARTUP_COMPONENTS_ADDRESS_SANITIZER_ACTIVE;
 
         append_wrapped_line(output, build_information, header.size());
 

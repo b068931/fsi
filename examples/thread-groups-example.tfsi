@@ -42,7 +42,7 @@ function show-passed-message-and-switch(eight-bytes counter, one-byte is-ping)
     load-value variable memory message;
 
     @repeat;
-    void: prts->io.log.info(variable memory null, immediate eight-bytes d0, variable memory null, variable memory message)
+    void: prts->io.log.info(variable memory null, immediate eight-bytes d0, variable memory null,variable memory null, variable memory message)
 
     compare variable eight-bytes counter, immediate eight-bytes d0;
     jump-equal point end;
@@ -64,7 +64,7 @@ function show-warning()
     warning-message: prts->memory.allocate(size-of eight-bytes warning)
     copy-string variable memory warning-message, string warning;
 
-    void: prts->io.log.warning(variable memory null, immediate eight-bytes d0, variable memory null, variable memory warning-message)
+    void: prts->io.log.warning(variable memory null, immediate eight-bytes d0, variable memory null,variable memory null, variable memory warning-message)
     warning-message: prts->memory.deallocate()
 }
 

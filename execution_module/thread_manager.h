@@ -64,11 +64,14 @@ class thread_manager {
 
             // All other modifications are synchronized with mutexes. This is one just needs atomicity.
             this->active_threads_counter.fetch_add(1, std::memory_order_relaxed);
-            CONTROL_CODE_TEMPLATE_LOAD_PROGRAM(
+            CONTROL_CODE_LOAD_PROGRAM(
                 &thread_structure->execution_thread_state, 
                 currently_running_thread_information->thread_state,
                 currently_running_thread_information->state == scheduler::thread_states::startup
             );
+
+            // Reset execution thread state to default values.
+            backend::get_thread_local_structure()->execution_thread_state = {};
 
             std::size_t previous_active_threads_count = this->active_threads_counter.fetch_sub(1, std::memory_order_relaxed);
             if (currently_running_thread_information->put_back_structure) {

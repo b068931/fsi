@@ -1,5 +1,5 @@
 $stack-size b1000000;
-function main(eight-bytes wrong);
-$main-function main;
-$expose-function main;
-main {;;;};;
+function mainтуті(eight-bytes wrong);
+$main-function mainтуті;
+$expose-function mainтуті;
+mainтуті {;;;};;

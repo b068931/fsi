@@ -33,7 +33,7 @@ namespace {
 #pragma clang diagnostic pop
 
         backend::thread_terminate();
-        CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD(&backend::get_thread_local_structure()->execution_thread_state);
+        CONTROL_CODE_LOAD_EXECUTION_THREAD(&backend::get_thread_local_structure()->execution_thread_state);
     }
 
     void show_error(std::uint64_t error_code) {
@@ -88,25 +88,30 @@ namespace runtime_traps {
         {
         case module_mediator::execution_result_continue:
             backend::program_resume();
-            CONTROL_CODE_TEMPLATE_RESUME_PROGRAM_EXECUTION(backend::get_thread_local_structure()->currently_running_thread_information.thread_state);
+            CONTROL_CODE_RESUME_PROGRAM_EXECUTION(backend::get_thread_local_structure()->currently_running_thread_information.thread_state);
 
         case module_mediator::execution_result_switch:
-            CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD(&backend::get_thread_local_structure()->execution_thread_state);
+            CONTROL_CODE_LOAD_EXECUTION_THREAD(&backend::get_thread_local_structure()->execution_thread_state);
 
         case module_mediator::execution_result_terminate:
             LOG_PROGRAM_INFO(interoperation::get_module_part(), "Requested thread termination.");
 
             backend::thread_terminate();
-            CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD(&backend::get_thread_local_structure()->execution_thread_state);
+            CONTROL_CODE_LOAD_EXECUTION_THREAD(&backend::get_thread_local_structure()->execution_thread_state);
 
         case module_mediator::execution_result_block:
             LOG_PROGRAM_INFO(interoperation::get_module_part(), "Was blocked.");
 
             backend::get_thread_manager().block(backend::get_thread_local_structure()->currently_running_thread_information.thread_id);
-            CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD(&backend::get_thread_local_structure()->execution_thread_state);
+            CONTROL_CODE_LOAD_EXECUTION_THREAD(&backend::get_thread_local_structure()->execution_thread_state);
 
         default:
             LOG_PROGRAM_FATAL(interoperation::get_module_part(), "Incorrect return code. Process will be aborted.");
+
+#ifdef ADDRESS_SANITIZER_ENABLED
+            __asan_handle_no_return();
+#endif
+
             std::terminate();
         }
     }
@@ -119,6 +124,6 @@ namespace runtime_traps {
         }
 
         backend::thread_terminate();
-        CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD(&backend::get_thread_local_structure()->execution_thread_state);
+        CONTROL_CODE_LOAD_EXECUTION_THREAD(&backend::get_thread_local_structure()->execution_thread_state);
     }
 }

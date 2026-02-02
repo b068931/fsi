@@ -21,7 +21,7 @@ function main() {
     message-storage: prts->memory.allocate(size-of eight-bytes message);
     copy-string variable memory message-storage, string message;
 
-    void: prts->io.log.info(variable memory null, immediate eight-bytes d0, variable memory null, variable memory message-storage);
+    void: prts->io.log.info(variable memory null, immediate eight-bytes d0, variable memory null, variable memory null,variable memory message-storage);
     message-storage: prts->memory.deallocate();
 }
 

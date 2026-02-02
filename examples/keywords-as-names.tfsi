@@ -1,7 +1,7 @@
 $stack-size hff;
 from prts import <io.log.info, memory.allocate, memory.deallocate>
 
-$define-string stack-size ''''Hello World! With tons of shady redefinitions.''''
+$define-string stack-size ''''Привіт світе! With tons of shady redefinitions.''''
 $redefine функція function; /*you are allowed to create only new keywords. you cannot remove the old ones, this should not be a problem because you should be able to use a keyword as a name for any program element you want.*/
 $redefine decl declare;
 $redefine strcpy copy-string;
@@ -22,6 +22,7 @@ $redefine strcpy copy-string;
         immediate eight-bytes d0, 
         variable memory copy-string
         , 
+variable memory memory,
         variable memory memory
     );
 

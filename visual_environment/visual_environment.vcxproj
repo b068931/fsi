@@ -131,6 +131,8 @@
       <AdditionalIncludeDirectories>$(VisualLeakDetectorDir)\include;$(QtIncludeDirectory);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>false</TreatWarningAsError>
       <AdditionalOptions>-Wno-unused-command-line-argument -Wno-nonportable-include-path %(AdditionalOptions)</AdditionalOptions>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <AssemblerListingLocation>$(SolutionDir)$(Platform)\$(Configuration)\assembly\$(TargetName).asm</AssemblerListingLocation>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(VisualLeakDetectorDir)\lib\Win64;</AdditionalLibraryDirectories>
@@ -148,6 +150,11 @@
       <AdditionalIncludeDirectories>$(QtIncludeDirectory)</AdditionalIncludeDirectories>
       <TreatWarningAsError>false</TreatWarningAsError>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <AssemblerListingLocation>$(SolutionDir)$(Platform)\$(Configuration)\assembly\$(TargetName).asm</AssemblerListingLocation>
+      <PreprocessorDefinitions>ADDRESS_SANITIZER_ENABLED;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <QtTranslation>
       <BuildAction>lupdate_lrelease</BuildAction>
@@ -164,6 +171,8 @@
       <AdditionalIncludeDirectories>$(QtIncludeDirectory)</AdditionalIncludeDirectories>
       <TreatWarningAsError>false</TreatWarningAsError>
       <AdditionalOptions>-Wno-unused-command-line-argument -Wno-nonportable-include-path %(AdditionalOptions)</AdditionalOptions>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <AssemblerListingLocation>$(SolutionDir)$(Platform)\$(Configuration)\assembly\$(TargetName).asm</AssemblerListingLocation>
     </ClCompile>
     <QtTranslation>
       <BuildAction>lupdate_lrelease</BuildAction>
@@ -181,6 +190,8 @@
       <TreatWarningAsError>false</TreatWarningAsError>
       <AdditionalOptions>-Wno-unused-command-line-argument -Wno-nonportable-include-path %(AdditionalOptions)</AdditionalOptions>
       <PreprocessorDefinitions>APPLICATION_RELEASE;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <AssemblerListingLocation>$(SolutionDir)$(Platform)\$(Configuration)\assembly\$(TargetName).asm</AssemblerListingLocation>
     </ClCompile>
     <QtTranslation>
       <BuildAction>lupdate_lrelease</BuildAction>
