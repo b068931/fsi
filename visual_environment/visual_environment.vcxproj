@@ -133,6 +133,7 @@
       <AdditionalOptions>-Wno-unused-command-line-argument -Wno-nonportable-include-path %(AdditionalOptions)</AdditionalOptions>
       <AssemblerOutput>NoListing</AssemblerOutput>
       <AssemblerListingLocation>$(SolutionDir)$(Platform)\$(Configuration)\assembly\$(TargetName).asm</AssemblerListingLocation>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(VisualLeakDetectorDir)\lib\Win64;</AdditionalLibraryDirectories>
@@ -155,6 +156,7 @@
       <AssemblerOutput>NoListing</AssemblerOutput>
       <AssemblerListingLocation>$(SolutionDir)$(Platform)\$(Configuration)\assembly\$(TargetName).asm</AssemblerListingLocation>
       <PreprocessorDefinitions>ADDRESS_SANITIZER_ENABLED;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <QtTranslation>
       <BuildAction>lupdate_lrelease</BuildAction>
@@ -173,6 +175,7 @@
       <AdditionalOptions>-Wno-unused-command-line-argument -Wno-nonportable-include-path %(AdditionalOptions)</AdditionalOptions>
       <AssemblerOutput>NoListing</AssemblerOutput>
       <AssemblerListingLocation>$(SolutionDir)$(Platform)\$(Configuration)\assembly\$(TargetName).asm</AssemblerListingLocation>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <QtTranslation>
       <BuildAction>lupdate_lrelease</BuildAction>
@@ -192,6 +195,7 @@
       <PreprocessorDefinitions>APPLICATION_RELEASE;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AssemblerOutput>NoListing</AssemblerOutput>
       <AssemblerListingLocation>$(SolutionDir)$(Platform)\$(Configuration)\assembly\$(TargetName).asm</AssemblerListingLocation>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <QtTranslation>
       <BuildAction>lupdate_lrelease</BuildAction>

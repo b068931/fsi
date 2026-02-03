@@ -106,6 +106,7 @@
       <AdditionalOptions>-Wno-c++20-compat -Wno-pre-c++20-compat -Wno-pre-c++20-compat-pedantic -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-unsafe-buffer-usage -Wno-ctad-maybe-unsupported -Wno-cast-function-type-strict -Wno-exit-time-destructors -Wno-global-constructors </AdditionalOptions>
       <AssemblerOutput>NoListing</AssemblerOutput>
       <AssemblerListingLocation>$(SolutionDir)$(Platform)\$(Configuration)\assembly\$(TargetName).asm</AssemblerListingLocation>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -127,6 +128,7 @@
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
       <AssemblerOutput>NoListing</AssemblerOutput>
       <AssemblerListingLocation>$(SolutionDir)$(Platform)\$(Configuration)\assembly\$(TargetName).asm</AssemblerListingLocation>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -181,6 +183,7 @@
       <AdditionalOptions>-Wno-c++20-compat -Wno-pre-c++20-compat -Wno-pre-c++20-compat-pedantic -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-unsafe-buffer-usage -Wno-ctad-maybe-unsupported -Wno-cast-function-type-strict -Wno-exit-time-destructors -Wno-global-constructors </AdditionalOptions>
       <AssemblerOutput>NoListing</AssemblerOutput>
       <AssemblerListingLocation>$(SolutionDir)$(Platform)\$(Configuration)\assembly\$(TargetName).asm</AssemblerListingLocation>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -206,6 +209,7 @@
       <AdditionalOptions>-Wno-c++20-compat -Wno-pre-c++20-compat -Wno-pre-c++20-compat-pedantic -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-unsafe-buffer-usage -Wno-ctad-maybe-unsupported -Wno-cast-function-type-strict -Wno-exit-time-destructors -Wno-global-constructors </AdditionalOptions>
       <AssemblerOutput>NoListing</AssemblerOutput>
       <AssemblerListingLocation>$(SolutionDir)$(Platform)\$(Configuration)\assembly\$(TargetName).asm</AssemblerListingLocation>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
