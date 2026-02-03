@@ -7,6 +7,8 @@
 #include "runtime_traps.h"
 #include "unwind_info.h"
 
+#include "../startup_components/local_crash_handlers.h"
+
 namespace {
     module_mediator::module_part* part = nullptr;
     thread_manager* manager = nullptr;
@@ -215,7 +217,7 @@ void initialize_m(module_mediator::module_part* module_part) {
             runtime_verification_result.value());
 
         // There isn't much we can do if this fails.
-        std::terminate();
+        ENVIRONMENT_REQUEST_TERMINATION();
     }
 
     logger_module::global_logging_instance::set_logging_enabled(true);

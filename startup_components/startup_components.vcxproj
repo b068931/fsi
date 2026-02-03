@@ -102,7 +102,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ADDRESS_SANITIZER_ENABLED;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <TreatWarningAsError>false</TreatWarningAsError>
@@ -150,9 +150,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="build_dump.cpp" />
+    <ClCompile Include="global_crash_handler.cpp" />
     <ClCompile Include="unicode_main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="global_crash_handler.h" />
+    <ClInclude Include="local_crash_handlers.h" />
     <ClInclude Include="startup_definitions.h" />
     <ClInclude Include="unicode_punning.h" />
   </ItemGroup>

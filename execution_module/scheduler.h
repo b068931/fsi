@@ -6,6 +6,7 @@
 #include "priority_list.h"
 
 #include "../module_mediator/module_part.h"
+#include "../startup_components/local_crash_handlers.h"
 
 class scheduler {
 public:
@@ -552,7 +553,7 @@ public:
         std::scoped_lock clock_list_lock{ this->clock_list_mutex };
         if (!this->threads_hash_table.empty() || !this->thread_groups_hash_table.empty()) {
             // Make a panic shutdown if hash tables got out of sync
-            std::terminate();
+            ENVIRONMENT_REQUEST_TERMINATION();
         }
 
         this->shutdown_sequence = true;

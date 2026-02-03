@@ -85,10 +85,14 @@ private:
     }
 
     static std::uint8_t convert_type_to_uint8(source_file_token token_type) {
+#ifdef __clang__
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wswitch"
 #pragma clang diagnostic ignored "-Wswitch-enum"
 #pragma clang diagnostic ignored "-Wswitch-default"
+
+#endif
 
         std::uint8_t type = 0;
         switch (token_type) {  // NOLINT(clang-diagnostic-switch-enum)
@@ -111,7 +115,11 @@ private:
             default: break;
         }
 
+#ifdef __clang__
+
 #pragma clang diagnostic pop
+
+#endif
 
         return type;
     }

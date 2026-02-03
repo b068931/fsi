@@ -6,8 +6,12 @@
 
 #define FSI_PROJECT_VERSION "2.0.0"
 
+#ifdef __clang__
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdate-time"
+
+#endif
 
 extern const char* STARTUP_COMPONENTS_COMPONENT_BUILD_TIME;
 const char* STARTUP_COMPONENTS_COMPONENT_BUILD_TIME = __DATE__ " " __TIME__;
@@ -69,6 +73,10 @@ const std::string STARTUP_COMPONENTS_COMPILER_INFORMATION = "UNKNOWN COMPILER";
     namespace startup_components { extern int u8main(int, char**); } \
     int startup_components::u8main(int ARGUMENTS_COUNT_NAME, char** ARGUMENTS_VALUES_NAME)
 
+#ifdef __clang__
+
 #pragma clang diagnostic pop
+
+#endif
 
 #endif

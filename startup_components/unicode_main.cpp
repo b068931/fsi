@@ -1,6 +1,8 @@
 #ifdef __clang__
+
 #pragma clang diagnostic push 
 #pragma clang diagnostic ignored "-Wreserved-identifier"
+
 #endif
 
 #define NOMINMAX
@@ -9,7 +11,9 @@
 #include <Windows.h>
 
 #ifdef __clang__
+
 #pragma clang diagnostic pop
+
 #endif
 
 #include <clocale>
@@ -20,6 +24,8 @@
 #include <cwchar>
 #include <variant>
 #include <format>
+
+#include "global_crash_handler.h"
 
 using error_type = std::string;
 
@@ -195,6 +201,11 @@ namespace {
 // However, working with wide characters is a pain, so we convert the wide character
 // array to UTF-8 and call u8main instead.
 int wmain(int arguments_count, wchar_t** arguments) {
+    if (!startup_components::crash_handling::install_global_crash_handler()) {
+        std::cerr << "Failed to install global crash handler. "
+            "The application will not be able to generate crash dumps on unhandled exceptions.\n";
+    }
+
     // Notify UCRT that we are going to use UTF-8 encoding for string functions.
     const char* locale_information = std::setlocale(LC_ALL, ".UTF-8");
     if (locale_information == nullptr) {

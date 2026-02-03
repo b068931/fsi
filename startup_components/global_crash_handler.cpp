@@ -1,10 +1,14 @@
+#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+
 #include <cstdlib>
 #include <cstdint>
 #include <iterator>
 #include <utility>
 #include <limits>
 
-#include "global_crash_handle_setup.h"
+#include "global_crash_handler.h"
 
 // Handle SEH exceptions
 namespace {
@@ -185,13 +189,24 @@ namespace {
     }
 }
 
-BOOL InstallGlobalCrashHandler() {
-    ULONG ulDesiredStackSize = 8192;
-    BOOL bResult = SetThreadStackGuarantee(&ulDesiredStackSize);
-    if (!bResult) {
-        return FALSE;
+namespace startup_components::crash_handling {
+    bool install_global_crash_handler() {
+        ULONG ulDesiredStackSize = 8192;
+        BOOL bResult = SetThreadStackGuarantee(&ulDesiredStackSize);
+        if (!bResult) {
+            return FALSE;
+        }
+
+        g_pPreviousFilter = SetUnhandledExceptionFilter(NotifyFatalUnhandledSEH);
+        if (g_pPreviousFilter == &NotifyFatalUnhandledSEH) {
+            g_pPreviousFilter = nullptr;
+        }
+
+        return TRUE;
     }
 
-    g_pPreviousFilter = SetUnhandledExceptionFilter(NotifyFatalUnhandledSEH);
-    return TRUE;
+    void remove_global_crash_handler() {
+        SetUnhandledExceptionFilter(g_pPreviousFilter);
+        g_pPreviousFilter = nullptr;
+    }
 }

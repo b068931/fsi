@@ -10,6 +10,7 @@
 #include <iostream>
 
 #include "module_part.h"
+#include "../startup_components/local_crash_handlers.h"
 
 namespace module_mediator::parser::components {
     using module_callable_function_type = return_value(*)(arguments_string_type);
@@ -124,7 +125,7 @@ namespace module_mediator::parser::components {
                 std::cerr << "Unable to load one of the modules. Process will be aborted."
                     << " (Path: " << module_path << ')' << '\n';
 
-                std::terminate();
+                ENVIRONMENT_REQUEST_TERMINATION();
             }
         }
 
@@ -140,7 +141,7 @@ namespace module_mediator::parser::components {
                     std::cerr << "Unable to correctly dispose one of the modules. Process will be aborted."
                         << " (Name: " << this->name << ')' << '\n';
 
-                    std::terminate();
+                    ENVIRONMENT_REQUEST_TERMINATION();
                 }
             }
         }
@@ -151,7 +152,7 @@ namespace module_mediator::parser::components {
                 std::cerr << "One of the modules does not define the initialize_m function. Process will be aborted."
                     << "(Name: " << this->name << ')' << '\n';
 
-                std::terminate();  
+                ENVIRONMENT_REQUEST_TERMINATION();
             }
             
             std::bit_cast<void(*)(module_part*)>(initialize)(mediator); // NOLINT(bugprone-bitwise-pointer-cast)

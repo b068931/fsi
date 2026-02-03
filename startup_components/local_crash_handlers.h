@@ -1,5 +1,9 @@
-#ifndef CRT_LOCAL_CRASH_HANDLE_SETUP_H
-#define CRT_LOCAL_CRASH_HANDLE_SETUP_H
+#ifndef STARTUP_COMPONENTS_LOCAL_CRASH_HANDLERS_H
+#define STARTUP_COMPONENTS_LOCAL_CRASH_HANDLERS_H
+
+#ifdef ADDRESS_SANITIZER_ENABLED
+#include <sanitizer/asan_interface.h>
+#endif
 
 // ReSharper disable CppClangTidyBugproneEmptyCatch
 #if defined(_DEBUG) && defined(_MSC_VER)
@@ -10,9 +14,10 @@
 #include <iostream>
 #include <syncstream>
 #include <atomic>
+#include <new>
 
 // Handle std::terminate
-namespace module_mediator::crash_handling {
+namespace startup_components::crash_handling {
     inline std::atomic<std::terminate_handler> previous_terminate_handler = nullptr;
     [[noreturn]] inline void notify_fatal_termination() {
         try { // Ensure that the error stream is flushed
@@ -51,14 +56,39 @@ namespace module_mediator::crash_handling {
             current_handler();
         }
 
+#ifdef ADDRESS_SANITIZER_ENABLED
+        __asan_handle_no_return();
+#endif
+
         // Technically useless because previous handler should terminate the process, but just in case.
         std::abort(); 
+    }
+
+    inline std::atomic<std::new_handler> previous_new_handler = nullptr;
+    inline void notify_error_no_memory() {
+        try {
+            std::osyncstream synchronized_error_stream{ std::cerr };
+            synchronized_error_stream << "*** ERROR: OUT OF MEMORY\n";
+        }
+        catch (...) {}
+
+        // This handler is different from others, because it does not cause termination.
+        // Old handler, however, may throw std::bad_alloc or terminate the process.
+        std::new_handler current_handler = previous_new_handler.load(std::memory_order_relaxed);
+        if (current_handler && current_handler != &notify_error_no_memory) {
+            current_handler();
+        }
+        else {
+            // If there is no previous handler, reset to default behavior, which
+            // is to throw std::bad_alloc.
+            std::set_new_handler(nullptr);
+        }
     }
 }
 
 // Handle CRT specific errors
 #ifdef _MSC_VER
-namespace module_mediator::crash_handling {
+namespace startup_components::crash_handling {
     inline std::atomic<_purecall_handler> previous_pure_call_handler = nullptr;
     [[noreturn]] inline void notify_fatal_pure_call() {
         try {
@@ -71,6 +101,10 @@ namespace module_mediator::crash_handling {
         if (current_handler && current_handler != &notify_fatal_pure_call) {
             current_handler();
         }
+
+#ifdef ADDRESS_SANITIZER_ENABLED
+        __asan_handle_no_return();
+#endif
 
         std::terminate();
     }
@@ -106,20 +140,30 @@ namespace module_mediator::crash_handling {
             current_handler(expression, function, file, line, reserved);
         }
 
+#ifdef ADDRESS_SANITIZER_ENABLED
+        __asan_handle_no_return();
+#endif
+
         std::terminate();
     }
 }
 #endif // _MSC_VER
 
-namespace module_mediator::crash_handling {
-    inline void install_crash_handlers() {
+namespace startup_components::crash_handling {
+    inline void install_local_crash_handlers() {
         std::terminate_handler terminate_old = std::set_terminate(notify_fatal_termination);
         if (terminate_old != &notify_fatal_termination) {
             previous_terminate_handler.store(terminate_old, std::memory_order_relaxed);
         }
 
+        std::new_handler new_handler_old = std::set_new_handler(notify_error_no_memory);
+        if (new_handler_old != &notify_error_no_memory) {
+            previous_new_handler.store(new_handler_old, std::memory_order_relaxed);
+        }
+
 #ifdef _MSC_VER
-        _purecall_handler pure_call_old= _set_purecall_handler(notify_fatal_pure_call);
+
+        _purecall_handler pure_call_old = _set_purecall_handler(notify_fatal_pure_call);
         if (pure_call_old != &notify_fatal_pure_call) {
             previous_pure_call_handler.store(pure_call_old, std::memory_order_relaxed);
         }
@@ -128,12 +172,44 @@ namespace module_mediator::crash_handling {
         if (invalid_parameter_old != &notify_fatal_invalid_parameter) {
             previous_invalid_parameter_handler.store(invalid_parameter_old, std::memory_order_relaxed);
         }
+
 #endif
 
 #if defined(_DEBUG) && defined(_MSC_VER)
     _CrtSetReportMode(_CRT_ASSERT, 0);
 #endif
     }
+
+    inline void remove_local_crash_handlers() {
+        std::set_terminate(previous_terminate_handler.load(std::memory_order_relaxed));
+        previous_terminate_handler.store(nullptr, std::memory_order_relaxed);
+
+        std::set_new_handler(previous_new_handler.load(std::memory_order_relaxed));
+        previous_new_handler.store(nullptr, std::memory_order_relaxed);
+
+#ifdef _MSC_VER
+
+        _set_purecall_handler(previous_pure_call_handler.load(std::memory_order_relaxed));
+        previous_pure_call_handler.store(nullptr, std::memory_order_relaxed);
+
+        _set_invalid_parameter_handler(previous_invalid_parameter_handler.load(std::memory_order_relaxed));
+        previous_invalid_parameter_handler.store(nullptr, std::memory_order_relaxed);
+
+#endif
+    }
 }
+
+#ifdef ADDRESS_SANITIZER_ENABLED
+
+#define ENVIRONMENT_REQUEST_TERMINATION() \
+    __asan_handle_no_return(); \
+    std::terminate()
+
+#else
+
+#define ENVIRONMENT_REQUEST_TERMINATION() \
+    std::terminate()
+
+#endif
 
 #endif

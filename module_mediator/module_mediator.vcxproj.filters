@@ -21,9 +21,6 @@
     <Filter Include="Source Files\Module File Parsing">
       <UniqueIdentifier>{33e14a88-65bc-4ce9-af82-f7157ffda10e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Crash Handling">
-      <UniqueIdentifier>{7375ddab-72f4-4e7b-b0a2-d7fa620ba5fc}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{c1e65c45-f850-4563-bf89-1fe8de0136d0}</UniqueIdentifier>
     </Filter>
@@ -37,9 +34,6 @@
     </ClCompile>
     <ClCompile Include="parser_options.cpp">
       <Filter>Source Files\Module File Parsing</Filter>
-    </ClCompile>
-    <ClCompile Include="crash_handle_setup.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -72,12 +66,6 @@
     </ClInclude>
     <ClInclude Include="parser_options.h">
       <Filter>Header Files\Module File Parsing</Filter>
-    </ClInclude>
-    <ClInclude Include="global_crash_handle_setup.h">
-      <Filter>Header Files\Crash Handling</Filter>
-    </ClInclude>
-    <ClInclude Include="local_crash_handle_setup.h">
-      <Filter>Header Files\Crash Handling</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>

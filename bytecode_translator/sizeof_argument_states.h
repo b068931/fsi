@@ -46,8 +46,12 @@ public:
             }
         }
 
+#ifdef __clang__
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wswitch-enum"
+
+#endif
 
         switch (element_token) {
         case source_file_token::one_byte_type_keyword:
@@ -77,7 +81,11 @@ public:
             return;
         }
 
+#ifdef __clang__
+
 #pragma clang diagnostic pop
+
+#endif
 
         helper.active_function.get_last_instruction().immediates.back().imm_val = element_size;
     }

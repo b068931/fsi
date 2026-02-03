@@ -295,8 +295,12 @@ namespace generic_parser {
             return redirection_information_type{ nullptr, state_action::no_action };
         }
         void choose_action(const redirection_information_type& redirection) {
+#ifdef __clang__
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wswitch-default"
+
+#endif
 
             switch (redirection.second) {
             case state_action::push_state:
@@ -316,7 +320,11 @@ namespace generic_parser {
             case state_action::no_action: break;
             }
 
+#ifdef __clang__
+
 #pragma clang diagnostic pop
+
+#endif
         }
 
     public:

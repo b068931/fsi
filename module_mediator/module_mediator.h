@@ -14,6 +14,7 @@
 
 #include "../logger_module/logging.h"
 #include "../generic_parser/parser_facade.h"
+#include "../startup_components/local_crash_handlers.h"
 
 /*
 * "When an evaluation of an expression writes to a memory location and another evaluation reads or modifies
@@ -85,7 +86,7 @@ namespace module_mediator {
                         "*** CALL_MODULE FAILED. ERROR:\n{}", 
                         exc.what()) << '\n';
 
-                    std::terminate();
+                    ENVIRONMENT_REQUEST_TERMINATION();
                 }
             }
 

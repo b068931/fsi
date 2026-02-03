@@ -20,14 +20,13 @@
 
 #include "fsi_types.h"
 #include "module_mediator.h"
-#include "local_crash_handle_setup.h"
-#include "global_crash_handle_setup.h"
 
 #include "../logger_module/logging.h"
 #include "../compression_algorithms/static_huffman.h"
 #include "../compression_algorithms/sequence_reduction.h"
 #include "../startup_components/startup_definitions.h"
 #include "../startup_components/unicode_punning.h"
+#include "../startup_components/local_crash_handlers.h"
 
 namespace {
     // Decompresses the bytecode from memory and stores that in a temporary file.
@@ -189,6 +188,10 @@ namespace {
 //       Must also document this pattern somewhere.
 
 APPLICATION_ENTRYPOINT(LOGGER_MODULE_EMITTER_MODULE_NAME, FSI_PROJECT_VERSION, argc, argv) {
+    // Funnily enough, CRT maintains std::set_terminate function on a per-thread basis.
+    // So we need to call this in each thread that the program uses.
+    crash_handling::install_local_crash_handlers();
+
     if (argc != 4) {
         std::cerr << "You need to provide three arguments: text file with the modules descriptions, executors count and a compiled file." <<
             '\n';
@@ -199,14 +202,6 @@ APPLICATION_ENTRYPOINT(LOGGER_MODULE_EMITTER_MODULE_NAME, FSI_PROJECT_VERSION, a
         if (!SetConsoleCtrlHandler(CtrlHandler, TRUE)) {
             std::cerr << "Failed to set control handler. "
                          "This may degrade user experience in fsi-visual-environment.\n";
-        }
-
-        // Funnily enough, CRT maintains std::set_terminate function on a per-thread basis.
-        // So we need to call this in each thread that the program uses.
-        module_mediator::crash_handling::install_crash_handlers();
-        if (!InstallGlobalCrashHandler()) {
-           std::cerr << "Failed to install global crash handler." \
-            " This may slightly impede reporting some types of fatal errors." << '\n';
         }
 
         std::filesystem::path modules_descriptor_file{ 

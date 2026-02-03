@@ -1,6 +1,15 @@
 $if-not-defined UKRAINIAN-KEYWORDS-DEFINITIONS-LIBRARY;
 $define UKRAINIAN-KEYWORDS-DEFINITIONS-LIBRARY;
 
+/*
+ * The bytecode translator does not actually support UTF-8.
+ * Instead, it treats all data as raw bytes. Partial support for Unicode through
+ * UTF-8 encoding is possible because it is compatible with ASCII. However, if files
+ * happen to use different normalizations of Unicode, it may lead to issues. For example,
+ * you may have two characters that look identical but are represented by different byte sequences.
+ * And the translator will treat them as different characters.
+ */
+
 $redefine з-модуля from;
 $redefine імпортувати import;
 $redefine функція function;

@@ -30,6 +30,7 @@
 #include "../compression_algorithms/sequence_reduction.h"
 #include "../startup_components/startup_definitions.h"
 #include "../startup_components/unicode_punning.h"
+#include "../startup_components/local_crash_handlers.h"
 
 namespace {
     bool verify_program(const structure_builder::file& parser_value) {
@@ -171,6 +172,8 @@ namespace {
 }
 
 APPLICATION_ENTRYPOINT("BYTECODE TRANSLATOR", FSI_PROJECT_VERSION, argc, argv) {
+    crash_handling::install_local_crash_handlers();
+
     auto start_time = std::chrono::high_resolution_clock::now();
     if (argc != 4) {
         std::cout << "Provide the name of the file to compile and its output destination. And add 'include-debug' or 'no-debug' at the end. It is only three arguments." <<

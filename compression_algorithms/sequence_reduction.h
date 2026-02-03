@@ -230,12 +230,20 @@ namespace compression_algorithms {
                     for (auto work_begin = working_place_begin; work_begin != write; ++work_begin, ++out) {
                         unsigned char symbol = *work_begin;
 
+#ifdef __clang__
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wsign-conversion"
 
+#endif
+
                         *out = symbol;
 
+#ifdef __clang__
+
 #pragma clang diagnostic pop
+
+#endif
 
                         *buffer_iterator = symbol;
                         ++buffer_iterator;
@@ -259,12 +267,20 @@ namespace compression_algorithms {
                     for (auto work_begin = working_place_begin; work_begin != write; ++work_begin, ++out) {
                         unsigned char symbol = *work_begin;
 
+#ifdef __clang__
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wsign-conversion"
 
+#endif
+
                         *out = symbol;
 
+#ifdef __clang__
+
 #pragma clang diagnostic pop
+
+#endif
 
                         *buffer_iterator = symbol;
                         ++buffer_iterator;

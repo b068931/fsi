@@ -22,11 +22,13 @@
 #include "background_service.h"
 
 #include "../startup_components/startup_definitions.h"
+#include "../startup_components/local_crash_handlers.h"
 
 // TODO: Consider adding command line arguments for opening specific files at startup.
 
 APPLICATION_ENTRYPOINT("VISUAL ENVIRONMENT", FSI_PROJECT_VERSION, argc, argv) {
     assert(argc > 0 && "Must contain at least one argument.");
+    crash_handling::install_local_crash_handlers();
 
     constexpr char applicationBaseStyle[]{ "Fusion" };
     constexpr char fontsRootDirectory[]{ ":/fonts" };

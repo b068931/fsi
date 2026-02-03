@@ -8,11 +8,16 @@
 
 #include "../logger_module/logging.h"
 #include "../program_loader/program_termination_codes.h"
+#include "../startup_components/local_crash_handlers.h"
 
 namespace {
     [[noreturn]] void call_module_error(module_mediator::module_part::call_error error) {
+#ifdef __clang__
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wswitch-default"
+
+#endif
 
         switch (error) {
         case module_mediator::module_part::call_error::function_is_not_visible:
@@ -27,18 +32,28 @@ namespace {
             LOG_PROGRAM_ERROR(interoperation::get_module_part(), "Module function does not exist. Thread terminated.");
             break;
 
-        case module_mediator::module_part::call_error::no_error: break;
+        case module_mediator::module_part::call_error::no_error: 
+            LOG_PROGRAM_WARNING(interoperation::get_module_part(), "call_module_error was called, but no error occurred.");
+            break;
         }
 
+#ifdef __clang__
+
 #pragma clang diagnostic pop
+
+#endif
 
         backend::thread_terminate();
         CONTROL_CODE_LOAD_EXECUTION_THREAD(&backend::get_thread_local_structure()->execution_thread_state);
     }
 
     void show_error(std::uint64_t error_code) {
+#ifdef __clang__
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wcovered-switch-default"
+
+#endif
 
         switch (static_cast<program_loader::termination_codes>(error_code)) {
         case program_loader::termination_codes::stack_overflow:
@@ -67,10 +82,14 @@ namespace {
 
         default:  // NOLINT(clang-diagnostic-covered-switch-default)
             LOG_PROGRAM_FATAL(interoperation::get_module_part(), "Unknown termination code. The process will be terminated.");
-            std::terminate();
+            ENVIRONMENT_REQUEST_TERMINATION();
         }
 
+#ifdef __clang__
+
 #pragma clang diagnostic pop
+
+#endif
 
         LOG_PROGRAM_ERROR(interoperation::get_module_part(), "Program execution error. Thread terminated.");
     }
@@ -107,12 +126,7 @@ namespace runtime_traps {
 
         default:
             LOG_PROGRAM_FATAL(interoperation::get_module_part(), "Incorrect return code. Process will be aborted.");
-
-#ifdef ADDRESS_SANITIZER_ENABLED
-            __asan_handle_no_return();
-#endif
-
-            std::terminate();
+            ENVIRONMENT_REQUEST_TERMINATION();
         }
     }
 

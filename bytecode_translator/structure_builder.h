@@ -526,10 +526,14 @@ public:
             .get_parameters_container()
             .retrieve_parameter<std::pair<bool, std::string>>(parameters_enumeration::inside_comment);
 
+#ifdef __clang__
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wswitch"
 #pragma clang diagnostic ignored "-Wswitch-enum"
 #pragma clang diagnostic ignored "-Wswitch-default"
+
+#endif
 
         switch (token) {  // NOLINT(clang-diagnostic-switch)
             case source_file_token::comment_start: {
@@ -561,7 +565,11 @@ public:
             }
         }
 
+#ifdef __clang__
+
 #pragma clang diagnostic pop
+
+#endif
 
         if (just_left_comment) {
             just_left_comment = false;

@@ -7,7 +7,7 @@
 #include "execution_backend_functions.h"
 
 #include "../logger_module/logging.h"
-#include "../module_mediator/local_crash_handle_setup.h"
+#include "../startup_components/local_crash_handlers.h"
 
 class thread_manager {
     /*
@@ -23,7 +23,7 @@ class thread_manager {
 
     void executor_thread(module_mediator::return_value executor_id) {
         // These must be installed on a per-thread basis.
-        module_mediator::crash_handling::install_crash_handlers();
+        startup_components::crash_handling::install_local_crash_handlers();
 
         LOG_INFO(
             interoperation::get_module_part(), 

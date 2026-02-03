@@ -15,8 +15,12 @@ namespace {
     };
 
     void decode_message_type(message_type type, std::osyncstream& synchronized_logger) {
+#ifdef __clang__
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wswitch-default"
+
+#endif
 
         synchronized_logger << '[';
         switch (type) {
@@ -37,7 +41,11 @@ namespace {
             break;
         }
 
+#ifdef __clang__
+
 #pragma clang diagnostic pop
+
+#endif
 
         synchronized_logger << ']';
     }

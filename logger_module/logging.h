@@ -19,6 +19,7 @@
 
 #include "../module_mediator/fsi_types.h"
 #include "../module_mediator/module_part.h"
+#include "../startup_components/local_crash_handlers.h"
 
 #define ONLY_FILE_NAME strrchr("\\" __FILE__, '\\') + 1 
 
@@ -63,7 +64,7 @@ namespace logger_module {
         static std::size_t logger = part->find_module_index("logger");
         if (logger == module_mediator::module_part::module_not_found) {
             std::cerr << "One of the modules uses logging. 'logger' was not found. Terminating the process." << '\n';
-            std::terminate();
+            ENVIRONMENT_REQUEST_TERMINATION();
         }
 
         static std::size_t info = part->find_function_index(logger, "info");
@@ -82,7 +83,7 @@ namespace logger_module {
         std::size_t log_type = logger_indexes[message_type];
         if (log_type == module_mediator::module_part::function_not_found) {
             std::cerr << "One of the required logging functions was not found. Terminating the process." << '\n';
-            std::terminate();
+            ENVIRONMENT_REQUEST_TERMINATION();
         }
 
         module_mediator::fast_call<

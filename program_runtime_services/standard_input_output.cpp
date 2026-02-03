@@ -3,7 +3,7 @@
 #include "backend_functions.h"
 
 #include "../logger_module/logging.h"
-#include "../module_mediator/local_crash_handle_setup.h"
+#include "../startup_components/local_crash_handlers.h"
 
 // This file describes IO logic for the FSI programs through PRTS (Program RunTime Services) module.
 // I use global variables because they are isolated to this cpp file, they cannot be accessed elsewhere.
@@ -140,8 +140,12 @@ namespace {
                     return { {}, true };
                 }
 
+#ifdef __clang__
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wtautological-constant-out-of-range-compare"
+
+#endif
 
                 WORD dwTotalTextSize = 0;
                 for (DWORD dwInputBufferIndex = 0; dwInputBufferIndex < dwReadEvents; ++dwInputBufferIndex) {
@@ -158,7 +162,11 @@ namespace {
                     }
                 }
 
+#ifdef __clang__
+
 #pragma clang diagnostic pop
+
+#endif
 
                 if (dwTotalTextSize > 0) {
                     DWORD dwTextRead = 0;
@@ -919,7 +927,7 @@ namespace {
     std::thread input_worker_thread{};
     void input_worker(HANDLE hStdIn, HANDLE hCancelIO) {
         // We can't call this after LOG_* function, because it might fail.
-        module_mediator::crash_handling::install_crash_handlers();
+        startup_components::crash_handling::install_local_crash_handlers();
 
         LOG_INFO(
             interoperation::get_module_part(),
@@ -1034,7 +1042,7 @@ namespace {
     std::thread output_worker_thread{};
     void output_worker(HANDLE hStdOut, HANDLE hCancelIO) {
         // We can't call this after LOG_* function, because it might fail.
-        module_mediator::crash_handling::install_crash_handlers();
+        startup_components::crash_handling::install_local_crash_handlers();
 
         LOG_INFO(
             interoperation::get_module_part(),

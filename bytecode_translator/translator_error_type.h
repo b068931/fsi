@@ -30,8 +30,12 @@ enum class translator_error_type {
     unknown_instruction
 };
 
+#ifdef __clang__
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wswitch-default"
+
+#endif
 
 inline void translate_error(translator_error_type error, std::ostream& stream) {
     switch (error) {
@@ -142,6 +146,10 @@ inline void translate_error(translator_error_type error, std::ostream& stream) {
     }
 }
 
+#ifdef __clang__
+
 #pragma clang diagnostic pop
+
+#endif
 
 #endif

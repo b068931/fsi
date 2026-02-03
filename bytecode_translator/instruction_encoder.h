@@ -13,10 +13,14 @@ class instruction_encoder : public structure_builder::variable_visitor {
 
     instruction_encoder() = default;
     static std::uint8_t convert_type_to_uint8(source_file_token token_type) {
+#ifdef __clang__
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wswitch"
 #pragma clang diagnostic ignored "-Wswitch-enum"
 #pragma clang diagnostic ignored "-Wswitch-default"
+
+#endif
 
         std::uint8_t type = 0;
         switch (token_type) {  // NOLINT(clang-diagnostic-switch-enum)
@@ -46,7 +50,11 @@ class instruction_encoder : public structure_builder::variable_visitor {
             }
         }
 
+#ifdef __clang__
+
 #pragma clang diagnostic pop
+
+#endif
 
         return type;
     }
@@ -107,10 +115,14 @@ public:
     }
 
     void visit(source_file_token active_type, const structure_builder::immediate_variable* variable, bool) override {
+#ifdef __clang__
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wswitch"
 #pragma clang diagnostic ignored "-Wswitch-enum"
 #pragma clang diagnostic ignored "-Wswitch-default"
+
+#endif
 
         this->encode_active_type(convert_type_to_uint8(active_type), 0b01);
         // ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
@@ -134,7 +146,11 @@ public:
             }
         }
 
+#ifdef __clang__
+
 #pragma clang diagnostic pop
+
+#endif
     }
 
     void visit(source_file_token, const structure_builder::function_address* variable, bool) override {

@@ -9,6 +9,8 @@
 #include <type_traits>
 #include <functional>
 
+#include "../startup_components/local_crash_handlers.h"
+
 namespace Utility {
     /// <summary>
     /// A container class for the QObject that should be moved to a separate thread and
@@ -32,6 +34,9 @@ namespace Utility {
               backgroundThread(new QThread)
         {
             this->service->moveToThread(this->backgroundThread.get());
+            QMetaObject::invokeMethod(this->service.get(), [] {
+                startup_components::crash_handling::install_local_crash_handlers();
+            }, Qt::QueuedConnection);
         }
 
         // Tries to gracefully stop the thread, waiting up to 5 seconds for it to finish.
@@ -101,9 +106,9 @@ namespace Utility {
         void send(
             std::function<void(ContainedQObjectType*)> action
         ) {
-            QMetaObject::invokeMethod(this->service.get(), [this, &action] {
+            QMetaObject::invokeMethod(this->service.get(), [this, action] {
                 action(this->service.get());
-            }, Qt::BlockingQueuedConnection);
+            }, Qt::QueuedConnection);
         }
 
         /// <summary>

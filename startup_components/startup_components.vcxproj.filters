@@ -9,12 +9,18 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
+    <Filter Include="Header Files\Crash Handling">
+      <UniqueIdentifier>{4f2bb865-ac3d-4779-b908-9e5be1720a70}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="unicode_main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="build_dump.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="global_crash_handler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -24,6 +30,12 @@
     </ClInclude>
     <ClInclude Include="unicode_punning.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="global_crash_handler.h">
+      <Filter>Header Files\Crash Handling</Filter>
+    </ClInclude>
+    <ClInclude Include="local_crash_handlers.h">
+      <Filter>Header Files\Crash Handling</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

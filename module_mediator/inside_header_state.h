@@ -15,10 +15,14 @@ namespace module_mediator::parser::states {
                 read_map.exit_with_error("You can not define the entire module as 'visible'.");
             }
 
+#ifdef __clang__
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wswitch"
 #pragma clang diagnostic ignored "-Wswitch-enum"
 #pragma clang diagnostic ignored "-Wswitch-default"
+
+#endif
 
             switch (read_map.get_current_token()) {
             case components::engine_module_builder::file_tokens::name_and_public_name_separator:
@@ -35,8 +39,11 @@ namespace module_mediator::parser::states {
 
                 break;
             }
-            
+#ifdef __clang__ 
+
 #pragma clang diagnostic pop
+
+#endif
         }
     };
 }
