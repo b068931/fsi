@@ -5,6 +5,7 @@
 
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
 
 #ifndef NDEBUG
 //#include <vld.h>
@@ -14,7 +15,7 @@
 #error "Currently only MSVC is supported for the program loader module."
 #endif
 
-#include <Windows.h>
+#include <winnt.h>
 #include <map>
 #include <memory>
 #include <fstream>
@@ -34,6 +35,7 @@
 #include <bit>
 #include <span>
 #include <shared_mutex>
+#include <variant>
 
 #endif
 

@@ -40,6 +40,10 @@ namespace {
             return "CONTROL_CODE_TEMPLATE_LOAD_PROGRAM does not have stack frame set up.";
         }
 
+        if (loadProgramUnwindInfo->Flags != UNW_FLAG_NHANDLER) {
+            return "CONTROL_CODE_TEMPLATE_LOAD_PROGRAM has incorrect unwind info flags.";
+        }
+
         DWORD64 dw64CallModuleTrampolineBase = 0;
         PRUNTIME_FUNCTION prfCallModuleTrampoline = RtlLookupFunctionEntry(
             std::bit_cast<DWORD64>(&CONTROL_CODE_TEMPLATE_CALL_MODULE_TRAMPOLINE),

@@ -188,6 +188,9 @@
     <ClInclude Include="exposed_functions_management.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="application_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="program_loader.cpp">

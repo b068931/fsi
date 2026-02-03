@@ -58,6 +58,17 @@ self_priority=
 -- Accepts a function address, function arguments (in a form of arguments string).
 dynamic_call=memory memory
 
+-- Provides unwind information for the program loader.
+-- Inserts unwind information to be used with dynamic functions.
+-- Accepts a buffer for unwind information, along with its size.
+-- On fail returns module_failure. Otherwise returns the number of bytes written to the buffer.
+build_unwind_info=memory eight-bytes
+
+-- Verifies that the specified application image is correct and can be loaded.
+-- Accepts an image base, image size, compiled functions addresses, compiled functions count,
+-- RUNTIME_FUNCTIONS table, UNWIND_INFORMATION pointer.
+verify_application_image=memory eight-bytes memory four-bytes memory memory
+
 -- Manages data related to thread groups (containers), threads. Essentially, it manages "counterpart" data structures for
 -- the execution module. I believe this enables a more clear separation of concerns: managing data is complicated enough on its own,
 -- trying to combine it with execution management would make it even more convoluted.
@@ -91,10 +102,11 @@ duplicate_container=eight-bytes memory
 get_preferred_stack_size=eight-bytes
 
 -- Creates a new program container with its program context.
--- Accepts preferred stack size, main function index, compiled functions addresses, compiled functions count,
+-- Accepts image base address, runtime function entires, preferred stack size, main function index, 
+-- compiled functions addresses, compiled functions count,
 -- exposed functions addresses, exposed functions count, jump table address, jump table size,
 -- program strings addresses, program strings count.
-create_new_program_container=eight-bytes four-bytes memory four-bytes memory four-bytes memory eight-bytes memory eight-bytes
+create_new_program_container=memory memory eight-bytes four-bytes memory four-bytes memory four-bytes memory eight-bytes memory eight-bytes
 
 -- Creates a resource container for a new thread.
 -- Does nothing if the thread group (container) does not exist.
@@ -170,10 +182,10 @@ verify_program_memory=eight-bytes memory
 load_program_to_memory=memory
 
 -- Frees the program context that was created by load_program_to_memory.
--- Accepts compiled functions addresses, compiled functions count, 
+-- Accepts image base address, runtime function entires, compiled functions addresses, compiled functions count, 
 -- exposed functions addresses, exposed functions count, jump table address,
 -- program strings addresses, program strings count.
-free_program=memory four-bytes memory four-bytes memory memory eight-bytes
+free_program=memory, memory, memory four-bytes memory four-bytes memory memory eight-bytes
 
 -- Checks whether provided type signature matches the expected type signature of an exposed function.
 -- Accepts function type signature, function address.

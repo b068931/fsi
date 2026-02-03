@@ -5,6 +5,7 @@
 #include "execution_backend_functions.h"
 #include "thread_local_structure.h"
 #include "thread_manager.h"
+#include "unwind_info.h"
 
 #include "../module_mediator/fsi_types.h"
 #include "../module_mediator/module_part.h"
@@ -285,4 +286,186 @@ module_mediator::return_value create_thread(module_mediator::arguments_string_ty
     std::memcpy(copy, main_function_parameters, parameters_size);
 
     return backend::create_thread_initializer(priority, main_function_address, copy);
+}
+
+module_mediator::return_value build_unwind_info(module_mediator::arguments_string_type bundle) {
+    auto [unwind_info_buffer, buffer_size] =
+        module_mediator::arguments_string_builder::unpack<module_mediator::memory, std::uint64_t>(bundle);
+
+    DWORD64 dw64LoadProgramBase = 0;
+    PRUNTIME_FUNCTION prfLoadProgram = RtlLookupFunctionEntry(
+        std::bit_cast<DWORD64>(&CONTROL_CODE_TEMPLATE_LOAD_PROGRAM),
+        &dw64LoadProgramBase,
+        nullptr
+    );
+
+    if (prfLoadProgram == nullptr) {
+        LOG_PROGRAM_ERROR(
+            interoperation::get_module_part(),
+            "RUNTIME_FUNCTION entry for LOAD_PROGRAM is unavailable."
+        );
+
+        return module_mediator::module_failure;
+    }
+
+    UNWIND_INFO_HEADER* loadProgramUnwindInfo = std::bit_cast<UNWIND_INFO_HEADER*>(
+        dw64LoadProgramBase + prfLoadProgram->UnwindData);
+
+    // Align to an even number, as required by Windows ABI.
+    UBYTE ubUnwindCodeCount = static_cast<UBYTE>(
+        (loadProgramUnwindInfo->CountOfCodes + 1) & ~1);
+
+    std::size_t unwind_info_size = sizeof(UNWIND_INFO_HEADER) +
+        (ubUnwindCodeCount * sizeof(USHORT));
+
+    if (buffer_size < unwind_info_size) {
+        LOG_PROGRAM_WARNING(
+            interoperation::get_module_part(),
+            std::format("Provided buffer size of {} bytes is insufficient for unwind info of size {} bytes.",
+                buffer_size,
+                unwind_info_size
+            )
+        );
+
+        return module_mediator::module_failure;
+    }
+
+    std::memcpy(unwind_info_buffer, loadProgramUnwindInfo, unwind_info_size);
+    return unwind_info_size;
+}
+
+module_mediator::return_value verify_application_image(module_mediator::arguments_string_type bundle) {
+    auto [image_base, image_size, function_addresses, functions_count, 
+        runtime_function_table, unwind_info] = module_mediator::arguments_string_builder::unpack<
+        module_mediator::memory, std::uint64_t, 
+        module_mediator::memory, std::uint32_t, 
+        module_mediator::memory, module_mediator::memory>(bundle);
+
+    if (image_size > std::numeric_limits<ULONG>::max()) {
+        LOG_PROGRAM_ERROR(
+            interoperation::get_module_part(),
+            std::format("Image size {} exceeds maximum supported size.", image_size)
+        );
+
+        return module_mediator::module_failure;
+    }
+
+    // Load reference UNWIND_INFO from CONTROL_CODE_TEMPLATE_LOAD_PROGRAM.
+    DWORD64 dw64LoadProgramBase = 0;
+    PRUNTIME_FUNCTION prfLoadProgram = RtlLookupFunctionEntry(
+        std::bit_cast<DWORD64>(&CONTROL_CODE_TEMPLATE_LOAD_PROGRAM),
+        &dw64LoadProgramBase,
+        nullptr
+    );
+
+    if (prfLoadProgram == nullptr) {
+        LOG_PROGRAM_ERROR(
+            interoperation::get_module_part(),
+            "RUNTIME_FUNCTION entry for CONTROL_CODE_TEMPLATE_LOAD_PROGRAM is unavailable."
+        );
+
+        return module_mediator::module_failure;
+    }
+
+    UNWIND_INFO_HEADER* reference_unwind_info = std::bit_cast<UNWIND_INFO_HEADER*>(
+        dw64LoadProgramBase + prfLoadProgram->UnwindData);
+
+
+    std::size_t reference_unwind_info_size = sizeof(UNWIND_INFO_HEADER) +
+        (reference_unwind_info->CountOfCodes * sizeof(USHORT));
+
+    // Verify that provided unwind_info matches the reference UNWIND_INFO from CONTROL_CODE_TEMPLATE_LOAD_PROGRAM.
+    UNWIND_INFO_HEADER* provided_unwind_info = static_cast<UNWIND_INFO_HEADER*>(unwind_info);
+
+    if (std::memcmp(provided_unwind_info, reference_unwind_info, reference_unwind_info_size) != 0) {
+        LOG_PROGRAM_ERROR(
+            interoperation::get_module_part(),
+            "Provided unwind info does not match CONTROL_CODE_TEMPLATE_LOAD_PROGRAM's unwind info."
+        );
+
+        return module_mediator::module_failure;
+    }
+
+    DWORD64 dw64ImageBase = std::bit_cast<DWORD64>(image_base);
+    void** function_addresses_array = static_cast<void**>(function_addresses);
+    PRUNTIME_FUNCTION expected_runtime_function_table = static_cast<PRUNTIME_FUNCTION>(runtime_function_table);
+
+    for (std::uint32_t index = 0; index < functions_count; ++index) {
+        void* function_address = function_addresses_array[index];
+        DWORD64 dw64FunctionBase = 0;
+
+        PRUNTIME_FUNCTION prfCurrent = RtlLookupFunctionEntry(
+            std::bit_cast<DWORD64>(function_address),
+            &dw64FunctionBase,
+            nullptr
+        );
+
+        if (prfCurrent == nullptr) {
+            LOG_PROGRAM_ERROR(
+                interoperation::get_module_part(),
+                std::format("RUNTIME_FUNCTION entry for function at {:#x} is unavailable.", 
+                    std::bit_cast<std::uintptr_t>(function_address))
+            );
+
+            return module_mediator::module_failure;
+        }
+
+        if (dw64FunctionBase != dw64ImageBase) {
+            LOG_PROGRAM_ERROR(
+                interoperation::get_module_part(),
+                std::format("Function at index {} has mismatched base address. Expected: {:#x}, Actual: {:#x}.",
+                    index, dw64ImageBase, dw64FunctionBase)
+            );
+
+            return module_mediator::module_failure;
+        }
+
+        PRUNTIME_FUNCTION expected_entry = &expected_runtime_function_table[index];
+        if (prfCurrent->BeginAddress != expected_entry->BeginAddress ||
+            prfCurrent->EndAddress != expected_entry->EndAddress ||
+            prfCurrent->UnwindData != expected_entry->UnwindData) {
+            LOG_PROGRAM_ERROR(
+                interoperation::get_module_part(),
+                std::format("RUNTIME_FUNCTION entry at index {} does not match expected values.", index)
+            );
+
+            return module_mediator::module_failure;
+        }
+
+        if (prfCurrent->BeginAddress >= image_size || prfCurrent->EndAddress > image_size) {
+            LOG_PROGRAM_ERROR(
+                interoperation::get_module_part(),
+                std::format("RUNTIME_FUNCTION entry at index {} has offsets outside image bounds. "
+                    "BeginAddress: {:#x}, EndAddress: {:#x}, ImageSize: {:#x}.",
+                    index, prfCurrent->BeginAddress, prfCurrent->EndAddress, image_size)
+            );
+
+            return module_mediator::module_failure;
+        }
+
+        if (prfCurrent->UnwindData >= image_size) {
+            LOG_PROGRAM_ERROR(
+                interoperation::get_module_part(),
+                std::format("RUNTIME_FUNCTION entry at index {} has UnwindData offset outside image bounds. "
+                    "UnwindData: {:#x}, ImageSize: {:#x}.",
+                    index, prfCurrent->UnwindData, image_size)
+            );
+
+            return module_mediator::module_failure;
+        }
+
+        UNWIND_INFO_HEADER* actual_unwind_info = std::bit_cast<UNWIND_INFO_HEADER*>(
+            dw64FunctionBase + prfCurrent->UnwindData);
+
+        if (std::memcmp(actual_unwind_info, provided_unwind_info, reference_unwind_info_size) != 0) {
+            LOG_PROGRAM_ERROR(
+                interoperation::get_module_part(),
+                std::format("Unwind info for function at index {} does not match expected values.", index)
+            );
+
+            return module_mediator::module_failure;
+        }
+    }
+
+    return module_mediator::module_success;
 }

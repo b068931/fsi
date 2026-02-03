@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="add_signed_add_builder.h" />
+    <ClInclude Include="application_image.h" />
     <ClInclude Include="apply_on_memory.h" />
     <ClInclude Include="apply_right_hand_bits_on_left_hand_binary.h" />
     <ClInclude Include="arithmetic_instruction_builder.h" />

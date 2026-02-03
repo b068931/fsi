@@ -9,6 +9,7 @@ private:
     std::mutex references_mutex{};
 
     program_context(
+        void* image_base, void* runtime_function_entries,
         std::uint64_t program_preferred_stack_size,
         void** program_code, std::uint32_t program_functions_count, 
         void** program_exposed_functions, std::uint32_t program_exposed_functions_count, 
@@ -27,6 +28,9 @@ private:
     {}
 
 public:
+    void* image_base{};
+    void* runtime_function_entries{};
+
     std::uint64_t preferred_stack_size{};
 
     void** code{};
@@ -42,6 +46,7 @@ public:
     std::uint64_t strings_size{};
 
     static program_context* create(
+        void* image_base, void* runtime_function_entries,
         std::uint64_t preferred_stack_size,
         void** code, std::uint32_t functions_count, 
         void** exposed_functions, std::uint32_t exposed_functions_count, 
@@ -49,6 +54,7 @@ public:
         void** program_strings, std::uint64_t program_strings_size
     ) {
         return new program_context{ 
+            image_base, runtime_function_entries,
             preferred_stack_size,
             code, functions_count, 
             exposed_functions, exposed_functions_count, 

@@ -18,10 +18,13 @@ void write_bytes(T value, std::vector<char>& destination) {
 }
 
 void generate_program_termination_code(std::vector<char>& destination, program_loader::termination_codes error_code);
+
 void generate_stack_allocation_code(std::vector<char>& destination, std::uint32_t size);
+
 void generate_stack_deallocation_code(std::vector<char>& destination, std::uint32_t size);
+
 std::uint32_t generate_function_prologue(std::vector<char>& destination, std::uint32_t allocation_size, const memory_layouts_builder::memory_addresses& locals);
+
 void generate_function_epilogue(std::vector<char>& destination, std::uint32_t deallocation_size, std::uint32_t arguments_deallocation_size);
-void* create_executable_function(const std::vector<char>& source);
 
 #endif // !AUXILIARY_FUNCTIONS_H

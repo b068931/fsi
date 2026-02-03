@@ -13,6 +13,9 @@ EXECUTIONMODULE_API module_mediator::return_value on_container_creation(module_m
 EXECUTIONMODULE_API module_mediator::return_value on_thread_creation(module_mediator::arguments_string_type bundle);
 EXECUTIONMODULE_API module_mediator::return_value register_deferred_callback(module_mediator::arguments_string_type bundle);
 
+EXECUTIONMODULE_API module_mediator::return_value build_unwind_info(module_mediator::arguments_string_type bundle);
+EXECUTIONMODULE_API module_mediator::return_value verify_application_image(module_mediator::arguments_string_type bundle);
+
 EXECUTIONMODULE_API module_mediator::return_value self_duplicate(module_mediator::arguments_string_type bundle);
 EXECUTIONMODULE_API module_mediator::return_value self_priority(module_mediator::arguments_string_type bundle);
 EXECUTIONMODULE_API module_mediator::return_value get_thread_saved_variable(module_mediator::arguments_string_type bundle);

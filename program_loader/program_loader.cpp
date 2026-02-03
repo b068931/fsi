@@ -11,13 +11,16 @@
 #include "jump_table_builder.h"
 #include "memory_layouts_builder.h"
 #include "compiled_program.h"
+#include "application_image.h"
 #include "program_compilation_error.h"
 
 #include "../logger_module/logging.h"
 #include "../module_mediator/fsi_types.h"
+#include "../execution_module/unwind_info.h"
 
 namespace {
     module_mediator::return_value add_program(
+        void* image_base, void* runtime_functions,
         std::uint64_t preferred_stack_size, std::uint32_t main_function_index,
         void** code, std::uint32_t functions_count,
         void** exposed_functions_addresses, std::uint32_t exposed_functions_count,
@@ -25,6 +28,7 @@ namespace {
         void** program_strings, std::uint64_t program_strings_count
     ) {
         return module_mediator::fast_call<
+            module_mediator::memory, module_mediator::memory,
             module_mediator::eight_bytes, module_mediator::four_bytes,
             module_mediator::memory, module_mediator::four_bytes,
             module_mediator::memory, module_mediator::four_bytes,
@@ -34,6 +38,7 @@ namespace {
             interoperation::get_module_part(),
             interoperation::index_getter::resource_module(),
             interoperation::index_getter::resource_module_create_new_program_container(),
+            image_base, runtime_functions,
             preferred_stack_size, main_function_index,
             code, functions_count,
             exposed_functions_addresses, exposed_functions_count,
@@ -70,7 +75,8 @@ namespace {
     jump_table_builder construct_jump_table(const runs_container& container) {
         jump_table_builder jump_table{}; //create jump_table builder and initialize it
         for (const auto& fnc : container.function_bodies) {
-            jump_table.add_new_function_address(fnc.function_signature, reinterpret_cast<std::uintptr_t>(get_default_function_address()));
+            jump_table.add_new_function_address(fnc.function_signature, 
+                reinterpret_cast<std::uintptr_t>(nullptr));
         }
 
         for (const auto& jump_point : container.jump_points) {
@@ -149,6 +155,153 @@ namespace {
         return { program_strings, program_strings_size };
     }
 
+    std::variant<std::string, application_image> create_application_image(
+        const std::vector<std::vector<char>>& sources,
+        std::unique_ptr<UNWIND_INFO_PROLOGUE> unwind_info,
+        std::size_t unwind_info_size
+    ) {
+        // Application image has the following format:
+        // 1. Function bodies, placed one after another.
+        // 2. Runtime function entries, placed one after another.
+        //    These entries must start at a new page boundary.
+        //    This is required in order to be able to mark executable code with W^X policy,
+        //    while keeping unwind information readable and writable without execution.
+        // 3. Unwind information provided in "unwind_info" parameter. It must also start at a new page boundary.
+        //    There is only one UNWIND_INFO instance in the image, all RUNTIME_FUNCTIONS point to it.
+        // This whole data is allocated as a one contiguous block of memory, then registered with the system.
+        // Note that RUNTIME_FUNCTIONs and UNWIND_INFORMATION usually require DWORD alignment. However,
+        // we align them at a page boundary, which is usually an even larger alignment, so it satisfies this requirement as well.
+
+        if (sources.empty()) {
+            return "No function bodies provided.";
+        }
+
+        SYSTEM_INFO system_info{};
+        GetSystemInfo(&system_info);
+        const std::size_t page_size = system_info.dwPageSize;
+
+        static_assert(alignof(UNWIND_INFO_PROLOGUE) == alignof(RUNTIME_FUNCTION),
+            "Unexpected alignment requirements for system objects.");
+
+        if (page_size < alignof(UNWIND_INFO_PROLOGUE) || 
+            page_size % alignof(UNWIND_INFO_PROLOGUE) != 0 ||
+            page_size % alignof(RUNTIME_FUNCTION) != 0) {
+            return std::format("Failed to satisfy alignment requirements for RUNTIME_FUNCTION "
+                   "or UNWIND_INFO_PROLOGUE with the system page size. System page: {}.", page_size);
+        }
+
+        auto align_to_page = [page_size](std::size_t value) -> std::size_t {
+            return (value + page_size - 1) & ~(page_size - 1);
+        };
+
+        std::size_t total_code_size = 0;
+        for (const auto& source : sources) {
+            total_code_size += source.size();
+        }
+
+        const std::size_t code_section_size = align_to_page(total_code_size);
+        const std::size_t runtime_functions_size = 
+            align_to_page(sources.size() * sizeof(RUNTIME_FUNCTION));
+
+        const std::size_t unwind_info_section_size = align_to_page(unwind_info_size);
+
+        assert(code_section_size % page_size == 0 && "Invalid alignment for code section");
+        assert(runtime_functions_size % page_size == 0 && "Invalid alignment for runtime functions section.");
+        assert(unwind_info_section_size % page_size == 0 && "Invalid alignment for unwind info.");
+
+        const std::size_t runtime_functions_offset = code_section_size;
+        const std::size_t unwind_info_offset = runtime_functions_offset + runtime_functions_size;
+        const std::size_t total_image_size = unwind_info_offset + unwind_info_section_size;
+
+        // Allocate memory for the entire image
+        char* image_base = static_cast<char*>(VirtualAlloc(
+            nullptr,
+            total_image_size,
+            MEM_COMMIT | MEM_RESERVE,
+            PAGE_READWRITE));
+
+        if (image_base == nullptr) {
+            return std::format("Failed to allocate memory for the application image "
+                               "(VirtualAlloc: {})", GetLastError());
+        }
+
+        // Populate the code section with dynamic functions.
+        char* current_code_position = image_base;
+        std::unique_ptr<void* []> function_addresses{ new void* [sources.size()] };
+        for (std::size_t index = 0; index < sources.size(); ++index) {
+            function_addresses[index] = current_code_position;
+
+            std::ranges::copy(sources[index], current_code_position);
+            current_code_position += sources[index].size();
+        }
+
+        // Populate our XDATA (unwind information).
+        UNWIND_INFO_PROLOGUE* unwind_info_destination = 
+            reinterpret_cast<UNWIND_INFO_PROLOGUE*>(image_base + unwind_info_offset);
+
+        std::memcpy(unwind_info_destination, unwind_info.get(), unwind_info_size);
+        DWORD unwind_info_rva = static_cast<DWORD>(unwind_info_offset);
+
+        // Populate our PDATA (runtime function entries).
+        PRUNTIME_FUNCTION runtime_functions = 
+            reinterpret_cast<PRUNTIME_FUNCTION>(image_base + runtime_functions_offset);
+
+        DWORD current_function_offset = 0;
+        for (std::size_t index = 0; index < sources.size(); ++index) {
+            PRUNTIME_FUNCTION runtime_function = 
+                new(runtime_functions + index) RUNTIME_FUNCTION{};
+
+            // Don't need std::launder here, because we use pointer from placement new.
+            runtime_function->BeginAddress = current_function_offset;
+            runtime_function->UnwindInfoAddress = unwind_info_rva;
+            runtime_function->EndAddress = current_function_offset + 
+                static_cast<DWORD>(sources[index].size());
+
+            current_function_offset += static_cast<DWORD>(sources[index].size());
+        }
+
+        auto free_image_base_on_fail = [](char* image_base) {
+            if (!VirtualFree(image_base, 0, MEM_RELEASE)) {
+                LOG_PROGRAM_WARNING(
+                    interoperation::get_module_part(),
+                    "Failed to free application image memory. This may lead to resource leaks."
+                );
+            }
+        };
+
+        // Set executable protection on the code section (W^X policy)
+        DWORD dwPreviousProtection = 0;
+        if (!VirtualProtect(image_base, total_code_size, PAGE_EXECUTE_READ, &dwPreviousProtection)) {
+            free_image_base_on_fail(image_base);
+            return std::format("Failed to change code section protection. "
+                                "(VirtualProtect: {})", GetLastError());
+        }
+
+        assert(dwPreviousProtection == PAGE_READWRITE && "Unexpected previous protection for image.");
+
+        // Flush instruction cache for the code section
+        if (!FlushInstructionCache(GetCurrentProcess(), image_base, total_code_size)) {
+            free_image_base_on_fail(image_base);
+            return std::format("Was unable to flush existing instruction cache. "
+                               "(FlushInstructionCache: {})", GetLastError());
+        }
+
+        // Register the function table with the system for exception handling
+        if (!RtlAddFunctionTable(runtime_functions, static_cast<DWORD>(sources.size()), reinterpret_cast<DWORD64>(image_base))) {
+            free_image_base_on_fail(image_base);
+            return std::format("Was unable to register new runtime functions. "
+                               "(RtlAddFunctionTable: {})", GetLastError());
+        }
+
+        return application_image{
+            .image_base = image_base,
+            .image_size = total_image_size,
+            .function_addresses = function_addresses.get(),
+            .runtime_functions = runtime_functions,
+            .unwind_info = unwind_info_destination
+        };
+    }
+
     std::vector<char> compile_function_body(
         std::uint32_t function_index,
         runs_container& container,
@@ -217,7 +370,7 @@ namespace {
         return function_body_symbols;
     }
 
-    std::pair<void*, std::uint32_t> compile_function(
+    std::pair<std::vector<char>, std::uint32_t> compile_function(
         std::uint32_t function_index,
         runs_container::function& current_function,
         runs_container& container,
@@ -297,7 +450,7 @@ namespace {
         );
 
         generate_function_epilogue(compiled_function, stack_space, function_arguments_size);
-        return { create_executable_function(compiled_function), prologue_size };
+        return { compiled_function, prologue_size };
     }
 
     std::unique_ptr<module_mediator::arguments_string_element[]> create_function_signature(
@@ -317,13 +470,21 @@ namespace {
         return std::unique_ptr<module_mediator::arguments_string_element[]>{ signature_string };
     }
 
-    void free_resources_on_fail(std::size_t loaded_functions_size, void** loaded_functions, void** exposed_functions_addresses) {
-        delete[] exposed_functions_addresses;
-        for (std::size_t index = 0; index < loaded_functions_size; ++index) {
-            VirtualFree(loaded_functions[index], 0, MEM_RELEASE);
+    void free_resources_on_fail(application_image& image, std::uint32_t functions_count) {
+        if (!RtlDeleteFunctionTable(image.runtime_functions)) {
+            LOG_PROGRAM_WARNING(
+                interoperation::get_module_part(),
+                "Failed to free runtime function table. This may lead to resource leaks."
+            );
         }
 
-        delete[] loaded_functions;
+        delete[] image.function_addresses;
+        if (!VirtualFree(image.image_base, 0, MEM_RELEASE)) {
+            LOG_PROGRAM_WARNING(
+                interoperation::get_module_part(),
+                "Failed to free image memory. This may lead to memory leaks."
+            );
+        }
     }
 
     compiled_program compile(
@@ -352,19 +513,22 @@ namespace {
             };
         }
 
-        void** exposed_functions_addresses = new void* [container.exposed_functions.size()] {};
-        void** loaded_functions_addresses = new void* [functions_count] {};
+        // It is declared here so that we can free its resources on failure.
+        // We can't really rely on RAII because it uses WinApi functions.
+        application_image image{};
 
-        std::uint32_t main_function_index = functions_count;
         try {
-            std::unordered_map<std::uintptr_t, exposed_function_data> loaded_exposed_functions{};
+            std::vector<std::vector<char>> compiled_functions{};
+            std::vector<uint32_t> function_prologue_sizes{};
+
+            std::uint32_t main_function_index = functions_count;
             for (std::uint32_t function_index = 0; function_index < functions_count; ++function_index) {
                 runs_container::function& current_function = container.function_bodies[function_index];
                 if (current_function.function_signature == container.main_function_id) {
                     main_function_index = function_index;
                 }
 
-                auto [loaded_function, prologue_size] = compile_function(
+                auto [function_body, prologue_size] = compile_function(
                     function_index,
                     current_function,
                     container,
@@ -373,45 +537,122 @@ namespace {
                     memory_layouts
                 );
 
+                compiled_functions.emplace_back(std::move(function_body));
+                function_prologue_sizes.push_back(prologue_size);
+            }
+
+            std::unique_ptr<char[]> unwind_info_buffer{ new char[UNWIND_INFO_MAXIMUM_SIZE] {} };
+            module_mediator::return_value unwind_info_size = module_mediator::fast_call<
+                module_mediator::memory,
+                module_mediator::eight_bytes
+            >(interoperation::get_module_part(),
+                interoperation::index_getter::execution_module(),
+                interoperation::index_getter::execution_module_build_unwind_info(),
+                unwind_info_buffer.get(), 
+                UNWIND_INFO_MAXIMUM_SIZE);
+
+            if (unwind_info_size == module_mediator::module_failure) {
+                throw program_compilation_error{ "Failed to build unwind information for the program." };
+            }
+
+            auto application_image_or_error = create_application_image(
+                compiled_functions, 
+                std::unique_ptr<UNWIND_INFO_PROLOGUE>{ 
+                    reinterpret_cast<UNWIND_INFO_PROLOGUE*>(
+                        std::launder(unwind_info_buffer.release())) 
+                },
+                unwind_info_size);
+
+            if (std::holds_alternative<std::string>(application_image_or_error)) {
+                throw program_compilation_error{
+                    std::format("Failed to create application image: {}", 
+                        std::get<std::string>(application_image_or_error))
+                };
+            }
+
+            image = std::get<application_image>(application_image_or_error);
+            LOG_PROGRAM_INFO(interoperation::get_module_part(),
+                std::format("Built application image at {}, length {}.",
+                    std::bit_cast<std::uint64_t>(image.image_base), image.image_size));
+
+            module_mediator::return_value image_verification_result = module_mediator::fast_call<
+                module_mediator::memory, module_mediator::eight_bytes,
+                module_mediator::memory, module_mediator::four_bytes,
+                module_mediator::memory, module_mediator::memory
+            >(interoperation::get_module_part(),
+                interoperation::index_getter::execution_module(),
+                interoperation::index_getter::execution_module_verify_application_image(),
+                image.image_base, image.image_size, 
+                image.function_addresses, functions_count,
+                image.runtime_functions, image.unwind_info);
+
+            if (image_verification_result == module_mediator::module_failure) {
+                throw program_compilation_error{ "Failed to verify application image." };
+            }
+
+            std::unordered_map<std::uintptr_t, exposed_function_data> loaded_exposed_functions{};
+            std::unique_ptr<void* []> exposed_functions_addresses{ 
+                new void* [container.exposed_functions.size()] {} 
+            };
+
+            for (std::uint32_t function_index = 0; function_index < functions_count; ++function_index) {
+                runs_container::function& current_function = container.function_bodies[function_index];
+                void* loaded_function = image.function_addresses[function_index];
+
                 auto found_exposed_function_information = container.exposed_functions.find(current_function.function_signature);
                 if (found_exposed_function_information != container.exposed_functions.end()) {
                     exposed_functions_addresses[loaded_exposed_functions.size()] = loaded_function;
                     loaded_exposed_functions[reinterpret_cast<std::uintptr_t>(loaded_function)] =
-                        exposed_function_data {
+                        exposed_function_data{
                             .function_name = std::move(found_exposed_function_information->second),
                             .function_signature = create_function_signature(
                                 container.function_signatures[current_function.function_signature])
                     };
                 }
 
-                loaded_functions_addresses[function_index] = loaded_function;
-                jump_table.add_jump_base_address(function_index, reinterpret_cast<std::uintptr_t>(loaded_function) + prologue_size);
-                jump_table.remap_function_address(current_function.function_signature, reinterpret_cast<std::uintptr_t>(loaded_function));
+                std::uint32_t prologue_size = function_prologue_sizes[function_index];
+
+                jump_table.add_jump_base_address(function_index, 
+                    reinterpret_cast<std::uintptr_t>(loaded_function) + prologue_size);
+
+                jump_table.remap_function_address(current_function.function_signature, 
+                    reinterpret_cast<std::uintptr_t>(loaded_function));
+            }
+
+            for (std::uint32_t function_index = 0; function_index < container.exposed_functions.size(); ++function_index) {
+                if (exposed_functions_addresses[function_index] == nullptr) {
+                    throw program_compilation_error{
+                        "Was unable to load all exposed functions properly."
+                    };
+                }
             }
 
             if (main_function_index >= functions_count) {
                 throw program_compilation_error{ std::format("Unknown starting function id specified.") };
             }
 
-            std::pair<void*, std::uint64_t> program_jump_table = jump_table.create_raw_table(reinterpret_cast<std::uintptr_t>(get_default_function_address));
             auto [program_strings, program_strings_size] = create_program_strings(container);
+            auto [jump_table_address, jump_table_size] = jump_table.create_raw_table(
+                reinterpret_cast<std::uintptr_t>(nullptr));
 
             merge_exposed_functions(loaded_exposed_functions);
             return compiled_program{
+                .image_base = image.image_base,
+                .runtime_functions = image.runtime_functions,
                 .main_function_index = main_function_index,
                 .preferred_stack_size = container.preferred_stack_size,
-                .compiled_functions = loaded_functions_addresses,
+                .compiled_functions = image.function_addresses,
                 .functions_count = functions_count,
-                .exposed_functions = exposed_functions_addresses,
+                .exposed_functions = exposed_functions_addresses.release(),
                 .exposed_functions_count = static_cast<uint32_t>(container.exposed_functions.size()),
-                .jump_table = program_jump_table.first,
-                .jump_table_size = program_jump_table.second,
+                .jump_table = jump_table_address,
+                .jump_table_size = jump_table_size,
                 .program_strings = program_strings,
                 .program_strings_count = program_strings_size
             };
         }
         catch (const program_compilation_error&) {
-            free_resources_on_fail(functions_count, loaded_functions_addresses, exposed_functions_addresses);
+            free_resources_on_fail(image, functions_count);
             throw;
         }
     }
@@ -482,6 +723,8 @@ module_mediator::return_value load_program_to_memory(module_mediator::arguments_
         );
 
         return add_program(
+            result.image_base,
+            result.runtime_functions,
             result.preferred_stack_size,
             result.main_function_index,
             result.compiled_functions,
@@ -562,13 +805,14 @@ module_mediator::return_value load_program_to_memory(module_mediator::arguments_
 }
 
 module_mediator::return_value free_program(module_mediator::arguments_string_type bundle) {
-    auto [compiled_functions, compiled_functions_count, 
+    auto [image_base, runtime_function_entries, compiled_functions, compiled_functions_count, 
           exposed_functions_addresses, exposed_functions_count, jump_table, 
           program_strings, program_strings_count] =
         module_mediator::arguments_string_builder::unpack<
-            void*, std::uint32_t,
-            void*, std::uint32_t,
-            void*, void*, std::uint64_t
+            module_mediator::memory, module_mediator::memory,
+            module_mediator::memory, std::uint32_t,
+            module_mediator::memory, std::uint32_t,
+            module_mediator::memory, module_mediator::memory, std::uint64_t
         >(bundle);
 
     remove_exposed_functions({ 
@@ -580,14 +824,24 @@ module_mediator::return_value free_program(module_mediator::arguments_string_typ
         delete[] static_cast<char**>(program_strings)[counter];
     }
 
-    for (std::uint32_t counter = 0; counter < compiled_functions_count; ++counter) {
-        VirtualFree(static_cast<void**>(compiled_functions)[counter], 0, MEM_RELEASE);
-    }
-
     delete[] static_cast<char*>(jump_table);
     delete[] static_cast<void**>(compiled_functions);
     delete[] static_cast<void**>(exposed_functions_addresses);
     delete[] static_cast<char**>(program_strings);
+
+    if (!RtlDeleteFunctionTable(static_cast<PRUNTIME_FUNCTION>(runtime_function_entries))) {
+        LOG_PROGRAM_WARNING(
+            interoperation::get_module_part(),
+            "Failed to remove function table. This may lead to resource leaks."
+        );
+    }
+
+    if (!VirtualFree(image_base, 0, MEM_RELEASE)) {
+        LOG_PROGRAM_WARNING(
+            interoperation::get_module_part(),
+            "Failed to free image memory. This will lead memory leaks."
+        );
+    }
 
     return module_mediator::module_success;
 }

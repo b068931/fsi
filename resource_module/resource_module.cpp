@@ -24,7 +24,7 @@ namespace {
     template<typename T>
     _Acquires_lock_(return.second) auto get_iterator(T& object, std::recursive_mutex& mutex, id_generator::id_type id) {
         /*
-        * here we at first lock mutex associated with a map,
+        * Here we at first lock mutex associated with a map,
         * look for an object, lock mutex associated with an object,
         * release mutex associated with a map, modify our object,
         * release mutex associated with an object.
@@ -32,8 +32,8 @@ namespace {
         * std::map does not invalidate iterators,
         * so even if some thread deletes another object while we modify a current object, nothing will happen.
         *
-        * a running object can not be deleted, but even if someone tries to do so,
-        * nothing will happen until the lock to an object is released or object.end() will be returned
+        * A running object can not be deleted, but even if someone tries to do so,
+        * nothing will happen until the lock to an object is released or object.end() will be returned.
         */
 
         std::scoped_lock lock{ mutex };
@@ -51,7 +51,7 @@ namespace {
 
         return
             std::pair{
-                object.end(), //won't be actually accessed anywhere in the program because map can be modified after this function
+                object.end(), // Won't be actually accessed anywhere in the program because map can be modified after this function.
                 std::unique_lock<
                     std::remove_reference_t<
                         decltype(*iterator->second.lock)
@@ -87,13 +87,13 @@ namespace {
         auto iterator_lock = get_iterator(object, mutex, id);
 
         /*
-        * in theory, this operation should always be successful
+        * In theory, this operation should always be successful
         * because program container can not be destroyed while it has at least one running thread,
         * and the memory belonging to a program can be allocated only by its own threads.
         * so "bool(iterator_lock.second)" works mostly as a precaution.
         */
 
-        if (iterator_lock.second) { //check if we acquired mutex for an object
+        if (iterator_lock.second) { // Check if we acquired mutex for an object.
             [[maybe_unused]] auto [result, is_new] = iterator_lock.first->second.allocated_memory.insert(
                 static_cast<void*>(new(std::nothrow) char[size] {})
             );
@@ -116,13 +116,13 @@ namespace {
 
     template<typename T>
     void deallocate_memory_generic(std::recursive_mutex& mutex, T& object, id_generator::id_type id, void* address) {
-        //see allocate_memory_generic
+        // See allocate_memory_generic.
         auto iterator_lock = get_iterator(object, mutex, id);
         if (iterator_lock.second) {
             auto& allocated_memory = iterator_lock.first->second.allocated_memory;
             auto found_address = allocated_memory.find(address);
 
-            //if address does not belong to this structure we do nothing
+            // If address does not belong to this structure we do nothing
             if (found_address != allocated_memory.end()) {
                 delete[] static_cast<char*>(*found_address);
                 allocated_memory.erase(found_address);
@@ -151,7 +151,7 @@ namespace {
 
     template<typename T>
     std::conditional_t<
-        std::is_same_v<T, std::map<id_generator::id_type, thread_structure>>, //for thread_structure this function also returns id of the associated program_container
+        std::is_same_v<T, std::map<id_generator::id_type, thread_structure>>, // For thread_structure this function also returns id of the associated program_container.
         std::pair<module_mediator::return_value, id_generator::id_type>,
         module_mediator::return_value
     >
@@ -178,12 +178,12 @@ namespace {
             }
 
             /*
-            * in theory, if several threads end simultaneously, it can lead to multiple calls to this function,
-            * so we need to make sure that nothing bad happens
+            * In theory, if several threads end simultaneously, it can lead to multiple calls to this function,
+            * so we need to make sure that nothing bad happens.
             */
 
             if (iterator_lock.second) {
-                auto container{ std::move(iterator_lock.first->second) }; //destructor of this class will free resources
+                auto container{ std::move(iterator_lock.first->second) }; // Destructor of this class will free resources.
 
                 /*
                 * "The behavior of a program is undefined if a recursive_mutex is destroyed while still owned by some thread."
@@ -193,7 +193,7 @@ namespace {
                 iterator_lock.second.unlock();
                 object.erase(iterator_lock.first);
 
-                lock.unlock(); //at this point the object is deleted and if several other threads were waiting on the mutex while we were deleting the object they will find nothing
+                lock.unlock(); // At this point the object is deleted and if several other threads were waiting on the mutex while we were deleting the object they will find nothing.
                 free_id = id;
 
                 if constexpr (thread_structure_switch) {
@@ -310,6 +310,7 @@ module_mediator::return_value add_container_on_destroy(module_mediator::argument
 
     return module_mediator::module_success;
 }
+
 module_mediator::return_value add_thread_on_destroy(module_mediator::arguments_string_type bundle) {
     auto [thread_id, callback_bundle] = 
         module_mediator::arguments_string_builder::unpack<module_mediator::return_value, module_mediator::memory>(bundle);
@@ -358,6 +359,7 @@ module_mediator::return_value duplicate_container(module_mediator::arguments_str
 
     return module_mediator::module_failure;
 }
+
 module_mediator::return_value get_preferred_stack_size(module_mediator::arguments_string_type bundle) {
     constexpr std::uint64_t fallback_stack_size = 1024;
     auto [container_id] = 
@@ -384,11 +386,13 @@ module_mediator::return_value get_preferred_stack_size(module_mediator::argument
 
 module_mediator::return_value create_new_program_container(module_mediator::arguments_string_type bundle) {
     id_generator::id_type id = id_generator::get_id();
-    auto [preferred_stack_size, main_function_index, 
+    auto [image_base, runtime_functions,
+          preferred_stack_size, main_function_index, 
           compiled_functions, compiled_functions_count, 
           exposed_functions, exposed_functions_count,
           jump_table, jump_table_size,
           program_strings, program_strings_count] = module_mediator::arguments_string_builder::unpack<
+        module_mediator::memory, module_mediator::memory,
         std::uint64_t, std::uint32_t, 
         module_mediator::memory, std::uint32_t, 
         module_mediator::memory, std::uint32_t, 
@@ -397,13 +401,14 @@ module_mediator::return_value create_new_program_container(module_mediator::argu
     >(bundle);
     
     /*
-    * a newly created object can not be deleted or modified if execution module does not know about it,
-    * so we don't need to lock on its mutex
+    * A newly created object can not be deleted or modified if execution module does not know about it,
+    * so we don't need to lock on its mutex.
     */
 
     insert_new_container(
         id,
         program_context::create(
+            image_base, runtime_functions,
             preferred_stack_size,
             static_cast<void**>(compiled_functions), compiled_functions_count, 
             static_cast<void**>(exposed_functions), exposed_functions_count, 
@@ -418,6 +423,7 @@ module_mediator::return_value create_new_program_container(module_mediator::argu
         preferred_stack_size
     );
 }
+
 module_mediator::return_value create_new_thread(module_mediator::arguments_string_type bundle) {
     auto [container_id] = 
         module_mediator::arguments_string_builder::unpack<id_generator::id_type>(bundle);
@@ -426,12 +432,12 @@ module_mediator::return_value create_new_thread(module_mediator::arguments_strin
     id_generator::id_type id = id_generator::get_id();
 
     /*
-    * despite the fact that get_iterator can fail,
+    * Despite the fact that get_iterator can fail,
     * it should never happen in this case because a new thread can be created only by an already existing thread,
-    * and creating thread can not continue its execution until a new thread is created
+    * and creating thread can not continue its execution until a new thread is created.
     */
 
-    { // make sure the lock is gone before calling to another module
+    { // Make sure the lock is gone before calling to another module.
         auto [iterator, lock] = 
             get_iterator(containers, containers_mutex, container_id);
 
@@ -479,6 +485,7 @@ module_mediator::return_value allocate_program_memory(module_mediator::arguments
 
     return allocate_memory_generic(containers_mutex, containers, container_id, memory_size);
 }
+
 module_mediator::return_value allocate_thread_memory(module_mediator::arguments_string_type bundle) {
     auto [thread_id, memory_size] =
         module_mediator::arguments_string_builder::unpack<id_generator::id_type, std::uint64_t>(bundle);
@@ -493,6 +500,7 @@ module_mediator::return_value deallocate_program_memory(module_mediator::argumen
     deallocate_memory_generic(containers_mutex, containers, container_id, memory_address);
     return module_mediator::module_success;
 }
+
 module_mediator::return_value deallocate_thread_memory(module_mediator::arguments_string_type bundle) {
     auto [thread_id, memory_address] = 
         module_mediator::arguments_string_builder::unpack<id_generator::id_type, module_mediator::memory>(bundle);
@@ -507,6 +515,7 @@ module_mediator::return_value deallocate_program_container(module_mediator::argu
 
     return deallocate_generic(containers_mutex, containers, container_id);
 }
+
 module_mediator::return_value deallocate_thread(module_mediator::arguments_string_type bundle) {
     auto [thread_id] = 
         module_mediator::arguments_string_builder::unpack<id_generator::id_type>(bundle);
@@ -561,6 +570,7 @@ module_mediator::return_value get_running_threads_count(module_mediator::argumen
 
     return module_mediator::module_failure; 
 }
+
 module_mediator::return_value get_program_container_id(module_mediator::arguments_string_type bundle) {
     auto [thread_id] =
         module_mediator::arguments_string_builder::unpack<id_generator::id_type>(bundle);
@@ -609,6 +619,7 @@ module_mediator::return_value get_jump_table(module_mediator::arguments_string_t
     
     return reinterpret_cast<std::uintptr_t>(nullptr);
 }
+
 module_mediator::return_value get_jump_table_size(module_mediator::arguments_string_type bundle) {
     auto [container_id] =
         module_mediator::arguments_string_builder::unpack<id_generator::id_type>(bundle);
@@ -642,6 +653,7 @@ module_mediator::return_value verify_thread_memory(module_mediator::arguments_st
         memory_address
     );
 }
+
 module_mediator::return_value verify_program_memory(module_mediator::arguments_string_type bundle) {
     auto [container_id, memory_address] =
         module_mediator::arguments_string_builder::unpack<id_generator::id_type, module_mediator::memory>(bundle);
@@ -673,8 +685,9 @@ program_container::~program_container() noexcept {
 }
 
 program_context::~program_context() noexcept {
-    assert(this->references_count == 0 && "destroying program context that has active references");
-    module_mediator::fast_call<
+    assert(this->references_count == 0 && "Destroying program context that has active references.");
+    module_mediator::return_value result = module_mediator::fast_call<
+        module_mediator::memory, module_mediator::memory,
         module_mediator::memory, module_mediator::four_bytes,
         module_mediator::memory, module_mediator::four_bytes,
         module_mediator::memory,
@@ -683,6 +696,8 @@ program_context::~program_context() noexcept {
         interoperation::get_module_part(),
         interoperation::index_getter::program_loader(),
         interoperation::index_getter::program_loader_free_program(),
+        this->image_base,
+        this->runtime_function_entries,
         this->code,
         this->functions_count,
         this->exposed_functions,
@@ -691,4 +706,8 @@ program_context::~program_context() noexcept {
         this->strings,
         this->strings_size
     );
+
+    if (result != module_mediator::module_success) {
+        std::cerr << "*** WARNING: failed to free program context resources.\n";
+    }
 }
