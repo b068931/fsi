@@ -12,6 +12,13 @@
 #include "../logger_module/logging.h"
 
 module_mediator::return_value on_thread_creation(module_mediator::arguments_string_type bundle) {
+    constexpr std::uint64_t program_start_function_index = 1;
+    constexpr std::uint64_t program_jump_table_address_index = 2;
+    constexpr std::uint64_t thread_state_address_index = 3;
+    constexpr std::uint64_t current_stack_position_index = 4;
+    constexpr std::uint64_t stack_end_position_index = 5;
+    constexpr std::uint64_t trap_table_address_index = 6;
+
     auto [container_id, thread_id, preferred_stack_size] =
         module_mediator::arguments_string_builder::unpack<module_mediator::return_value, module_mediator::return_value, std::uint64_t>(bundle);
 
@@ -35,21 +42,21 @@ module_mediator::return_value on_thread_creation(module_mediator::arguments_stri
     // Fill in state_buffer - start.
     // Fill in program main function address.
     backend::fill_in_register_array_entry( 
-        1, 
+        program_start_function_index, 
         thread_state_memory, 
         reinterpret_cast<std::uintptr_t>(thread_structure->program_function_address)
     );
 
     // Fill in jump table address.
     backend::fill_in_register_array_entry(
-        2,
+        program_jump_table_address_index,
         thread_state_memory,
         reinterpret_cast<std::uintptr_t>(program_jump_table)
     );
 
     // Fill in thread state address. I don't quite remember what purpose this serves.
     backend::fill_in_register_array_entry(
-        3,
+        thread_state_address_index,
         thread_state_memory,
         reinterpret_cast<std::uintptr_t>(thread_state_memory)
     );
@@ -89,9 +96,9 @@ module_mediator::return_value on_thread_creation(module_mediator::arguments_stri
         return module_mediator::module_failure;
     }
 
-    // Fill in current stack position with value obtained from stack initializer.
+    // Fill in current stack position with the value obtained from stack initializer.
     backend::fill_in_register_array_entry(
-        4,
+        current_stack_position_index,
         thread_state_memory,
         result
     );
@@ -99,7 +106,7 @@ module_mediator::return_value on_thread_creation(module_mediator::arguments_stri
     // Fill in stack end address. Notice that it had to account for the space that 
     // will be used to save the state of one variable between function calls.
     backend::fill_in_register_array_entry(
-        5,
+        stack_end_position_index,
         thread_state_memory,
         reinterpret_cast<std::uintptr_t>(thread_stack_end)
     );
@@ -107,7 +114,7 @@ module_mediator::return_value on_thread_creation(module_mediator::arguments_stri
     // Fill in runtime trap table address. This is mostly a limitation of the current design,
     // as "program_loader" is a separate module, and it can't directly access "execution_module" data.
     backend::fill_in_register_array_entry(
-        6,
+        trap_table_address_index,
         thread_state_memory,
         reinterpret_cast<std::uintptr_t>(backend::get_runtime_trap_table())
     );
