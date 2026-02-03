@@ -26,20 +26,22 @@ public:
         this->create_immediate_instruction<std::uint64_t>(found_string_info.second - 1);
         this->generate_pointer_size_check();
 
-        this->write_bytes('\x4c'); //mov rcx, r8
+        this->write_bytes('\x4c'); // mov rcx, r8
         this->write_bytes('\x89');
         this->write_bytes('\xc1');
 
-        this->write_bytes('\x49'); //mov rdi, qword ptr [r15 + 8]
+        this->write_bytes('\x49'); // mov rdi, qword ptr [r15 + 8]
         this->write_bytes('\x8b');
         this->write_bytes('\x7f');
         this->write_bytes('\x08');
 
-        this->write_bytes('\x48'); //mov rsi, address of the string
+        this->write_bytes('\x48'); // mov rsi, address of the string
         this->write_bytes('\xbe');
         this->write_bytes<std::uint64_t>(reinterpret_cast<std::uintptr_t>(found_string_info.first.get()));
 
-        this->write_bytes('\xf3'); //rep movsb + REX.W
+        this->write_bytes('\xfc'); // cld
+
+        this->write_bytes('\xf3'); // rep movsb + REX.W
         this->write_bytes('\x48');
         this->write_bytes('\xa4');
     }
