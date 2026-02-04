@@ -11,7 +11,7 @@ struct application_image {
 
     void** function_addresses;
     PRUNTIME_FUNCTION runtime_functions;
-    UNWIND_INFO_PROLOGUE* unwind_info;
+    UNWIND_INFO_DISPATCHER_PROLOGUE* unwind_info;
 };
 
 #endif

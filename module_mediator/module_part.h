@@ -352,6 +352,14 @@ namespace module_mediator {
         std::size_t function_index,
         args... arguments
     ) {
+        if (module_index == module_part::module_not_found) {
+            throw std::invalid_argument("Module was not found.");
+        }
+
+        if (function_index == module_part::function_not_found) {
+            throw std::invalid_argument("Function was not found.");
+        }
+
         auto args_string = std::unique_ptr<arguments_string_element[]>(
             arguments_string_builder::pack(arguments...));
 

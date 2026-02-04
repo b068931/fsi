@@ -166,6 +166,9 @@ CONTROL_CODE_TEMPLATE_LOAD_PROGRAM PROC FRAME
     sub rsp,    FRAME_SHADOW_SPACE_SIZE
     .allocstack FRAME_SHADOW_SPACE_SIZE
 
+    lea rax, [CONTROL_CODE_TEMPLATE_LOAD_EXECUTION_THREAD]
+    mov [rsp], rax
+
     ; Use FRAME_POINTER_REGISTER as frame pointer. We must ensure to never modify it.
     ; Otherwise, SEH and the debugger stack view will break.
     mov       FRAME_POINTER_REGISTER, rsp

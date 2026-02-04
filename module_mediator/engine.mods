@@ -60,6 +60,8 @@ dynamic_call=memory memory
 
 -- Provides unwind information for the program loader.
 -- Inserts unwind information to be used with dynamic functions.
+-- Describes the copy of unwind info structure used by control code that loads programs.
+-- Dynamic functions must have identical unwind information so that exceptions can be handled properly.
 -- Accepts a buffer for unwind information, along with its size.
 -- On fail returns module_failure. Otherwise returns the number of bytes written to the buffer.
 build_unwind_info=memory eight-bytes
@@ -185,7 +187,7 @@ load_program_to_memory=memory
 -- Accepts image base address, runtime function entires, compiled functions addresses, compiled functions count, 
 -- exposed functions addresses, exposed functions count, jump table address,
 -- program strings addresses, program strings count.
-free_program=memory, memory, memory four-bytes memory four-bytes memory memory eight-bytes
+free_program=memory memory memory four-bytes memory four-bytes memory memory eight-bytes
 
 -- Checks whether provided type signature matches the expected type signature of an exposed function.
 -- Accepts function type signature, function address.

@@ -5,6 +5,11 @@
 #include <cstdint>
 #include <limits>
 
+// This is to satisfy more formal C++ requirements for object creation.
+// We are going to use std::memcpy for implicit object creation, so ensure that
+// compiler knows what object size we are dealing with.
+constexpr std::size_t EXPECTED_UNWIND_CODES_COUNT = 10;
+
 using UBYTE = unsigned char;
 struct alignas(DWORD) UNWIND_INFO_HEADER {
     UBYTE Version : 3;
@@ -15,9 +20,9 @@ struct alignas(DWORD) UNWIND_INFO_HEADER {
     UBYTE FrameOffset : 4;
 };
 
-struct UNWIND_INFO_PROLOGUE {
+struct UNWIND_INFO_DISPATCHER_PROLOGUE {
     UNWIND_INFO_HEADER Header;
-    USHORT UnwindCodes[1];
+    USHORT UnwindCodes[EXPECTED_UNWIND_CODES_COUNT];
 };
 
 struct CHAINED_UNWIND_INFO {
@@ -25,13 +30,13 @@ struct CHAINED_UNWIND_INFO {
     RUNTIME_FUNCTION ChainedFunction;
 };
 
-constexpr std::size_t UNWIND_INFO_MAXIMUM_SIZE = sizeof(UNWIND_INFO_HEADER) + 
-    std::numeric_limits<UBYTE>::max() * sizeof(USHORT);
+constexpr std::size_t DISPATCHER_UNWIND_INFO_SIZE = 
+    sizeof(UNWIND_INFO_DISPATCHER_PROLOGUE);
 
 static_assert(alignof(UNWIND_INFO_HEADER) == alignof(DWORD), 
     "UNWIND_INFO_HEADER must be DWORD-aligned.");
 
-static_assert(alignof(UNWIND_INFO_PROLOGUE) == alignof(DWORD), 
+static_assert(alignof(UNWIND_INFO_DISPATCHER_PROLOGUE) == alignof(DWORD), 
     "UNWIND_INFO_HEADER must be DWORD-aligned.");
 
 static_assert(alignof(CHAINED_UNWIND_INFO) == alignof(DWORD), 

@@ -157,7 +157,7 @@ namespace {
 
     std::variant<std::string, application_image> create_application_image(
         const std::vector<std::vector<char>>& sources,
-        std::unique_ptr<UNWIND_INFO_PROLOGUE> unwind_info,
+        std::unique_ptr<UNWIND_INFO_DISPATCHER_PROLOGUE> unwind_info,
         std::size_t unwind_info_size
     ) {
         // Application image has the following format:
@@ -180,14 +180,14 @@ namespace {
         GetSystemInfo(&system_info);
         const std::size_t page_size = system_info.dwPageSize;
 
-        static_assert(alignof(UNWIND_INFO_PROLOGUE) == alignof(RUNTIME_FUNCTION),
+        static_assert(alignof(UNWIND_INFO_DISPATCHER_PROLOGUE) == alignof(RUNTIME_FUNCTION),
             "Unexpected alignment requirements for system objects.");
 
-        if (page_size < alignof(UNWIND_INFO_PROLOGUE) || 
-            page_size % alignof(UNWIND_INFO_PROLOGUE) != 0 ||
+        if (page_size < alignof(UNWIND_INFO_DISPATCHER_PROLOGUE) || 
+            page_size % alignof(UNWIND_INFO_DISPATCHER_PROLOGUE) != 0 ||
             page_size % alignof(RUNTIME_FUNCTION) != 0) {
             return std::format("Failed to satisfy alignment requirements for RUNTIME_FUNCTION "
-                   "or UNWIND_INFO_PROLOGUE with the system page size. System page: {}.", page_size);
+                   "or UNWIND_INFO_DISPATCHER_PROLOGUE with the system page size. System page: {}.", page_size);
         }
 
         auto align_to_page = [page_size](std::size_t value) -> std::size_t {
@@ -236,32 +236,32 @@ namespace {
         }
 
         // Populate our XDATA (unwind information).
-        UNWIND_INFO_PROLOGUE* unwind_info_destination = 
-            reinterpret_cast<UNWIND_INFO_PROLOGUE*>(image_base + unwind_info_offset);
+        UNWIND_INFO_DISPATCHER_PROLOGUE* unwindInfoDestination = 
+            new(image_base + unwind_info_offset) UNWIND_INFO_DISPATCHER_PROLOGUE {};
 
-        std::memcpy(unwind_info_destination, unwind_info.get(), unwind_info_size);
-        DWORD unwind_info_rva = static_cast<DWORD>(unwind_info_offset);
+        std::memcpy(unwindInfoDestination, unwind_info.get(), unwind_info_size);
+        DWORD dwUnwindInfoRva = static_cast<DWORD>(unwind_info_offset);
 
         // Populate our PDATA (runtime function entries).
-        PRUNTIME_FUNCTION runtime_functions = 
-            reinterpret_cast<PRUNTIME_FUNCTION>(image_base + runtime_functions_offset);
+        PRUNTIME_FUNCTION prfFunctionsList = new(
+            reinterpret_cast<PRUNTIME_FUNCTION>(image_base + runtime_functions_offset)
+        ) RUNTIME_FUNCTION[sources.size()] {};
 
         DWORD current_function_offset = 0;
         for (std::size_t index = 0; index < sources.size(); ++index) {
-            PRUNTIME_FUNCTION runtime_function = 
-                new(runtime_functions + index) RUNTIME_FUNCTION{};
+            PRUNTIME_FUNCTION prfCurrent = &prfFunctionsList[index];
 
             // Don't need std::launder here, because we use pointer from placement new.
-            runtime_function->BeginAddress = current_function_offset;
-            runtime_function->UnwindInfoAddress = unwind_info_rva;
-            runtime_function->EndAddress = current_function_offset + 
+            prfCurrent->BeginAddress = current_function_offset;
+            prfCurrent->UnwindInfoAddress = dwUnwindInfoRva;
+            prfCurrent->EndAddress = current_function_offset + 
                 static_cast<DWORD>(sources[index].size());
 
             current_function_offset += static_cast<DWORD>(sources[index].size());
         }
 
-        auto free_image_base_on_fail = [](char* image_base) {
-            if (!VirtualFree(image_base, 0, MEM_RELEASE)) {
+        auto free_image_base_on_fail = [](char* image_base_address) {
+            if (!VirtualFree(image_base_address, 0, MEM_RELEASE)) {
                 LOG_PROGRAM_WARNING(
                     interoperation::get_module_part(),
                     "Failed to free application image memory. This may lead to resource leaks."
@@ -287,7 +287,7 @@ namespace {
         }
 
         // Register the function table with the system for exception handling
-        if (!RtlAddFunctionTable(runtime_functions, static_cast<DWORD>(sources.size()), reinterpret_cast<DWORD64>(image_base))) {
+        if (!RtlAddFunctionTable(prfFunctionsList, static_cast<DWORD>(sources.size()), reinterpret_cast<DWORD64>(image_base))) {
             free_image_base_on_fail(image_base);
             return std::format("Was unable to register new runtime functions. "
                                "(RtlAddFunctionTable: {})", GetLastError());
@@ -296,9 +296,9 @@ namespace {
         return application_image{
             .image_base = image_base,
             .image_size = total_image_size,
-            .function_addresses = function_addresses.get(),
-            .runtime_functions = runtime_functions,
-            .unwind_info = unwind_info_destination
+            .function_addresses = function_addresses.release(),
+            .runtime_functions = prfFunctionsList,
+            .unwind_info = std::launder(unwindInfoDestination)
         };
     }
 
@@ -470,7 +470,7 @@ namespace {
         return std::unique_ptr<module_mediator::arguments_string_element[]>{ signature_string };
     }
 
-    void free_resources_on_fail(application_image& image, std::uint32_t functions_count) {
+    void free_resources_on_fail(const application_image& image) {
         if (!RtlDeleteFunctionTable(image.runtime_functions)) {
             LOG_PROGRAM_WARNING(
                 interoperation::get_module_part(),
@@ -541,7 +541,7 @@ namespace {
                 function_prologue_sizes.push_back(prologue_size);
             }
 
-            std::unique_ptr<char[]> unwind_info_buffer{ new char[UNWIND_INFO_MAXIMUM_SIZE] {} };
+            std::unique_ptr<char[]> unwind_info_buffer{ new char[DISPATCHER_UNWIND_INFO_SIZE] {} };
             module_mediator::return_value unwind_info_size = module_mediator::fast_call<
                 module_mediator::memory,
                 module_mediator::eight_bytes
@@ -549,7 +549,7 @@ namespace {
                 interoperation::index_getter::execution_module(),
                 interoperation::index_getter::execution_module_build_unwind_info(),
                 unwind_info_buffer.get(), 
-                UNWIND_INFO_MAXIMUM_SIZE);
+                DISPATCHER_UNWIND_INFO_SIZE);
 
             if (unwind_info_size == module_mediator::module_failure) {
                 throw program_compilation_error{ "Failed to build unwind information for the program." };
@@ -557,9 +557,9 @@ namespace {
 
             auto application_image_or_error = create_application_image(
                 compiled_functions, 
-                std::unique_ptr<UNWIND_INFO_PROLOGUE>{ 
-                    reinterpret_cast<UNWIND_INFO_PROLOGUE*>(
-                        std::launder(unwind_info_buffer.release())) 
+                std::unique_ptr<UNWIND_INFO_DISPATCHER_PROLOGUE>{ 
+                    std::launder(reinterpret_cast<UNWIND_INFO_DISPATCHER_PROLOGUE*>(
+                        unwind_info_buffer.release())) 
                 },
                 unwind_info_size);
 
@@ -572,7 +572,7 @@ namespace {
 
             image = std::get<application_image>(application_image_or_error);
             LOG_PROGRAM_INFO(interoperation::get_module_part(),
-                std::format("Built application image at {}, length {}.",
+                std::format("Built application image at {:#x}, length {} bytes.",
                     std::bit_cast<std::uint64_t>(image.image_base), image.image_size));
 
             module_mediator::return_value image_verification_result = module_mediator::fast_call<
@@ -652,7 +652,7 @@ namespace {
             };
         }
         catch (const program_compilation_error&) {
-            free_resources_on_fail(image, functions_count);
+            free_resources_on_fail(image);
             throw;
         }
     }

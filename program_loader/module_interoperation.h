@@ -25,7 +25,7 @@ namespace interoperation {
         }
 
         static std::size_t execution_module() {
-            static std::size_t index = get_module_part()->find_module_index("execm");
+            static std::size_t index = get_module_part()->find_module_index("excm");
             return index;
         }
 
