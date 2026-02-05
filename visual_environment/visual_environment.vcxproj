@@ -139,6 +139,7 @@
       <AdditionalLibraryDirectories>$(VisualLeakDetectorDir)\lib\Win64;</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(SolutionDir)$(Platform)\$(Configuration)\staging\startup_components.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ProgramDatabaseFile>$(SolutionDir)$(Platform)\$(Configuration)\staging\$(TargetName).pdb</ProgramDatabaseFile>
+      <StackReserveSize>0x200000</StackReserveSize>
     </Link>
     <QtTranslation>
       <BuildAction>lupdate_lrelease</BuildAction>
@@ -165,6 +166,7 @@
     <Link>
       <AdditionalDependencies>$(SolutionDir)$(Platform)\$(Configuration)\staging\startup_components.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ProgramDatabaseFile>$(SolutionDir)$(Platform)\$(Configuration)\staging\$(TargetName).pdb</ProgramDatabaseFile>
+      <StackReserveSize>0x200000</StackReserveSize>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -184,6 +186,7 @@
     <Link>
       <AdditionalDependencies>$(SolutionDir)$(Platform)\$(Configuration)\staging\startup_components.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ProgramDatabaseFile>$(SolutionDir)$(Platform)\$(Configuration)\staging\$(TargetName).pdb</ProgramDatabaseFile>
+      <StackReserveSize>0x200000</StackReserveSize>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release (Installer)|x64'">
@@ -204,6 +207,7 @@
     <Link>
       <AdditionalDependencies>$(SolutionDir)$(Platform)\$(Configuration)\staging\startup_components.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ProgramDatabaseFile>$(SolutionDir)$(Platform)\$(Configuration)\staging\$(TargetName).pdb</ProgramDatabaseFile>
+      <StackReserveSize>0x200000</StackReserveSize>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">

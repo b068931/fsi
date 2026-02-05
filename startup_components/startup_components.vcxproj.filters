@@ -23,6 +23,9 @@
     <ClCompile Include="global_crash_handler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="configure_dbghelp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="startup_definitions.h">
@@ -36,6 +39,9 @@
     </ClInclude>
     <ClInclude Include="local_crash_handlers.h">
       <Filter>Header Files\Crash Handling</Filter>
+    </ClInclude>
+    <ClInclude Include="dbghelp_functions.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

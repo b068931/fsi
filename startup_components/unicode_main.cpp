@@ -26,6 +26,7 @@
 #include <format>
 
 #include "global_crash_handler.h"
+#include "dbghelp_functions.h"
 
 using error_type = std::string;
 
@@ -201,6 +202,16 @@ namespace {
 // However, working with wide characters is a pain, so we convert the wide character
 // array to UTF-8 and call u8main instead.
 int wmain(int arguments_count, wchar_t** arguments) {
+    // Load and initialize DbgHelp for stack traces.
+    if (!startup_components::dbghelp::load_dbghelp()) {
+        std::cerr << "Failed to load DbgHelp.dll. "
+            "Stack traces will not be available in crash dumps.\n";
+    }
+    else if (!startup_components::dbghelp::initialize_symbols(GetCurrentProcess())) {
+        std::cerr << "Failed to initialize symbol handler. "
+            "Stack traces may not include symbol names.\n";
+    }
+
     if (!startup_components::crash_handling::install_global_crash_handler()) {
         std::cerr << "Failed to install global crash handler. "
             "The application will not be able to generate crash dumps on unhandled exceptions.\n";
@@ -212,6 +223,8 @@ int wmain(int arguments_count, wchar_t** arguments) {
         std::cerr << "Failed to set UCRT locale to UTF-8. "
             "Can't start the application without UTF-8 support.";
 
+        startup_components::dbghelp::cleanup_symbols(GetCurrentProcess());
+        startup_components::dbghelp::unload_dbghelp();
         return EXIT_FAILURE;
     }
 
@@ -303,11 +316,14 @@ int wmain(int arguments_count, wchar_t** arguments) {
         }
     }
 
+
     char** utf8_arguments = convert_to_utf8(arguments_count, arguments);
     if (!utf8_arguments) {
         std::cerr << "Failed to allocate memory for UTF-8 arguments. "
                      "Can't start the application without conversion.";
 
+        startup_components::dbghelp::cleanup_symbols(GetCurrentProcess());
+        startup_components::dbghelp::unload_dbghelp();
         return EXIT_FAILURE;
     }
 
@@ -316,5 +332,9 @@ int wmain(int arguments_count, wchar_t** arguments) {
 
     // All objects are trivially destructible, so we can just deallocate the memory block.
     operator delete[](utf8_arguments, std::align_val_t{ alignof(char*) });
+
+    startup_components::dbghelp::cleanup_symbols(GetCurrentProcess());
+    startup_components::dbghelp::unload_dbghelp();
+
     return exit_code;
 }

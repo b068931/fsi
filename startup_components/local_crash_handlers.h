@@ -15,6 +15,7 @@
 #include <syncstream>
 #include <atomic>
 #include <new>
+#include <format>
 
 // Handle std::terminate
 namespace startup_components::crash_handling {
@@ -151,6 +152,15 @@ namespace startup_components::crash_handling {
 
 namespace startup_components::crash_handling {
     inline void install_local_crash_handlers() {
+        ULONG ulDesiredStackSize = 262144;
+        BOOL bResult = SetThreadStackGuarantee(&ulDesiredStackSize);
+        if (!bResult) {
+            std::osyncstream synchronized_error_stream{ std::cerr };
+            synchronized_error_stream << std::format("*** WARNING: Failed to set thread stack "
+                                                     "guarantee for thread {}. This may impede some types "
+                                                     "of fatal error reporting.", GetCurrentThreadId());
+        }
+
         std::terminate_handler terminate_old = std::set_terminate(notify_fatal_termination);
         if (terminate_old != &notify_fatal_termination) {
             previous_terminate_handler.store(terminate_old, std::memory_order_relaxed);

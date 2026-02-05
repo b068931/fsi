@@ -154,10 +154,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="build_dump.cpp" />
+    <ClCompile Include="configure_dbghelp.cpp" />
     <ClCompile Include="global_crash_handler.cpp" />
     <ClCompile Include="unicode_main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="dbghelp_functions.h" />
     <ClInclude Include="global_crash_handler.h" />
     <ClInclude Include="local_crash_handlers.h" />
     <ClInclude Include="startup_definitions.h" />
