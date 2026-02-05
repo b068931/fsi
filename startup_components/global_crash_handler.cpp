@@ -438,9 +438,9 @@ namespace {
 
         if (sModuleName && szModuleNameSize > 0) {
             wchar_t wsFullPath[MAX_PATH];
-            DWORD dwLength = GetModuleFileNameW(hModule, wsFullPath, MAX_PATH);
 
             SecureZeroMemory(wsFullPath, sizeof(wsFullPath));
+            DWORD dwLength = GetModuleFileNameW(hModule, wsFullPath, MAX_PATH);
             
             // Extract just the filename from the full path.
             if (dwLength > 0 && dwLength < MAX_PATH) {
@@ -816,8 +816,85 @@ namespace {
         }
     }
 
+    void AppendExceptionRecordInfo(
+        char* sBuffer,
+        std::size_t szBufferSize,
+        std::size_t* szBufferPosition,
+        const EXCEPTION_RECORD* pExceptionRecord
+    ) {
+        SafeAppend(sBuffer, szBufferSize, szBufferPosition, "--> EXCEPTION CODE: ");
+        SafeAppendPointerHex(sBuffer, szBufferSize, szBufferPosition, pExceptionRecord->ExceptionCode);
+
+        SafeAppend(sBuffer, szBufferSize, szBufferPosition, "\n--> EXCEPTION ADDRESS: ");
+        SafeAppendPointerHex(
+            sBuffer,
+            szBufferSize,
+            szBufferPosition,
+            reinterpret_cast<std::uintptr_t>(pExceptionRecord->ExceptionAddress)
+        );
+
+        SafeAppend(sBuffer, szBufferSize, szBufferPosition, "\n--> EXCEPTION FLAGS: ");
+        SafeAppendPointerHex(sBuffer, szBufferSize, szBufferPosition, pExceptionRecord->ExceptionFlags);
+
+        if (pExceptionRecord->ExceptionCode == EXCEPTION_ACCESS_VIOLATION ||
+            pExceptionRecord->ExceptionCode == EXCEPTION_IN_PAGE_ERROR) {
+            constexpr DWORD ACCESS_VIOLATION_ARGUMENTS = 2;
+            constexpr DWORD IN_PAGE_ERROR_ARGUMENTS = 3;
+
+            if (pExceptionRecord->NumberParameters >= ACCESS_VIOLATION_ARGUMENTS) {
+                constexpr ULONG_PTR READ_ACCESS_FLAG = 0;
+                constexpr ULONG_PTR WRITE_ACCESS_FLAG = 1;
+                constexpr ULONG_PTR EXECUTE_ACCESS_FLAG = 8;
+
+                SafeAppend(sBuffer, szBufferSize, szBufferPosition, "\n--> ACCESS TYPE: ");
+
+                const char* sAccessTypeString;
+                switch (pExceptionRecord->ExceptionInformation[0]) {
+                case READ_ACCESS_FLAG:
+                    sAccessTypeString = "READ";
+                    break;
+
+                case WRITE_ACCESS_FLAG:
+                    sAccessTypeString = "WRITE";
+                    break;
+
+                case EXECUTE_ACCESS_FLAG:
+                    sAccessTypeString = "EXECUTE (DEP VIOLATION)";
+                    break;
+
+                default:
+                    sAccessTypeString = "UNKNOWN";
+                    break;
+                }
+
+                SafeAppend(sBuffer, szBufferSize, szBufferPosition, sAccessTypeString);
+                SafeAppend(sBuffer, szBufferSize, szBufferPosition, "\n--> ACCESS VIRTUAL ADDRESS: ");
+                SafeAppendPointerHex(sBuffer, szBufferSize, szBufferPosition, pExceptionRecord->ExceptionInformation[1]);
+            }
+
+            if (pExceptionRecord->NumberParameters == IN_PAGE_ERROR_ARGUMENTS) {
+                SafeAppend(sBuffer, szBufferSize, szBufferPosition, "\n--> NT STATUS: ");
+                SafeAppendPointerHex(sBuffer, szBufferSize, szBufferPosition, pExceptionRecord->ExceptionInformation[2]);
+            }
+        }
+        else if (pExceptionRecord->NumberParameters > 0) {
+            SafeAppend(sBuffer, szBufferSize, szBufferPosition, "\n--> EXCEPTION PARAMETERS (");
+            SafeAppendDecimalU32(sBuffer, szBufferSize, szBufferPosition, pExceptionRecord->NumberParameters);
+            SafeAppend(sBuffer, szBufferSize, szBufferPosition, "):");
+
+            for (DWORD dwIndex = 0; dwIndex < pExceptionRecord->NumberParameters; ++dwIndex) {
+                SafeAppend(sBuffer, szBufferSize, szBufferPosition, "\n    [");
+                SafeAppendDecimalU32(sBuffer, szBufferSize, szBufferPosition, dwIndex);
+                SafeAppend(sBuffer, szBufferSize, szBufferPosition, "] ");
+                SafeAppendPointerHex(sBuffer, szBufferSize, szBufferPosition, pExceptionRecord->ExceptionInformation[dwIndex]);
+            }
+        }
+
+        SafeAppend(sBuffer, szBufferSize, szBufferPosition, "\n");
+    }
+
     // ReSharper disable once CppParameterMayBeConstPtrOrRef
-    LONG WINAPI NotifyFatalUnhandledSEH(EXCEPTION_POINTERS* pExceptionInfo) {
+    LONG WINAPI NotifyFatalUnhandledSEH(PEXCEPTION_POINTERS pExceptionInfo) {
         HANDLE hProcess = GetCurrentProcess();
 
         constexpr std::size_t szExceptionInfoBufferSize = 32768;
@@ -867,35 +944,7 @@ namespace {
             sExceptionInfoBuffer,
             szExceptionInfoBufferSize,
             &szExceptionInfoBufferPosition,
-            "--> EXCEPTION CODE: "
-        );
-
-        SafeAppendPointerHex(
-            sExceptionInfoBuffer,
-            szExceptionInfoBufferSize,
-            &szExceptionInfoBufferPosition,
-            pExceptionInfo->ExceptionRecord->ExceptionCode
-        );
-
-        SafeAppend(
-            sExceptionInfoBuffer,
-            szExceptionInfoBufferSize,
-            &szExceptionInfoBufferPosition,
-            "\n--> EXCEPTION ADDRESS: "
-        );
-
-        SafeAppendPointerHex(
-            sExceptionInfoBuffer,
-            szExceptionInfoBufferSize,
-            &szExceptionInfoBufferPosition,
-            reinterpret_cast<std::uintptr_t>(pExceptionInfo->ExceptionRecord->ExceptionAddress)
-        );
-
-        SafeAppend(
-            sExceptionInfoBuffer,
-            szExceptionInfoBufferSize,
-            &szExceptionInfoBufferPosition,
-            "\n--> SYSTEM THREAD: "
+            "--> SYSTEM THREAD: "
         );
 
         SafeAppendDecimalU32(
@@ -911,6 +960,63 @@ namespace {
             &szExceptionInfoBufferPosition,
             "\n"
         );
+
+        // Iterate through the chain of exception records.
+        constexpr int iMaxChainDepth = 16;
+        int iCurrentChainIndex = 0;
+        const EXCEPTION_RECORD* pCurrentRecord = pExceptionInfo->ExceptionRecord;
+
+        while (pCurrentRecord && iCurrentChainIndex < iMaxChainDepth) {
+            if (iCurrentChainIndex == 0) {
+                SafeAppend(
+                    sExceptionInfoBuffer,
+                    szExceptionInfoBufferSize,
+                    &szExceptionInfoBufferPosition,
+                    "--> PRIMARY EXCEPTION RECORD:\n"
+                );
+            }
+            else {
+                SafeAppend(
+                    sExceptionInfoBuffer,
+                    szExceptionInfoBufferSize,
+                    &szExceptionInfoBufferPosition,
+                    "--> CHAINED EXCEPTION RECORD ["
+                );
+
+                SafeAppendDecimalU32(
+                    sExceptionInfoBuffer,
+                    szExceptionInfoBufferSize,
+                    &szExceptionInfoBufferPosition,
+                    static_cast<std::uint32_t>(iCurrentChainIndex)
+                );
+
+                SafeAppend(
+                    sExceptionInfoBuffer,
+                    szExceptionInfoBufferSize,
+                    &szExceptionInfoBufferPosition,
+                    "]:\n"
+                );
+            }
+
+            AppendExceptionRecordInfo(
+                sExceptionInfoBuffer,
+                szExceptionInfoBufferSize,
+                &szExceptionInfoBufferPosition,
+                pCurrentRecord
+            );
+
+            pCurrentRecord = pCurrentRecord->ExceptionRecord;
+            ++iCurrentChainIndex;
+        }
+
+        if (pCurrentRecord && iCurrentChainIndex >= iMaxChainDepth) {
+            SafeAppend(
+                sExceptionInfoBuffer,
+                szExceptionInfoBufferSize,
+                &szExceptionInfoBufferPosition,
+                "--> WARNING: Exception chain exceeded maximum depth, truncated.\n"
+            );
+        }
 
         // Generate stack trace into the same buffer
         if (pExceptionInfo->ContextRecord) {

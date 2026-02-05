@@ -202,6 +202,12 @@ namespace {
 // However, working with wide characters is a pain, so we convert the wide character
 // array to UTF-8 and call u8main instead.
 int wmain(int arguments_count, wchar_t** arguments) {
+    // ASan provides its own SEH reporting capabilities.
+    // It is still possible to initialize own crash reporting, but it
+    // most likely won't work with it.
+
+#ifndef ADDRESS_SANITIZER_ENABLED
+
     // Load and initialize DbgHelp for stack traces.
     if (!startup_components::dbghelp::load_dbghelp()) {
         std::cerr << "Failed to load DbgHelp.dll. "
@@ -216,6 +222,8 @@ int wmain(int arguments_count, wchar_t** arguments) {
         std::cerr << "Failed to install global crash handler. "
             "The application will not be able to generate crash dumps on unhandled exceptions.\n";
     }
+
+#endif
 
     // Notify UCRT that we are going to use UTF-8 encoding for string functions.
     const char* locale_information = std::setlocale(LC_ALL, ".UTF-8");
@@ -333,8 +341,14 @@ int wmain(int arguments_count, wchar_t** arguments) {
     // All objects are trivially destructible, so we can just deallocate the memory block.
     operator delete[](utf8_arguments, std::align_val_t{ alignof(char*) });
 
+#ifndef ADDRESS_SANITIZER_ENABLED
+
     startup_components::dbghelp::cleanup_symbols(GetCurrentProcess());
     startup_components::dbghelp::unload_dbghelp();
+
+    startup_components::crash_handling::remove_global_crash_handler();
+
+#endif
 
     return exit_code;
 }
