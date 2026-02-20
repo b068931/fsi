@@ -358,7 +358,7 @@ namespace {
     }
 
     // Custom function table access that falls back to RtlLookupFunctionEntry.
-    [[nodiscard]] PVOID CALLBACK CustomFunctionTableAccess64(HANDLE hProcess, DWORD64 dwAddrBase) {
+    [[nodiscard]] PVOID CALLBACK FallbackFunctionTableAccess(HANDLE hProcess, DWORD64 dwAddrBase) {
         using namespace startup_components::dbghelp;
 
         // First try DbgHelp's function.
@@ -384,7 +384,7 @@ namespace {
     }
 
     // Custom module base function that falls back to RtlLookupFunctionEntry.
-    [[nodiscard]] DWORD64 CALLBACK CustomGetModuleBase64(HANDLE hProcess, DWORD64 dwAddr) {
+    [[nodiscard]] DWORD64 CALLBACK FallbackGetModuleBase(HANDLE hProcess, DWORD64 dwAddr) {
         using namespace startup_components::dbghelp;
 
         // First try DbgHelp's function.
@@ -603,7 +603,6 @@ namespace {
         std::size_t szBufferSize,
         std::size_t* szBufferPosition,
         DWORD64 dwAddr,
-        DWORD64 dwReturnAddr,
         HANDLE hProcess,
         int* piFrameNumber
     ) {
@@ -625,7 +624,7 @@ namespace {
         DWORD dwInlineContext = 0;
         DWORD dwFrameIndex = 0;
 
-        if (!pfnSymQueryInlineTrace(hProcess, dwAddr, 0, dwReturnAddr, 
+        if (!pfnSymQueryInlineTrace(hProcess, dwAddr, INLINE_FRAME_CONTEXT_INIT, dwAddr, 
             dwAddr, &dwInlineContext, &dwFrameIndex)) {
             return;
         }
@@ -656,7 +655,7 @@ namespace {
                 lineInfo.SizeOfStruct = sizeof(lineInfo);
 
                 DWORD dwLineDisplacement = 0;
-                DWORD64 dwModuleBase = CustomGetModuleBase64(hProcess, dwAddr);
+                DWORD64 dwModuleBase = FallbackGetModuleBase(hProcess, dwAddr);
 
                 if (pfnSymGetLineFromInlineContextW(hProcess, dwAddr, dwInlineContext + dwCurrent, 
                     dwModuleBase, &dwLineDisplacement, &lineInfo)) {
@@ -680,7 +679,7 @@ namespace {
     ) {
         using namespace startup_components::dbghelp;
 
-        if (!g_bDbgHelpLoaded || !pfnStackWalk64) {
+        if (!g_bDbgHelpLoaded || !pfnStackWalk2) {
             SafeAppend(sBuffer, szBufferSize, szBufferPosition, "--> STACK TRACE: [DbgHelp not available]\n");
             return;
         }
@@ -691,10 +690,11 @@ namespace {
         // Make a copy of the context to avoid modifying the original
         CONTEXT contextCopy = *pContext;
 
-        STACKFRAME64 stackFrame;
+        STACKFRAME_EX stackFrame;
         DWORD dwMachineType = 0;
 
         SecureZeroMemory(&stackFrame, sizeof(stackFrame));
+        stackFrame.StackFrameSize = sizeof(STACKFRAME_EX);
 
 #if defined(_M_AMD64)
 
@@ -761,16 +761,18 @@ namespace {
         DWORD64 dwPrevReturnAddr = 0;
 
         for (int iCurrent = 0; iCurrent < iMaxFrames; ++iCurrent) {
-            BOOL bResult = pfnStackWalk64(
+            stackFrame.InlineFrameContext = INLINE_FRAME_CONTEXT_IGNORE;
+            BOOL bResult = pfnStackWalk2(
                 dwMachineType,
                 hProcess,
                 hThread,
                 &stackFrame,
                 &contextCopy,
                 nullptr,
-                CustomFunctionTableAccess64,
-                CustomGetModuleBase64,
-                nullptr
+                FallbackFunctionTableAccess,
+                FallbackGetModuleBase,
+                nullptr,
+                SYM_STKWALK_DEFAULT
             );
 
             if (!bResult || stackFrame.AddrPC.Offset == 0) {
@@ -793,7 +795,6 @@ namespace {
                 szBufferPosition,
                 stackFrame.AddrPC.Offset - 
                     ((iCurrent > 0 && stackFrame.AddrPC.Offset != 0) ? 1 : 0),
-                stackFrame.AddrReturn.Offset,
                 hProcess,
                 &iFrameNumber
             );

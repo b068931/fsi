@@ -22,7 +22,7 @@ namespace startup_components::dbghelp {
     PFN_SymGetLineFromAddrW64 pfnSymGetLineFromAddrW64 = nullptr;
     PFN_SymFunctionTableAccess64 pfnSymFunctionTableAccess64 = nullptr;
     PFN_SymGetModuleBase64 pfnSymGetModuleBase64 = nullptr;
-    PFN_StackWalk64 pfnStackWalk64 = nullptr;
+    PFN_StackWalk2 pfnStackWalk2 = nullptr;
     PFN_SymAddrIncludeInlineTrace pfnSymAddrIncludeInlineTrace = nullptr;
     PFN_SymQueryInlineTrace pfnSymQueryInlineTrace = nullptr;
     PFN_SymFromInlineContextW pfnSymFromInlineContextW = nullptr;
@@ -52,7 +52,7 @@ namespace startup_components::dbghelp {
             pfnSymGetLineFromAddrW64 = nullptr;
             pfnSymFunctionTableAccess64 = nullptr;
             pfnSymGetModuleBase64 = nullptr;
-            pfnStackWalk64 = nullptr;
+            pfnStackWalk2 = nullptr;
             pfnSymAddrIncludeInlineTrace = nullptr;
             pfnSymQueryInlineTrace = nullptr;
             pfnSymFromInlineContextW = nullptr;
@@ -92,7 +92,7 @@ namespace startup_components::dbghelp {
         bAllLoaded &= load_function(hDbgHelp, "SymGetLineFromAddrW64", pfnSymGetLineFromAddrW64);
         bAllLoaded &= load_function(hDbgHelp, "SymFunctionTableAccess64", pfnSymFunctionTableAccess64);
         bAllLoaded &= load_function(hDbgHelp, "SymGetModuleBase64", pfnSymGetModuleBase64);
-        bAllLoaded &= load_function(hDbgHelp, "StackWalk64", pfnStackWalk64);
+        bAllLoaded &= load_function(hDbgHelp, "StackWalk2", pfnStackWalk2);
         bAllLoaded &= load_function(hDbgHelp, "SymRefreshModuleList", pfnSymRefreshModuleList);
         bAllLoaded &= load_function(hDbgHelp, "SymLoadModuleExW", pfnSymLoadModuleExW);
         bAllLoaded &= load_function(hDbgHelp, "SymUnloadModule64", pfnSymUnloadModule64);

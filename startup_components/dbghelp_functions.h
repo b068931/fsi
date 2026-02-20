@@ -33,16 +33,17 @@ namespace startup_components::dbghelp {
     using PFN_SymGetModuleBase64 = 
         DWORD64 (WINAPI*) (HANDLE hProcess, DWORD64 dwAddr);
 
-    using PFN_StackWalk64 = BOOL (WINAPI*) (
+    using PFN_StackWalk2 = BOOL (WINAPI*) (
         DWORD MachineType,
         HANDLE hProcess,
         HANDLE hThread,
-        LPSTACKFRAME64 StackFrame,
+        LPSTACKFRAME_EX StackFrame,
         PVOID ContextRecord,
         PREAD_PROCESS_MEMORY_ROUTINE64 ReadMemoryRoutine,
         PFUNCTION_TABLE_ACCESS_ROUTINE64 FunctionTableAccessRoutine,
         PGET_MODULE_BASE_ROUTINE64 GetModuleBaseRoutine,
-        PTRANSLATE_ADDRESS_ROUTINE64 TranslateAddress
+        PTRANSLATE_ADDRESS_ROUTINE64 TranslateAddress,
+        DWORD Flags
     );
 
     using PFN_SymAddrIncludeInlineTrace = DWORD (WINAPI*) (
@@ -109,7 +110,7 @@ namespace startup_components::dbghelp {
     extern PFN_SymGetLineFromAddrW64 pfnSymGetLineFromAddrW64;
     extern PFN_SymFunctionTableAccess64 pfnSymFunctionTableAccess64;
     extern PFN_SymGetModuleBase64 pfnSymGetModuleBase64;
-    extern PFN_StackWalk64 pfnStackWalk64;
+    extern PFN_StackWalk2 pfnStackWalk2;
     extern PFN_SymAddrIncludeInlineTrace pfnSymAddrIncludeInlineTrace;
     extern PFN_SymQueryInlineTrace pfnSymQueryInlineTrace;
     extern PFN_SymFromInlineContextW pfnSymFromInlineContextW;
