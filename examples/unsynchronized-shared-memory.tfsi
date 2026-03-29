@@ -1,4 +1,4 @@
-$stack-size d1024;
+$stack-size 1024_10;
 from prts import <
     io.std.out, 
     memory.allocate, 
@@ -7,12 +7,12 @@ from prts import <
     threading.create
 >
 
-$redefine symbol-base d48;
+$redefine symbol-base 48_10;
 
 function memory-copy(memory destination, memory source, eight-bytes size) {
     @repeat;
         compare variable  eight-bytes size, 
-                immediate eight-bytes d0;
+                immediate eight-bytes 0_10;
 
         jump-equal point end;
         decrement variable eight-bytes size;
@@ -28,11 +28,11 @@ function memory-copy-reversed(memory destination, memory source, eight-bytes siz
     $declare eight-bytes destination-index;
 
     move variable  eight-bytes destination-index, 
-         immediate eight-bytes d0;
+         immediate eight-bytes 0_10;
 
     @repeat;
         compare variable  eight-bytes size, 
-                immediate eight-bytes d0;
+                immediate eight-bytes 0_10;
 
         jump-equal point end;
         decrement variable eight-bytes size;
@@ -56,14 +56,14 @@ function eight-bytes-to-string(eight-bytes value) {
     $declare eight-bytes symbol;
 
     move variable  eight-bytes result-size, 
-         immediate eight-bytes d0;
+         immediate eight-bytes 0_10;
 
     move variable  eight-bytes result-copy-size, 
-         immediate eight-bytes d0;
+         immediate eight-bytes 0_10;
 
     @repeat;
         divide variable  eight-bytes value, 
-               immediate eight-bytes d10;
+               immediate eight-bytes 10_10;
 
         increment variable eight-bytes result-copy-size;
 
@@ -95,7 +95,7 @@ function eight-bytes-to-string(eight-bytes value) {
              variable eight-bytes result-copy-size;
 
         compare variable  eight-bytes value, 
-                immediate eight-bytes d0;
+                immediate eight-bytes 0_10;
 
         jump-equal point end;
         jump point repeat;
@@ -122,7 +122,7 @@ function eight-bytes-to-string(eight-bytes value) {
  * That is, the first thread will finish before
  * the first one starts.
 */
-$redefine do-increments d10000000;
+$redefine do-increments 10000000_10;
 $define-string i-counted ''''I counted: ''''
 
 function increment-shared-memory(memory shared-memory) {
@@ -137,16 +137,16 @@ function increment-shared-memory(memory shared-memory) {
     $declare eight-bytes message-result-size;
 
     move variable  eight-bytes counter,
-         immediate eight-bytes d0;
+         immediate eight-bytes 0_10;
 
     move variable  one-byte    first-byte, 
-         immediate one-byte    d0;
+         immediate one-byte    0_10;
 
     move variable  eight-bytes my-result, 
-         immediate eight-bytes d0;
+         immediate eight-bytes 0_10;
 
     move variable  eight-bytes my-result-index, 
-         immediate eight-bytes d0;
+         immediate eight-bytes 0_10;
 
     @repeat1;
         /*
@@ -154,7 +154,7 @@ function increment-shared-memory(memory shared-memory) {
          * we will get value that is not equal to do-increment * the number of threads
         */
         add dereference eight-bytes shared-memory[first-byte], 
-            immediate   eight-bytes d1;
+            immediate   eight-bytes 1_10;
 
         increment variable eight-bytes counter;
 
@@ -204,7 +204,7 @@ function increment-shared-memory(memory shared-memory) {
 
     move dereference one-byte message-result[message-result-size],
          /* h0A is an ASCII code for '\n' or new line character */
-         immediate   one-byte h0A; 
+         immediate   one-byte 0A_16; 
 
     increment variable eight-bytes message-result-size;
     void: prts->io.std.out(
@@ -231,7 +231,7 @@ function main() {
     $declare eight-bytes function-address;
 
     shared-memory: prts->memory.allocate(
-        immediate eight-bytes d8
+        immediate eight-bytes 8_10
     )
 
     get-function-address variable      eight-bytes function-address,
@@ -239,13 +239,13 @@ function main() {
 
     void: prts->threading.create(
         /* The first argument is the priority */
-    immediate eight-bytes d0,
+    immediate eight-bytes 0_10,
         variable  eight-bytes function-address,
         variable  memory      shared-memory
     )
 
     void: prts->threading.create(
-        immediate eight-bytes d0,
+        immediate eight-bytes 0_10,
         variable  eight-bytes function-address,
         variable  memory      shared-memory
     )

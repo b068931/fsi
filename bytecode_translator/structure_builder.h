@@ -400,34 +400,46 @@ public:
 
             template<typename T>
             T translate_name_to_integer(std::string name) const {
+                constexpr int base_number_radix = 10;
                 std::string value{ this->translate_name(std::move(name)) };
+                
                 if (!value.empty()) {
-                    int base;
-                    switch (value[0]) {
-                    case 'd':
-                        base = 10;
-                        break;
-                    case 'b':
-                        base = 2;
-                        break;
-                    case 'o':
-                        base = 8;
-                        break;
-                    case 'h':
-                        base = 16;
-                        break;
-                    default:
-                        throw std::invalid_argument{ "Unknown base." };
-                    }
-
-                    char* last_symbol = nullptr;
-                    unsigned long long result = std::strtoull(value.c_str() + 1, &last_symbol, base);
-                    if (static_cast<std::size_t>(last_symbol - value.c_str()) == value.size()) {
-                        if (errno == ERANGE || result != static_cast<T>(result)) {
-                            throw std::invalid_argument{ "Value is too big to be converted." };
-                        }
+                    std::size_t delimiter_position = value.find_last_of('_');
+                    
+                    if (delimiter_position != std::string::npos && 
+                        delimiter_position > 0 && 
+                        delimiter_position < value.size() - 1) {
+                        std::string number_string = value.substr(0, delimiter_position);
+                        std::string base_string = value.substr(delimiter_position + 1);
                         
-                        return static_cast<T>(result);
+                        char* base_end = nullptr;
+                        long base = std::strtol(
+                            base_string.c_str(), 
+                            &base_end, 
+                            base_number_radix);
+                        
+                        if (base_end == base_string.c_str() + base_string.size() && 
+                            base >= 2 && 
+                            base <= 36) {
+                            char* last_symbol = nullptr;
+                            errno = 0;
+                            
+                            unsigned long long result = std::strtoull(
+                                number_string.c_str(), 
+                                &last_symbol, 
+                                static_cast<int>(base));
+                            
+                            if (static_cast<std::size_t>(last_symbol - number_string.c_str()) == number_string.size()) {
+                                if (errno == ERANGE || result != static_cast<T>(result)) {
+                                    throw std::invalid_argument{ "Value is too big to be converted." };
+                                }
+                                
+                                return static_cast<T>(result);
+                            }
+                        } 
+                        else {
+                            throw std::invalid_argument{ "Invalid base. Base must be a number between 2 and 36." };
+                        }
                     }
                 }
                 

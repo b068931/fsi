@@ -1,4 +1,4 @@
-$stack-size d100;
+$stack-size 100_16;
 from prts import <io.std.out, memory.allocate, memory.deallocate>
 
 $define-string message ''''Hello World!''''
@@ -12,6 +12,6 @@ function main() {
     message-storage: prts->memory.allocate(size-of eight-bytes message)
     copy-string variable memory message-storage, string message;
 
-    void: prts->io.std.out(variable memory message-storage, immediate eight-bytes d12)
+    void: prts->io.std.out(variable memory message-storage, immediate eight-bytes 12_10)
     message-storage: prts->memory.deallocate()
 }

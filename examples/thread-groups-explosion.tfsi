@@ -1,12 +1,12 @@
-$stack-size d1024;
-$redefine binary-tree-depth d10;
+$stack-size 1024_10;
+$redefine binary-tree-depth 10_10;
 
 from prts import <threading.create-group>
 
 function self-duplicate(eight-bytes counter) {
     $expose-function self-duplicate;
 
-    compare variable eight-bytes counter, immediate eight-bytes d0;
+    compare variable eight-bytes counter, immediate eight-bytes 0_10;
     jump-equal point end;
 
     decrement variable eight-bytes counter;

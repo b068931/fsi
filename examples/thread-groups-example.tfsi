@@ -1,4 +1,4 @@
-$stack-size o700;
+$stack-size 700_8;
 from prts import <io.log.info, io.log.warning, memory.allocate, memory.deallocate, this-thread.yield, threading.create-group>
 
 $define-string ping ''''ping''''
@@ -20,7 +20,7 @@ function get-pong-string()
 function choose-string(one-byte is-ping)
 
 {
-    compare variable one-byte is-ping, immediate one-byte d1;
+    compare variable one-byte is-ping, immediate one-byte 1_10;
     jump-equal point ping;
 
     get-pong-string()
@@ -42,9 +42,9 @@ function show-passed-message-and-switch(eight-bytes counter, one-byte is-ping)
     load-value variable memory message;
 
     @repeat;
-    void: prts->io.log.info(variable memory null, immediate eight-bytes d0, variable memory null,variable memory null, variable memory message)
+    void: prts->io.log.info(variable memory null, immediate eight-bytes 0_10, variable memory null,variable memory null, variable memory message)
 
-    compare variable eight-bytes counter, immediate eight-bytes d0;
+    compare variable eight-bytes counter, immediate eight-bytes 0_10;
     jump-equal point end;
 
     decrement variable eight-bytes counter;
@@ -64,7 +64,7 @@ function show-warning()
     warning-message: prts->memory.allocate(size-of eight-bytes warning)
     copy-string variable memory warning-message, string warning;
 
-    void: prts->io.log.warning(variable memory null, immediate eight-bytes d0, variable memory null,variable memory null, variable memory warning-message)
+    void: prts->io.log.warning(variable memory null, immediate eight-bytes 0_10, variable memory null,variable memory null, variable memory warning-message)
     warning-message: prts->memory.deallocate()
 }
 
@@ -72,8 +72,8 @@ main
 {
     show-warning()
 
-    void: prts->threading.create-group(function-name show-passed-message-and-switch, immediate eight-bytes d5, immediate one-byte d0)
-    void: prts->threading.create-group(function-name show-passed-message-and-switch, immediate eight-bytes d5, immediate one-byte d1)
+    void: prts->threading.create-group(function-name show-passed-message-and-switch, immediate eight-bytes 5_10, immediate one-byte 0_10)
+    void: prts->threading.create-group(function-name show-passed-message-and-switch, immediate eight-bytes 5_10, immediate one-byte 1_10)
 }
 
 get-ping-string {

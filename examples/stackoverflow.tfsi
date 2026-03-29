@@ -2,5 +2,5 @@ function
 
 
 main( );$expose-function main;main	{main
-()$stack-size d1000000000;}
+()$stack-size 1000000000_10;}
 $main-function main;

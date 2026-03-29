@@ -10,6 +10,29 @@ $define UKRAINIAN-KEYWORDS-DEFINITIONS-LIBRARY;
  * And the translator will treat them as different characters.
  */
 
+/* Translate PRTS' names */
+$redefine свп prts;
+$redefine пам'ять.виділити memory.allocate;
+$redefine пам'ять.звільнити memory.deallocate;
+$redefine пам'ять.виділений-розмір memory.allocated-size;
+
+$redefine цей-потік.поступитися this-thread.yield;
+$redefine цей-потік.завершити this-thread.terminate;
+$redefine цей-потік.пріоритет this-thread.priority;
+$redefine цей-потік.ідентифікатор this-thread.id;
+$redefine цей-потік.ідентифікатор-групи this-thread.group-id;
+$redefine цей-потік.динамічний-виклик this-thread.dynamic-call;
+
+$redefine потоки.створити threading.create;
+$redefine потоки.створити-групу threading.create-group;
+
+$redefine ввід-вивід.журнал.інформація io.log.info;
+$redefine ввід-вивід.журнал.попередження io.log.warning;
+$redefine ввід-вивід.журнал.помилка io.log.error;
+$redefine ввід-вивід.стандартний.вивід io.std.out;
+$redefine ввід-вивід.стандартний.ввід io.std.in;
+
+/* Translate language identifiers */
 $redefine з-модуля from;
 $redefine імпортувати import;
 $redefine функція function;

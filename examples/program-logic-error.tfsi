@@ -1,4 +1,4 @@
-$stack-size d100;
+$stack-size 100_10;
 from prts import <io.log.info, memory.allocate, memory.deallocate>
 
 function main() {

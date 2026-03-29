@@ -1,12 +1,12 @@
-$stack-size d1024;
+$stack-size 1024_10;
 from prts import <io.log.info, memory.allocate, memory.deallocate>
 
-$redefine symbol-base d48;
+$redefine symbol-base 48_10;
 /* you may also use $include */
 
 function memory-copy(memory destination, memory source, eight-bytes size) {
     @repeat;
-    compare variable eight-bytes size, immediate eight-bytes d0;
+    compare variable eight-bytes size, immediate eight-bytes 0_10;
     jump-equal point end;
 
     decrement variable eight-bytes size;
@@ -18,10 +18,10 @@ function memory-copy(memory destination, memory source, eight-bytes size) {
 
 function memory-copy-reversed(memory destination, memory source, eight-bytes size) {
     $declare eight-bytes destination-index;
-    move variable eight-bytes destination-index, immediate eight-bytes d0;
+    move variable eight-bytes destination-index, immediate eight-bytes 0_10;
 
     @repeat;
-    compare variable eight-bytes size, immediate eight-bytes d0;
+    compare variable eight-bytes size, immediate eight-bytes 0_10;
     jump-equal point end;
 
     decrement variable eight-bytes size;
@@ -38,15 +38,15 @@ function ebyte-to-string(eight-bytes value) {
     $declare memory result-copy;
 
     $declare eight-bytes result-size;
-    move variable eight-bytes result-size, immediate eight-bytes d0;
+    move variable eight-bytes result-size, immediate eight-bytes 0_10;
 
     $declare eight-bytes result-copy-size;
-    move variable eight-bytes result-copy-size, immediate eight-bytes d0;
+    move variable eight-bytes result-copy-size, immediate eight-bytes 0_10;
 
     $declare eight-bytes symbol;
 
     @repeat;
-    divide variable eight-bytes value, immediate eight-bytes d10;
+    divide variable eight-bytes value, immediate eight-bytes 10_10;
     increment variable eight-bytes result-copy-size;
 
     result-copy: prts->memory.allocate(variable eight-bytes result-copy-size)
@@ -62,7 +62,7 @@ function ebyte-to-string(eight-bytes value) {
     move-pointer variable memory result, variable memory result-copy;
     move variable eight-bytes result-size, variable eight-bytes result-copy-size;
 
-    compare variable eight-bytes value, immediate eight-bytes d0;
+    compare variable eight-bytes value, immediate eight-bytes 0_10;
 
     jump-equal point end;
     jump point repeat;
@@ -84,9 +84,9 @@ function main() {
     $declare memory message;
     $declare memory null;
 
-    ebyte-to-string(immediate eight-bytes d22082023)
+    ebyte-to-string(immediate eight-bytes 22082023_10)
     load-value variable memory message;
 
-    void: prts->io.log.info(variable memory null, immediate eight-bytes d0, variable memory null, variable memory null, variable memory message)
+    void: prts->io.log.info(variable memory null, immediate eight-bytes 0_10, variable memory null, variable memory null, variable memory message)
     message: prts->memory.deallocate()
 }

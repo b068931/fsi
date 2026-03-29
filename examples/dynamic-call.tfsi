@@ -1,4 +1,4 @@
-$stack-size d512;
+$stack-size 512_10;
 /*trailing comas everywhere*/
 from prts import<
     io.log.info, 
@@ -13,7 +13,7 @@ function hello-world(memory the-message
 $expose-function hello-world;
 $expose-function hello-world; /* noop if done twice */
     $declare memory null;
-    void: prts->io.log.info(variable memory null, immediate eight-bytes d0, 
+    void: prts->io.log.info(variable memory null, immediate eight-bytes 0_10, 
 variable memory null, variable memory null, variable memory the-message,)
     the-message: prts->memory.deallocate()
 }

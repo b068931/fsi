@@ -1,4 +1,4 @@
-$stack-size d100;
+$stack-size 100_10;
 from prts import <memory.allocate, memory.deallocate>
 
 function free(memory pointer) {
@@ -18,10 +18,10 @@ function main() {
     $declare one-byte value;
     $declare eight-bytes index;
 
-    storage: prts->memory.allocate(immediate eight-bytes d1)
+    storage: prts->memory.allocate(immediate eight-bytes 1_10)
     free(variable memory storage)
 
     
-    move variable eight-bytes index, immediate eight-bytes d0;
+    move variable eight-bytes index, immediate eight-bytes 0_10;
     move variable one-byte value, dereference one-byte storage[index];
 }

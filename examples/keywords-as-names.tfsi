@@ -1,4 +1,4 @@
-$stack-size hff;
+$stack-size ff_16;
 from prts import <io.log.info, memory.allocate, memory.deallocate>
 
 $define-string stack-size ''''Привіт світе! With tons of shady redefinitions.''''
@@ -19,7 +19,7 @@ $redefine strcpy copy-string;
 
     void: prts->io.log.info(
         variable memory copy-string , 
-        immediate eight-bytes d0, 
+        immediate eight-bytes 0_10, 
         variable memory copy-string
         , 
 variable memory memory,

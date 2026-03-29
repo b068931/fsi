@@ -1,4 +1,4 @@
-$stack-size b1000000;
+$stack-size 1000000_2;
 function mainтуті(eight-bytes wrong);
 $main-function mainтуті;
 $expose-function mainтуті;

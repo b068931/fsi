@@ -1,4 +1,4 @@
-$stack-size d4096; /* Increased stack size for matrix data */
+$stack-size 4096_10; /* Increased stack size for matrix data */
 
 from prts import <
     io.std.out, 
@@ -8,7 +8,7 @@ from prts import <
     memory.allocated-size
 >
 
-$redefine symbol-base d48;
+$redefine symbol-base 48_10;
 $define-string prompt-n ''''Enter matrix size (N): ''''
 $define-string prompt-matrix ''''Enter matrix elements (one per line):''''
 $define-string result-message ''''Transposed matrix:''''
@@ -16,7 +16,7 @@ $define-string result-message ''''Transposed matrix:''''
 function memory-copy(memory destination, memory source, eight-bytes size) {
     @repeat;
     compare variable  eight-bytes size, 
-            immediate eight-bytes d0;
+            immediate eight-bytes 0_10;
     jump-equal point end;
         decrement variable eight-bytes size;
 
@@ -29,11 +29,11 @@ function memory-copy(memory destination, memory source, eight-bytes size) {
 function memory-copy-reversed(memory destination, memory source, eight-bytes size) {
     $declare eight-bytes destination-index;
     move variable  eight-bytes destination-index, 
-         immediate eight-bytes d0;
+         immediate eight-bytes 0_10;
 
     @repeat;
     compare variable  eight-bytes size, 
-            immediate eight-bytes d0;
+            immediate eight-bytes 0_10;
     jump-equal point end;
         decrement variable eight-bytes size;
 
@@ -53,13 +53,13 @@ function eight-bytes-to-string(eight-bytes value) {
     $declare eight-bytes symbol;
 
     move variable  eight-bytes result-size, 
-         immediate eight-bytes d0;
+         immediate eight-bytes 0_10;
     move variable  eight-bytes result-copy-size, 
-         immediate eight-bytes d0;
+         immediate eight-bytes 0_10;
 
     @repeat;
     divide variable  eight-bytes value, 
-           immediate eight-bytes d10;
+           immediate eight-bytes 10_10;
     increment variable eight-bytes result-copy-size;
 
         result-copy: prts->memory.allocate(
@@ -85,7 +85,7 @@ function eight-bytes-to-string(eight-bytes value) {
     move variable eight-bytes result-size, 
          variable eight-bytes result-copy-size;
     compare variable  eight-bytes value, 
-            immediate eight-bytes d0;
+            immediate eight-bytes 0_10;
     jump-equal point end;
         jump point repeat;
 
@@ -114,8 +114,8 @@ function string-to-eight-bytes(memory str, eight-bytes len) {
     $declare eight-bytes index;
     $declare eight-bytes digit;
 
-    move variable eight-bytes result, immediate eight-bytes d0;
-    move variable eight-bytes index, immediate eight-bytes d0;
+    move variable eight-bytes result, immediate eight-bytes 0_10;
+    move variable eight-bytes index, immediate eight-bytes 0_10;
 
     @loop;
     /* Stop if we've processed all characters */
@@ -123,20 +123,20 @@ function string-to-eight-bytes(memory str, eight-bytes len) {
     jump-equal point end;
 
     /* Load the ASCII character byte */
-    move variable eight-bytes digit, immediate eight-bytes d0;
+    move variable eight-bytes digit, immediate eight-bytes 0_10;
     move variable one-byte digit, dereference one-byte str[index];
     
     /* Stop if we hit a newline (h0A) or carriage return (h0D) */
-    compare variable eight-bytes digit, immediate eight-bytes h0A;
+    compare variable eight-bytes digit, immediate eight-bytes 0A_16;
     jump-equal point end;
-    compare variable eight-bytes digit, immediate eight-bytes h0D;
+    compare variable eight-bytes digit, immediate eight-bytes 0D_16;
     jump-equal point end;
 
     /* Convert ASCII '0'-'9' to integer 0-9 */
     subtract variable eight-bytes digit, immediate eight-bytes symbol-base;
 
     /* result = result * 10 */
-    multiply variable eight-bytes result, immediate eight-bytes d10;
+    multiply variable eight-bytes result, immediate eight-bytes 10_10;
     
     /* result = result + digit */
     add variable eight-bytes result, variable eight-bytes digit;
@@ -154,7 +154,7 @@ function read-number() {
     $declare eight-bytes result-number;
     $declare eight-bytes buffer-size;
     
-    move variable eight-bytes buffer-size, immediate eight-bytes d100;
+    move variable eight-bytes buffer-size, immediate eight-bytes 100_10;
     input-buffer: prts->memory.allocate(variable eight-bytes buffer-size)
 
     bytes-read: prts->io.std.in(
@@ -185,14 +185,14 @@ function main() {
     $declare eight-bytes zero;
     $declare eight-bytes message-index;
 
-    move variable eight-bytes zero, immediate eight-bytes d0;
+    move variable eight-bytes zero, immediate eight-bytes 0_10;
 
     /* Allocate enough memory into the message storage so that it is guaranteed that everything fits there */
-    message-storage: prts->memory.allocate(immediate eight-bytes d100)
+    message-storage: prts->memory.allocate(immediate eight-bytes 100_10)
     
     /* Store '8' in a variable for offset calculations */
     $declare eight-bytes eight;
-    move variable eight-bytes eight, immediate eight-bytes d8;
+    move variable eight-bytes eight, immediate eight-bytes 8_10;
 
     /* ----------------------------------- */
     /* 1. Get Matrix Size (N)              */
@@ -222,7 +222,7 @@ function main() {
     copy-string variable memory message-storage, string prompt-matrix;
     move variable eight-bytes message-index, size-of eight-bytes prompt-matrix;
     decrement variable eight-bytes message-index;
-    move dereference one-byte message-storage[message-index], immediate one-byte d10;
+    move dereference one-byte message-storage[message-index], immediate one-byte 10_10;
     void: prts->io.std.out(
         variable memory message-storage,
         size-of eight-bytes prompt-matrix
@@ -234,12 +234,12 @@ function main() {
     $declare eight-bytes offset;
     $declare eight-bytes temp-index;
 
-    move variable eight-bytes row, immediate eight-bytes d0;
+    move variable eight-bytes row, immediate eight-bytes 0_10;
     @read-row-loop;
         compare variable eight-bytes row, variable eight-bytes n-size;
         jump-equal point read-row-end;
 
-        move variable eight-bytes col, immediate eight-bytes d0;
+        move variable eight-bytes col, immediate eight-bytes 0_10;
         @read-col-loop;
             compare variable eight-bytes col, variable eight-bytes n-size;
             jump-equal point read-col-end;
@@ -273,7 +273,7 @@ function main() {
     $declare eight-bytes offset2;
     $declare eight-bytes temp-val;
 
-    move variable eight-bytes row, immediate eight-bytes d0;
+    move variable eight-bytes row, immediate eight-bytes 0_10;
     @transpose-row-loop;
         /* for (row = 0; row < n-size; row++) */
         compare variable eight-bytes row, variable eight-bytes n-size;
@@ -322,7 +322,7 @@ function main() {
     copy-string variable memory message-storage, string result-message;
     move variable eight-bytes message-index, size-of eight-bytes result-message;
     decrement variable eight-bytes message-index;
-    move dereference one-byte message-storage[message-index], immediate one-byte d10;
+    move dereference one-byte message-storage[message-index], immediate one-byte 10_10;
     void: prts->io.std.out(
         variable memory message-storage,
         size-of eight-bytes result-message
@@ -331,12 +331,12 @@ function main() {
     $declare memory elem-string;
     $declare eight-bytes elem-string-size;
 
-    move variable eight-bytes row, immediate eight-bytes d0;
+    move variable eight-bytes row, immediate eight-bytes 0_10;
     @print-row-loop;
         compare variable eight-bytes row, variable eight-bytes n-size;
         jump-equal point print-row-end;
 
-        move variable eight-bytes col, immediate eight-bytes d0;
+        move variable eight-bytes col, immediate eight-bytes 0_10;
         @print-col-loop;
             compare variable eight-bytes col, variable eight-bytes n-size;
             jump-equal point print-col-end;
@@ -368,10 +368,10 @@ function main() {
             )
             elem-string: prts->memory.deallocate()
 
-            move dereference one-byte message-storage[zero], immediate one-byte d32;
+            move dereference one-byte message-storage[zero], immediate one-byte 32_10;
             void: prts->io.std.out(
                 variable memory message-storage,
-                immediate eight-bytes d1
+                immediate eight-bytes 1_10
             )
 
             increment variable eight-bytes col;
@@ -379,10 +379,10 @@ function main() {
         @print-col-end;
 
         /* Print a newline after the row */
-	move dereference one-byte message-storage[zero], immediate one-byte d10;
+	move dereference one-byte message-storage[zero], immediate one-byte 10_10;
 	void: prts->io.std.out(
 	    variable memory message-storage,
-	    immediate eight-bytes d1
+	    immediate eight-bytes 1_10
 	)
 
         increment variable eight-bytes row;

@@ -1,4 +1,4 @@
-$stack-size d100;
+$stack-size 100_10;
 from prts import <io.std.out, io.std.in, memory.deallocate, memory.allocate>
 
 function main() {
@@ -9,14 +9,14 @@ function main() {
     $declare eight-bytes storage-size;
     $declare eight-bytes bytes-read;
 
-    move variable eight-bytes storage-size, immediate eight-bytes d10;
+    move variable eight-bytes storage-size, immediate eight-bytes 10_10;
     message-storage: prts->memory.allocate(variable eight-bytes storage-size);
 
     @repeat;
     bytes-read: prts->io.std.in(variable memory message-storage, variable eight-bytes storage-size);
     void: prts->io.std.out(variable memory message-storage, variable eight-bytes bytes-read);
 
-    compare variable eight-bytes bytes-read, immediate eight-bytes d0;
+    compare variable eight-bytes bytes-read, immediate eight-bytes 0_10;
     jump-not-equal point repeat;
 
     message-storage: prts->memory.deallocate()
