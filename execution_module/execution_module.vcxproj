@@ -58,10 +58,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release (Installer)|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="runtime_traps.cpp">
-      <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">All</AssemblerOutput>
-      <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Debug Sanitizer|x64'">All</AssemblerOutput>
-      <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Release (Installer)|x64'">All</AssemblerOutput>
-      <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">All</AssemblerOutput>
+      <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NoListing</AssemblerOutput>
+      <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Debug Sanitizer|x64'">NoListing</AssemblerOutput>
+      <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Release (Installer)|x64'">NoListing</AssemblerOutput>
+      <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NoListing</AssemblerOutput>
     </ClCompile>
   </ItemGroup>
   <PropertyGroup Label="Globals">
