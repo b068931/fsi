@@ -60,24 +60,24 @@
     <Import Project="$(QtMsBuild)\qt_defaults.props" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
-    <QtInstall>6.10.1_msvc2022_64</QtInstall>
+    <QtInstall>6.11.0_msvc2022_64</QtInstall>
     <QtModules>core;gui;widgets;svg</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Sanitizer|x64'" Label="QtSettings">
-    <QtInstall>6.10.1_msvc2022_64</QtInstall>
+    <QtInstall>6.11.0_msvc2022_64</QtInstall>
     <QtModules>core;gui;widgets;svg</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
     <QtDeploy>true</QtDeploy>
     <QtDeployDebugRelease>debug</QtDeployDebugRelease>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
-    <QtInstall>6.10.1_msvc2022_64</QtInstall>
+    <QtInstall>6.11.0_msvc2022_64</QtInstall>
     <QtModules>core;gui;widgets;svg</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release (Installer)|x64'" Label="QtSettings">
-    <QtInstall>6.10.1_msvc2022_64</QtInstall>
+    <QtInstall>6.11.0_msvc2022_64</QtInstall>
     <QtModules>core;gui;widgets;svg</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
     <QtDeploy>true</QtDeploy>
